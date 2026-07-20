@@ -1,26 +1,424 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050505;
+  --foreground: #fafafa;
+  --mint: #5eead4;
+  --mint-dim: rgba(94, 234, 212, 0.15);
+  --amber: #fbbf24;
+
+  /* Premium glass tokens */
+  --glass-bg: rgba(255, 255, 255, 0.075);
+  --glass-bg-strong: rgba(255, 255, 255, 0.12);
+  --glass-tint: rgba(10, 10, 14, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border-soft: rgba(255, 255, 255, 0.12);
+  --glass-nested: rgba(255, 255, 255, 0.06);
+  --glass-nested-tint: rgba(8, 8, 12, 0.35);
+  --glass-highlight: rgba(255, 255, 255, 0.32);
+  --glass-blur: 64px;
+  --glass-blur-nested: 36px;
+  --glass-saturate: 185%;
+  --glass-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.22),
+    0 22px 56px -14px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  --glass-inset:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
+    inset 1px 0 0 0 rgba(255, 255, 255, 0.08),
+    inset -1px 0 0 0 rgba(255, 255, 255, 0.04);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-mint: var(--mint);
+  --color-amber-soft: var(--amber);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════
+   Glassmorphism system — premium & coherent
+   ═══════════════════════════════════════════ */
+
+.glass-card {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1.5rem;
+  border: 1px solid var(--glass-border);
+  /* Layered fill: soft white sheen + dark tint for text contrast */
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.05) 42%,
+      rgba(255, 255, 255, 0.08) 100%
+    ),
+    var(--glass-tint);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  transition:
+    border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Specular top glare + soft corner highlight (under content, never blocks UI) */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      120% 80% at 12% -10%,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      transparent 34%
+    );
+  opacity: 0.85;
+}
+
+/* Thin rim light along the top edge (1px — clear of body text) */
+.glass-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 35%,
+    rgba(255, 255, 255, 0.35) 65%,
+    transparent 100%
+  );
+  opacity: 0.7;
+}
+
+/* Hero / featured cards — slightly stronger glass */
+.glass-elevated {
+  border-color: rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.06) 40%,
+      rgba(255, 255, 255, 0.1) 100%
+    ),
+    rgba(10, 10, 14, 0.52);
+  backdrop-filter: blur(72px) saturate(200%);
+  -webkit-backdrop-filter: blur(72px) saturate(200%);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.28),
+    0 28px 64px -16px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.06),
+    inset 1px 0 0 0 rgba(255, 255, 255, 0.1),
+    inset -1px 0 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Premium soft transitions for interactive glass UI */
+.glass-smooth {
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.4s ease;
+}
+
+.glass-nested {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1rem;
+  border: 1px solid var(--glass-border-soft);
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    ),
+    var(--glass-nested-tint);
+  backdrop-filter: blur(var(--glass-blur-nested)) saturate(165%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-nested)) saturate(165%);
+  box-shadow:
+    0 8px 28px -12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass-nested::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 40%
+  );
+}
+
+.glass-panel {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1rem;
+  border: 1px solid var(--glass-border-soft);
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.03) 55%,
+      rgba(255, 255, 255, 0.06) 100%
+    ),
+    rgba(8, 8, 12, 0.42);
+  backdrop-filter: blur(48px) saturate(170%);
+  -webkit-backdrop-filter: blur(48px) saturate(170%);
+  box-shadow:
+    0 12px 36px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
+}
+
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      90% 60% at 15% 0%,
+      rgba(255, 255, 255, 0.14) 0%,
+      transparent 50%
+    );
+  opacity: 0.85;
+}
+
+.glass-panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  opacity: 0.65;
+}
+
+/* Fallback when backdrop-filter is unavailable — keep readability */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-card,
+  .glass-elevated,
+  .glass-nested,
+  .glass-panel {
+    background: rgba(22, 22, 26, 0.94);
+  }
+}
+
+.glass-glow:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 6px 22px rgba(0, 0, 0, 0.3),
+    0 28px 56px -14px rgba(0, 0, 0, 0.55),
+    0 0 48px -12px rgba(94, 234, 212, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
+    inset 1px 0 0 0 rgba(255, 255, 255, 0.1),
+    inset -1px 0 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Chip / pill glass (badges, tags, small controls) */
+.glass-chip {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.04) 100%
+    ),
+    rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow:
+    0 4px 14px -6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+}
+
+/* Utility for chrome (header, dock) */
+.glass-chrome {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    ),
+    rgba(8, 8, 12, 0.55);
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 32px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Ken Burns wallpaper */
+@keyframes kenburns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.06) translate(-1%, -0.5%);
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+.wallpaper-kenburns {
+  animation: kenburns 50s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, -30px);
+  }
+}
+
+.orb-drift {
+  animation: orb-drift 18s ease-in-out infinite;
+}
+
+.orb-drift-slow {
+  animation: orb-drift 28s ease-in-out infinite reverse;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(94, 234, 212, 0.4);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.print-only {
+  display: none !important;
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+    size: A4;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background: white !important;
+    color: #18181b !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  #cv-print {
+    display: block !important;
+    color: #18181b;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .wallpaper-kenburns,
+  .orb-drift,
+  .orb-drift-slow {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
