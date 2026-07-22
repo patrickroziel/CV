@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/shared/ImageUpload";
+import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
 import {
   getL,
@@ -170,7 +171,11 @@ export function ProjectForm({
       {mediaType === "image" && (
         <div className="grid gap-2">
           <Label>Image du projet</Label>
-          <ImageUpload value={image} onChange={setImage} />
+          <ImageUpload
+            value={image}
+            onChange={setImage}
+            folder={CLOUDINARY_FOLDERS.projects}
+          />
         </div>
       )}
 
@@ -196,6 +201,7 @@ export function ProjectForm({
               onChange={setImage}
               aspectClassName="aspect-video max-h-28"
               label="Poster avant lecture"
+              folder={CLOUDINARY_FOLDERS.projects}
             />
           </div>
         </div>
@@ -223,6 +229,7 @@ export function ProjectForm({
               onChange={setImage}
               aspectClassName="aspect-video max-h-28"
               label="Affichée avant le chargement de l’embed"
+              folder={CLOUDINARY_FOLDERS.projects}
             />
           </div>
         </div>

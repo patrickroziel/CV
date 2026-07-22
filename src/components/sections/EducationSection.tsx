@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { GraduationCap, Pencil, Plus, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
-import { SectionHeading } from "@/components/shared/SectionHeading";
+import { EditableSectionHeading } from "@/components/shared/EditableSectionHeading";
+import { DEFAULT_SECTION_LABELS } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +37,7 @@ export function EducationSection() {
     editMode,
     l,
     t,
+    updateSectionLabels,
   } = usePortfolio();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Education | null>(null);
@@ -86,10 +88,16 @@ export function EducationSection() {
   return (
     <section id="education" className="relative z-10 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow={t("sections.educationEyebrow")}
+        <EditableSectionHeading
+          eyebrow={
+            data.sectionLabels?.educationEyebrow ??
+            DEFAULT_SECTION_LABELS.educationEyebrow
+          }
+          onEyebrowChange={(educationEyebrow) =>
+            updateSectionLabels({ educationEyebrow })
+          }
           title={t("sections.educationTitle")}
-          description={t("sections.educationDesc")}
+          descriptionFallback={t("sections.educationDesc")}
           action={
             <EditGate>
               <Button onClick={openCreate}>

@@ -29,7 +29,7 @@ export type MediaItemType = "image" | "youtube" | "x" | "file";
 export type MediaItem = {
   id: string;
   type: MediaItemType;
-  /** Image/file data URL or YouTube/X URL */
+  /** Image/file Cloudinary URL or YouTube/X URL */
   url: string;
   caption?: Translatable;
 };
@@ -79,7 +79,7 @@ export type Skill = {
   category?: Translatable;
   /** Long-form explanation shown in the skill detail modal */
   description?: Translatable;
-  /** Optional cover / illustrative photo (data URL or remote) */
+  /** Optional cover / illustrative photo (Cloudinary URL or remote) */
   image?: string | null;
   /** Decorative icons (emoji / uploads) */
   icons?: SkillIcon[];
@@ -112,7 +112,7 @@ export type LanguageIconItem = {
   region?: string;
   /** Optional emoji for monument/culture presets */
   emoji?: string;
-  /** Uploaded PNG/SVG/WebP data URL */
+  /** Uploaded PNG/SVG/WebP (Cloudinary URL) */
   src?: string | null;
 };
 
@@ -272,6 +272,21 @@ export type MainShowreel = {
   videoUrl: string | null;
 };
 
+/** Editable small labels (eyebrows) + optional description per section */
+export type SectionLabelsConfig = {
+  experienceEyebrow: Translatable;
+  projectsEyebrow: Translatable;
+  skillsEyebrow: Translatable;
+  educationEyebrow: Translatable;
+  languagesEyebrow: Translatable;
+  languagesDescription: Translatable;
+};
+
+/** @deprecated use SectionLabelsConfig.languagesDescription */
+export type LanguagesSectionConfig = {
+  description: Translatable;
+};
+
 export type PortfolioData = {
   profile: Profile;
   experiences: Experience[];
@@ -279,6 +294,13 @@ export type PortfolioData = {
   skills: Skill[];
   education: Education[];
   languages: Language[];
+  /** Editable section eyebrows (+ languages description) */
+  sectionLabels: SectionLabelsConfig;
+  /**
+   * Legacy languages section description (migrated into sectionLabels).
+   * Kept optional for older localStorage payloads.
+   */
+  languagesSection?: LanguagesSectionConfig;
   contact: ContactConfig;
   /** Main showreel above the 3 feature cards */
   mainShowreel: MainShowreel;
@@ -289,7 +311,45 @@ export type PortfolioData = {
   version: number;
 };
 
-export const DATA_VERSION = 18;
+export const DATA_VERSION = 20;
+
+export const DEFAULT_SECTION_LABELS: SectionLabelsConfig = {
+  experienceEyebrow: L("Parcours", {
+    en: "Career",
+    pl: "Ścieżka",
+    es: "Trayectoria",
+  }),
+  projectsEyebrow: L("Portfolio", {
+    en: "Portfolio",
+    pl: "Portfolio",
+    es: "Portfolio",
+  }),
+  skillsEyebrow: L("Expertise", {
+    en: "Expertise",
+    pl: "Ekspertyza",
+    es: "Experiencia",
+  }),
+  educationEyebrow: L("Études", {
+    en: "Education",
+    pl: "Edukacja",
+    es: "Estudios",
+  }),
+  languagesEyebrow: L("International", {
+    en: "International",
+    pl: "Międzynarodowo",
+    es: "Internacional",
+  }),
+  languagesDescription: L("Survolez une carte pour voir la démo vidéo", {
+    en: "Hover a card to watch the video demo",
+    pl: "Najedź na kartę, aby zobaczyć demo wideo",
+    es: "Pasa el cursor sobre una tarjeta para ver el vídeo demo",
+  }),
+};
+
+/** @deprecated use DEFAULT_SECTION_LABELS */
+export const DEFAULT_LANGUAGES_SECTION: LanguagesSectionConfig = {
+  description: DEFAULT_SECTION_LABELS.languagesDescription,
+};
 
 export const DEFAULT_MAIN_SHOWREEL: MainShowreel = {
   title: L("Showreel"),

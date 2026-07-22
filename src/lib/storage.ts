@@ -13,6 +13,7 @@ import type {
   ProjectMediaType,
   QuickContactIcon,
   QuickContactLink,
+  SectionLabelsConfig,
   Skill,
   SkillIcon,
 } from "./types";
@@ -22,6 +23,7 @@ import {
   DEFAULT_FEATURE_VIDEOS,
   DEFAULT_MAIN_SHOWREEL,
   DEFAULT_QUICK_CONTACT_LINKS,
+  DEFAULT_SECTION_LABELS,
   DEFAULT_WIDGET_SKILL_TAGS,
 } from "./types";
 import { DEFAULT_PORTFOLIO, DEFAULT_BACKGROUND } from "./defaults";
@@ -32,6 +34,7 @@ import {
   isYoutubeUrl,
 } from "./utils";
 import { getL, liftToLocalized, mergeMissingLocales } from "./i18n-content";
+import { expandLocalizedSync } from "./auto-localize";
 import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 import type { LocalizedString, MaybeLocalized } from "./i18n-content";
 
@@ -131,8 +134,10 @@ function normalizeLanguage(
   let videoType = normalizeLanguageVideoType(l.videoType, videoUrl);
   if (videoType !== "none" && !videoUrl) videoType = "none";
 
-  const nameLifted = liftToLocalized(l.name ?? "Langue");
-  if (!nameLifted.fr) nameLifted.fr = "Langue";
+  // Expand known language names / levels to FR·EN·PL·ES immediately on load
+  const nameLifted = expandLocalizedSync(l.name ?? "Langue");
+  if (!nameLifted.fr) nameLifted.fr = getL(nameLifted) || "Langue";
+  const levelLifted = expandLocalizedSync(l.level ?? "");
   const n = getL(nameLifted, "fr").toLowerCase();
   const defPrimary = n.includes("angl")
     ? "GB"
@@ -219,13 +224,18 @@ function normalizeLanguage(
   return {
     id: l.id,
     name: nameLifted,
-    level: liftToLocalized(l.level ?? ""),
+    level: levelLifted,
     videoType,
     videoUrl: videoType === "none" ? null : videoUrl,
     icons,
     outlines: outlines.map((o) => ({
       ...o,
-      label: o.label != null ? liftToLocalized(o.label) : undefined,
+      label:
+        o.label != null
+          ? expandLocalizedSync(o.label)
+          : o.code
+            ? expandLocalizedSync(o.code)
+            : undefined,
     })),
     iconStyle: l.iconStyle,
     primaryRegion,
@@ -330,13 +340,55 @@ function normalizeSkillIcons(raw: unknown): SkillIcon[] {
     .filter((ic) => Boolean(ic.emoji || ic.src));
 }
 
+function seedMissingLocales(value: LocalizedString): LocalizedString {
+  const seed =
+    value.fr?.trim() ||
+    value.en?.trim() ||
+    value.pl?.trim() ||
+    value.es?.trim() ||
+    "";
+  if (!seed) return value;
+  const out: LocalizedString = { ...value };
+  for (const loc of ["fr", "en", "pl", "es"] as const) {
+    if (!out[loc]?.trim()) out[loc] = seed;
+  }
+  return out;
+}
+
 function normalizeSkill(raw: Partial<Skill> | undefined): Skill {
   const base = raw && typeof raw === "object" ? raw : {};
-  const nameLifted = liftToLocalized(base.name as string | undefined);
+  let nameLifted = liftToLocalized(base.name as string | undefined);
   if (!nameLifted.fr && typeof base.name === "string") {
     nameLifted.fr = base.name.trim() || "Compétence";
   }
-  if (!nameLifted.fr) nameLifted.fr = "Compétence";
+  // Prefer any existing locale as seed — never invent "Compétence" if EN/PL/ES exist
+  const anyName =
+    nameLifted.fr?.trim() ||
+    nameLifted.en?.trim() ||
+    nameLifted.pl?.trim() ||
+    nameLifted.es?.trim();
+  if (!anyName) {
+    nameLifted = { fr: "Compétence", en: "Skill", pl: "Umiejętność", es: "Competencia" };
+  } else {
+    nameLifted = seedMissingLocales(nameLifted);
+  }
+
+  let category =
+    base.category != null
+      ? liftToLocalized(base.category as never)
+      : undefined;
+  if (category && Object.keys(category).length > 0) {
+    category = seedMissingLocales(category);
+  }
+
+  let description =
+    base.description != null
+      ? liftToLocalized(base.description as never)
+      : undefined;
+  if (description && Object.keys(description).length > 0) {
+    description = seedMissingLocales(description);
+  }
+
   return {
     id: typeof base.id === "string" && base.id ? base.id : `skill-${Date.now()}`,
     name: nameLifted,
@@ -344,11 +396,8 @@ function normalizeSkill(raw: Partial<Skill> | undefined): Skill {
       typeof base.level === "number"
         ? Math.min(100, Math.max(0, base.level))
         : undefined,
-    category: base.category != null ? liftToLocalized(base.category as never) : undefined,
-    description:
-      base.description != null
-        ? liftToLocalized(base.description as never)
-        : undefined,
+    category,
+    description,
     image:
       typeof base.image === "string"
         ? base.image
@@ -388,6 +437,40 @@ function liftContact(c: ContactConfig): ContactConfig {
       ...l,
       label: liftToLocalized(l.label),
     })),
+  };
+}
+
+function normalizeSectionLabels(
+  raw: Partial<SectionLabelsConfig> | undefined,
+  legacyLanguagesSection?: { description?: unknown }
+): SectionLabelsConfig {
+  const base = { ...DEFAULT_SECTION_LABELS, ...raw };
+  // Migrate old languagesSection.description if present
+  const legacyDesc =
+    legacyLanguagesSection?.description != null
+      ? liftToLocalized(legacyLanguagesSection.description as never)
+      : undefined;
+  return {
+    experienceEyebrow: liftToLocalized(
+      base.experienceEyebrow ?? DEFAULT_SECTION_LABELS.experienceEyebrow
+    ),
+    projectsEyebrow: liftToLocalized(
+      base.projectsEyebrow ?? DEFAULT_SECTION_LABELS.projectsEyebrow
+    ),
+    skillsEyebrow: liftToLocalized(
+      base.skillsEyebrow ?? DEFAULT_SECTION_LABELS.skillsEyebrow
+    ),
+    educationEyebrow: liftToLocalized(
+      base.educationEyebrow ?? DEFAULT_SECTION_LABELS.educationEyebrow
+    ),
+    languagesEyebrow: liftToLocalized(
+      base.languagesEyebrow ?? DEFAULT_SECTION_LABELS.languagesEyebrow
+    ),
+    languagesDescription: liftToLocalized(
+      base.languagesDescription ??
+        legacyDesc ??
+        DEFAULT_SECTION_LABELS.languagesDescription
+    ),
   };
 }
 
@@ -527,6 +610,12 @@ export function loadPortfolio(): PortfolioData {
       languages: (parsed.languages ?? DEFAULT_PORTFOLIO.languages).map(
         normalizeLanguage
       ),
+      sectionLabels: normalizeSectionLabels(
+        (parsed as { sectionLabels?: Partial<SectionLabelsConfig> })
+          .sectionLabels,
+        (parsed as { languagesSection?: { description?: unknown } })
+          .languagesSection
+      ),
       contact: normalizeContact(parsed.contact),
       mainShowreel: normalizeMainShowreel(
         parsed.mainShowreel,
@@ -637,6 +726,33 @@ function enrichFromDefaults(data: PortfolioData): PortfolioData {
         }),
       };
     }),
+    sectionLabels: {
+      experienceEyebrow: fill(
+        data.sectionLabels?.experienceEyebrow,
+        d.sectionLabels.experienceEyebrow
+      ),
+      projectsEyebrow: fill(
+        data.sectionLabels?.projectsEyebrow,
+        d.sectionLabels.projectsEyebrow
+      ),
+      skillsEyebrow: fill(
+        data.sectionLabels?.skillsEyebrow,
+        d.sectionLabels.skillsEyebrow
+      ),
+      educationEyebrow: fill(
+        data.sectionLabels?.educationEyebrow,
+        d.sectionLabels.educationEyebrow
+      ),
+      languagesEyebrow: fill(
+        data.sectionLabels?.languagesEyebrow,
+        d.sectionLabels.languagesEyebrow
+      ),
+      languagesDescription: fill(
+        data.sectionLabels?.languagesDescription ??
+          data.languagesSection?.description,
+        d.sectionLabels.languagesDescription
+      ),
+    },
     contact: {
       ...data.contact,
       sectionEyebrow: fill(data.contact.sectionEyebrow, d.contact.sectionEyebrow),

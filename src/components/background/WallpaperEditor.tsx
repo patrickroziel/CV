@@ -61,20 +61,19 @@ export function WallpaperEditor({ open, onOpenChange }: WallpaperEditorProps) {
               placeholder="https://…"
             />
             <p className="text-xs text-zinc-500">
-              Une URL externe est recommandée (évite le quota localStorage).
+              URL externe ou upload Cloudinary (seule l’URL est stockée localement).
             </p>
           </div>
           <div className="grid gap-2">
             <Label>Ou uploader une image</Label>
             <ImageUpload
               value={null}
-              onChange={(dataUrl) => {
-                if (dataUrl) setUrl(dataUrl);
+              onChange={(url) => {
+                if (url) setUrl(url);
               }}
               aspectClassName="aspect-video max-h-36"
-              label="Upload fond (compressé)"
-              maxWidth={1600}
-              quality={0.75}
+              label="Upload fond (Cloudinary)"
+              folder="patrick-roziel/wallpaper"
             />
           </div>
           <div className="grid gap-2">

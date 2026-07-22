@@ -1,56 +1,122 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import type { LanguageVideoType } from "@/lib/types";
 import { cn, youtubeEmbedUrl, xEmbedUrl } from "@/lib/utils";
+
+export type LanguageHoverVideoHandle = {
+  /** Call from mouseenter — keeps user gesture so audio is allowed */
+  playUnmuted: () => void;
+  stop: () => void;
+};
 
 type LanguageHoverVideoProps = {
   videoType: LanguageVideoType;
   videoUrl: string | null;
   languageName: string;
   className?: string;
-  /** Only when true: video is mounted and playing (hover) */
+  /** Card is hovered — show layer / keep playing */
   active: boolean;
 };
 
 /**
- * Demo video — mounted only while the card is hovered.
- * Never visible at rest.
+ * Language demo video — plays WITH sound on hover (not muted).
+ * File uploads: keep element mounted and start play from playUnmuted()
+ * so the browser treats it as a user gesture.
  */
-export function LanguageHoverVideo({
-  videoType,
-  videoUrl,
-  languageName,
-  className,
-  active,
-}: LanguageHoverVideoProps) {
+export const LanguageHoverVideo = forwardRef<
+  LanguageHoverVideoHandle,
+  LanguageHoverVideoProps
+>(function LanguageHoverVideo(
+  { videoType, videoUrl, languageName, className, active },
+  ref
+) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [fileError, setFileError] = useState(false);
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      playUnmuted: () => {
+        const el = videoRef.current;
+        if (!el || videoType !== "file") return;
+        setFileError(false);
+        el.defaultMuted = false;
+        el.muted = false;
+        el.volume = 1;
+        try {
+          el.currentTime = 0;
+        } catch {
+          /* ignore */
+        }
+        const tryPlay = () => {
+          el.muted = false;
+          el.volume = 1;
+          const p = el.play();
+          if (p !== undefined) {
+            void p.catch(() => {
+              // Do not fall back to muted — language demos need audio
+              setFileError(true);
+            });
+          }
+        };
+        if (el.readyState >= 2) {
+          tryPlay();
+        } else {
+          el.load();
+          el.addEventListener("canplay", tryPlay, { once: true });
+        }
+      },
+      stop: () => {
+        const el = videoRef.current;
+        if (!el) return;
+        el.pause();
+        try {
+          el.currentTime = 0;
+        } catch {
+          /* ignore */
+        }
+      },
+    }),
+    [videoType]
+  );
+
+  // Pause when leaving hover
   useEffect(() => {
+    if (active || videoType !== "file") return;
     const el = videoRef.current;
-    if (!el || videoType !== "file" || !active) return;
-    el.muted = false;
-    el.currentTime = 0;
-    void el.play().catch(() => {
-      el.muted = true;
-      void el.play().catch(() => setFileError(true));
-    });
-    return () => {
-      el.pause();
-    };
-  }, [active, videoType, videoUrl]);
+    if (!el) return;
+    el.pause();
+    try {
+      el.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
+  }, [active, videoType]);
 
-  if (!active || videoType === "none" || !videoUrl) return null;
+  // Reset error when source changes
+  useEffect(() => {
+    setFileError(false);
+  }, [videoUrl, videoType]);
 
-  // —— File ——
+  if (videoType === "none" || !videoUrl) return null;
+
+  // —— File (upload) — always mounted so playUnmuted works on gesture ——
   if (videoType === "file") {
     return (
       <div
         className={cn(
-          "absolute inset-0 z-[1] overflow-hidden bg-black/90",
+          "absolute inset-0 z-[1] overflow-hidden bg-black/90 transition-opacity duration-300",
+          active ? "opacity-100" : "pointer-events-none opacity-0",
           className
         )}
+        aria-hidden={!active}
       >
         <video
           ref={videoRef}
@@ -58,20 +124,27 @@ export function LanguageHoverVideo({
           className="h-full w-full object-cover"
           playsInline
           loop
-          preload="metadata"
+          // Explicitly NOT muted — language demos need audio
+          muted={false}
+          preload="auto"
+          controls={false}
           onError={() => setFileError(true)}
         />
-        {fileError && (
-          <div className="absolute inset-0 flex items-center justify-center text-xs text-zinc-400">
-            Lecture impossible
+        {fileError && active && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/70 px-4 text-center text-xs text-zinc-300">
+            Lecture avec son impossible — cliquez une fois sur la page puis
+            re-survolez.
           </div>
         )}
       </div>
     );
   }
 
-  // —— YouTube ——
+  // YouTube / X only when active (iframe autoplay-with-sound is limited by browsers)
+  if (!active) return null;
+
   if (videoType === "youtube") {
+    // Prefer unmuted; browsers may still force mute on iframe autoplay
     const playSrc = youtubeEmbedUrl(videoUrl, {
       autoplay: true,
       mute: false,
@@ -99,7 +172,6 @@ export function LanguageHoverVideo({
     );
   }
 
-  // —— X ——
   if (videoType === "x") {
     const embed = xEmbedUrl(videoUrl);
     if (!embed) return null;
@@ -123,4 +195,4 @@ export function LanguageHoverVideo({
   }
 
   return null;
-}
+});

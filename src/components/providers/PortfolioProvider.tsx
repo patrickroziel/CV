@@ -19,6 +19,7 @@ import type {
   PortfolioData,
   Profile,
   Project,
+  SectionLabelsConfig,
   Skill,
   UiPrefs,
 } from "@/lib/types";
@@ -37,6 +38,7 @@ import {
   getL,
   type MaybeLocalized,
 } from "@/lib/i18n-content";
+import { ensureLanguageLocales } from "@/lib/auto-localize";
 
 type PortfolioContextValue = {
   data: PortfolioData;
@@ -64,6 +66,7 @@ type PortfolioContextValue = {
   updateBackground: (url: string) => void;
   updateUi: (partial: Partial<UiPrefs>) => void;
   updateContact: (partial: Partial<ContactConfig>) => void;
+  updateSectionLabels: (partial: Partial<SectionLabelsConfig>) => void;
   updateFeatureVideos: (videos: FeatureVideo[]) => void;
   updateMainShowreel: (showreel: MainShowreel) => void;
   addExperience: (exp: Omit<Experience, "id">) => void;
@@ -119,6 +122,25 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.lang = initial;
     }
     setIsHydrated(true);
+
+    // Backfill FR/EN/PL/ES for language names & levels (custom levels included)
+    void ensureLanguageLocales(loaded.languages).then((updates) => {
+      if (!updates) return;
+      setData((prev) => {
+        const languages = prev.languages.map((lang) => {
+          const u = updates.find((x) => x.id === lang.id);
+          if (!u) return lang;
+          return { ...lang, name: u.name, level: u.level };
+        });
+        const next = { ...prev, languages, version: DATA_VERSION };
+        try {
+          savePortfolio(next);
+        } catch {
+          /* ignore */
+        }
+        return next;
+      });
+    });
   }, []);
 
   const setLocale = useCallback(
@@ -220,6 +242,20 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       persist(
         { ...data, contact: { ...data.contact, ...partial } },
         "Contact mis à jour"
+      );
+    },
+    [data, persist]
+  );
+
+  const updateSectionLabels = useCallback(
+    (partial: Partial<SectionLabelsConfig>) => {
+      const current = data.sectionLabels ?? DEFAULT_PORTFOLIO.sectionLabels;
+      persist(
+        {
+          ...data,
+          sectionLabels: { ...current, ...partial },
+        },
+        "Titres de section mis à jour"
       );
     },
     [data, persist]
@@ -431,6 +467,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       updateBackground,
       updateUi,
       updateContact,
+      updateSectionLabels,
       updateFeatureVideos,
       updateMainShowreel,
       addExperience,
@@ -468,6 +505,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       updateBackground,
       updateUi,
       updateContact,
+      updateSectionLabels,
       updateFeatureVideos,
       updateMainShowreel,
       addExperience,

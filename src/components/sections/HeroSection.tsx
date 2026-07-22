@@ -520,6 +520,7 @@ export function HeroSection() {
             aspectClassName="aspect-square max-w-[240px] mx-auto w-full"
             round
             label="Glissez ou cliquez pour uploader"
+            folder="patrick-roziel/profile"
           />
           <DialogFooter>
             <Button onClick={() => setPhotoOpen(false)}>Fermer</Button>

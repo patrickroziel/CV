@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
-import { SectionHeading } from "@/components/shared/SectionHeading";
+import { EditableSectionHeading } from "@/components/shared/EditableSectionHeading";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { SkillTag } from "@/components/skills/SkillTag";
@@ -28,6 +28,7 @@ import {
 import { MediaCarousel } from "@/components/shared/MediaCarousel";
 import { formatPeriod } from "@/lib/utils";
 import type { Experience } from "@/lib/types";
+import { DEFAULT_SECTION_LABELS } from "@/lib/types";
 
 function sortExperiences(list: Experience[]) {
   return [...list].sort((a, b) => {
@@ -44,6 +45,7 @@ export function ExperienceSection() {
     addExperience,
     updateExperience,
     removeExperience,
+    updateSectionLabels,
     editMode,
     l,
     t,
@@ -59,10 +61,16 @@ export function ExperienceSection() {
   return (
     <section id="experience" className="relative z-10 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow={t("sections.experienceEyebrow")}
+        <EditableSectionHeading
+          eyebrow={
+            data.sectionLabels?.experienceEyebrow ??
+            DEFAULT_SECTION_LABELS.experienceEyebrow
+          }
+          onEyebrowChange={(experienceEyebrow) =>
+            updateSectionLabels({ experienceEyebrow })
+          }
           title={t("sections.experienceTitle")}
-          description={t("sections.experienceDesc")}
+          descriptionFallback={t("sections.experienceDesc")}
           action={
             <EditGate>
               <Button onClick={() => setOpen(true)}>

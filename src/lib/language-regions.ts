@@ -19,6 +19,7 @@ export const REGION_LABELS: Record<string, string> = {
   IN: "Inde",
   PL: "Pologne",
   DE: "Allemagne",
+  AT: "Autriche",
   LT: "Lituanie",
   UA: "Ukraine",
   ES: "Espagne",
@@ -27,6 +28,8 @@ export const REGION_LABELS: Record<string, string> = {
   BR: "Brésil",
   MX: "Mexique",
   AR: "Argentine",
+  CO: "Colombie",
+  CL: "Chili",
 };
 
 /** Flag emoji from ISO alpha-2 */
@@ -60,6 +63,7 @@ export const REGION_PATHS: Record<string, string> = {
   IN: "M34 8 C48 6 58 14 62 28 C66 44 58 62 46 74 C34 78 24 68 22 50 C18 34 22 14 34 8 Z",
   PL: "M24 14 C42 10 60 12 68 28 C72 42 66 58 52 68 C36 72 22 64 18 46 C16 30 18 18 24 14 Z",
   DE: "M28 12 C46 8 62 14 68 30 C70 46 62 62 46 70 C30 70 18 56 18 38 C18 24 22 14 28 12 Z",
+  AT: "M22 30 C42 22 62 24 72 38 C74 50 62 60 44 62 C28 60 18 48 20 38 C20 34 20 32 22 30 Z",
   LT: "M30 24 C46 20 58 26 60 40 C58 54 44 60 32 56 C22 48 22 32 30 24 Z",
   UA: "M12 26 C36 14 64 16 78 32 C82 46 72 60 52 66 C30 68 12 56 10 40 C8 32 10 28 12 26 Z",
   ES: "M18 30 C40 18 66 22 74 40 C76 54 62 68 42 70 C24 66 14 50 16 38 C16 34 16 32 18 30 Z",
@@ -68,6 +72,8 @@ export const REGION_PATHS: Record<string, string> = {
   BR: "M26 12 C48 6 70 14 76 36 C78 54 64 72 42 76 C22 70 12 50 16 32 C18 20 22 14 26 12 Z",
   MX: "M14 30 C36 18 64 22 76 40 C78 54 62 68 40 70 C20 64 10 48 12 38 C12 34 12 32 14 30 Z",
   AR: "M34 8 C50 6 58 18 56 36 C54 56 48 74 38 78 C28 74 24 56 26 36 C26 20 28 10 34 8 Z",
+  CO: "M28 18 C48 12 64 20 68 38 C66 54 50 66 34 64 C20 56 18 36 28 18 Z",
+  CL: "M42 6 C52 10 54 28 52 48 C50 68 46 84 40 88 C34 82 34 60 36 40 C36 22 38 10 42 6 Z",
 };
 
 export const REGION_CODES = Object.keys(REGION_PATHS);
@@ -97,6 +103,7 @@ export const COUNTRY_SYMBOLS: Record<string, CountrySymbols> = {
   IN: { monuments: ["🕌", "🏛️"], culture: ["🪔", "🍛", "🪷"] },
   PL: { monuments: ["🏰", "🦅"], culture: ["🥟", "🥖", "🎼"] },
   DE: { monuments: ["🚪", "🏰"], culture: ["🥨", "🍺", "🚗"] },
+  AT: { monuments: ["🏔️", "🏰"], culture: ["☕", "🎼", "🍰"] },
   LT: { monuments: ["🏰"], culture: ["🏀", "🌲"] },
   UA: { monuments: ["🌻"], culture: ["🌻", "🥟"] },
   ES: { monuments: ["🏛️", "⛪"], culture: ["🎸", "🥘", "💃"] },
@@ -105,6 +112,8 @@ export const COUNTRY_SYMBOLS: Record<string, CountrySymbols> = {
   BR: { monuments: ["🎭", "🗽"], culture: ["🎉", "⚽", "🏖️"] },
   MX: { monuments: ["🏛️"], culture: ["🌮", "🌶️", "🎸"] },
   AR: { monuments: ["🏔️"], culture: ["🥩", "🍷", "💃"] },
+  CO: { monuments: ["☕"], culture: ["☕", "💃", "🎵"] },
+  CL: { monuments: ["🏔️"], culture: ["🍷", "🍇"] },
 };
 
 export function countryMonuments(code: string): string[] {
@@ -253,32 +262,117 @@ export function isSvgSource(value: string): boolean {
   );
 }
 
-/** Sensible defaults when creating a language by name */
+/**
+ * Sensible defaults when creating / suggesting countries for a language name.
+ * Matches FR / EN / PL / ES language names (and common variants).
+ */
 export function defaultRegionsForLanguage(name: string): {
   primaryRegion: string;
   regions: string[];
 } {
-  const n = name.toLowerCase();
-  if (n.includes("franç") || n.includes("french")) {
-    return { primaryRegion: "FR", regions: ["FR", "BE", "CH", "CA", "LU"] };
-  }
-  if (n.includes("angl") || n.includes("english")) {
+  const n = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, ""); // strip accents: français → francais, español → espanol
+
+  // French — France always primary + francophone countries
+  if (
+    n.includes("francais") ||
+    n.includes("french") ||
+    n.includes("francuski") ||
+    n.includes("frances") ||
+    n === "fr"
+  ) {
     return {
-      primaryRegion: "GB",
-      regions: ["GB", "US", "CA", "AU", "IE", "NZ"],
+      primaryRegion: "FR",
+      regions: ["FR", "BE", "CH", "CA", "LU", "MC"],
     };
   }
-  if (n.includes("polon") || n.includes("polish")) {
+
+  // English — UK (GB) primary
+  if (
+    n.includes("anglais") ||
+    n.includes("english") ||
+    n.includes("angielski") ||
+    n.includes("ingles") ||
+    n === "en" ||
+    n === "gb" ||
+    n === "uk"
+  ) {
+    return {
+      primaryRegion: "GB",
+      regions: ["GB", "US", "CA", "AU", "IE", "NZ", "ZA", "IN"],
+    };
+  }
+
+  // Polish
+  if (
+    n.includes("polonais") ||
+    n.includes("polish") ||
+    n.includes("polski") ||
+    n.includes("polaco") ||
+    n === "pl"
+  ) {
     return { primaryRegion: "PL", regions: ["PL", "LT", "UA", "DE"] };
   }
-  if (n.includes("espagn") || n.includes("spanish")) {
-    return { primaryRegion: "ES", regions: ["ES", "MX", "AR", "US"] };
+
+  // Spanish
+  if (
+    n.includes("espagnol") ||
+    n.includes("spanish") ||
+    n.includes("hiszpanski") ||
+    n.includes("espanol") ||
+    n === "es"
+  ) {
+    return {
+      primaryRegion: "ES",
+      regions: ["ES", "MX", "AR", "CO", "CL", "US"],
+    };
   }
-  if (n.includes("allemand") || n.includes("german")) {
+
+  // German
+  if (
+    n.includes("allemand") ||
+    n.includes("german") ||
+    n.includes("niemiecki") ||
+    n.includes("aleman") ||
+    n === "de"
+  ) {
     return { primaryRegion: "DE", regions: ["DE", "AT", "CH"] };
   }
-  if (n.includes("italien") || n.includes("italian")) {
+
+  // Italian
+  if (
+    n.includes("italien") ||
+    n.includes("italian") ||
+    n.includes("wloski") ||
+    n.includes("italiano") ||
+    n === "it"
+  ) {
     return { primaryRegion: "IT", regions: ["IT", "CH"] };
   }
+
+  // Portuguese
+  if (
+    n.includes("portugai") ||
+    n.includes("portugues") ||
+    n.includes("portuguese") ||
+    n === "pt"
+  ) {
+    return { primaryRegion: "PT", regions: ["PT", "BR"] };
+  }
+
   return { primaryRegion: "FR", regions: ["FR"] };
+}
+
+/** Only keep codes that exist in REGION_PATHS */
+export function normalizeRegionCodes(codes: string[]): string[] {
+  const known = new Set(REGION_CODES);
+  return [
+    ...new Set(
+      codes
+        .map((c) => c?.toUpperCase?.() ?? "")
+        .filter((c) => c.length === 2 && known.has(c))
+    ),
+  ];
 }

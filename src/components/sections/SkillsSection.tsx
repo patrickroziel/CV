@@ -11,15 +11,17 @@ import { Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useSkillDetail } from "@/components/skills/SkillDetailProvider";
 import { EditGate } from "@/components/shared/EditGate";
-import { SectionHeading } from "@/components/shared/SectionHeading";
+import { EditableSectionHeading } from "@/components/shared/EditableSectionHeading";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/glass/GlassCard";
 import type { Skill } from "@/lib/types";
+import { DEFAULT_SECTION_LABELS } from "@/lib/types";
 import { getL } from "@/lib/i18n-content";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/** Stable FR category keys (order + React keys — never use localized labels as keys) */
 const CATEGORY_ORDER = [
   "Montage vidéo",
   "Motion design",
@@ -27,6 +29,24 @@ const CATEGORY_ORDER = [
   "Graphisme",
   "Autres",
 ];
+
+/**
+ * Stable grouping key for a skill category, independent of UI locale.
+ * Prefer FR, then any filled locale, then "Autres".
+ */
+function categoryStableKey(category: Skill["category"]): string {
+  if (category == null) return "Autres";
+  if (typeof category === "string") {
+    return category.trim() || "Autres";
+  }
+  const fr = category.fr?.trim();
+  if (fr) return fr;
+  for (const loc of ["en", "pl", "es"] as const) {
+    const v = category[loc]?.trim();
+    if (v) return v;
+  }
+  return "Autres";
+}
 
 const gridVariants: Variants = {
   hidden: {},
@@ -52,7 +72,8 @@ const listVariants: Variants = {
 };
 
 const skillRowVariants: Variants = {
-  hidden: { opacity: 0, x: -10, y: 6 },
+  // Keep opacity visible by default so locale remounts never leave rows invisible
+  hidden: { opacity: 1, x: 0, y: 0 },
   visible: {
     opacity: 1,
     x: 0,
@@ -93,9 +114,16 @@ function SkillRow({
       onMouseLeave={() => setHover(false)}
       className="list-none"
     >
-      <motion.button
-        type="button"
+      <motion.div
+        role="button"
+        tabIndex={0}
         onClick={onOpen}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onOpen();
+          }
+        }}
         animate={
           reduceMotion
             ? undefined
@@ -244,13 +272,14 @@ function SkillRow({
             )}
           </AnimatePresence>
         </div>
-      </motion.button>
+      </motion.div>
     </motion.li>
   );
 }
 
 function SkillCategoryCard({
-  category,
+  categoryKey,
+  categoryLabel,
   skills,
   editMode,
   reduceMotion,
@@ -258,7 +287,9 @@ function SkillCategoryCard({
   onEdit,
   onDelete,
 }: {
-  category: string;
+  /** Stable id (FR category) — used only for React identity upstream */
+  categoryKey: string;
+  categoryLabel: string;
   skills: Skill[];
   editMode: boolean;
   reduceMotion: boolean | null;
@@ -271,6 +302,7 @@ function SkillCategoryCard({
   return (
     <motion.div
       variants={cardVariants}
+      initial={false}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       className="h-full"
@@ -304,15 +336,19 @@ function SkillCategoryCard({
             transition={{ duration: 0.4, ease: EASE }}
             className="mb-5 text-sm font-semibold uppercase tracking-widest"
           >
-            {category}
+            {categoryLabel}
           </motion.h3>
 
+          {/*
+            Do NOT use whileInView + once here: on locale change, remounted
+            rows would stay at opacity 0 if the viewport observer does not
+            re-fire. Always show skills once the category card is mounted.
+          */}
           <motion.ul
             className="space-y-2"
             variants={listVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-30px" }}
+            initial="visible"
+            animate="visible"
           >
             {skills.map((skill) => (
               <SkillRow
@@ -335,16 +371,21 @@ function SkillCategoryCard({
 }
 
 export function SkillsSection() {
-  const { data, removeSkill, editMode, l, t, locale } = usePortfolio();
+  const { data, removeSkill, editMode, updateSectionLabels, t, locale } =
+    usePortfolio();
   const { openSkillDetail, openSkillEditor } = useSkillDetail();
   const reduceMotion = useReducedMotion();
 
   const grouped = useMemo(() => {
-    // Group by French key for stable order; display localized label
+    // Group by stable key (FR-first); display localized label separately
     const map = new Map<string, { label: string; skills: Skill[] }>();
     for (const s of data.skills) {
-      const key = getL(s.category, "fr") || "Autres";
-      const label = getL(s.category, locale) || key;
+      const key = categoryStableKey(s.category);
+      // Display label follows UI locale, with fallback chain (never empty)
+      const label =
+        getL(s.category, locale) ||
+        getL(s.category, "fr") ||
+        key;
       if (!map.has(key)) map.set(key, { label, skills: [] });
       map.get(key)!.skills.push(s);
       map.get(key)!.label = label;
@@ -354,7 +395,8 @@ export function SkillsSection() {
       ...[...map.keys()].filter((c) => !CATEGORY_ORDER.includes(c)),
     ];
     return keys.map((k) => ({
-      category: map.get(k)!.label,
+      key: k,
+      label: map.get(k)!.label,
       skills: map.get(k)!.skills,
     }));
   }, [data.skills, locale]);
@@ -362,10 +404,16 @@ export function SkillsSection() {
   return (
     <section id="skills" className="relative z-10 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow={t("sections.skillsEyebrow")}
+        <EditableSectionHeading
+          eyebrow={
+            data.sectionLabels?.skillsEyebrow ??
+            DEFAULT_SECTION_LABELS.skillsEyebrow
+          }
+          onEyebrowChange={(skillsEyebrow) =>
+            updateSectionLabels({ skillsEyebrow })
+          }
           title={t("sections.skillsTitle")}
-          description={t("sections.skillsDesc")}
+          descriptionFallback={t("sections.skillsDesc")}
           action={
             <EditGate>
               <Button onClick={() => openSkillEditor()}>
@@ -385,8 +433,9 @@ export function SkillsSection() {
         >
           {grouped.map((group) => (
             <SkillCategoryCard
-              key={group.category}
-              category={group.category}
+              key={group.key}
+              categoryKey={group.key}
+              categoryLabel={group.label}
               skills={group.skills}
               editMode={editMode}
               reduceMotion={reduceMotion}

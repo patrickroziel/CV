@@ -44,8 +44,7 @@ export const es: MessageTree = {
     educationDesc: "Formación académica y certificaciones.",
     languagesEyebrow: "Internacional",
     languagesTitle: "Idiomas",
-    languagesDesc:
-      "Iconos en fundido, contornos a pantalla y vídeo solo al pasar el ratón.",
+    languagesDesc: "Pasa el cursor sobre una tarjeta para ver el vídeo demo",
     contactDefaultEyebrow: "Sigamos en contacto",
     contactDefaultTitle: "Contacto",
   },
@@ -62,6 +61,12 @@ export const es: MessageTree = {
     editHint: "Haz clic en «Editar» para añadir texto, foto e iconos.",
     createHint: "Haz clic en «Crear ficha» para añadirla a tus competencias.",
     zones: "Zonas lingüísticas",
+  },
+  languages: {
+    demoHint: "Escuchar el nivel",
+    demoPlaying: "Demo en curso",
+    proofTitle: "Prueba de dominio",
+    proofSubtitle: "Nivel real en situación",
   },
   languageSwitcher: {
     label: "Idioma del sitio",
@@ -82,5 +87,18 @@ export const es: MessageTree = {
     notFound: "No encontrado",
     back: "Volver",
     availability: "Disponibilidad",
+  },
+  contact: {
+    nameLabel: "Tu nombre",
+    namePlaceholder: "Nombre Apellido",
+    messageLabel: "Mensaje",
+    messagePlaceholder: "Hola Patrick, me gustaría…",
+    mailSubject: "Contacto del portfolio",
+    mailSubjectAnonymous: "Sin nombre",
+    emailCopied: "Email copiado",
+    emailCopyFailed: "No se pudo copiar",
+    configureButtons: "Configurar botones",
+    editHint:
+      "Modo edición: usa « Configurar » para mostrar / ocultar y renombrar cada elemento.",
   },
 };

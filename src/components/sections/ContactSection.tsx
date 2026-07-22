@@ -15,7 +15,7 @@ import { EditGate } from "@/components/shared/EditGate";
 import { ContactSettingsPanel } from "@/components/contact/ContactSettingsPanel";
 
 export function ContactSection() {
-  const { data, showToast, editMode, l } = usePortfolio();
+  const { data, showToast, editMode, l, t } = usePortfolio();
   const { profile, contact: c } = data;
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState("");
@@ -30,17 +30,18 @@ export function ContactSection() {
     try {
       await navigator.clipboard.writeText(email);
       setCopied(true);
-      showToast("Email copié");
+      showToast(t("contact.emailCopied"));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      showToast("Impossible de copier");
+      showToast(t("contact.emailCopyFailed"));
     }
   };
 
   const sendMailto = (e: React.FormEvent) => {
     e.preventDefault();
+    const who = name.trim() || t("contact.mailSubjectAnonymous");
     const subject = encodeURIComponent(
-      `Contact portfolio — ${name || "Sans nom"}`
+      `${t("contact.mailSubject")} — ${who}`
     );
     const body = encodeURIComponent(message || "");
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
@@ -57,7 +58,7 @@ export function ContactSection() {
             <EditGate>
               <Button variant="secondary" onClick={() => setSettingsOpen(true)}>
                 <Settings2 className="h-4 w-4" />
-                Configurer boutons
+                {t("contact.configureButtons")}
               </Button>
             </EditGate>
           }
@@ -150,8 +151,7 @@ export function ContactSection() {
 
                 {editMode && (
                   <p className="mt-6 text-xs text-zinc-600">
-                    Mode édition : utilisez « Configurer » pour afficher / masquer
-                    et renommer chaque élément.
+                    {t("contact.editHint")}
                   </p>
                 )}
               </div>
@@ -160,22 +160,22 @@ export function ContactSection() {
                 <form onSubmit={sendMailto} className="grid gap-4">
                   <p className="text-sm text-zinc-400">{l(c.formTitle)}</p>
                   <div className="grid gap-2">
-                    <Label htmlFor="c-name">Votre nom</Label>
+                    <Label htmlFor="c-name">{t("contact.nameLabel")}</Label>
                     <Input
                       id="c-name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Prénom Nom"
+                      placeholder={t("contact.namePlaceholder")}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="c-msg">Message</Label>
+                    <Label htmlFor="c-msg">{t("contact.messageLabel")}</Label>
                     <Textarea
                       id="c-msg"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       rows={4}
-                      placeholder="Bonjour Patrick, je souhaite…"
+                      placeholder={t("contact.messagePlaceholder")}
                     />
                   </div>
                   <Button type="submit" className="w-full sm:w-auto">

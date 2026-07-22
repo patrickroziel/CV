@@ -75,6 +75,11 @@ type YoutubeEmbedOptions = {
   mute?: boolean;
   loop?: boolean;
   controls?: boolean;
+  /**
+   * Strip as much player chrome as possible (logo, FS, keyboard, annotations).
+   * Use with controls=false for ambient feature cards.
+   */
+  hideChrome?: boolean;
 };
 
 /** Safe embed URL for iframe */
@@ -89,6 +94,7 @@ export function youtubeEmbedUrl(
     mute = false,
     loop = false,
     controls = true,
+    hideChrome = false,
   } = options;
   const params = new URLSearchParams({
     rel: "0",
@@ -104,12 +110,59 @@ export function youtubeEmbedUrl(
     params.set("loop", "1");
     params.set("playlist", id);
   }
-  return `https://www.youtube.com/embed/${id}?${params.toString()}`;
+  if (hideChrome || !controls) {
+    params.set("controls", "0");
+    params.set("disablekb", "1");
+    params.set("fs", "0");
+    params.set("iv_load_policy", "3");
+    params.set("cc_load_policy", "0");
+    params.set("modestbranding", "1");
+    // Avoid related / end-screen UI as much as possible
+    params.set("rel", "0");
+  }
+  // nocookie reduces some branding chrome; same embed API
+  const host = hideChrome
+    ? "https://www.youtube-nocookie.com"
+    : "https://www.youtube.com";
+  return `${host}/embed/${id}?${params.toString()}`;
 }
 
 /** True if URL is a YouTube watch/share/embed link */
 export function isYoutubeUrl(url: string): boolean {
   return youtubeVideoId(url) !== null;
+}
+
+/**
+ * True for YouTube Shorts (vertical 9:16).
+ * Detects /shorts/ path and youtu.be links that use short-style paths.
+ */
+export function isYoutubeShort(url: string): boolean {
+  try {
+    const u = new URL(url.trim());
+    const host = u.hostname.replace(/^www\./, "").toLowerCase();
+    if (
+      !host.includes("youtube.com") &&
+      !host.includes("youtube-nocookie.com") &&
+      !host.includes("youtu.be")
+    ) {
+      return false;
+    }
+    if (u.pathname.includes("/shorts/")) return true;
+    // Some share URLs: youtube.com/short/ID (rare)
+    if (/\/short\//i.test(u.pathname)) return true;
+    return false;
+  } catch {
+    return /youtube\.com\/shorts\//i.test(url) || /\/shorts\//i.test(url);
+  }
+}
+
+/**
+ * Portrait when width/height < ~1 (includes 9:16 Shorts and 3:4).
+ * Pass either (width, height) or (aspectRatio, 1).
+ */
+export function isPortraitRatio(width: number, height: number): boolean {
+  if (width <= 0 || height <= 0) return false;
+  return width / height < 0.95;
 }
 
 /** Extract status id from x.com / twitter.com post URLs */
@@ -146,6 +199,7 @@ export function xPostUrl(url: string): string | null {
 /**
  * Official X/Twitter tweet embed iframe URL (dark theme).
  * Autoplay of embedded video is controlled by the X player (muted when possible).
+ * Prefer `xVideoPlayerUrl` when you only want the video (feature cards).
  */
 export function xEmbedUrl(url: string): string | null {
   const id = xStatusId(url);
@@ -161,6 +215,16 @@ export function xEmbedUrl(url: string): string | null {
     lang: "fr",
   });
   return `https://platform.twitter.com/embed/Tweet.html?${params.toString()}`;
+}
+
+/**
+ * Official X video-only player (no tweet text / header / actions).
+ * https://twitter.com/i/videos/tweet/{id}
+ */
+export function xVideoPlayerUrl(url: string): string | null {
+  const id = xStatusId(url);
+  if (!id) return null;
+  return `https://twitter.com/i/videos/tweet/${id}`;
 }
 
 /**
@@ -218,10 +282,17 @@ export function xProfileHref(urlOrUser: string): string | null {
   return `https://x.com/${user}`;
 }
 
-/** True if value looks like a local/uploaded video (data URL or common video path) */
+/** True if value looks like an uploaded video (data URL, Cloudinary, or common video path) */
 export function isFileVideoUrl(url: string): boolean {
   if (url.startsWith("data:video/")) return true;
   if (url.startsWith("blob:")) return true;
+  // Cloudinary video delivery
+  if (
+    /res\.cloudinary\.com\/[^/]+\/video\//i.test(url) ||
+    /\/video\/upload\//i.test(url)
+  ) {
+    return true;
+  }
   return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
 }
 

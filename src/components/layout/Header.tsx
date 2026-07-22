@@ -26,6 +26,7 @@ const LINK_DEFS = [
   { href: "/#projects", key: "nav.projects", id: "projects" },
   { href: "/#skills", key: "nav.skills", id: "skills" },
   { href: "/#education", key: "nav.education", id: "education" },
+  { href: "/#languages", key: "nav.languages", id: "languages" },
   { href: "/#contact", key: "nav.contact", id: "contact" },
 ] as const;
 

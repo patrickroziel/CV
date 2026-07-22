@@ -42,8 +42,7 @@ export const fr = {
     educationDesc: "Parcours académique et certifications.",
     languagesEyebrow: "International",
     languagesTitle: "Langues",
-    languagesDesc:
-      "Icônes en fondu, contours fins plein carte, et démo vidéo uniquement au survol.",
+    languagesDesc: "Survolez une carte pour voir la démo vidéo",
     contactDefaultEyebrow: "Restons en contact",
     contactDefaultTitle: "Contact",
   },
@@ -64,6 +63,12 @@ export const fr = {
       "Cliquez sur « Créer la fiche » pour l’ajouter aux compétences.",
     zones: "Zones linguistiques",
   },
+  languages: {
+    demoHint: "Entendre le niveau",
+    demoPlaying: "Démo en cours",
+    proofTitle: "Preuve de maîtrise",
+    proofSubtitle: "Niveau réel en situation",
+  },
   languageSwitcher: {
     label: "Langue du site",
     fr: "Français",
@@ -83,6 +88,19 @@ export const fr = {
     notFound: "Introuvable",
     back: "Retour",
     availability: "Disponibilité",
+  },
+  contact: {
+    nameLabel: "Votre nom",
+    namePlaceholder: "Prénom Nom",
+    messageLabel: "Message",
+    messagePlaceholder: "Bonjour Patrick, je souhaite…",
+    mailSubject: "Contact portfolio",
+    mailSubjectAnonymous: "Sans nom",
+    emailCopied: "Email copié",
+    emailCopyFailed: "Impossible de copier",
+    configureButtons: "Configurer boutons",
+    editHint:
+      "Mode édition : utilisez « Configurer » pour afficher / masquer et renommer chaque élément.",
   },
 };
 

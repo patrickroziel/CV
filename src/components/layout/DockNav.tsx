@@ -7,6 +7,7 @@ import {
   FolderOpen,
   GraduationCap,
   Home,
+  Languages,
   Mail,
   Sparkles,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const ITEMS = [
   { href: "/#projects", key: "nav.projects", icon: FolderOpen },
   { href: "/#skills", key: "nav.skills", icon: Sparkles },
   { href: "/#education", key: "nav.education", icon: GraduationCap },
+  { href: "/#languages", key: "nav.languages", icon: Languages },
   { href: "/#contact", key: "nav.contact", icon: Mail },
 ] as const;
 

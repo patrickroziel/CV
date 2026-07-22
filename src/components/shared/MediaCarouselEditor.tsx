@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { VideoUpload } from "@/components/shared/VideoUpload";
+import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary";
 import { createId, isXUrl, isYoutubeUrl, cn } from "@/lib/utils";
 
 type MediaCarouselEditorProps = {
@@ -182,13 +183,15 @@ export function MediaCarouselEditor({
           onChange={addImage}
           aspectClassName="aspect-video max-h-28"
           label="Ajouter une photo"
+          folder={CLOUDINARY_FOLDERS.projects}
         />
       )}
       {addType === "file" && (
         <VideoUpload
           value={null}
           onChange={addFile}
-          label="Ajouter une vidéo (max 4 Mo)"
+          label="Ajouter une vidéo"
+          folder={CLOUDINARY_FOLDERS.projects}
         />
       )}
       {(addType === "youtube" || addType === "x") && (

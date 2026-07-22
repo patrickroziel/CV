@@ -1,44 +1,29 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  CLOUDINARY_FOLDERS,
+  uploadToCloudinary,
+  type CloudinaryFolder,
+} from "@/lib/cloudinary";
 
-const MAX_BYTES = 1.5 * 1024 * 1024;
-const MAX_WIDTH = 1200;
+/** Client-side guard before hitting Cloudinary (dashboard may also enforce limits) */
+const MAX_BYTES = 12 * 1024 * 1024;
 
 type ImageUploadProps = {
   value: string | null;
-  onChange: (dataUrl: string | null) => void;
+  /** Receives Cloudinary secure_url (or null when cleared) */
+  onChange: (url: string | null) => void;
   className?: string;
   aspectClassName?: string;
   label?: string;
   round?: boolean;
-  maxWidth?: number;
-  quality?: number;
+  /** Cloudinary folder namespace */
+  folder?: CloudinaryFolder | string;
 };
-
-async function resizeImage(
-  file: File,
-  maxWidth: number,
-  quality: number
-): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  let { width, height } = bitmap;
-  if (width > maxWidth) {
-    height = Math.round((height * maxWidth) / width);
-    width = maxWidth;
-  }
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas non supporté");
-  ctx.drawImage(bitmap, 0, 0, width, height);
-  bitmap.close();
-  return canvas.toDataURL("image/jpeg", quality);
-}
 
 export function ImageUpload({
   value,
@@ -47,13 +32,14 @@ export function ImageUpload({
   aspectClassName = "aspect-video",
   label = "Glissez une image ou cliquez",
   round = false,
-  maxWidth = MAX_WIDTH,
-  quality = 0.85,
+  folder = CLOUDINARY_FOLDERS.media,
 }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const processFile = useCallback(
     async (file: File) => {
@@ -62,21 +48,39 @@ export function ImageUpload({
         setError("Fichier image requis (JPG, PNG, WebP…).");
         return;
       }
-      if (file.size > MAX_BYTES * 3) {
-        setError("Image trop lourde (max ~4 Mo avant compression).");
+      if (file.size > MAX_BYTES) {
+        setError("Image trop lourde (max 12 Mo).");
         return;
       }
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       setLoading(true);
+      setProgress(0);
       try {
-        const dataUrl = await resizeImage(file, maxWidth, quality);
-        onChange(dataUrl);
-      } catch {
-        setError("Impossible de traiter l’image.");
+        const result = await uploadToCloudinary(file, {
+          folder,
+          resourceType: "image",
+          onProgress: setProgress,
+          signal: controller.signal,
+        });
+        onChange(result.secure_url);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Impossible d’uploader l’image vers Cloudinary."
+        );
       } finally {
         setLoading(false);
+        setProgress(0);
+        abortRef.current = null;
       }
     },
-    [onChange, maxWidth, quality]
+    [onChange, folder]
   );
 
   const onDrop = useCallback(
@@ -97,10 +101,12 @@ export function ImageUpload({
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            inputRef.current?.click();
+            if (!loading) inputRef.current?.click();
           }
         }}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => {
+          if (!loading) inputRef.current?.click();
+        }}
         onDragOver={(e) => {
           e.preventDefault();
           setDragging(true);
@@ -114,10 +120,11 @@ export function ImageUpload({
           dragging
             ? "border-teal-300/60 bg-teal-300/10"
             : "border-white/20 bg-black/20 hover:border-white/35 hover:bg-white/5",
-          value && "border-solid border-white/15"
+          value && "border-solid border-white/15",
+          loading && "pointer-events-none"
         )}
       >
-        {value ? (
+        {value && !loading ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={value}
@@ -129,13 +136,30 @@ export function ImageUpload({
           />
         ) : (
           <div className="flex flex-col items-center gap-2 p-4 text-center text-zinc-400">
-            <ImagePlus className="h-8 w-8 text-zinc-500" />
+            {loading ? (
+              <Loader2 className="h-8 w-8 animate-spin text-teal-300/80" />
+            ) : (
+              <ImagePlus className="h-8 w-8 text-zinc-500" />
+            )}
             <span className="text-xs sm:text-sm">
-              {loading ? "Traitement…" : label}
+              {loading ? `Upload… ${progress}%` : label}
             </span>
           </div>
         )}
-        {value && (
+
+        {loading && (
+          <div
+            className="absolute inset-x-0 bottom-0 h-1.5 bg-black/40"
+            aria-hidden
+          >
+            <div
+              className="h-full bg-gradient-to-r from-teal-400 to-amber-200 transition-[width] duration-150 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+
+        {value && !loading && (
           <Button
             type="button"
             size="icon"
@@ -155,13 +179,18 @@ export function ImageUpload({
         type="file"
         accept="image/*"
         className="hidden"
+        disabled={loading}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) void processFile(file);
           e.target.value = "";
         }}
       />
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && (
+        <p className="whitespace-pre-wrap break-words text-xs text-red-400">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

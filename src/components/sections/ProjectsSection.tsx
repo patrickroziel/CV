@@ -5,7 +5,8 @@ import Link from "next/link";
 import { ArrowRight, Plus } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
-import { SectionHeading } from "@/components/shared/SectionHeading";
+import { EditableSectionHeading } from "@/components/shared/EditableSectionHeading";
+import { DEFAULT_SECTION_LABELS } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +22,8 @@ import { ProjectCard } from "@/components/projects/ProjectCard";
 import type { Project } from "@/lib/types";
 
 export function ProjectsSection() {
-  const { data, addProject, updateProject, t } = usePortfolio();
+  const { data, addProject, updateProject, updateSectionLabels, t } =
+    usePortfolio();
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
   const preview = data.projects.slice(0, 3);
@@ -29,10 +31,16 @@ export function ProjectsSection() {
   return (
     <section id="projects" className="relative z-10 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow={t("sections.projectsEyebrow")}
+        <EditableSectionHeading
+          eyebrow={
+            data.sectionLabels?.projectsEyebrow ??
+            DEFAULT_SECTION_LABELS.projectsEyebrow
+          }
+          onEyebrowChange={(projectsEyebrow) =>
+            updateSectionLabels({ projectsEyebrow })
+          }
           title={t("sections.projectsTitle")}
-          description={t("sections.projectsDesc")}
+          descriptionFallback={t("sections.projectsDesc")}
           action={
             <div className="flex flex-wrap gap-2">
               <EditGate>

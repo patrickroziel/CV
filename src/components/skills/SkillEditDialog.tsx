@@ -152,16 +152,38 @@ export function SkillEditDialog({
 
   const handleSave = () => {
     if (!getL(form.name).trim()) return;
+
+    // Propagate filled text into missing locales so skills stay visible in all languages
+    const seedLocales = (value: LocalizedString): LocalizedString => {
+      const seed =
+        value.fr?.trim() ||
+        value.en?.trim() ||
+        value.pl?.trim() ||
+        value.es?.trim() ||
+        "";
+      if (!seed) return value;
+      return {
+        fr: value.fr?.trim() || seed,
+        en: value.en?.trim() || seed,
+        pl: value.pl?.trim() || seed,
+        es: value.es?.trim() || seed,
+      };
+    };
+
+    const name = seedLocales(form.name);
+    const category = getL(form.category).trim()
+      ? seedLocales(form.category)
+      : liftToLocalized("Autres");
+    const description = getL(form.description).trim()
+      ? seedLocales(form.description)
+      : undefined;
+
     onSave(
       {
-        name: form.name,
+        name,
         level: Math.min(100, Math.max(0, form.level)),
-        category: getL(form.category).trim()
-          ? form.category
-          : liftToLocalized("Autres"),
-        description: getL(form.description).trim()
-          ? form.description
-          : undefined,
+        category,
+        description,
         image: form.image,
         icons: form.icons,
       },
@@ -236,8 +258,7 @@ export function SkillEditDialog({
               onChange={(image) => setForm((f) => ({ ...f, image }))}
               aspectClassName="aspect-video max-h-44 w-full"
               label="Image illustrative (optionnel)"
-              maxWidth={900}
-              quality={0.85}
+              folder="patrick-roziel/skills"
             />
           </div>
 
@@ -327,8 +348,7 @@ export function SkillEditDialog({
                 onChange={addUploadIcon}
                 aspectClassName="aspect-square max-h-20 max-w-20"
                 label="PNG / SVG / WebP"
-                maxWidth={128}
-                quality={0.9}
+                folder="patrick-roziel/skills"
               />
             </div>
           </div>

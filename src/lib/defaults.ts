@@ -4,6 +4,7 @@ import {
   DEFAULT_CONTACT,
   DEFAULT_FEATURE_VIDEOS,
   DEFAULT_MAIN_SHOWREEL,
+  DEFAULT_SECTION_LABELS,
 } from "./types";
 import { L } from "./i18n-content";
 
@@ -679,6 +680,7 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
     },
   ],
   contact: { ...DEFAULT_CONTACT },
+  sectionLabels: { ...DEFAULT_SECTION_LABELS },
   mainShowreel: { ...DEFAULT_MAIN_SHOWREEL },
   featureVideos: DEFAULT_FEATURE_VIDEOS.map((f) => ({ ...f })),
   languages: [
