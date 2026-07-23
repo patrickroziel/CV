@@ -1,0 +1,1741 @@
+{
+  "version": 20,
+  "backgroundUrl": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80",
+  "ui": {
+    "overlayOpacity": 0.52,
+    "showDock": true,
+    "locale": "fr"
+  },
+  "profile": {
+    "name": "Patrick Roziel",
+    "title": {
+      "fr": "Monteur vidéo | Motion designer | Chargé de communication digitale",
+      "en": "Video editor | Motion designer | Digital communications specialist",
+      "pl": "Montażysta wideo | Motion designer | Specjalista ds. komunikacji cyfrowej",
+      "es": "Editor de vídeo | Motion designer | Especialista en comunicación digital"
+    },
+    "bio": {
+      "fr": "Monteur vidéo et spécialiste en communication digitale avec plus de 10 ans d’expérience en production vidéo, motion design et contenus de marque. Expertise en formats réseaux sociaux, vidéos corporate et workflows à délais courts.",
+      "en": "Video editor and digital communications specialist with over 10 years of experience in video production, motion design and brand content. Expert in social formats, corporate films and fast-turnaround workflows.",
+      "pl": "Montażysta wideo i specjalista ds. komunikacji cyfrowej z ponad 10-letnim doświadczeniem w produkcji wideo, motion designie i treściach marki. Ekspert od formatów social, filmów corporate i szybkich workflowów.",
+      "es": "Editor de vídeo y especialista en comunicación digital con más de 10 años de experiencia en producción audiovisual, motion design y contenidos de marca. Experto en formatos sociales, vídeos corporativos y flujos de trabajo ágiles."
+    },
+    "photo": "https://res.cloudinary.com/ptp8diwd/image/upload/v1784742778/ih9243zrqradcoauy6vi.png",
+    "email": "patrick.roziel@me.com",
+    "phone": "07 44 40 97 90",
+    "location": {
+      "fr": "La Courneuve (93), France",
+      "en": "La Courneuve (93), France",
+      "pl": "La Courneuve (93), Francja",
+      "es": "La Courneuve (93), Francia"
+    },
+    "showreelUrl": "https://youtu.be/ws0EbZOxaNs",
+    "cvUrl": null
+  },
+  "experiences": [
+    {
+      "id": "exp-sav",
+      "company": {
+        "fr": "SAV"
+      },
+      "role": {
+        "fr": "Technicien audiovisuel",
+        "en": "Audiovisual technician",
+        "pl": "Technik audiowizualny",
+        "es": "Técnico audiovisual"
+      },
+      "location": {
+        "fr": "Saint-Denis"
+      },
+      "startDate": "2024-09",
+      "endDate": "2025-02",
+      "description": {
+        "fr": "Gestion de stock matériel audiovisuel, préparation de commandes et optimisation de l’atelier (−30 % de temps de préparation). Création d’une vidéo récapitulative pour documenter les process.",
+        "en": "AV equipment stock management, order prep and workshop optimization (−30% prep time). Created a summary video to document processes.",
+        "pl": "Zarządzanie magazynem sprzętu AV, przygotowanie zamówień i optymalizacja warsztatu (−30% czasu przygotowania). Film podsumowujący procesy.",
+        "es": "Gestión de stock de material AV, preparación de pedidos y optimización del taller (−30% de tiempo de prep.). Vídeo resumen de los procesos."
+      },
+      "technologies": [
+        "Audiovisuel",
+        "Logistique",
+        "Vidéo"
+      ],
+      "media": []
+    },
+    {
+      "id": "exp-prompteur",
+      "company": {
+        "fr": "Solutions Prompteur"
+      },
+      "role": {
+        "fr": "Monteur vidéo / Opérateur prompteur",
+        "en": "Video editor / Teleprompter operator",
+        "pl": "Montażysta wideo / Operator promptera",
+        "es": "Editor de vídeo / Operador de teleprompter"
+      },
+      "location": {
+        "fr": "Île-de-France",
+        "en": "Île-de-France",
+        "pl": "Île-de-France",
+        "es": "Isla de Francia"
+      },
+      "startDate": "2023",
+      "endDate": "2024",
+      "description": {
+        "fr": "Montage vidéo, création graphique et opération de prompteur pour des productions événementielles et corporate.",
+        "en": "Video editing, graphic creation and teleprompter operation for live and corporate productions.",
+        "pl": "Montaż wideo, grafika i obsługa promptera na produkcjach eventowych i corporate.",
+        "es": "Edición de vídeo, creación gráfica y operación de teleprompter para eventos y corporate."
+      },
+      "technologies": [
+        "Premiere Pro",
+        "After Effects",
+        "Prompteur",
+        "Graphisme"
+      ],
+      "media": []
+    },
+    {
+      "id": "exp-dietplus-2022",
+      "company": {
+        "fr": "Dietplus"
+      },
+      "role": {
+        "fr": "Réalisateur / Monteur vidéo freelance",
+        "en": "Director / Freelance video editor",
+        "pl": "Reżyser / Freelancer montażysta wideo",
+        "es": "Realizador / Editor de vídeo freelance"
+      },
+      "location": {
+        "fr": "France",
+        "en": "France",
+        "pl": "Francja",
+        "es": "Francia"
+      },
+      "startDate": "2022",
+      "endDate": "2022",
+      "description": {
+        "fr": "Captation Steadicam, interviews et montage pour des contenus de marque nutrition / bien-être.",
+        "en": "Steadicam capture, interviews and editing for nutrition / wellness brand content.",
+        "pl": "Zdjęcia Steadicam, wywiady i montaż dla marki nutrition / wellness.",
+        "es": "Captación con Steadicam, entrevistas y montaje para marca de nutrición / bienestar."
+      },
+      "technologies": [
+        "Steadicam",
+        "Réalisation",
+        "Montage",
+        "Interview"
+      ],
+      "media": []
+    },
+    {
+      "id": "exp-jellysmack",
+      "company": {
+        "fr": "Jellysmack"
+      },
+      "role": {
+        "fr": "Monteur vidéo",
+        "en": "Video editor",
+        "pl": "Montażysta wideo",
+        "es": "Editor de vídeo"
+      },
+      "location": {
+        "fr": "Paris"
+      },
+      "startDate": "2022",
+      "endDate": "2022",
+      "description": {
+        "fr": "Montage de contenus pour créateurs et influenceurs : rythme social, hooks, formats verticaux et horizontaux (Facebook, Shorts).",
+        "en": "Editing for creators and influencers: social pacing, hooks, vertical and horizontal formats (Facebook, Shorts).",
+        "pl": "Montaż dla twórców i influencerów: tempo social, hooki, formaty pionowe i poziome (Facebook, Shorts).",
+        "es": "Edición para creadores e influencers: ritmo social, hooks, formatos verticales y horizontales (Facebook, Shorts)."
+      },
+      "technologies": [
+        "Premiere Pro",
+        "Social Media",
+        "Facebook",
+        "YouTube"
+      ],
+      "media": []
+    },
+    {
+      "id": "exp-sputnik",
+      "company": {
+        "fr": "Sputnik France"
+      },
+      "role": {
+        "fr": "Monteur vidéo / Graphiste",
+        "en": "Video editor / Graphic designer",
+        "pl": "Montażysta wideo / Grafik",
+        "es": "Editor de vídeo / Diseñador gráfico"
+      },
+      "location": {
+        "fr": "Paris"
+      },
+      "startDate": "2021",
+      "endDate": "2022",
+      "description": {
+        "fr": "Montage d’actualités et de reportages, habillage graphique et motion pour un média d’information.",
+        "en": "News and reportage editing, graphic packaging and motion for a news media outlet.",
+        "pl": "Montaż newsów i reportaży, oprawa graficzna i motion dla medium informacyjnego.",
+        "es": "Montaje de noticias y reportajes, packaging gráfico y motion para un medio de información."
+      },
+      "technologies": [
+        "Premiere Pro",
+        "After Effects",
+        "News",
+        "Motion"
+      ],
+      "media": []
+    },
+    {
+      "id": "exp-dietplus-2018",
+      "company": {
+        "fr": "Dietplus"
+      },
+      "role": {
+        "fr": "Monteur vidéo",
+        "en": "Video editor",
+        "pl": "Montażysta wideo",
+        "es": "Editor de vídeo"
+      },
+      "location": {
+        "fr": "France",
+        "en": "France",
+        "pl": "Francja",
+        "es": "Francia"
+      },
+      "startDate": "2018",
+      "endDate": "2019",
+      "description": {
+        "fr": "Production vidéo et supports graphiques pour la communication de marque.",
+        "en": "Video production and graphic assets for brand communication.",
+        "pl": "Produkcja wideo i materiały graficzne do komunikacji marki.",
+        "es": "Producción de vídeo y soportes gráficos para la comunicación de marca."
+      },
+      "technologies": [
+        "Montage",
+        "Photoshop",
+        "Illustrator"
+      ],
+      "media": []
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-showreel",
+      "title": {
+        "fr": "Showreel 2024"
+      },
+      "description": {
+        "fr": "Sélection de montages, motions et captations — rythme, couleur et storytelling.",
+        "en": "A selection of edits, motions and captures — pacing, color and storytelling.",
+        "pl": "Wybór montaży, motionów i zdjęć — rytm, kolor i storytelling.",
+        "es": "Selección de montajes, motions y captaciones — ritmo, color y storytelling."
+      },
+      "longDescription": {
+        "fr": "Showreel personnel regroupant des extraits de montage corporate, social, motion design et captation. Idéal pour découvrir mon style et mon niveau technique en quelques minutes.",
+        "en": "Personal showreel with corporate, social, motion design and capture excerpts. Ideal to discover my style and technical level in a few minutes.",
+        "pl": "Osobisty showreel z fragmentami montażu corporate, social, motion design i captacji. Idealny, by poznać mój styl w kilka minut.",
+        "es": "Showreel personal con extractos de montaje corporate, social, motion design y captación. Ideal para descubrir mi estilo en pocos minutos."
+      },
+      "mediaType": "youtube",
+      "image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22800%22%20height%3D%22500%22%20viewBox%3D%220%200%20800%20500%22%3E%0A%20%20%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20style%3D%22stop-color%3A%230f766e%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20style%3D%22stop-color%3A%23134e4a%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%0A%20%20%20%20%20%20font-family%3D%22system-ui%2Csans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22700%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%3ES%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E",
+      "videoUrl": "https://youtu.be/ws0EbZOxaNs",
+      "tags": [
+        "Montage",
+        "Showreel",
+        "Premiere Pro",
+        "After Effects"
+      ],
+      "link": "https://youtu.be/ws0EbZOxaNs"
+    },
+    {
+      "id": "proj-motion",
+      "title": {
+        "fr": "Motion Brand Package"
+      },
+      "description": {
+        "fr": "Pack d’animations pour intro, lower-thirds et transitions de marque.",
+        "en": "Animation pack for intros, lower-thirds and brand transitions.",
+        "pl": "Pakiet animacji: intro, lower-thirds i przejścia marki.",
+        "es": "Pack de animaciones para intro, lower-thirds y transiciones de marca."
+      },
+      "longDescription": {
+        "fr": "Kit motion design réutilisable : intros, bas de page animés, transitions et end-cards. Expressions After Effects et templates MOGRT pour Premiere.",
+        "en": "Reusable motion design kit: intros, animated lower-thirds, transitions and end-cards. After Effects expressions and MOGRT templates for Premiere.",
+        "pl": "Zestaw motion design do ponownego użycia: intro, dolne paski, przejścia i end-cards. Expressions AE i szablony MOGRT.",
+        "es": "Kit de motion reutilizable: intros, lower-thirds, transiciones y end-cards. Expresiones de AE y plantillas MOGRT para Premiere."
+      },
+      "mediaType": "image",
+      "image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22800%22%20height%3D%22500%22%20viewBox%3D%220%200%20800%20500%22%3E%0A%20%20%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20style%3D%22stop-color%3A%23115e59%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20style%3D%22stop-color%3A%23042f2e%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%0A%20%20%20%20%20%20font-family%3D%22system-ui%2Csans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22700%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%3EM%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E",
+      "videoUrl": null,
+      "tags": [
+        "After Effects",
+        "Motion Design",
+        "MOGRT",
+        "Branding"
+      ]
+    },
+    {
+      "id": "proj-social",
+      "title": {
+        "fr": "Social Cuts Influenceurs",
+        "en": "Influencer Social Cuts",
+        "pl": "Social Cuts dla influencerów",
+        "es": "Cortes social para influencers"
+      },
+      "description": {
+        "fr": "Formats courts dynamiques pour YouTube, Instagram, Facebook et Shorts.",
+        "en": "Dynamic short-form edits for YouTube, Instagram, Facebook and Shorts.",
+        "pl": "Dynamiczne krótkie formaty na YouTube, Instagram, Facebook i Shorts.",
+        "es": "Formatos cortos dinámicos para YouTube, Instagram, Facebook y Shorts."
+      },
+      "longDescription": {
+        "fr": "Séries de montages courts optimisés pour l’attention mobile : hooks, sous-titres, punchlines et rythme serré.",
+        "en": "Short-form series optimized for mobile attention: hooks, captions, punchlines and tight pacing.",
+        "pl": "Serie krótkich montaży pod mobile: hooki, napisy, punchline’y i szybkie tempo.",
+        "es": "Series de montajes cortos optimizados para móvil: hooks, subtítulos, punchlines y ritmo cerrado."
+      },
+      "mediaType": "image",
+      "image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22800%22%20height%3D%22500%22%20viewBox%3D%220%200%20800%20500%22%3E%0A%20%20%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20style%3D%22stop-color%3A%23b45309%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20style%3D%22stop-color%3A%23451a03%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%0A%20%20%20%20%20%20font-family%3D%22system-ui%2Csans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22700%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%3ES%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E",
+      "videoUrl": null,
+      "tags": [
+        "Social Media",
+        "Montage",
+        "Shorts",
+        "Vertical"
+      ]
+    },
+    {
+      "id": "proj-corporate",
+      "title": {
+        "fr": "Captation & Interview Corporate",
+        "en": "Corporate Capture & Interviews",
+        "pl": "Captacja i wywiady corporate",
+        "es": "Captación y entrevistas corporate"
+      },
+      "description": {
+        "fr": "Tournage Steadicam, interviews et post-production pour la marque.",
+        "en": "Steadicam shooting, interviews and post-production for the brand.",
+        "pl": "Zdjęcia Steadicam, wywiady i postprodukcja dla marki.",
+        "es": "Rodaje con Steadicam, entrevistas y postproducción para la marca."
+      },
+      "longDescription": {
+        "fr": "De la captation (Steadicam, lumière, son) au montage final : interviews, plans de coupe et étalonnage pour un rendu premium.",
+        "en": "From capture (Steadicam, light, sound) to final edit: interviews, B-roll and grading for a premium look.",
+        "pl": "Od zdjęć (Steadicam, światło, dźwięk) do finalnego montażu: wywiady, plany i color grading premium.",
+        "es": "De la captación (Steadicam, luz, sonido) al montaje final: entrevistas, planos de corte y etalonaje premium."
+      },
+      "mediaType": "image",
+      "image": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22800%22%20height%3D%22500%22%20viewBox%3D%220%200%20800%20500%22%3E%0A%20%20%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20style%3D%22stop-color%3A%23292524%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20style%3D%22stop-color%3A%230c0a09%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%0A%20%20%20%20%20%20font-family%3D%22system-ui%2Csans-serif%22%20font-size%3D%22120%22%20font-weight%3D%22700%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%3EC%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E",
+      "videoUrl": null,
+      "tags": [
+        "Steadicam",
+        "Interview",
+        "Réalisation",
+        "Colorimétrie"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "id": "sk-premiere",
+      "name": {
+        "fr": "Adobe Premiere Pro",
+        "en": "Adobe Premiere Pro",
+        "pl": "Adobe Premiere Pro",
+        "es": "Adobe Premiere Pro"
+      },
+      "level": 95,
+      "category": {
+        "fr": "Montage vidéo",
+        "en": "Video editing",
+        "pl": "Montaż wideo",
+        "es": "Montaje de vídeo"
+      },
+      "description": {
+        "fr": "Montage multi-caméras, storytelling rythmé, workflows proxy et livraison broadcast / social. Maîtrise des timelines complexes, de l’audio mix et des exports optimisés.",
+        "en": "Multi-cam editing, paced storytelling, proxy workflows and broadcast/social delivery. Complex timelines, audio mix and optimized exports.",
+        "pl": "Montaż multi-cam, storytelling, workflow proxy i dostawy broadcast/social. Złożone timeline’y, mix audio i eksporty.",
+        "es": "Montaje multi-cámara, storytelling rítmico, workflows proxy y entrega broadcast/social. Timelines complejas, mezcla de audio y exports."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-fcp",
+      "name": {
+        "fr": "Final Cut Pro",
+        "en": "Final Cut Pro",
+        "pl": "Final Cut Pro",
+        "es": "Final Cut Pro"
+      },
+      "level": 85,
+      "category": {
+        "fr": "Montage vidéo",
+        "en": "Video editing",
+        "pl": "Montaż wideo",
+        "es": "Montaje de vídeo"
+      },
+      "description": {
+        "fr": "Montage magnétique rapide, étalonnage intégré et livraisons multi-formats sur écosystème Apple.",
+        "en": "Fast magnetic timeline editing, built-in grading and multi-format delivery on Apple ecosystem.",
+        "pl": "Szybki montaż magnetyczny, grading wbudowany i dostawy multi-format w ekosystemie Apple.",
+        "es": "Montaje magnético rápido, etalonaje integrado y entregas multi-formato en ecosistema Apple."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-resolve",
+      "name": {
+        "fr": "DaVinci Resolve",
+        "en": "DaVinci Resolve",
+        "pl": "DaVinci Resolve",
+        "es": "DaVinci Resolve"
+      },
+      "level": 82,
+      "category": {
+        "fr": "Montage vidéo",
+        "en": "Video editing",
+        "pl": "Montaż wideo",
+        "es": "Montaje de vídeo"
+      },
+      "description": {
+        "fr": "Color grading avancé, nodes, looks cinéma et finishing pour films corporate et clips.",
+        "en": "Advanced color grading, nodes, cinematic looks and finishing for corporate films and clips.",
+        "pl": "Zaawansowany color grading, nodes, looki filmowe i finishing dla corporate i klipów.",
+        "es": "Etalonaje avanzado, nodos, looks cine y finishing para films corporate y clips."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-ae",
+      "name": {
+        "fr": "Adobe After Effects",
+        "en": "Adobe After Effects",
+        "pl": "Adobe After Effects",
+        "es": "Adobe After Effects"
+      },
+      "level": 92,
+      "category": {
+        "fr": "Motion design",
+        "en": "Motion design",
+        "pl": "Motion design",
+        "es": "Motion design"
+      },
+      "description": {
+        "fr": "Motion design, habillage, lower-thirds, animations 2D et intégration de templates dynamiques.",
+        "en": "Motion design, packaging, lower-thirds, 2D animation and dynamic template integration.",
+        "pl": "Motion design, oprawa, lower-thirds, animacja 2D i dynamiczne szablony.",
+        "es": "Motion design, packaging, lower-thirds, animación 2D e integración de plantillas dinámicas."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-motion",
+      "name": {
+        "fr": "Apple Motion",
+        "en": "Apple Motion",
+        "pl": "Apple Motion",
+        "es": "Apple Motion"
+      },
+      "level": 80,
+      "category": {
+        "fr": "Motion design",
+        "en": "Motion design",
+        "pl": "Motion design",
+        "es": "Motion design"
+      },
+      "description": {
+        "fr": "Templates Motion / FCP, titres animés et graphiques temps réel pour broadcasts légers.",
+        "en": "Motion / FCP templates, animated titles and real-time graphics for light broadcast.",
+        "pl": "Szablony Motion / FCP, animowane tytuły i grafika real-time.",
+        "es": "Plantillas Motion / FCP, títulos animados y gráficos en tiempo real."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-mogrt",
+      "name": {
+        "fr": "Templates MOGRT",
+        "en": "Templates MOGRT",
+        "pl": "Templates MOGRT",
+        "es": "Templates MOGRT"
+      },
+      "level": 88,
+      "category": {
+        "fr": "Motion design",
+        "en": "Motion design",
+        "pl": "Motion design",
+        "es": "Motion design"
+      },
+      "description": {
+        "fr": "Création et adaptation de Motion Graphics Templates pour Premiere, réutilisables en série.",
+        "en": "Creating and adapting Motion Graphics Templates for Premiere, reusable at scale.",
+        "pl": "Tworzenie i adaptacja szablonów MOGRT do Premiere, wielokrotnego użytku.",
+        "es": "Creación y adaptación de plantillas MOGRT para Premiere, reutilizables en serie."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-yt",
+      "name": {
+        "fr": "YouTube / Shorts",
+        "en": "YouTube / Shorts",
+        "pl": "YouTube / Shorts",
+        "es": "YouTube / Shorts"
+      },
+      "level": 90,
+      "category": {
+        "fr": "Vidéo réseaux sociaux",
+        "en": "Social video",
+        "pl": "Wideo w social media",
+        "es": "Vídeo redes sociales"
+      },
+      "description": {
+        "fr": "Formats verticaux et horizontaux, hooks, pacing algorithmique et miniatures cohérentes.",
+        "en": "Vertical and horizontal formats, hooks, algorithm-friendly pacing and consistent thumbnails.",
+        "pl": "Formaty pionowe i poziome, hooki, pacing pod algorytm i spójne miniatury.",
+        "es": "Formatos verticales y horizontales, hooks, pacing algorítmico y miniaturas coherentes."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-ig",
+      "name": {
+        "fr": "Instagram / Reels",
+        "en": "Instagram / Reels",
+        "pl": "Instagram / Reels",
+        "es": "Instagram / Reels"
+      },
+      "level": 88,
+      "category": {
+        "fr": "Vidéo réseaux sociaux",
+        "en": "Social video",
+        "pl": "Wideo w social media",
+        "es": "Vídeo redes sociales"
+      },
+      "description": {
+        "fr": "Reels engageants, cuts au beat, overlays et finitions adaptées au feed Instagram.",
+        "en": "Engaging Reels, beat cuts, overlays and finishes tailored for Instagram feed.",
+        "pl": "Angażujące Reels, cięcia do beatu, overlaye i finisz pod Instagram.",
+        "es": "Reels atractivos, cortes al beat, overlays y acabados para el feed de Instagram."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-fb",
+      "name": {
+        "fr": "Facebook / formats social",
+        "en": "Facebook / social formats",
+        "pl": "Facebook / formaty social",
+        "es": "Facebook / formatos social"
+      },
+      "level": 90,
+      "category": {
+        "fr": "Vidéo réseaux sociaux",
+        "en": "Social video",
+        "pl": "Wideo w social media",
+        "es": "Vídeo redes sociales"
+      },
+      "description": {
+        "fr": "Formats ads et organiques Facebook, ratios multiples et messages clairs dès les premières secondes.",
+        "en": "Facebook ads and organic formats, multiple ratios and clear messages from the first seconds.",
+        "pl": "Formaty ads i organiczne na Facebooku, wiele ratio i jasny przekaz od pierwszych sekund.",
+        "es": "Formatos ads y orgánicos de Facebook, múltiples ratios y mensajes claros desde el primer segundo."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-ps",
+      "name": {
+        "fr": "Photoshop",
+        "en": "Photoshop",
+        "pl": "Photoshop",
+        "es": "Photoshop"
+      },
+      "level": 90,
+      "category": {
+        "fr": "Graphisme",
+        "en": "Graphic design",
+        "pl": "Grafika",
+        "es": "Diseño gráfico"
+      },
+      "description": {
+        "fr": "Retouche photo, miniatures, assets UI et compositions pour supports print & digital.",
+        "en": "Photo retouching, thumbnails, UI assets and compositions for print & digital.",
+        "pl": "Retusz zdjęć, miniatury, assety UI i kompozycje print & digital.",
+        "es": "Retoque foto, miniaturas, assets UI y composiciones para print y digital."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-ai",
+      "name": {
+        "fr": "Illustrator",
+        "en": "Illustrator",
+        "pl": "Illustrator",
+        "es": "Illustrator"
+      },
+      "level": 88,
+      "category": {
+        "fr": "Graphisme",
+        "en": "Graphic design",
+        "pl": "Grafika",
+        "es": "Diseño gráfico"
+      },
+      "description": {
+        "fr": "Logos, pictos, vectoriel et déclinaisons de charte pour motion et print.",
+        "en": "Logos, icons, vector art and brand system assets for motion and print.",
+        "pl": "Loga, piktogramy, wektory i system identyfikacji do motion i printu.",
+        "es": "Logos, pictos, vectorial y declinaciones de marca para motion y print."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-id",
+      "name": {
+        "fr": "InDesign",
+        "en": "InDesign",
+        "pl": "InDesign",
+        "es": "InDesign"
+      },
+      "level": 82,
+      "category": {
+        "fr": "Graphisme",
+        "en": "Graphic design",
+        "pl": "Grafika",
+        "es": "Diseño gráfico"
+      },
+      "description": {
+        "fr": "Mises en page éditoriales, dossiers de presse et supports print multi-pages.",
+        "en": "Editorial layouts, press kits and multi-page print materials.",
+        "pl": "Skład edytorski, press kitty i materiały print multi-page.",
+        "es": "Maquetación editorial, dossiers de prensa y soportes print multipágina."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-color",
+      "name": {
+        "fr": "Colorimétrie",
+        "en": "Color grading",
+        "pl": "Kolorystyka",
+        "es": "Etalonaje"
+      },
+      "level": 85,
+      "category": {
+        "fr": "Autres",
+        "en": "Other",
+        "pl": "Inne",
+        "es": "Otros"
+      },
+      "description": {
+        "fr": "Looks cohérents de projet, matching multi-cam et finitions cinema / corporate.",
+        "en": "Consistent project looks, multi-cam matching and cinema / corporate finishing.",
+        "pl": "Spójne looki projektu, matching multi-cam i finishing cinema / corporate.",
+        "es": "Looks coherentes de proyecto, matching multi-cam y finishing cine / corporate."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-prompter",
+      "name": {
+        "fr": "Prompteur",
+        "en": "Teleprompter",
+        "pl": "Prompter",
+        "es": "Teleprompter"
+      },
+      "level": 88,
+      "category": {
+        "fr": "Autres",
+        "en": "Other",
+        "pl": "Inne",
+        "es": "Otros"
+      },
+      "description": {
+        "fr": "Gestion prompteur en plateau, rythme de lecture et confort interlocuteur.",
+        "en": "On-set teleprompter operation, reading pace and talent comfort.",
+        "pl": "Obsługa promptera na planie, tempo czytania i komfort mówcy.",
+        "es": "Operación de teleprompter en plató, ritmo de lectura y comodidad del interlocutor."
+      },
+      "icons": []
+    },
+    {
+      "id": "sk-multi",
+      "name": {
+        "fr": "Production multilingue (FR / EN / PL)",
+        "en": "Multilingual production (FR / EN / PL)",
+        "pl": "Produkcja wielojęzyczna (FR / EN / PL)",
+        "es": "Producción multilingüe (FR / EN / PL)"
+      },
+      "level": 90,
+      "category": {
+        "fr": "Autres",
+        "en": "Other",
+        "pl": "Inne",
+        "es": "Otros"
+      },
+      "description": {
+        "fr": "Coordination de contenus multilingues, sous-titres et versions adaptées par marché.",
+        "en": "Coordinating multilingual content, subtitles and market-specific versions.",
+        "pl": "Koordynacja treści wielojęzycznych, napisy i wersje pod rynki.",
+        "es": "Coordinación de contenidos multilingües, subtítulos y versiones por mercado."
+      },
+      "icons": []
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-m2",
+      "year": "2013",
+      "degree": {
+        "fr": "Master 2 Management & Communication Web",
+        "en": "Master’s in Management & Web Communication",
+        "pl": "Magister Management & Communication Web",
+        "es": "Máster en Management y Comunicación Web"
+      },
+      "school": {
+        "fr": "ISEFAC Paris"
+      },
+      "media": []
+    },
+    {
+      "id": "edu-licence-com",
+      "year": "2011",
+      "degree": {
+        "fr": "Licence Activités et Techniques de Communication",
+        "en": "Bachelor’s in Communication Activities & Techniques",
+        "pl": "Licencjat: Działania i Techniki Komunikacji",
+        "es": "Grado en Actividades y Técnicas de Comunicación"
+      },
+      "school": {
+        "fr": "UMLV"
+      },
+      "media": []
+    },
+    {
+      "id": "edu-licence-arts",
+      "year": "2009–2010",
+      "degree": {
+        "fr": "Licence Arts et Technologies, option cinéma",
+        "en": "Bachelor’s in Arts & Technologies, cinema track",
+        "pl": "Licencjat Sztuka i Technologie, ścieżka filmowa",
+        "es": "Grado en Artes y Tecnologías, opción cine"
+      },
+      "school": {
+        "fr": "UMLV"
+      },
+      "media": []
+    }
+  ],
+  "languages": [
+    {
+      "id": "lang-fr",
+      "name": {
+        "fr": "Français",
+        "en": "French",
+        "pl": "Francuski",
+        "es": "Francés"
+      },
+      "level": {
+        "fr": "Natif",
+        "en": "Native",
+        "pl": "Ojczysty",
+        "es": "Nativo"
+      },
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784762544/iukryqcmt5iz8odkujre.mov",
+      "icons": [
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-flag-FR-0",
+          "kind": "flag",
+          "region": "FR"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-mon-FR-1",
+          "kind": "monument",
+          "region": "FR",
+          "emoji": "🗼"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-cul-FR-2",
+          "kind": "culture",
+          "region": "FR",
+          "emoji": "🍷"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-flag-BE-3",
+          "kind": "flag",
+          "region": "BE"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-mon-BE-4",
+          "kind": "monument",
+          "region": "BE",
+          "emoji": "🍫"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-cul-BE-5",
+          "kind": "culture",
+          "region": "BE",
+          "emoji": "🍺"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-flag-CH-6",
+          "kind": "flag",
+          "region": "CH"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-mon-CH-7",
+          "kind": "monument",
+          "region": "CH",
+          "emoji": "⛰️"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-cul-CH-8",
+          "kind": "culture",
+          "region": "CH",
+          "emoji": "🧀"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-flag-CA-9",
+          "kind": "flag",
+          "region": "CA"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-mon-CA-10",
+          "kind": "monument",
+          "region": "CA",
+          "emoji": "🍁"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-cul-CA-11",
+          "kind": "culture",
+          "region": "CA",
+          "emoji": "🏒"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-flag-LU-12",
+          "kind": "flag",
+          "region": "LU"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-mon-LU-13",
+          "kind": "monument",
+          "region": "LU",
+          "emoji": "🏰"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-cul-LU-14",
+          "kind": "culture",
+          "region": "LU",
+          "emoji": "🍷"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-flag-MC-15",
+          "kind": "flag",
+          "region": "MC"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-mon-MC-16",
+          "kind": "monument",
+          "region": "MC",
+          "emoji": "🏎️"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-cul-MC-17",
+          "kind": "culture",
+          "region": "MC",
+          "emoji": "🎰"
+        },
+        {
+          "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-outline-FR",
+          "kind": "outline",
+          "region": "FR"
+        }
+      ],
+      "outlines": [
+        {
+          "id": "8e6409f0-d82f-4b1c-acf1-8f2934e6e8e9",
+          "code": "FR",
+          "label": {
+            "fr": "France",
+            "en": "France",
+            "pl": "Francja",
+            "es": "Francia"
+          }
+        },
+        {
+          "id": "c06a5a79-a96d-4a10-8df8-257d6c095213",
+          "code": "BE",
+          "label": {
+            "fr": "Belgique",
+            "en": "Belgium",
+            "pl": "Belgia",
+            "es": "Bélgica"
+          }
+        },
+        {
+          "id": "8508881a-406f-49e4-a395-ee35dd8da674",
+          "code": "CH",
+          "label": {
+            "fr": "Suisse",
+            "en": "Switzerland",
+            "pl": "Szwajcaria",
+            "es": "Suiza"
+          }
+        },
+        {
+          "id": "a5d88d94-781f-4998-89df-d4cdd2e3fe95",
+          "code": "CA",
+          "label": {
+            "fr": "Canada",
+            "en": "Canada",
+            "pl": "Kanada",
+            "es": "Canadá"
+          }
+        },
+        {
+          "id": "37b11ab8-7958-49f3-a7a6-5ff8d52cebb5",
+          "code": "LU",
+          "label": {
+            "fr": "Luxembourg",
+            "en": "Luxembourg",
+            "pl": "Luksemburg",
+            "es": "Luxemburgo"
+          }
+        },
+        {
+          "id": "fc8dd173-9473-48cf-8815-5ed1de650911",
+          "code": "MC",
+          "label": {
+            "fr": "Monaco",
+            "en": "Monaco",
+            "pl": "Monako",
+            "es": "Mónaco"
+          }
+        }
+      ],
+      "iconStyle": "flag",
+      "primaryRegion": "FR",
+      "regions": [
+        "FR",
+        "BE",
+        "CH",
+        "CA",
+        "LU",
+        "MC"
+      ]
+    },
+    {
+      "id": "lang-en",
+      "name": {
+        "fr": "Anglais",
+        "en": "English",
+        "pl": "Angielski",
+        "es": "Inglés"
+      },
+      "level": {
+        "fr": "Courant",
+        "en": "Fluent",
+        "pl": "Biegły",
+        "es": "Fluido"
+      },
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784763043/jz0nfo5hx2yjzlpoeohb.mov",
+      "icons": [
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-GB-0",
+          "kind": "flag",
+          "region": "GB"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-GB-1",
+          "kind": "monument",
+          "region": "GB",
+          "emoji": "🏰"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-GB-2",
+          "kind": "culture",
+          "region": "GB",
+          "emoji": "☕"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-US-3",
+          "kind": "flag",
+          "region": "US"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-US-4",
+          "kind": "monument",
+          "region": "US",
+          "emoji": "🗽"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-US-5",
+          "kind": "culture",
+          "region": "US",
+          "emoji": "🎬"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-CA-6",
+          "kind": "flag",
+          "region": "CA"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-CA-7",
+          "kind": "monument",
+          "region": "CA",
+          "emoji": "🍁"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-CA-8",
+          "kind": "culture",
+          "region": "CA",
+          "emoji": "🏒"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-AU-9",
+          "kind": "flag",
+          "region": "AU"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-AU-10",
+          "kind": "monument",
+          "region": "AU",
+          "emoji": "🏛️"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-AU-11",
+          "kind": "culture",
+          "region": "AU",
+          "emoji": "🪃"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-IE-12",
+          "kind": "flag",
+          "region": "IE"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-IE-13",
+          "kind": "monument",
+          "region": "IE",
+          "emoji": "☘️"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-IE-14",
+          "kind": "culture",
+          "region": "IE",
+          "emoji": "🎻"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-NZ-15",
+          "kind": "flag",
+          "region": "NZ"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-NZ-16",
+          "kind": "monument",
+          "region": "NZ",
+          "emoji": "🏔️"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-NZ-17",
+          "kind": "culture",
+          "region": "NZ",
+          "emoji": "🥝"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-ZA-18",
+          "kind": "flag",
+          "region": "ZA"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-ZA-19",
+          "kind": "monument",
+          "region": "ZA",
+          "emoji": "🦁"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-ZA-20",
+          "kind": "culture",
+          "region": "ZA",
+          "emoji": "🍷"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-IN-21",
+          "kind": "flag",
+          "region": "IN"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-mon-IN-22",
+          "kind": "monument",
+          "region": "IN",
+          "emoji": "🕌"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-cul-IN-23",
+          "kind": "culture",
+          "region": "IN",
+          "emoji": "🪔"
+        },
+        {
+          "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-outline-GB",
+          "kind": "outline",
+          "region": "GB"
+        }
+      ],
+      "outlines": [
+        {
+          "id": "81aa1230-45de-4f00-98c3-1db31cf77f1a",
+          "code": "GB",
+          "label": {
+            "fr": "Royaume-Uni",
+            "en": "United Kingdom",
+            "pl": "Wielka Brytania",
+            "es": "Reino Unido"
+          }
+        },
+        {
+          "id": "a91b66cf-e6ae-4b8f-905c-162a02e49655",
+          "code": "US",
+          "label": {
+            "fr": "États-Unis",
+            "en": "United States",
+            "pl": "Stany Zjednoczone",
+            "es": "Estados Unidos"
+          }
+        },
+        {
+          "id": "c5ebce17-6d10-468a-8ebf-822f60051aef",
+          "code": "CA",
+          "label": {
+            "fr": "Canada",
+            "en": "Canada",
+            "pl": "Kanada",
+            "es": "Canadá"
+          }
+        },
+        {
+          "id": "a071d761-9c7a-4ff4-be6d-dcccdf62b268",
+          "code": "AU",
+          "label": {
+            "fr": "Australie",
+            "en": "Australia",
+            "pl": "Australia",
+            "es": "Australia"
+          }
+        },
+        {
+          "id": "935a31b5-f2eb-432c-b35d-e6057a742e3f",
+          "code": "IE",
+          "label": {
+            "fr": "Irlande",
+            "en": "Ireland",
+            "pl": "Irlandia",
+            "es": "Irlanda"
+          }
+        },
+        {
+          "id": "90a1df83-b9fc-4b88-80a0-8d1ba49f42fe",
+          "code": "NZ",
+          "label": {
+            "fr": "Nouvelle-Zélande",
+            "en": "New Zealand",
+            "pl": "Nowa Zelandia",
+            "es": "Nueva Zelanda"
+          }
+        },
+        {
+          "id": "11be7fb2-030e-4872-9561-59e532f942ef",
+          "code": "ZA",
+          "label": {
+            "fr": "Afrique du Sud",
+            "en": "South Africa",
+            "pl": "Republika Południowej Afryki",
+            "es": "Sudáfrica"
+          }
+        },
+        {
+          "id": "8c783b1c-f572-41c7-acc0-9641136e9928",
+          "code": "IN",
+          "label": {
+            "fr": "Inde",
+            "en": "India",
+            "pl": "Indie",
+            "es": "India"
+          }
+        }
+      ],
+      "iconStyle": "flag",
+      "primaryRegion": "GB",
+      "regions": [
+        "GB",
+        "US",
+        "CA",
+        "AU",
+        "IE",
+        "NZ",
+        "ZA",
+        "IN"
+      ]
+    },
+    {
+      "id": "lang-pl",
+      "name": {
+        "fr": "Polonais",
+        "en": "Polish",
+        "pl": "Polski",
+        "es": "Polaco"
+      },
+      "level": {
+        "fr": "Courant",
+        "en": "Fluent",
+        "pl": "Biegły",
+        "es": "Fluido"
+      },
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784763107/sipmppyiwyzu20awd2iw.mov",
+      "icons": [
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-flag-PL-0",
+          "kind": "flag",
+          "region": "PL"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-mon-PL-1",
+          "kind": "monument",
+          "region": "PL",
+          "emoji": "🏰"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-cul-PL-2",
+          "kind": "culture",
+          "region": "PL",
+          "emoji": "🥟"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-flag-LT-3",
+          "kind": "flag",
+          "region": "LT"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-mon-LT-4",
+          "kind": "monument",
+          "region": "LT",
+          "emoji": "🏰"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-cul-LT-5",
+          "kind": "culture",
+          "region": "LT",
+          "emoji": "🏀"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-flag-UA-6",
+          "kind": "flag",
+          "region": "UA"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-mon-UA-7",
+          "kind": "monument",
+          "region": "UA",
+          "emoji": "🌻"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-cul-UA-8",
+          "kind": "culture",
+          "region": "UA",
+          "emoji": "🌻"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-flag-DE-9",
+          "kind": "flag",
+          "region": "DE"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-mon-DE-10",
+          "kind": "monument",
+          "region": "DE",
+          "emoji": "🚪"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-cul-DE-11",
+          "kind": "culture",
+          "region": "DE",
+          "emoji": "🥨"
+        },
+        {
+          "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-outline-PL",
+          "kind": "outline",
+          "region": "PL"
+        }
+      ],
+      "outlines": [
+        {
+          "id": "cc514e2a-4ae2-47e8-a66e-439654382eda",
+          "code": "PL",
+          "label": {
+            "fr": "Pologne",
+            "en": "Poland",
+            "pl": "Polska",
+            "es": "Polonia"
+          }
+        },
+        {
+          "id": "710b059c-2ef9-4164-a434-a800b1abaf96",
+          "code": "LT",
+          "label": {
+            "fr": "Lituanie",
+            "en": "Lithuania",
+            "pl": "Litwa",
+            "es": "Lituania"
+          }
+        },
+        {
+          "id": "6f957a93-51be-474a-8826-02b4bf325748",
+          "code": "UA",
+          "label": {
+            "fr": "Ukraine",
+            "en": "Ukraine",
+            "pl": "Ukraina",
+            "es": "Ucrania"
+          }
+        },
+        {
+          "id": "ef2e31e6-6ec0-4698-9af0-41bc860b241b",
+          "code": "DE",
+          "label": {
+            "fr": "Allemagne",
+            "en": "Germany",
+            "pl": "Niemcy",
+            "es": "Alemania"
+          }
+        }
+      ],
+      "iconStyle": "flag",
+      "primaryRegion": "PL",
+      "regions": [
+        "PL",
+        "LT",
+        "UA",
+        "DE"
+      ]
+    },
+    {
+      "id": "9c483f6e-f77f-47ee-9ccd-11ff5566f4a3",
+      "name": {
+        "fr": "Espagnol",
+        "en": "Spanish",
+        "pl": "Hiszpański",
+        "es": "Español"
+      },
+      "level": {
+        "fr": "Je me débrouille… pas vraiment lol",
+        "en": "I get by… not really lol",
+        "pl": "Radzę sobie… no nie bardzo lol",
+        "es": "Me defiendo… la verdad no mucho lol"
+      },
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784763248/oravm91gccwsn1fpx1vt.mov",
+      "icons": [
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-flag-ES-0",
+          "kind": "flag",
+          "region": "ES"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-mon-ES-1",
+          "kind": "monument",
+          "region": "ES",
+          "emoji": "🏛️"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-cul-ES-2",
+          "kind": "culture",
+          "region": "ES",
+          "emoji": "🎸"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-flag-MX-3",
+          "kind": "flag",
+          "region": "MX"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-mon-MX-4",
+          "kind": "monument",
+          "region": "MX",
+          "emoji": "🏛️"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-cul-MX-5",
+          "kind": "culture",
+          "region": "MX",
+          "emoji": "🌮"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-flag-AR-6",
+          "kind": "flag",
+          "region": "AR"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-mon-AR-7",
+          "kind": "monument",
+          "region": "AR",
+          "emoji": "🏔️"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-cul-AR-8",
+          "kind": "culture",
+          "region": "AR",
+          "emoji": "🥩"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-flag-CO-9",
+          "kind": "flag",
+          "region": "CO"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-mon-CO-10",
+          "kind": "monument",
+          "region": "CO",
+          "emoji": "☕"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-cul-CO-11",
+          "kind": "culture",
+          "region": "CO",
+          "emoji": "☕"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-flag-CL-12",
+          "kind": "flag",
+          "region": "CL"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-mon-CL-13",
+          "kind": "monument",
+          "region": "CL",
+          "emoji": "🏔️"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-cul-CL-14",
+          "kind": "culture",
+          "region": "CL",
+          "emoji": "🍷"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-flag-US-15",
+          "kind": "flag",
+          "region": "US"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-mon-US-16",
+          "kind": "monument",
+          "region": "US",
+          "emoji": "🗽"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-cul-US-17",
+          "kind": "culture",
+          "region": "US",
+          "emoji": "🎬"
+        },
+        {
+          "id": "385e74f2-8362-4095-91ac-8317118b4c67-outline-ES",
+          "kind": "outline",
+          "region": "ES"
+        }
+      ],
+      "outlines": [
+        {
+          "id": "ee465203-4100-4222-bfd7-5c7213b2fd4d",
+          "code": "ES",
+          "label": {
+            "fr": "Espagne",
+            "en": "Spain",
+            "pl": "Hiszpania",
+            "es": "España"
+          }
+        },
+        {
+          "id": "68b5fa18-eb13-44e9-8788-2481748ca246",
+          "code": "MX",
+          "label": {
+            "fr": "Mexique",
+            "en": "Mexico",
+            "pl": "Meksyk",
+            "es": "México"
+          }
+        },
+        {
+          "id": "246cd399-f6a3-49ec-bce3-7132ac5ba79d",
+          "code": "AR",
+          "label": {
+            "fr": "Argentine",
+            "en": "Argentina",
+            "pl": "Argentyna",
+            "es": "Argentina"
+          }
+        },
+        {
+          "id": "c0cdca98-50ea-4ce0-b098-3ee697543023",
+          "code": "CO",
+          "label": {
+            "fr": "Colombie",
+            "en": "Colombia",
+            "pl": "Kolumbia",
+            "es": "Colombia"
+          }
+        },
+        {
+          "id": "01c98f47-1cc0-4e37-97ea-0af52e4dbbfb",
+          "code": "CL",
+          "label": {
+            "fr": "Chili",
+            "en": "Chile",
+            "pl": "Chile",
+            "es": "Chile"
+          }
+        },
+        {
+          "id": "3313e97a-f3a9-41c1-8e53-26b762ed8bd9",
+          "code": "US",
+          "label": {
+            "fr": "États-Unis",
+            "en": "United States",
+            "pl": "Stany Zjednoczone",
+            "es": "Estados Unidos"
+          }
+        }
+      ],
+      "primaryRegion": "ES",
+      "regions": [
+        "ES",
+        "MX",
+        "AR",
+        "CO",
+        "CL",
+        "US"
+      ]
+    }
+  ],
+  "sectionLabels": {
+    "experienceEyebrow": {
+      "fr": "Parcours",
+      "en": "Career",
+      "pl": "Ścieżka",
+      "es": "Trayectoria"
+    },
+    "projectsEyebrow": {
+      "fr": "Portfolio",
+      "en": "Portfolio",
+      "pl": "Portfolio",
+      "es": "Portfolio"
+    },
+    "skillsEyebrow": {
+      "fr": "Expertise",
+      "en": "Expertise",
+      "pl": "Ekspertyza",
+      "es": "Experiencia"
+    },
+    "educationEyebrow": {
+      "fr": "Études",
+      "en": "Education",
+      "pl": "Edukacja",
+      "es": "Estudios"
+    },
+    "languagesEyebrow": {
+      "fr": "International",
+      "en": "International",
+      "pl": "Międzynarodowo",
+      "es": "Internacional"
+    },
+    "languagesDescription": {
+      "fr": "Survolez une carte pour voir la démo vidéo",
+      "en": "Hover a card to watch the video demo",
+      "pl": "Najedź na kartę, aby zobaczyć demo wideo",
+      "es": "Pasa el cursor sobre una tarjeta para ver el vídeo demo"
+    }
+  },
+  "contact": {
+    "sectionEyebrow": {
+      "fr": "Restons en contact",
+      "en": "Let’s connect",
+      "pl": "Bądźmy w kontakcie",
+      "es": "Sigamos en contacto"
+    },
+    "sectionTitle": {
+      "fr": "Contact"
+    },
+    "introText": {
+      "fr": "Disponible pour missions montage, motion et communication digitale.",
+      "en": "Available for editing, motion and digital communications missions.",
+      "pl": "Dostępny do projektów montażu, motion i komunikacji cyfrowej.",
+      "es": "Disponible para misiones de montaje, motion y comunicación digital."
+    },
+    "showNameTitle": true,
+    "showLocation": true,
+    "showEmail": true,
+    "emailLabel": {
+      "fr": "Email"
+    },
+    "emailValue": "",
+    "showPhone": true,
+    "phoneLabel": {
+      "fr": "Appeler",
+      "en": "Call",
+      "pl": "Zadzwoń",
+      "es": "Llamar"
+    },
+    "phoneValue": "",
+    "showShowreel": true,
+    "showreelLabel": {
+      "fr": "Showreel"
+    },
+    "showreelUrl": "",
+    "showCopyEmail": true,
+    "copyEmailLabel": {},
+    "showForm": true,
+    "formTitle": {
+      "fr": "Message rapide (ouvre votre client mail) :",
+      "en": "Quick message (opens your mail client):",
+      "pl": "Szybka wiadomość (otwiera klienta mail):",
+      "es": "Mensaje rápido (abre tu cliente de correo):"
+    },
+    "formSubmitLabel": {
+      "fr": "Envoyer via mail",
+      "en": "Send via email",
+      "pl": "Wyślij mailem",
+      "es": "Enviar por correo"
+    },
+    "showHeroShowreel": true,
+    "heroShowreelLabel": {
+      "fr": "Voir le showreel",
+      "en": "Watch showreel",
+      "pl": "Zobacz showreel",
+      "es": "Ver showreel"
+    },
+    "showHeroCv": true,
+    "heroCvLabel": {
+      "fr": "Télécharger CV",
+      "en": "Download CV",
+      "pl": "Pobierz CV",
+      "es": "Descargar CV"
+    },
+    "showHeroPhone": true,
+    "heroPhoneLabel": {
+      "fr": "Appeler"
+    },
+    "showHeroEmail": true,
+    "heroEmailLabel": {
+      "fr": "Envoyer un email"
+    },
+    "showHeroX": true,
+    "heroXLabel": {
+      "fr": "X / Twitter"
+    },
+    "xProfileUrl": "https://x.com/",
+    "showWidgetQuickContact": true,
+    "widgetQuickContactTitle": {
+      "fr": "Contact rapide",
+      "en": "Quick contact",
+      "pl": "Szybki kontakt",
+      "es": "Contacto rápido"
+    },
+    "quickContactLinks": [
+      {
+        "id": "qc-mail",
+        "icon": "mail",
+        "label": {
+          "fr": "Email"
+        },
+        "href": "mailto:patrick.roziel@me.com"
+      },
+      {
+        "id": "qc-phone",
+        "icon": "phone",
+        "label": {
+          "fr": "07 44 40 97 90"
+        },
+        "href": "tel:0744409790"
+      },
+      {
+        "id": "qc-showreel",
+        "icon": "play",
+        "label": {
+          "fr": "Showreel"
+        },
+        "href": "https://youtu.be/ws0EbZOxaNs"
+      }
+    ],
+    "showWidgetSkills": true,
+    "widgetSkillsTitle": {
+      "fr": "Top skills"
+    },
+    "widgetSkillTags": [
+      "Premiere Pro",
+      "After Effects",
+      "Motion design",
+      "Social media",
+      "Colorimétrie",
+      "DaVinci Resolve"
+    ],
+    "showWidgetAvailability": true,
+    "widgetAvailabilityTitle": {
+      "fr": "Disponibilité",
+      "en": "Availability",
+      "pl": "Dostępność",
+      "es": "Disponibilidad"
+    },
+    "widgetAvailabilityText": {
+      "fr": "Ouvert aux missions",
+      "en": "Open to missions",
+      "pl": "Otwarty na projekty",
+      "es": "Abierto a misiones"
+    },
+    "showWidgetXFeed": true,
+    "widgetXFeedTitle": {
+      "fr": "Sur X",
+      "en": "On X",
+      "pl": "Na X",
+      "es": "En X"
+    },
+    "xUsername": "@patrickroziel"
+  },
+  "mainShowreel": {
+    "title": {
+      "fr": "Showreel"
+    },
+    "videoType": "youtube",
+    "videoUrl": "https://youtu.be/ws0EbZOxaNs"
+  },
+  "featureVideos": [
+    {
+      "id": "feat-1",
+      "title": {
+        "fr": "Timelapse"
+      },
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784743251/fpydktqqqq4d7ibymdsu.mov"
+    },
+    {
+      "id": "feat-2",
+      "title": {
+        "fr": "Motion Design"
+      },
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784748535/pcqayn0d8gw7cmssuqmy.mov"
+    },
+    {
+      "id": "feat-3",
+      "title": {
+        "fr": "AI + Sources"
+      },
+      "videoType": "youtube",
+      "videoUrl": "https://youtube.com/shorts/dHWIxpPRmmM"
+    }
+  ]
+}

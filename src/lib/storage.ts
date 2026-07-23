@@ -808,3 +808,20 @@ export function savePortfolio(data: PortfolioData): void {
     throw e;
   }
 }
+
+/** Download current portfolio JSON (for baking into defaults) */
+export function downloadPortfolioSnapshot(data: PortfolioData): void {
+  if (typeof window === "undefined") return;
+  const payload = { ...data, version: DATA_VERSION };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `portfolio-snapshot-v${DATA_VERSION}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}

@@ -387,28 +387,27 @@ export const DEFAULT_WIDGET_SKILL_TAGS: string[] = [
   "DaVinci Resolve",
 ];
 
+/** Production defaults for the 3 feature video cards (Cloudinary + YouTube Shorts) */
 export const DEFAULT_FEATURE_VIDEOS: FeatureVideo[] = [
   {
     id: "feat-1",
-    title: L("Motion design"),
-    videoType: "none",
-    videoUrl: null,
+    title: L("Timelapse"),
+    videoType: "file",
+    videoUrl:
+      "https://res.cloudinary.com/ptp8diwd/video/upload/v1784743251/fpydktqqqq4d7ibymdsu.mov",
   },
   {
     id: "feat-2",
-    title: L("Réseaux sociaux", {
-      en: "Social media",
-      pl: "Social media",
-      es: "Redes sociales",
-    }),
-    videoType: "none",
-    videoUrl: null,
+    title: L("Motion Design"),
+    videoType: "file",
+    videoUrl:
+      "https://res.cloudinary.com/ptp8diwd/video/upload/v1784748535/pcqayn0d8gw7cmssuqmy.mov",
   },
   {
     id: "feat-3",
-    title: L("Corporate"),
-    videoType: "none",
-    videoUrl: null,
+    title: L("AI + Sources"),
+    videoType: "youtube",
+    videoUrl: "https://youtube.com/shorts/dHWIxpPRmmM",
   },
 ];
 
@@ -504,11 +503,11 @@ export const DEFAULT_CONTACT: ContactConfig = {
     es: "Abierto a misiones",
   }),
 
-  showWidgetXFeed: false,
+  showWidgetXFeed: true,
   widgetXFeedTitle: L("Sur X", {
     en: "On X",
     pl: "Na X",
     es: "En X",
   }),
-  xUsername: "",
+  xUsername: "@patrickroziel",
 };

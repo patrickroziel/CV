@@ -19,6 +19,7 @@ import { WallpaperEditor } from "@/components/background/WallpaperEditor";
 import { EditGate } from "@/components/shared/EditGate";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { EditLocaleBar } from "@/components/i18n/EditLocaleBar";
+import { downloadPortfolioSnapshot } from "@/lib/storage";
 
 const LINK_DEFS = [
   { href: "/#hero", key: "nav.home", id: "hero" },
@@ -31,7 +32,8 @@ const LINK_DEFS = [
 ] as const;
 
 export function Header() {
-  const { editMode, setEditMode, editAllowed, t } = usePortfolio();
+  const { editMode, setEditMode, editAllowed, t, data, showToast } =
+    usePortfolio();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -130,6 +132,19 @@ export function Header() {
             >
               <ImageIcon className="h-3.5 w-3.5" />
               {t("actions.appearance")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden sm:inline-flex"
+              title="Exporter le JSON pour defaults production"
+              onClick={() => {
+                downloadPortfolioSnapshot(data);
+                showToast("Snapshot JSON téléchargé");
+              }}
+            >
+              <FileDown className="h-3.5 w-3.5" />
+              Export JSON
             </Button>
           </EditGate>
           <Button
