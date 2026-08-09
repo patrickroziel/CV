@@ -14,11 +14,14 @@ import { GlassCard } from "@/components/glass/GlassCard";
 import { Button } from "@/components/ui/button";
 import { ProjectMedia } from "@/components/projects/ProjectMedia";
 import { SkillTag } from "@/components/skills/SkillTag";
+import { RichHtml } from "@/components/shared/RichHtml";
+import { useSectionVisible } from "@/components/shared/SectionVisibility";
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : "";
   const { data, isHydrated, l } = usePortfolio();
+  const { shouldRender: galleryOpen } = useSectionVisible("gallery");
 
   const index = useMemo(
     () => data.projects.findIndex((p) => p.id === id),
@@ -36,6 +39,22 @@ export default function ProjectDetailPage() {
       <main className="no-print relative z-10 pb-16 pt-32">
         <div className="mx-auto max-w-4xl px-4">
           <div className="h-96 animate-pulse rounded-3xl bg-white/5" />
+        </div>
+      </main>
+    );
+  }
+
+  if (!galleryOpen) {
+    return (
+      <main className="no-print relative z-10 pb-16 pt-32">
+        <div className="mx-auto max-w-lg px-4 text-center">
+          <p className="text-zinc-400">Cette page n’est pas disponible.</p>
+          <Link
+            href="/"
+            className="mt-4 inline-flex text-sm text-teal-300 hover:underline"
+          >
+            Retour à l’accueil
+          </Link>
         </div>
       </main>
     );
@@ -88,16 +107,20 @@ export default function ProjectDetailPage() {
               <h1 className="text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
                 {l(project.title)}
               </h1>
-              <p className="mt-3 text-lg text-zinc-400">{l(project.description)}</p>
+              <RichHtml
+                html={l(project.description)}
+                className="mt-3 text-lg text-zinc-400"
+              />
               <div className="mt-4 flex flex-wrap gap-2">
                 {project.tags.map((t) => (
                   <SkillTag key={t} label={t} variant="default" />
                 ))}
               </div>
               {project.longDescription && l(project.longDescription) && (
-                <p className="mt-6 text-base leading-relaxed text-zinc-300">
-                  {l(project.longDescription)}
-                </p>
+                <RichHtml
+                  html={l(project.longDescription)}
+                  className="mt-6 text-base leading-relaxed text-zinc-300"
+                />
               )}
               {project.link && (
                 <Button asChild className="mt-8" size="lg">

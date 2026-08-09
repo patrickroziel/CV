@@ -21,6 +21,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EditGate } from "@/components/shared/EditGate";
+import { ImageUpload } from "@/components/shared/ImageUpload";
+import {
+  VideoFallbackSurface,
+  VideoWithFallback,
+} from "@/components/shared/VideoWithFallback";
 import { VideoUpload } from "@/components/shared/VideoUpload";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import type {
@@ -47,6 +52,7 @@ type MediaSlot = {
   title: Translatable;
   videoType: FeatureVideoType;
   videoUrl: string | null;
+  fallbackImageUrl?: string | null;
 };
 
 const VIDEO_TYPE_META: {
@@ -136,25 +142,23 @@ function MediaPlayer({
   /** object-cover fill (feature cards) vs contain (main showreel default) */
   cover?: boolean;
 }) {
-  const { videoType, videoUrl } = slot;
+  const { videoType, videoUrl, fallbackImageUrl } = slot;
   const title = getL(slot.title);
 
   if (videoType === "none" || !videoUrl) {
     return (
-      <div
-        className={cn(
-          "flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-zinc-900/80 to-black/80 text-zinc-500",
-          className
-        )}
-      >
-        <Play className="h-8 w-8 opacity-40" />
-        <span className="text-xs">Aucune vidéo</span>
+      <div className={cn("relative h-full w-full", className)}>
+        <VideoFallbackSurface imageUrl={fallbackImageUrl} />
+        <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center gap-2 text-zinc-500">
+          <Play className="h-8 w-8 opacity-40" />
+          <span className="text-xs">Aucune vidéo</span>
+        </div>
       </div>
     );
   }
 
   if (videoType === "youtube") {
-    const thumb = youtubeThumb(videoUrl);
+    const thumb = fallbackImageUrl?.trim() || youtubeThumb(videoUrl);
     const src = youtubeEmbedUrl(videoUrl, {
       autoplay,
       mute: autoplay,
@@ -162,14 +166,15 @@ function MediaPlayer({
       controls: !autoplay,
     });
     return (
-      <div className={cn("relative h-full w-full bg-black", className)}>
+      <div className={cn("relative h-full w-full overflow-hidden", className)}>
+        <VideoFallbackSurface imageUrl={thumb} />
         {src ? (
           <iframe
             key={src}
             src={src}
             title={title}
             className={cn(
-              "absolute inset-0 h-full w-full border-0",
+              "absolute inset-0 z-[2] h-full w-full border-0",
               cover && "pointer-events-none scale-[1.35]"
             )}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -177,9 +182,6 @@ function MediaPlayer({
             allowFullScreen={!cover}
             tabIndex={cover ? -1 : undefined}
           />
-        ) : thumb ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt={title} className="h-full w-full object-cover" />
         ) : null}
       </div>
     );
@@ -190,10 +192,11 @@ function MediaPlayer({
     return (
       <div
         className={cn(
-          "relative h-full w-full overflow-hidden bg-black",
+          "relative h-full w-full overflow-hidden",
           className
         )}
       >
+        <VideoFallbackSurface imageUrl={fallbackImageUrl} />
         {src ? (
           <iframe
             src={src}
@@ -201,15 +204,15 @@ function MediaPlayer({
             className={
               cover
                 ? // Crop tweet chrome → focus on media / video only
-                  "pointer-events-none absolute left-1/2 top-[-8%] h-[160%] w-[220%] max-w-none -translate-x-1/2 border-0"
-                : "absolute inset-0 h-full w-full border-0"
+                  "pointer-events-none absolute left-1/2 top-[-8%] z-[2] h-[160%] w-[220%] max-w-none -translate-x-1/2 border-0"
+                : "absolute inset-0 z-[2] h-full w-full border-0"
             }
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy"
             tabIndex={cover ? -1 : undefined}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-2xl text-zinc-500">
+          <div className="absolute inset-0 z-[2] flex h-full items-center justify-center text-2xl text-zinc-500">
             𝕏
           </div>
         )}
@@ -219,13 +222,11 @@ function MediaPlayer({
 
   if (videoType === "file" || isFileVideoUrl(videoUrl)) {
     return (
-      <video
+      <VideoWithFallback
         src={videoUrl}
-        className={cn(
-          "h-full w-full bg-black",
-          cover ? "object-cover" : "object-contain",
-          className
-        )}
+        fallbackImageUrl={fallbackImageUrl}
+        className={cn("h-full w-full", className)}
+        objectFit={cover ? "cover" : "contain"}
         controls={!autoplay}
         playsInline
         autoPlay={autoplay}
@@ -237,7 +238,11 @@ function MediaPlayer({
     );
   }
 
-  return null;
+  return (
+    <div className={cn("relative h-full w-full", className)}>
+      <VideoFallbackSurface imageUrl={fallbackImageUrl} />
+    </div>
+  );
 }
 
 /**
@@ -269,12 +274,17 @@ function BlurFillVideo({
   const bgRef = useRef<HTMLVideoElement>(null);
   /** width / height — null until metadata loads */
   const [aspect, setAspect] = useState<number | null>(null);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     setAspect(null);
+    setReady(false);
+    setFailed(false);
   }, [src]);
 
   useEffect(() => {
+    if (failed) return;
     for (const el of [fgRef.current, bgRef.current]) {
       if (!el) continue;
       el.muted = true;
@@ -282,13 +292,13 @@ function BlurFillVideo({
       el.playsInline = true;
       if (active) {
         void el.play().catch(() => {
-          /* autoplay policy */
+          /* autoplay policy — still keep frame if loaded */
         });
       } else {
         el.pause();
       }
     }
-  }, [active, src]);
+  }, [active, src, failed]);
 
   useEffect(() => {
     const fg = fgRef.current;
@@ -299,8 +309,18 @@ function BlurFillVideo({
         setAspect(fg.videoWidth / fg.videoHeight);
       }
     };
+    const onReady = () => setReady(true);
+    const onError = () => {
+      setFailed(true);
+      setReady(false);
+    };
     if (fg.readyState >= 1) onMeta();
+    if (fg.readyState >= 2) onReady();
     fg.addEventListener("loadedmetadata", onMeta);
+    fg.addEventListener("loadeddata", onReady);
+    fg.addEventListener("canplay", onReady);
+    fg.addEventListener("error", onError);
+    bg.addEventListener("error", onError);
 
     const sync = () => {
       if (Math.abs(bg.currentTime - fg.currentTime) > 0.35) {
@@ -328,6 +348,10 @@ function BlurFillVideo({
     fg.addEventListener("ended", onEnded);
     return () => {
       fg.removeEventListener("loadedmetadata", onMeta);
+      fg.removeEventListener("loadeddata", onReady);
+      fg.removeEventListener("canplay", onReady);
+      fg.removeEventListener("error", onError);
+      bg.removeEventListener("error", onError);
       fg.removeEventListener("timeupdate", sync);
       fg.removeEventListener("seeked", sync);
       fg.removeEventListener("play", onPlay);
@@ -339,14 +363,19 @@ function BlurFillVideo({
   // aspect = width/height; portrait when taller than wide (incl. 9:16 Shorts)
   const portraitVideo =
     aspect != null ? isPortraitRatio(aspect, 1) : false;
+  const showVideo = ready && !failed;
+  const fade = "opacity 450ms ease";
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-black">
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Always-on still — custom poster or discreet placeholder */}
+      <VideoFallbackSurface imageUrl={poster} className="z-0" />
+
       <video
         ref={bgRef}
         src={src}
-        poster={poster ?? undefined}
-        className={BLUR_BG}
+        className={cn(BLUR_BG, "z-[1]")}
+        style={{ opacity: showVideo ? 0.75 : 0, transition: fade }}
         muted
         playsInline
         loop
@@ -361,6 +390,7 @@ function BlurFillVideo({
       <div
         className="pointer-events-none absolute inset-0 z-[1] bg-black/10"
         aria-hidden
+        style={{ opacity: showVideo ? 1 : 0, transition: fade }}
       />
       {/*
         Foreground sized by detected ratio:
@@ -368,11 +398,13 @@ function BlurFillVideo({
         - landscape: full width, height from ratio
         - unknown: object-contain fallback
       */}
-      <div className="absolute inset-0 z-[2] flex items-center justify-center">
+      <div
+        className="absolute inset-0 z-[2] flex items-center justify-center"
+        style={{ opacity: showVideo ? 1 : 0, transition: fade }}
+      >
         <video
           ref={fgRef}
           src={src}
-          poster={poster ?? undefined}
           className={cn(
             "max-h-full max-w-full object-contain",
             aspect == null && "h-full w-full",
@@ -419,21 +451,18 @@ function BlurFillYouTube({
   vertical?: boolean;
 }) {
   return (
-    <div className="absolute inset-0 overflow-hidden bg-black">
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Base still — custom fallback, YT thumb, or discreet placeholder */}
+      <VideoFallbackSurface imageUrl={posterUrl} className="z-0" />
       {posterUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={posterUrl}
           alt=""
-          className={BLUR_BG}
+          className={cn(BLUR_BG, "z-[1]")}
           aria-hidden
         />
-      ) : (
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800 to-black"
-          aria-hidden
-        />
-      )}
+      ) : null}
       <div
         className="pointer-events-none absolute inset-0 z-[1] bg-black/10"
         aria-hidden
@@ -443,9 +472,9 @@ function BlurFillYouTube({
           className={cn(
             "relative overflow-hidden",
             vertical
-              ? // 9:16 — fill portrait card height, blur on the sides
+              ? // 9:16 — fill square card height, blur on the sides
                 "h-full max-h-full w-auto max-w-full aspect-[9/16]"
-              : // 16:9 — fill width of portrait card
+              : // 16:9 — fill width of square card
                 "aspect-video h-auto w-full max-h-full max-w-full"
           )}
         >
@@ -473,11 +502,11 @@ function BlurFillYouTube({
 
 /**
  * Feature card media — Upload + YouTube only.
- * Portrait card stays fixed; video keeps original ratio, light blur fill behind.
+ * Card frame is 1:1; video keeps original ratio with light blur fill behind.
  */
 function FeatureCardMedia({ slot }: { slot: MediaSlot }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.3, "80px");
-  const { videoType, videoUrl } = slot;
+  const { videoType, videoUrl, fallbackImageUrl } = slot;
   const title = getL(slot.title);
 
   // Legacy X entries on feature cards → empty state
@@ -487,12 +516,12 @@ function FeatureCardMedia({ slot }: { slot: MediaSlot }) {
 
   if (effectiveType === "none" || !effectiveUrl) {
     return (
-      <div
-        ref={ref}
-        className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-zinc-900/90 to-black text-zinc-500"
-      >
-        <Play className="h-7 w-7 opacity-35" />
-        <span className="text-[11px]">Aucune vidéo</span>
+      <div ref={ref} className="relative h-full w-full">
+        <VideoFallbackSurface imageUrl={fallbackImageUrl} />
+        <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center gap-2 text-zinc-500">
+          <Play className="h-7 w-7 opacity-35" />
+          <span className="text-[11px]">Aucune vidéo</span>
+        </div>
       </div>
     );
   }
@@ -500,13 +529,19 @@ function FeatureCardMedia({ slot }: { slot: MediaSlot }) {
   if (effectiveType === "file" || isFileVideoUrl(effectiveUrl)) {
     return (
       <div ref={ref} className="absolute inset-0">
-        <BlurFillVideo src={effectiveUrl} title={title} active={inView} />
+        <BlurFillVideo
+          src={effectiveUrl}
+          title={title}
+          active={inView}
+          poster={fallbackImageUrl}
+        />
       </div>
     );
   }
 
   if (effectiveType === "youtube") {
-    const thumb = youtubeThumb(effectiveUrl);
+    const thumb =
+      fallbackImageUrl?.trim() || youtubeThumb(effectiveUrl);
     const vertical = isYoutubeShort(effectiveUrl);
     const src = inView
       ? youtubeEmbedUrl(effectiveUrl, {
@@ -530,10 +565,14 @@ function FeatureCardMedia({ slot }: { slot: MediaSlot }) {
     );
   }
 
-  return <div ref={ref} className="absolute inset-0 bg-black" />;
+  return (
+    <div ref={ref} className="absolute inset-0">
+      <VideoFallbackSurface imageUrl={fallbackImageUrl} />
+    </div>
+  );
 }
 
-/** Portrait glass card under the showreel */
+/** Square (1:1) glass card under the showreel */
 function FeatureVideoCard({
   video,
   index,
@@ -555,8 +594,8 @@ function FeatureVideoCard({
         glow
         className="group relative w-full overflow-hidden p-0"
       >
-        {/* Portrait frame — 3:4 (social-friendly, fills card) */}
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-black">
+        {/* Square frame — 1:1 desktop & mobile */}
+        <div className="relative aspect-square w-full overflow-hidden bg-black">
           <FeatureCardMedia slot={video} />
 
           {/* Glass edge + readability gradient */}
@@ -570,15 +609,15 @@ function FeatureVideoCard({
           />
 
           {/* Title as glass badge */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-3.5 sm:p-4">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-1.5 sm:p-3.5 md:p-4">
             <span
               className={cn(
                 "glass-chip inline-flex max-w-full items-center justify-center",
-                "rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2",
+                "rounded-full px-2 py-1 sm:px-3.5 sm:py-1.5 md:px-4 md:py-2",
                 "border border-white/18",
-                "text-center text-xs font-semibold leading-snug tracking-tight text-zinc-50",
+                "text-center text-[10px] font-semibold leading-snug tracking-tight text-zinc-50",
                 "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.55)]",
-                "sm:text-sm"
+                "sm:text-xs md:text-sm"
               )}
             >
               <span className="truncate">{title}</span>
@@ -619,11 +658,16 @@ function cleanSlot(
   videoType: FeatureVideoType,
   videoUrl: string | null,
   label: string,
-  options?: { allowX?: boolean }
+  options?: { allowX?: boolean; fallbackImageUrl?: string | null }
 ): { ok: true; slot: MediaSlot } | { ok: false; error: string } {
   let type = videoType;
   let url = videoUrl;
   const allowX = options?.allowX ?? true;
+  const fallback =
+    typeof options?.fallbackImageUrl === "string" &&
+    options.fallbackImageUrl.trim()
+      ? options.fallbackImageUrl.trim()
+      : null;
 
   // Feature cards: drop legacy X
   if (!allowX && type === "x") {
@@ -665,6 +709,7 @@ function cleanSlot(
       title: getL(title).trim() ? title : label,
       videoType: type,
       videoUrl: type === "none" ? null : url,
+      fallbackImageUrl: type === "none" ? null : fallback,
     },
   };
 }
@@ -674,6 +719,7 @@ function SlotEditor({
   title,
   videoType,
   videoUrl,
+  fallbackImageUrl,
   onChange,
   types = MAIN_VIDEO_TYPES,
 }: {
@@ -681,6 +727,7 @@ function SlotEditor({
   title: Translatable;
   videoType: FeatureVideoType;
   videoUrl: string | null;
+  fallbackImageUrl?: string | null;
   onChange: (partial: Partial<MediaSlot>) => void;
   types?: typeof MAIN_VIDEO_TYPES;
 }) {
@@ -722,6 +769,8 @@ function SlotEditor({
                               ? videoUrl
                               : ""
                             : null,
+                  fallbackImageUrl:
+                    type === "none" ? null : fallbackImageUrl ?? null,
                 });
               }}
               className={cn(
@@ -759,16 +808,35 @@ function SlotEditor({
         <VideoUpload
           value={videoUrl && isFileVideoUrl(videoUrl) ? videoUrl : null}
           onChange={(url) => onChange({ videoUrl: url })}
-          label="Upload vidéo (Cloudinary)"
+          label="Upload vidéo légère (Blob) — showreel long → YouTube"
           folder="patrick-roziel/showreel"
         />
+      )}
+
+      {videoType !== "none" && (
+        <div className="grid gap-2">
+          <Label className="text-xs text-zinc-400">
+            Image de secours (si la vidéo ne charge pas)
+          </Label>
+          <p className="text-[10px] leading-relaxed text-zinc-500">
+            Affichée pendant le chargement et en cas d’erreur / format non
+            supporté. Si vide : placeholder discret.
+          </p>
+          <ImageUpload
+            value={fallbackImageUrl ?? null}
+            onChange={(url) => onChange({ fallbackImageUrl: url })}
+            aspectClassName="aspect-video max-h-32"
+            label="Upload image de secours (JPG, PNG, WebP)"
+            folder="patrick-roziel/showreel"
+          />
+        </div>
       )}
     </div>
   );
 }
 
 /**
- * Main showreel + 3 portrait feature cards.
+ * Main showreel + 3 square (1:1) feature cards.
  */
 export function ShowreelEmbed({ className }: { className?: string }) {
   const {
@@ -807,7 +875,10 @@ export function ShowreelEmbed({ className }: { className?: string }) {
       draftMain.videoType,
       draftMain.videoUrl,
       "Showreel",
-      { allowX: true }
+      {
+        allowX: true,
+        fallbackImageUrl: draftMain.fallbackImageUrl,
+      }
     );
     if (!mainResult.ok) {
       setError(mainResult.error);
@@ -822,7 +893,10 @@ export function ShowreelEmbed({ className }: { className?: string }) {
         f.videoType,
         f.videoUrl,
         getL(f.title) || `Carte ${i + 1}`,
-        { allowX: false }
+        {
+          allowX: false,
+          fallbackImageUrl: f.fallbackImageUrl,
+        }
       );
       if (!r.ok) {
         setError(r.error);
@@ -914,8 +988,8 @@ export function ShowreelEmbed({ className }: { className?: string }) {
           )}
         </GlassCard>
 
-        {/* 3 portrait feature cards */}
-        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+        {/* 3 square feature cards — always side-by-side (mobile + desktop) */}
+        <div className="grid w-full grid-cols-3 gap-2 sm:gap-4 md:gap-5">
           {featureVideos.map((video, i) => (
             <FeatureVideoCard key={video.id} video={video} index={i} />
           ))}
@@ -923,7 +997,7 @@ export function ShowreelEmbed({ className }: { className?: string }) {
       </motion.div>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Showreel & 3 cartes vidéo</DialogTitle>
           </DialogHeader>
@@ -933,6 +1007,7 @@ export function ShowreelEmbed({ className }: { className?: string }) {
               title={draftMain.title}
               videoType={draftMain.videoType}
               videoUrl={draftMain.videoUrl}
+              fallbackImageUrl={draftMain.fallbackImageUrl}
               onChange={(partial) =>
                 setDraftMain((m) => ({ ...m, ...partial }))
               }
@@ -949,6 +1024,7 @@ export function ShowreelEmbed({ className }: { className?: string }) {
                   feat.videoType === "x" ? "none" : feat.videoType
                 }
                 videoUrl={feat.videoType === "x" ? null : feat.videoUrl}
+                fallbackImageUrl={feat.fallbackImageUrl}
                 types={FEATURE_VIDEO_TYPES}
                 onChange={(partial) =>
                   setDraftFeatures((list) =>

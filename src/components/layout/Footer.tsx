@@ -10,7 +10,9 @@ export function Footer() {
     <footer className="no-print relative z-10 border-t border-white/12 bg-gradient-to-t from-black/40 to-transparent pb-28 pt-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] lg:pb-24">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p className="text-xs text-zinc-500">
-          © {year} {data.profile.name}. Portfolio personnel — glassmorphism.
+          © {year}{" "}
+          {data.profile.name.replace(/<[^>]+>/g, "").trim() || data.profile.name}
+          . Portfolio personnel — glassmorphism.
         </p>
         {editMode && (
           <button

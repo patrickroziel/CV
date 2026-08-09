@@ -121,35 +121,184 @@ const ICON_KINDS: {
   { kind: "upload", label: "Upload", icon: Upload },
 ];
 
+/** Desktop / trackpad: true hover. Touch / coarse: tap-to-toggle. */
+function canHoverFine(): boolean {
+  if (typeof window === "undefined") return true;
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
+
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  const el = target as HTMLElement | null;
+  return Boolean(
+    el?.closest?.("button, a, input, textarea, select, label, [role='button']")
+  );
+}
+
+/** Max finger travel (px) still counted as a tap, not a scroll */
+const TAP_MOVE_PX = 12;
+
 function LanguageCard({
   lang,
   editMode,
   onEdit,
   onDelete,
+  totalCount = 3,
 }: {
   lang: Language;
   editMode: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  /** Total language cards — drives compact sizing on one desktop row */
+  totalCount?: number;
 }) {
   const { l, t } = usePortfolio();
   const reduceMotion = useReducedMotion();
-  const [hover, setHover] = useState(false);
+  /** Demo layer visible (playing or paused mid-demo) */
+  const [demoActive, setDemoActive] = useState(false);
+  /** Paused while layer still visible (mobile tap-to-pause) */
+  const [demoPaused, setDemoPaused] = useState(false);
   const [inView, setInView] = useState(false);
   const [activeOutlineId, setActiveOutlineId] = useState<string | null>(null);
   const demoVideoRef = useRef<LanguageHoverVideoHandle>(null);
+  /** Suppress synthetic click after we already handled touch */
+  const suppressClickUntil = useRef(0);
+  const touchStartRef = useRef<{
+    x: number;
+    y: number;
+    id: number;
+  } | null>(null);
   const hasVideo = lang.videoType !== "none" && Boolean(lang.videoUrl);
-  const videoPlaying = hasVideo && hover;
+  const videoPlaying = hasVideo && demoActive;
+  const compact = totalCount >= 4;
+  const dense = totalCount >= 5;
 
   const startDemo = useCallback(() => {
-    setHover(true);
-    // Call play in the same user-gesture turn (hover) so audio is allowed
+    setDemoActive(true);
+    setDemoPaused(false);
+    // Same user-gesture turn so audio is allowed (hover or tap)
     demoVideoRef.current?.playUnmuted();
   }, []);
 
   const stopDemo = useCallback(() => {
-    setHover(false);
+    setDemoActive(false);
+    setDemoPaused(false);
     demoVideoRef.current?.stop();
+  }, []);
+
+  const pauseDemo = useCallback(() => {
+    setDemoPaused(true);
+    demoVideoRef.current?.pause();
+  }, []);
+
+  const resumeDemo = useCallback(() => {
+    setDemoPaused(false);
+    demoVideoRef.current?.resume();
+  }, []);
+
+  /**
+   * Mobile tap cycle: play → pause → resume → …
+   * Must run synchronously in the gesture for unmuted autoplay.
+   */
+  const toggleDemoFromGesture = useCallback(() => {
+    if (!hasVideo) return;
+    if (!demoActive) {
+      startDemo();
+      return;
+    }
+    if (demoPaused) resumeDemo();
+    else pauseDemo();
+  }, [hasVideo, demoActive, demoPaused, startDemo, resumeDemo, pauseDemo]);
+
+  const onMouseEnter = useCallback(() => {
+    if (canHoverFine()) startDemo();
+  }, [startDemo]);
+
+  const onMouseLeave = useCallback(() => {
+    if (canHoverFine()) stopDemo();
+  }, [stopDemo]);
+
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (canHoverFine() || !hasVideo) return;
+      if (isInteractiveTarget(e.target)) return;
+      if (e.touches.length !== 1) {
+        touchStartRef.current = null;
+        return;
+      }
+      const t0 = e.touches[0];
+      touchStartRef.current = {
+        x: t0.clientX,
+        y: t0.clientY,
+        id: t0.identifier,
+      };
+    },
+    [hasVideo]
+  );
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    const start = touchStartRef.current;
+    if (!start) return;
+    const t0 = Array.from(e.touches).find((x) => x.identifier === start.id);
+    if (!t0) return;
+    const dx = t0.clientX - start.x;
+    const dy = t0.clientY - start.y;
+    if (dx * dx + dy * dy > TAP_MOVE_PX * TAP_MOVE_PX) {
+      // Scroll / drag — cancel pending tap
+      touchStartRef.current = null;
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (canHoverFine() || !hasVideo) return;
+      const start = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!start) return;
+      if (isInteractiveTarget(e.target)) return;
+
+      const t0 = Array.from(e.changedTouches).find(
+        (x) => x.identifier === start.id
+      );
+      if (!t0) return;
+      const dx = t0.clientX - start.x;
+      const dy = t0.clientY - start.y;
+      if (dx * dx + dy * dy > TAP_MOVE_PX * TAP_MOVE_PX) return;
+
+      // Immediate toggle in the same gesture chain (no 300ms wait)
+      e.preventDefault();
+      toggleDemoFromGesture();
+      // Block the ghost click that follows touchend on iOS/Android
+      suppressClickUntil.current = performance.now() + 650;
+    },
+    [hasVideo, toggleDemoFromGesture]
+  );
+
+  const onTouchCancel = useCallback(() => {
+    touchStartRef.current = null;
+  }, []);
+
+  /** Fallback for environments that only emit click (or pen) */
+  const onCardClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (canHoverFine()) return;
+      if (!hasVideo) return;
+      if (isInteractiveTarget(e.target)) return;
+      if (performance.now() < suppressClickUntil.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      toggleDemoFromGesture();
+    },
+    [hasVideo, toggleDemoFromGesture]
+  );
+
+  const onContextMenu = useCallback((e: React.MouseEvent) => {
+    // Block long-press context menu / callout on the card
+    if (!canHoverFine()) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }, []);
   const outlines =
     lang.outlines?.length > 0
@@ -193,11 +342,18 @@ function LanguageCard({
     <motion.div
       variants={cardItemVariants}
       onViewportEnter={() => setInView(true)}
-      onMouseEnter={startDemo}
-      onMouseLeave={stopDemo}
-      onTouchStart={startDemo}
-      onTouchEnd={stopDemo}
-      className="h-full"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchCancel}
+      onClick={onCardClick}
+      onContextMenu={onContextMenu}
+      className={cn(
+        "language-card-touch h-full min-w-0 w-full",
+        hasVideo && "select-none"
+      )}
     >
       {/* Hover lift + glow entirely driven by Framer Motion (no CSS glass-glow) */}
       <motion.div
@@ -205,14 +361,14 @@ function LanguageCard({
           reduceMotion
             ? undefined
             : {
-                y: hover ? -7 : 0,
-                boxShadow: hover
+                y: demoActive ? -7 : 0,
+                boxShadow: demoActive
                   ? "0 28px 56px -18px rgba(0,0,0,0.72), 0 0 48px -8px rgba(245,158,11,0.22)"
                   : "0 16px 40px -20px rgba(0,0,0,0.45)",
-                borderColor: hover
+                borderColor: demoActive
                   ? "rgba(255,255,255,0.24)"
                   : "rgba(255,255,255,0.14)",
-                scale: hover ? 1.012 : 1,
+                scale: demoActive ? 1.012 : 1,
               }
         }
         transition={
@@ -229,13 +385,18 @@ function LanguageCard({
       >
         <GlassCard
           className={cn(
-            "group relative isolate flex h-full min-h-[300px] flex-col overflow-hidden p-0 !transition-none",
-            hasVideo && "cursor-default"
+            "group relative isolate flex h-full flex-col overflow-hidden p-0 !transition-none",
+            dense
+              ? "min-h-[220px] sm:min-h-[240px]"
+              : compact
+                ? "min-h-[260px] sm:min-h-[280px]"
+                : "min-h-[300px]",
+            hasVideo && "cursor-pointer sm:cursor-default"
           )}
         >
           <LanguageRegionsMap
             outlines={outlines}
-            active={inView && !hover}
+            active={inView && !demoActive}
             className="z-0"
             onActiveIdChange={onActiveIdChange}
           />
@@ -254,8 +415,15 @@ function LanguageCard({
                 ref={demoVideoRef}
                 videoType={lang.videoType}
                 videoUrl={lang.videoUrl}
+                fallbackImageUrl={lang.fallbackImageUrl}
                 languageName={l(lang.name)}
-                active={videoPlaying}
+                // File: keep layer mounted while demoActive (pause without unmount).
+                // YouTube/X: unmount when paused so the iframe stops.
+                active={
+                  lang.videoType === "file"
+                    ? videoPlaying
+                    : videoPlaying && !demoPaused
+                }
               />
               {videoPlaying && (
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
@@ -263,8 +431,13 @@ function LanguageCard({
             </div>
           )}
 
-          <div className="relative z-20 flex min-h-0 flex-1 flex-col p-5">
-            <div className="flex w-full shrink-0 items-start justify-between gap-2">
+          <div
+            className={cn(
+              "relative z-20 flex min-h-0 flex-1 flex-col",
+              dense ? "p-3.5 sm:p-4" : compact ? "p-4 sm:p-5" : "p-5"
+            )}
+          >
+            <div className="flex w-full shrink-0 items-start justify-between gap-1.5 sm:gap-2">
               <LanguageIconCarousel
                 icons={icons}
                 allowedRegions={allowedRegions}
@@ -278,10 +451,17 @@ function LanguageCard({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.35, ease: EASE }}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-2.5 py-1 text-[10px] font-medium text-zinc-200 backdrop-blur-md"
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 font-medium text-zinc-200 backdrop-blur-md",
+                      dense
+                        ? "px-1.5 py-0.5 text-[9px]"
+                        : "px-2.5 py-1 text-[10px]"
+                    )}
                   >
-                    <Volume2 className="h-3 w-3 text-amber-300/90" />
-                    {t("languages.demoHint")}
+                    <Volume2 className="h-3 w-3 shrink-0 text-amber-300/90" />
+                    {/* Touch: tap · Desktop: hover (CSS media) */}
+                    <span className="max-sm:hidden">{t("languages.demoHint")}</span>
+                    <span className="sm:hidden">{t("languages.demoHintTap")}</span>
                   </motion.span>
                 )}
                 {editMode && (
@@ -313,14 +493,28 @@ function LanguageCard({
               </div>
             </div>
 
-            <div className="relative z-20 mt-5 flex min-h-0 flex-1 flex-col">
+            <div
+              className={cn(
+                "relative z-20 flex min-h-0 flex-1 flex-col",
+                dense ? "mt-3" : "mt-5"
+              )}
+            >
               <motion.h3
                 layout
-                className="text-lg font-semibold tracking-tight text-zinc-50 drop-shadow-md"
+                className={cn(
+                  "font-semibold tracking-tight text-zinc-50 drop-shadow-md",
+                  dense ? "text-base" : "text-lg"
+                )}
               >
                 {l(lang.name)}
               </motion.h3>
-              <Badge variant="amber" className="mt-2 w-fit shrink-0">
+              <Badge
+                variant="amber"
+                className={cn(
+                  "mt-2 w-fit shrink-0",
+                  dense && "text-[10px] px-2 py-0.5"
+                )}
+              >
                 {l(lang.level)}
               </Badge>
 
@@ -352,7 +546,7 @@ function LanguageCard({
                         <div className="flex w-full flex-wrap items-center justify-center gap-2">
                           {countryLabels.map((c) => {
                             const isActive =
-                              c.id === activeOutlineId && !hover;
+                              c.id === activeOutlineId && !demoActive;
                             return (
                               <motion.span
                                 key={c.id}
@@ -449,6 +643,7 @@ export function LanguagesSection() {
   );
   const [videoType, setVideoType] = useState<LanguageVideoType>("none");
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [fallbackImageUrl, setFallbackImageUrl] = useState<string | null>(null);
   const [linkInput, setLinkInput] = useState("");
   const [icons, setIcons] = useState<LanguageIconItem[]>([]);
   const [outlines, setOutlines] = useState<LanguageOutline[]>([]);
@@ -465,6 +660,7 @@ export function LanguagesSection() {
     });
     setVideoType("none");
     setVideoUrl(null);
+    setFallbackImageUrl(null);
     setLinkInput("");
     setIcons([{ id: createId(), kind: "flag", region: "FR" }]);
     setOutlines([
@@ -483,6 +679,7 @@ export function LanguagesSection() {
     setLevel(liftToLocalized(lang.level));
     setVideoType(lang.videoType ?? "none");
     setVideoUrl(lang.videoUrl ?? null);
+    setFallbackImageUrl(lang.fallbackImageUrl ?? null);
     setLinkInput(
       lang.videoType === "youtube" || lang.videoType === "x"
         ? lang.videoUrl ?? ""
@@ -721,6 +918,12 @@ export function LanguagesSection() {
         level: localizedLevel,
         videoType: finalType,
         videoUrl: finalUrl,
+        fallbackImageUrl:
+          finalType === "none"
+            ? null
+            : fallbackImageUrl?.trim()
+              ? fallbackImageUrl.trim()
+              : null,
         icons: finalIcons,
         outlines: localizedOutlines,
         primaryRegion: regionCodes[0] || "FR",
@@ -775,24 +978,38 @@ export function LanguagesSection() {
         />
 
         <motion.div
-          className="grid gap-4 sm:grid-cols-3"
+          className={cn(
+            // Mobile: stack · Desktop: one row, equal flex shrink (no wrap)
+            "flex flex-col gap-4",
+            "sm:flex-row sm:flex-nowrap sm:items-stretch",
+            data.languages.length >= 5
+              ? "sm:gap-2.5"
+              : data.languages.length >= 4
+                ? "sm:gap-3"
+                : "sm:gap-4"
+          )}
           variants={cardGridVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
         >
           {data.languages.map((lang) => (
-            <LanguageCard
+            <div
               key={lang.id}
-              lang={lang}
-              editMode={editMode}
-              onEdit={() => openEdit(lang)}
-              onDelete={() => {
-                if (confirm("Supprimer cette langue ?")) {
-                  removeLanguage(lang.id);
-                }
-              }}
-            />
+              className="min-w-0 w-full sm:flex-1 sm:basis-0"
+            >
+              <LanguageCard
+                lang={lang}
+                editMode={editMode}
+                totalCount={data.languages.length}
+                onEdit={() => openEdit(lang)}
+                onDelete={() => {
+                  if (confirm("Supprimer cette langue ?")) {
+                    removeLanguage(lang.id);
+                  }
+                }}
+              />
+            </div>
           ))}
         </motion.div>
       </div>
@@ -804,7 +1021,7 @@ export function LanguagesSection() {
           if (!v) resetForm();
         }}
       >
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editing ? "Modifier la langue" : "Ajouter une langue"}
@@ -1299,6 +1516,7 @@ export function LanguagesSection() {
                       setError(null);
                       if (type === "none") {
                         setVideoUrl(null);
+                        setFallbackImageUrl(null);
                         setLinkInput("");
                       }
                     }}
@@ -1336,6 +1554,25 @@ export function LanguagesSection() {
                 onChange={(e) => setLinkInput(e.target.value)}
                 placeholder="https://x.com/…/status/…"
               />
+            )}
+
+            {videoType !== "none" && (
+              <div className="grid gap-2">
+                <Label className="text-xs text-zinc-400">
+                  Image de secours (si la vidéo ne charge pas)
+                </Label>
+                <p className="text-[10px] leading-relaxed text-zinc-500">
+                  Affichée pendant le chargement et en cas d’erreur. Si vide :
+                  placeholder discret (ou miniature YouTube).
+                </p>
+                <ImageUpload
+                  value={fallbackImageUrl}
+                  onChange={setFallbackImageUrl}
+                  aspectClassName="aspect-video max-h-32"
+                  label="Upload image de secours"
+                  folder="patrick-roziel/languages"
+                />
+              </div>
             )}
 
             {error && <p className="text-sm text-red-400">{error}</p>}

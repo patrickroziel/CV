@@ -1,26 +1,42 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const SOFT = "easeInOut" as const;
 
+type HeroPhotoWavesProps = {
+  /**
+   * `photo` — centered on the profile photo only (default).
+   * `card` — legacy full-card field (kept for compatibility).
+   */
+  mode?: "photo" | "card";
+  className?: string;
+};
+
 /**
- * Cinematic energy field for the Hero card.
- * Origin = profile photo zone; fills the entire card surface.
- * No strokes / lines — only soft glows, waves, drifting plasma, particles.
- * Opacity loops never hit 0 (no blink).
+ * Cinematic energy field.
+ * Default: sits behind the profile photo only (mode="photo").
+ * No strokes / lines — soft glows, waves, plasma, particles.
  */
-export function HeroPhotoWaves() {
+export function HeroPhotoWaves({
+  mode = "photo",
+  className,
+}: HeroPhotoWavesProps) {
   const reduce = useReducedMotion();
+  const photoMode = mode === "photo";
 
   if (reduce) {
     return (
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden rounded-[inherit]"
+        className={cn(
+          "pointer-events-none absolute inset-0 z-0 overflow-visible",
+          className
+        )}
       >
-        <div className="absolute left-1/2 top-28 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-teal-400/25 blur-3xl lg:left-28 lg:top-1/2 lg:-translate-y-1/2" />
-        <div className="absolute right-0 top-0 h-full w-2/3 rounded-full bg-violet-500/15 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-400/30 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-[90%] w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/20 blur-3xl" />
       </div>
     );
   }
@@ -28,23 +44,31 @@ export function HeroPhotoWaves() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-[1] overflow-hidden rounded-[inherit]"
+      className={cn(
+        "pointer-events-none absolute inset-0 z-0",
+        photoMode ? "overflow-visible" : "overflow-hidden rounded-[inherit]",
+        className
+      )}
     >
-      {/* Full-card chromatic wash */}
-      <div className="absolute inset-0 bg-gradient-to-br from-teal-400/12 via-violet-500/8 to-amber-400/10" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_45%,rgba(45,212,191,0.22)_0%,transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_30%,rgba(167,139,250,0.16)_0%,transparent_50%)]" />
+      {!photoMode && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-400/7 via-violet-500/5 to-amber-400/6" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_45%,rgba(45,212,191,0.12)_0%,transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_30%,rgba(167,139,250,0.09)_0%,transparent_50%)]" />
+        </>
+      )}
 
-      {/*
-        Wave origin ≈ profile photo:
-        mobile centered near top, desktop left column center
-      */}
+      {/* Wave origin: center of photo wrapper (or legacy card photo zone) */}
       <div
-        className={[
-          "absolute",
-          "left-1/2 top-[9rem] -translate-x-1/2 -translate-y-1/2",
-          "lg:left-[7.75rem] lg:top-1/2 lg:translate-x-0",
-        ].join(" ")}
+        className={
+          photoMode
+            ? "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            : [
+                "absolute",
+                "left-1/2 top-[9rem] -translate-x-1/2 -translate-y-1/2",
+                "lg:left-[7.75rem] lg:top-1/2 lg:translate-x-0",
+              ].join(" ")
+        }
       >
         {/* Hot core — bright showreel-style pulse */}
         <motion.div

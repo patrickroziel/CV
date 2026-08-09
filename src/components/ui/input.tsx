@@ -1,8 +1,9 @@
 import * as React from "react";
+import { handlePlainPaste } from "@/lib/clipboard-paste";
 import { cn } from "@/lib/utils";
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, onPaste, ...props }, ref) => {
     return (
       <input
         type={type}
@@ -12,6 +13,21 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
         )}
         ref={ref}
         {...props}
+        onPaste={(e) => {
+          const t = type ?? "text";
+          if (
+            t === "text" ||
+            t === "search" ||
+            t === "url" ||
+            t === "tel" ||
+            t === "email" ||
+            t === "password" ||
+            t === undefined
+          ) {
+            handlePlainPaste(e, true);
+          }
+          onPaste?.(e);
+        }}
       />
     );
   }

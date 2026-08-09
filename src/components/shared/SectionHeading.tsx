@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { RichHtml } from "@/components/shared/RichHtml";
 import { cn } from "@/lib/utils";
 
 type SectionHeadingProps = {
@@ -41,9 +42,10 @@ export function SectionHeading({
           {title}
         </h2>
         {description && (
-          <p className="mt-2 text-sm text-zinc-400 sm:text-base">
-            {description}
-          </p>
+          <RichHtml
+            html={description}
+            className="mt-2 text-sm text-zinc-400 sm:text-base"
+          />
         )}
       </motion.div>
       {action && <div className="no-print shrink-0">{action}</div>}

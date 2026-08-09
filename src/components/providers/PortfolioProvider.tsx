@@ -9,23 +9,34 @@ import React, {
   useState,
 } from "react";
 import type {
+  BackgroundImage,
+  ComingSoonConfig,
   ContactConfig,
   Education,
   Experience,
   FeatureVideo,
+  HeroGlassConfig,
   Language,
   Locale,
   MainShowreel,
+  NavConfig,
   PortfolioData,
   Profile,
   Project,
+  QuotesConfig,
   SectionLabelsConfig,
   Skill,
   UiPrefs,
 } from "@/lib/types";
-import { DATA_VERSION } from "@/lib/types";
-import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
-import { loadPortfolio, savePortfolio } from "@/lib/storage";
+import { DATA_VERSION, DEFAULT_COMING_SOON, DEFAULT_NAV } from "@/lib/types";
+import { DEFAULT_BACKGROUND, DEFAULT_PORTFOLIO } from "@/lib/defaults";
+import {
+  loadPortfolio,
+  normalizeBackgroundImages,
+  normalizeComingSoon,
+  normalizeNav,
+  savePortfolio,
+} from "@/lib/storage";
 import { createId } from "@/lib/utils";
 import { isEditEnvironment } from "@/lib/edit-env";
 import {
@@ -63,10 +74,25 @@ type PortfolioContextValue = {
   toast: string | null;
   showToast: (msg: string) => void;
   updateProfile: (partial: Partial<Profile>) => void;
+  /** @deprecated prefer updateBackgroundImages — keeps single-URL compat */
   updateBackground: (url: string) => void;
+  /** Replace the wallpaper pool (order preserved). Syncs backgroundUrl. */
+  updateBackgroundImages: (images: BackgroundImage[]) => void;
+  /**
+   * Atomic appearance save (images + UI prefs) — avoids race when
+   * updateBackground + updateUi were called back-to-back.
+   */
+  updateAppearance: (
+    images: BackgroundImage[],
+    ui?: Partial<UiPrefs>,
+    heroGlass?: HeroGlassConfig
+  ) => void;
   updateUi: (partial: Partial<UiPrefs>) => void;
   updateContact: (partial: Partial<ContactConfig>) => void;
+  updateQuotes: (partial: Partial<QuotesConfig> | QuotesConfig) => void;
   updateSectionLabels: (partial: Partial<SectionLabelsConfig>) => void;
+  updateNav: (partial: Partial<NavConfig> | NavConfig) => void;
+  updateComingSoon: (partial: Partial<ComingSoonConfig>) => void;
   updateFeatureVideos: (videos: FeatureVideo[]) => void;
   updateMainShowreel: (showreel: MainShowreel) => void;
   addExperience: (exp: Omit<Experience, "id">) => void;
@@ -203,244 +229,442 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const persist = useCallback(
-    (next: PortfolioData, toastMsg?: string) => {
-      const withVersion = { ...next, version: DATA_VERSION };
-      setData(withVersion);
-      try {
-        savePortfolio(withVersion);
-        if (toastMsg) showToast(toastMsg);
-      } catch {
-        showToast("Quota de stockage dépassé — image trop lourde ?");
-      }
+    (
+      next: PortfolioData | ((prev: PortfolioData) => PortfolioData),
+      toastMsg?: string
+    ) => {
+      setData((prev) => {
+        const resolved = typeof next === "function" ? next(prev) : next;
+        const withVersion = { ...resolved, version: DATA_VERSION };
+        try {
+          savePortfolio(withVersion);
+          if (toastMsg) showToast(toastMsg);
+        } catch {
+          showToast("Quota de stockage dépassé — image trop lourde ?");
+        }
+        return withVersion;
+      });
     },
     [showToast]
   );
 
   const updateProfile = useCallback(
     (partial: Partial<Profile>) => {
-      persist({ ...data, profile: { ...data.profile, ...partial } }, "Enregistré");
+      persist(
+        (prev) => ({
+          ...prev,
+          profile: { ...prev.profile, ...partial },
+        }),
+        "Enregistré"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const updateBackground = useCallback(
     (url: string) => {
-      persist({ ...data, backgroundUrl: url }, "Fond mis à jour");
+      const trimmed = url.trim();
+      if (!trimmed) return;
+      persist((prev) => {
+        const images = normalizeBackgroundImages(
+          prev.backgroundImages,
+          prev.backgroundUrl
+        );
+        // Replace pool with this single URL if empty, else update fallback + ensure present
+        const hasUrl = images.some((img) => img.url === trimmed);
+        const nextImages = hasUrl
+          ? images
+          : [...images, { id: createId(), url: trimmed }];
+        return {
+          ...prev,
+          backgroundUrl: trimmed,
+          backgroundImages: nextImages,
+        };
+      }, "Fond mis à jour");
     },
-    [data, persist]
+    [persist]
+  );
+
+  const updateBackgroundImages = useCallback(
+    (images: BackgroundImage[]) => {
+      persist((prev) => {
+        const list = normalizeBackgroundImages(
+          images,
+          prev.backgroundUrl || DEFAULT_BACKGROUND
+        );
+        return {
+          ...prev,
+          backgroundImages: list,
+          backgroundUrl: list[0]?.url || DEFAULT_BACKGROUND,
+        };
+      }, "Fonds d’écran mis à jour");
+    },
+    [persist]
+  );
+
+  const updateAppearance = useCallback(
+    (
+      images: BackgroundImage[],
+      ui?: Partial<UiPrefs>,
+      heroGlass?: HeroGlassConfig
+    ) => {
+      persist((prev) => {
+        const list = normalizeBackgroundImages(
+          images,
+          prev.backgroundUrl || DEFAULT_BACKGROUND
+        );
+        return {
+          ...prev,
+          backgroundImages: list,
+          backgroundUrl: list[0]?.url || DEFAULT_BACKGROUND,
+          ui: ui ? { ...prev.ui, ...ui } : prev.ui,
+          heroGlass: heroGlass ?? prev.heroGlass,
+        };
+      }, "Apparence enregistrée");
+    },
+    [persist]
   );
 
   const updateUi = useCallback(
     (partial: Partial<UiPrefs>) => {
-      persist({ ...data, ui: { ...data.ui, ...partial } });
+      persist((prev) => ({
+        ...prev,
+        ui: { ...prev.ui, ...partial },
+      }));
     },
-    [data, persist]
+    [persist]
   );
 
   const updateContact = useCallback(
     (partial: Partial<ContactConfig>) => {
+      // Always functional — sequential updates (e.g. profile + contact) must not clobber each other
       persist(
-        { ...data, contact: { ...data.contact, ...partial } },
+        (prev) => ({
+          ...prev,
+          contact: { ...prev.contact, ...partial },
+        }),
         "Contact mis à jour"
       );
     },
-    [data, persist]
+    [persist]
+  );
+
+  const updateQuotes = useCallback(
+    (partial: Partial<QuotesConfig> | QuotesConfig) => {
+      persist((prev) => {
+        const current = prev.quotes;
+        const nextServices =
+          "services" in partial && Array.isArray(partial.services)
+            ? partial.services
+            : current.services;
+        return {
+          ...prev,
+          quotes: {
+            ...current,
+            ...partial,
+            services: nextServices,
+          },
+        };
+      }, "Devis mis à jour");
+    },
+    [persist]
   );
 
   const updateSectionLabels = useCallback(
     (partial: Partial<SectionLabelsConfig>) => {
-      const current = data.sectionLabels ?? DEFAULT_PORTFOLIO.sectionLabels;
       persist(
-        {
-          ...data,
-          sectionLabels: { ...current, ...partial },
-        },
+        (prev) => ({
+          ...prev,
+          sectionLabels: {
+            ...(prev.sectionLabels ?? DEFAULT_PORTFOLIO.sectionLabels),
+            ...partial,
+          },
+        }),
         "Titres de section mis à jour"
       );
     },
-    [data, persist]
+    [persist]
+  );
+
+  const updateNav = useCallback(
+    (partial: Partial<NavConfig> | NavConfig) => {
+      persist(
+        (prev) => {
+          const current = normalizeNav(prev.nav ?? DEFAULT_NAV);
+          const merged = { ...current };
+          for (const id of Object.keys(partial) as (keyof NavConfig)[]) {
+            const p = partial[id];
+            if (!p) continue;
+            merged[id] = {
+              label:
+                p.label != null
+                  ? (p.label as typeof current[typeof id]["label"])
+                  : current[id].label,
+              visible:
+                typeof p.visible === "boolean"
+                  ? p.visible
+                  : current[id].visible,
+            };
+          }
+          return { ...prev, nav: normalizeNav(merged) };
+        },
+        "Navigation mise à jour"
+      );
+    },
+    [persist]
+  );
+
+  const updateComingSoon = useCallback(
+    (partial: Partial<ComingSoonConfig>) => {
+      persist(
+        (prev) => ({
+          ...prev,
+          comingSoon: normalizeComingSoon({
+            ...(prev.comingSoon ?? DEFAULT_COMING_SOON),
+            ...partial,
+          }),
+        }),
+        partial.enabled === true
+          ? "Coming Soon activé (vue publique)"
+          : partial.enabled === false
+            ? "Coming Soon désactivé"
+            : "Coming Soon mis à jour"
+      );
+    },
+    [persist]
   );
 
   const updateFeatureVideos = useCallback(
     (videos: FeatureVideo[]) => {
-      persist({ ...data, featureVideos: videos }, "Vidéos mises à jour");
+      persist(
+        (prev) => ({ ...prev, featureVideos: videos }),
+        "Vidéos mises à jour"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const updateMainShowreel = useCallback(
     (showreel: MainShowreel) => {
       // Keep profile.showreelUrl in sync for contact/hero when YouTube
-      const nextProfile =
-        showreel.videoType === "youtube" && showreel.videoUrl
-          ? { ...data.profile, showreelUrl: showreel.videoUrl }
-          : data.profile;
-      persist(
-        { ...data, mainShowreel: showreel, profile: nextProfile },
-        "Showreel mis à jour"
-      );
+      persist((prev) => {
+        const nextProfile =
+          showreel.videoType === "youtube" && showreel.videoUrl
+            ? { ...prev.profile, showreelUrl: showreel.videoUrl }
+            : prev.profile;
+        return {
+          ...prev,
+          mainShowreel: showreel,
+          profile: nextProfile,
+        };
+      }, "Showreel mis à jour");
     },
-    [data, persist]
+    [persist]
   );
 
   const addExperience = useCallback(
     (exp: Omit<Experience, "id">) => {
-      persist({
-        ...data,
-        experiences: [{ ...exp, id: createId() }, ...data.experiences],
-      }, "Expérience ajoutée");
+      persist(
+        (prev) => ({
+          ...prev,
+          experiences: [{ ...exp, id: createId() }, ...prev.experiences],
+        }),
+        "Expérience ajoutée"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const updateExperience = useCallback(
     (id: string, partial: Partial<Experience>) => {
-      persist({
-        ...data,
-        experiences: data.experiences.map((e) =>
-          e.id === id ? { ...e, ...partial } : e
-        ),
-      }, "Enregistré");
+      persist(
+        (prev) => ({
+          ...prev,
+          experiences: prev.experiences.map((e) =>
+            e.id === id ? { ...e, ...partial } : e
+          ),
+        }),
+        "Enregistré"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const removeExperience = useCallback(
     (id: string) => {
-      persist({
-        ...data,
-        experiences: data.experiences.filter((e) => e.id !== id),
-      }, "Supprimé");
+      persist(
+        (prev) => ({
+          ...prev,
+          experiences: prev.experiences.filter((e) => e.id !== id),
+        }),
+        "Supprimé"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const addProject = useCallback(
     (project: Omit<Project, "id">) => {
-      persist({
-        ...data,
-        projects: [{ ...project, id: createId() }, ...data.projects],
-      }, "Projet ajouté");
+      persist(
+        (prev) => ({
+          ...prev,
+          projects: [{ ...project, id: createId() }, ...prev.projects],
+        }),
+        "Projet ajouté"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const updateProject = useCallback(
     (id: string, partial: Partial<Project>) => {
-      persist({
-        ...data,
-        projects: data.projects.map((p) =>
-          p.id === id ? { ...p, ...partial } : p
-        ),
-      }, "Enregistré");
+      persist(
+        (prev) => ({
+          ...prev,
+          projects: prev.projects.map((p) =>
+            p.id === id ? { ...p, ...partial } : p
+          ),
+        }),
+        "Enregistré"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const removeProject = useCallback(
     (id: string) => {
-      persist({
-        ...data,
-        projects: data.projects.filter((p) => p.id !== id),
-      }, "Supprimé");
+      persist(
+        (prev) => ({
+          ...prev,
+          projects: prev.projects.filter((p) => p.id !== id),
+        }),
+        "Supprimé"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const addSkill = useCallback(
     (skill: Omit<Skill, "id">) => {
-      persist({
-        ...data,
-        skills: [...data.skills, { ...skill, id: createId() }],
-      }, "Compétence ajoutée");
+      persist(
+        (prev) => ({
+          ...prev,
+          skills: [...prev.skills, { ...skill, id: createId() }],
+        }),
+        "Compétence ajoutée"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const updateSkill = useCallback(
     (id: string, partial: Partial<Skill>) => {
-      persist({
-        ...data,
-        skills: data.skills.map((s) =>
-          s.id === id ? { ...s, ...partial } : s
-        ),
-      }, "Enregistré");
+      persist(
+        (prev) => ({
+          ...prev,
+          skills: prev.skills.map((s) =>
+            s.id === id ? { ...s, ...partial } : s
+          ),
+        }),
+        "Enregistré"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const removeSkill = useCallback(
     (id: string) => {
-      persist({
-        ...data,
-        skills: data.skills.filter((s) => s.id !== id),
-      }, "Supprimé");
+      persist(
+        (prev) => ({
+          ...prev,
+          skills: prev.skills.filter((s) => s.id !== id),
+        }),
+        "Supprimé"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const addEducation = useCallback(
     (edu: Omit<Education, "id">) => {
-      persist({
-        ...data,
-        education: [{ ...edu, id: createId() }, ...data.education],
-      }, "Formation ajoutée");
+      persist(
+        (prev) => ({
+          ...prev,
+          education: [{ ...edu, id: createId() }, ...prev.education],
+        }),
+        "Formation ajoutée"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const updateEducation = useCallback(
     (id: string, partial: Partial<Education>) => {
-      persist({
-        ...data,
-        education: data.education.map((e) =>
-          e.id === id ? { ...e, ...partial } : e
-        ),
-      }, "Enregistré");
+      persist(
+        (prev) => ({
+          ...prev,
+          education: prev.education.map((e) =>
+            e.id === id ? { ...e, ...partial } : e
+          ),
+        }),
+        "Enregistré"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const removeEducation = useCallback(
     (id: string) => {
-      persist({
-        ...data,
-        education: data.education.filter((e) => e.id !== id),
-      }, "Supprimé");
+      persist(
+        (prev) => ({
+          ...prev,
+          education: prev.education.filter((e) => e.id !== id),
+        }),
+        "Supprimé"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const addLanguage = useCallback(
     (lang: Omit<Language, "id">) => {
-      persist({
-        ...data,
-        languages: [...data.languages, { ...lang, id: createId() }],
-      }, "Langue ajoutée");
+      persist(
+        (prev) => ({
+          ...prev,
+          languages: [...prev.languages, { ...lang, id: createId() }],
+        }),
+        "Langue ajoutée"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const updateLanguage = useCallback(
     (id: string, partial: Partial<Language>) => {
-      persist({
-        ...data,
-        languages: data.languages.map((l) =>
-          l.id === id ? { ...l, ...partial } : l
-        ),
-      }, "Enregistré");
+      persist(
+        (prev) => ({
+          ...prev,
+          languages: prev.languages.map((l) =>
+            l.id === id ? { ...l, ...partial } : l
+          ),
+        }),
+        "Enregistré"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const removeLanguage = useCallback(
     (id: string) => {
-      persist({
-        ...data,
-        languages: data.languages.filter((l) => l.id !== id),
-      }, "Supprimé");
+      persist(
+        (prev) => ({
+          ...prev,
+          languages: prev.languages.filter((l) => l.id !== id),
+        }),
+        "Supprimé"
+      );
     },
-    [data, persist]
+    [persist]
   );
 
   const resetToDefaults = useCallback(() => {
@@ -465,9 +689,14 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       showToast,
       updateProfile,
       updateBackground,
+      updateBackgroundImages,
+      updateAppearance,
       updateUi,
       updateContact,
+      updateQuotes,
       updateSectionLabels,
+      updateNav,
+      updateComingSoon,
       updateFeatureVideos,
       updateMainShowreel,
       addExperience,
@@ -503,9 +732,14 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       showToast,
       updateProfile,
       updateBackground,
+      updateBackgroundImages,
+      updateAppearance,
       updateUi,
       updateContact,
+      updateQuotes,
       updateSectionLabels,
+      updateNav,
+      updateComingSoon,
       updateFeatureVideos,
       updateMainShowreel,
       addExperience,

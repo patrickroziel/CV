@@ -5,21 +5,28 @@ import { Film, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  CLOUDINARY_FOLDERS,
-  uploadToCloudinary,
-  type CloudinaryFolder,
-} from "@/lib/cloudinary";
+  MEDIA_FOLDERS,
+  uploadToBlob,
+  type MediaFolder,
+} from "@/lib/blob-upload";
 
-/** Client-side guard — Cloudinary free tier allows larger files */
+/** Client-side guard — large showreels should use unlisted YouTube instead */
 const MAX_BYTES = 100 * 1024 * 1024;
 
 type VideoUploadProps = {
   value: string | null;
-  /** Receives Cloudinary secure_url (or null when cleared) */
+  /** Receives public Blob URL (or null when cleared) */
   onChange: (url: string | null) => void;
   className?: string;
   label?: string;
-  folder?: CloudinaryFolder | string;
+  folder?: MediaFolder | string;
+  /**
+   * `any` — common video formats (default).
+   * `webm-mp4` — WebM / MP4 / MOV (alpha overlays, Hero glass).
+   */
+  formats?: "any" | "webm-mp4";
+  /** Compact layout for nested editors */
+  compact?: boolean;
 };
 
 export function VideoUpload({
@@ -27,7 +34,9 @@ export function VideoUpload({
   onChange,
   className,
   label = "Uploader une vidéo (MP4 / WebM)",
-  folder = CLOUDINARY_FOLDERS.media,
+  folder = MEDIA_FOLDERS.media,
+  formats = "any",
+  compact = false,
 }: VideoUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -40,13 +49,22 @@ export function VideoUpload({
     async (file: File) => {
       setError(null);
 
-      // .mov sometimes has empty MIME on macOS — accept by extension too
+      const name = file.name || "";
       const looksLikeVideo =
-        file.type.startsWith("video/") ||
-        /\.(mov|mp4|webm|ogg|m4v|avi|mkv)$/i.test(file.name);
+        formats === "webm-mp4"
+          ? file.type === "video/webm" ||
+            file.type === "video/mp4" ||
+            file.type === "video/quicktime" ||
+            /\.(webm|mp4|mov)$/i.test(name)
+          : file.type.startsWith("video/") ||
+            /\.(mov|mp4|webm|ogg|m4v|avi|mkv)$/i.test(name);
 
       if (!looksLikeVideo) {
-        setError("Fichier vidéo requis (MP4, MOV, WebM…).");
+        setError(
+          formats === "webm-mp4"
+            ? "Fichier WebM (alpha), MP4 ou MOV requis."
+            : "Fichier vidéo requis (MP4, MOV, WebM…)."
+        );
         return;
       }
       if (file.size > MAX_BYTES) {
@@ -63,20 +81,19 @@ export function VideoUpload({
       setLoading(true);
       setProgress(0);
       try {
-        // Always force video endpoint + same unsigned preset as images
-        const result = await uploadToCloudinary(file, {
+        const result = await uploadToBlob(file, {
           folder,
           resourceType: "video",
           onProgress: setProgress,
           signal: controller.signal,
         });
-        onChange(result.secure_url);
+        onChange(result.url);
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setError(
           err instanceof Error
             ? err.message
-            : "Impossible d’uploader la vidéo vers Cloudinary."
+            : "Impossible d’uploader la vidéo vers Vercel Blob."
         );
       } finally {
         setLoading(false);
@@ -84,8 +101,13 @@ export function VideoUpload({
         abortRef.current = null;
       }
     },
-    [onChange, folder]
+    [onChange, folder, formats]
   );
+
+  const accept =
+    formats === "webm-mp4"
+      ? "video/webm,video/mp4,video/quicktime,.webm,.mp4,.mov"
+      : "video/mp4,video/webm,video/ogg,video/quicktime";
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -113,7 +135,10 @@ export function VideoUpload({
           if (file) void processFile(file);
         }}
         className={cn(
-          "relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed aspect-video transition-colors",
+          "relative flex cursor-pointer flex-col items-center justify-center overflow-hidden border border-dashed transition-colors",
+          compact
+            ? "min-h-[88px] rounded-xl aspect-video max-h-28"
+            : "rounded-2xl aspect-video",
           dragging
             ? "border-teal-300/60 bg-teal-300/10"
             : "border-white/20 bg-black/20 hover:border-white/35 hover:bg-white/5",
@@ -131,18 +156,33 @@ export function VideoUpload({
             autoPlay
           />
         ) : (
-          <div className="flex flex-col items-center gap-2 p-4 text-center text-zinc-400">
-            {loading ? (
-              <Loader2 className="h-8 w-8 animate-spin text-teal-300/80" />
-            ) : (
-              <Film className="h-8 w-8 text-zinc-500" />
+          <div
+            className={cn(
+              "flex flex-col items-center gap-1.5 text-center text-zinc-400",
+              compact ? "p-2" : "gap-2 p-4"
             )}
-            <span className="text-xs sm:text-sm">
+          >
+            {loading ? (
+              <Loader2
+                className={cn(
+                  "animate-spin text-teal-300/80",
+                  compact ? "h-6 w-6" : "h-8 w-8"
+                )}
+              />
+            ) : (
+              <Film
+                className={cn(
+                  "text-zinc-500",
+                  compact ? "h-6 w-6" : "h-8 w-8"
+                )}
+              />
+            )}
+            <span className={cn(compact ? "text-[11px]" : "text-xs sm:text-sm")}>
               {loading ? `Upload… ${progress}%` : label}
             </span>
-            {!loading && (
+            {!loading && !compact && (
               <span className="text-[10px] text-zinc-600">
-                Max 100 Mo · Cloudinary (chunked)
+                Max 100 Mo · Vercel Blob (YouTube pour les longs showreels)
               </span>
             )}
           </div>
@@ -165,20 +205,23 @@ export function VideoUpload({
             type="button"
             size="icon"
             variant="secondary"
-            className="absolute right-2 top-2 h-8 w-8 shadow-md"
+            className={cn(
+              "absolute right-2 top-2 shadow-md",
+              compact ? "h-7 w-7" : "h-8 w-8"
+            )}
             onClick={(e) => {
               e.stopPropagation();
               onChange(null);
             }}
           >
-            <X className="h-4 w-4" />
+            <X className={cn(compact ? "h-3.5 w-3.5" : "h-4 w-4")} />
           </Button>
         )}
       </div>
       <input
         ref={inputRef}
         type="file"
-        accept="video/mp4,video/webm,video/ogg,video/quicktime"
+        accept={accept}
         className="hidden"
         disabled={loading}
         onChange={(e) => {

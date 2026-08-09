@@ -2,19 +2,30 @@
 
 import { useEffect, useState } from "react";
 import {
+  Briefcase,
   ChevronDown,
   ChevronUp,
+  FileText,
+  IdCard,
   Plus,
   Settings2,
   Trash2,
+  type LucideIcon,
 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SkillTag } from "@/components/skills/SkillTag";
 import type {
   ContactConfig,
+  ExtraDocument,
+  ExtraDocumentId,
+  ExtraDocumentsConfig,
   QuickContactIcon,
   QuickContactLink,
   Translatable,
+} from "@/lib/types";
+import {
+  DEFAULT_EXTRA_DOCUMENTS,
+  EXTRA_DOCUMENT_IDS,
 } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,12 +39,48 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
+import { DocumentUpload, type DocumentKind } from "@/components/shared/DocumentUpload";
 import { getL, type MaybeLocalized } from "@/lib/i18n-content";
 import { createId, cn } from "@/lib/utils";
 import {
   QUICK_CONTACT_ICON_OPTIONS,
   QuickContactIconView,
 } from "@/components/widgets/widget-icons";
+
+const DOC_META: Record<
+  ExtraDocumentId,
+  {
+    title: string;
+    description: string;
+    kind: DocumentKind;
+    Icon: LucideIcon;
+    placeholderLabel: string;
+  }
+> = {
+  personalCv: {
+    title: "CV PDF personnel",
+    description:
+      "En plus du CV généré par le site (bouton « Télécharger CV »). PDF uploadé ou lien externe.",
+    kind: "pdf",
+    Icon: FileText,
+    placeholderLabel: "CV PDF",
+  },
+  portfolioPdf: {
+    title: "Portfolio PDF",
+    description: "Portfolio téléchargeable (PDF Blob ou lien externe).",
+    kind: "pdf",
+    Icon: Briefcase,
+    placeholderLabel: "Portfolio PDF",
+  },
+  businessCard: {
+    title: "Carte de visite interactive",
+    description:
+      "Fichier HTML interactif (upload Blob ou hébergement externe).",
+    kind: "html",
+    Icon: IdCard,
+    placeholderLabel: "Carte de visite",
+  },
+};
 
 type ToggleRowProps = {
   label: string;
@@ -95,7 +142,23 @@ export function ContactSettingsPanel({
 
   useEffect(() => {
     if (open) {
-      setDraft({ ...data.contact });
+      setDraft({
+        ...data.contact,
+        extraDocuments: {
+          personalCv: {
+            ...DEFAULT_EXTRA_DOCUMENTS.personalCv,
+            ...data.contact.extraDocuments?.personalCv,
+          },
+          portfolioPdf: {
+            ...DEFAULT_EXTRA_DOCUMENTS.portfolioPdf,
+            ...data.contact.extraDocuments?.portfolioPdf,
+          },
+          businessCard: {
+            ...DEFAULT_EXTRA_DOCUMENTS.businessCard,
+            ...data.contact.extraDocuments?.businessCard,
+          },
+        },
+      });
       setSkillText((data.contact.widgetSkillTags ?? []).join(", "));
     }
   }, [open, data.contact]);
@@ -105,6 +168,35 @@ export function ContactSettingsPanel({
     value: ContactConfig[K]
   ) => {
     setDraft((d) => ({ ...d, [key]: value }));
+  };
+
+  const updateDoc = (
+    id: ExtraDocumentId,
+    partial: Partial<ExtraDocument>
+  ) => {
+    setDraft((d) => {
+      const current: ExtraDocumentsConfig = {
+        personalCv: {
+          ...DEFAULT_EXTRA_DOCUMENTS.personalCv,
+          ...d.extraDocuments?.personalCv,
+        },
+        portfolioPdf: {
+          ...DEFAULT_EXTRA_DOCUMENTS.portfolioPdf,
+          ...d.extraDocuments?.portfolioPdf,
+        },
+        businessCard: {
+          ...DEFAULT_EXTRA_DOCUMENTS.businessCard,
+          ...d.extraDocuments?.businessCard,
+        },
+      };
+      return {
+        ...d,
+        extraDocuments: {
+          ...current,
+          [id]: { ...current[id], ...partial },
+        },
+      };
+    });
   };
 
   const links = draft.quickContactLinks ?? [];
@@ -169,7 +261,7 @@ export function ContactSettingsPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings2 className="h-5 w-5 text-teal-300" />
@@ -268,6 +360,105 @@ export function ContactSettingsPanel({
               Ouvre le profil dans un nouvel onglet.
             </p>
           </ToggleRow>
+
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+            Documents (CV, Portfolio, Carte)
+          </p>
+          <p className="text-[11px] leading-relaxed text-zinc-500">
+            Trois documents optionnels en plus du CV généré par le site. Upload
+            Vercel Blob ou lien externe. Chaque bouton s’ouvre dans un nouvel
+            onglet, dans le Hero et/ou Contact selon les cases cochées.
+          </p>
+
+          {EXTRA_DOCUMENT_IDS.map((id) => {
+            const meta = DOC_META[id];
+            const doc =
+              draft.extraDocuments?.[id] ?? DEFAULT_EXTRA_DOCUMENTS[id];
+            const Icon = meta.Icon;
+            return (
+              <ToggleRow
+                key={id}
+                label={meta.title}
+                checked={doc.show}
+                onChange={(v) => updateDoc(id, { show: v })}
+              >
+                <div className="flex items-start gap-2 text-[11px] text-zinc-500">
+                  <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-teal-300/80" />
+                  <span>{meta.description}</span>
+                </div>
+
+                <ButtonNameField
+                  value={doc.label}
+                  onChange={(v) => updateDoc(id, { label: v })}
+                  placeholder={meta.placeholderLabel}
+                />
+
+                <div className="grid gap-1.5">
+                  <Label className="text-xs text-zinc-400">
+                    Upload (Vercel Blob)
+                  </Label>
+                  <DocumentUpload
+                    value={doc.url}
+                    onChange={(url) => updateDoc(id, { url })}
+                    kind={meta.kind}
+                    label={
+                      meta.kind === "html"
+                        ? "Glissez un .html ou cliquez"
+                        : "Glissez un PDF ou cliquez"
+                    }
+                  />
+                </div>
+
+                <div className="grid gap-1.5">
+                  <Label className="text-xs text-zinc-400">
+                    Ou lien externe (prioritaire si renseigné après upload)
+                  </Label>
+                  <Input
+                    value={doc.url ?? ""}
+                    onChange={(e) =>
+                      updateDoc(id, {
+                        url: e.target.value.trim() || null,
+                      })
+                    }
+                    placeholder={
+                      meta.kind === "html"
+                        ? "https://…/carte.html"
+                        : "https://…/document.pdf"
+                    }
+                  />
+                  <p className="text-[10px] text-zinc-500">
+                    Collez une URL pour remplacer ou éviter l’upload. Laissez
+                    vide et uploadez un fichier vers Blob.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-4 pt-1">
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+                    <input
+                      type="checkbox"
+                      checked={doc.showInHero}
+                      onChange={(e) =>
+                        updateDoc(id, { showInHero: e.target.checked })
+                      }
+                      className="h-4 w-4 accent-teal-300"
+                    />
+                    Afficher dans le Hero
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+                    <input
+                      type="checkbox"
+                      checked={doc.showInContact}
+                      onChange={(e) =>
+                        updateDoc(id, { showInContact: e.target.checked })
+                      }
+                      className="h-4 w-4 accent-teal-300"
+                    />
+                    Afficher dans Contact
+                  </label>
+                </div>
+              </ToggleRow>
+            );
+          })}
 
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
             Section Contact

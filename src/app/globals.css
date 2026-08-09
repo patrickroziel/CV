@@ -51,6 +51,88 @@ body {
   min-height: 100vh;
 }
 
+/* Rich text editor — placeholder when empty */
+.rich-bio-editor:empty::before {
+  content: attr(data-placeholder);
+  color: rgb(82 82 91);
+  pointer-events: none;
+}
+
+/* Always site font inside editor (ignore any leftover face/family) */
+.rich-bio-editor,
+.rich-bio-editor * {
+  font-family: inherit !important;
+}
+
+/* ── Rich text line-height (editor + public) ── */
+/* Actual line-height is set inline from data-rich-lh (default 1.25). */
+.rich-lh,
+.rich-lh p,
+.rich-lh li,
+.rich-lh div,
+.rich-lh span {
+  line-height: inherit;
+}
+.rich-lh p {
+  margin: 0;
+}
+.rich-lh p + p {
+  margin-top: 0.35em;
+}
+.rich-lh ul,
+.rich-lh ol {
+  margin: 0.2em 0;
+  padding-left: 1.15rem;
+}
+.rich-lh li {
+  margin: 0;
+  padding: 0;
+}
+.rich-lh li + li {
+  margin-top: 0;
+}
+
+/* Formatting visibility in the editor */
+.rich-bio-editor b,
+.rich-bio-editor strong {
+  font-weight: 700;
+}
+.rich-bio-editor i,
+.rich-bio-editor em {
+  font-style: italic;
+}
+
+/* List style base in editor */
+.rich-bio-editor ul {
+  list-style: disc;
+}
+.rich-bio-editor ol {
+  list-style: decimal;
+}
+
+/* Homogeneous blocks — no surprise nested layout */
+.rich-bio-editor,
+.rich-html {
+  word-break: break-word;
+}
+.rich-bio-editor ul,
+.rich-bio-editor ol,
+.rich-html ul,
+.rich-html ol {
+  list-style-position: outside;
+}
+
+/*
+ * Inline colours use style="color:…" set by the editor (and data-rich-color).
+ * Inline styles always override inherited text-* utilities on the parent.
+ */
+
+/* Hero rich text: inherit surrounding styles for nested tags */
+.glass-hero-vitrail h1.whitespace-pre-line font,
+.glass-hero-vitrail h1.whitespace-pre-line span {
+  line-height: inherit;
+}
+
 /* ═══════════════════════════════════════════
    Glassmorphism system — premium & coherent
    ═══════════════════════════════════════════ */
@@ -143,6 +225,211 @@ body {
     inset 0 -1px 0 0 rgba(255, 255, 255, 0.06),
     inset 1px 0 0 0 rgba(255, 255, 255, 0.1),
     inset -1px 0 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/*
+ * Hero vitrail / real window pane
+ * Strong transparency so the forest reads through; light blur = refraction glaze.
+ */
+.glass-hero-vitrail.glass-elevated,
+.glass-hero-vitrail {
+  border-color: rgba(255, 255, 255, 0.42);
+  /* Barely tinted — forest must show clearly */
+  background:
+    linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.04) 28%,
+      rgba(140, 200, 240, 0.05) 52%,
+      rgba(255, 255, 255, 0.07) 78%,
+      rgba(200, 230, 255, 0.04) 100%
+    ),
+    rgba(8, 14, 22, 0.045);
+  /* Lower blur = sharper forest, still “through glass” */
+  backdrop-filter: blur(14px) saturate(155%) contrast(1.04) brightness(1.06);
+  -webkit-backdrop-filter: blur(14px) saturate(155%) contrast(1.04) brightness(1.06);
+  box-shadow:
+    0 4px 28px rgba(0, 0, 0, 0.14),
+    0 30px 64px -22px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    /* Edge reflections — real glass rim */
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.62),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.12),
+    inset 1px 0 0 0 rgba(255, 255, 255, 0.18),
+    inset -1px 0 0 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 40px 0 rgba(180, 220, 255, 0.04);
+}
+
+/* Specular sheet + prismatic wash on the glass surface */
+.glass-hero-vitrail::before {
+  background:
+    radial-gradient(
+      95% 65% at 12% -15%,
+      rgba(255, 255, 255, 0.48) 0%,
+      transparent 48%
+    ),
+    radial-gradient(
+      70% 50% at 88% 110%,
+      rgba(160, 210, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 32%
+    ),
+    linear-gradient(
+      118deg,
+      rgba(120, 200, 255, 0.08) 0%,
+      transparent 38%,
+      rgba(200, 170, 255, 0.05) 72%,
+      transparent 100%
+    );
+  opacity: 1;
+  /* Soft breathing of the top specular (light on glass) */
+  animation: hero-vitrail-sheen 14s ease-in-out infinite alternate;
+}
+
+/* Thin bright edge stroke — semi-animated rim light */
+.glass-hero-vitrail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  height: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 2px 14px rgba(255, 255, 255, 0.07),
+    inset 0 0 28px rgba(180, 220, 255, 0.04);
+  background:
+    linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.07) 18%,
+      transparent 36%,
+      transparent 64%,
+      rgba(160, 210, 255, 0.06) 82%,
+      transparent 100%
+    );
+  background-size: 220% 100%;
+  opacity: 0.85;
+  animation: hero-vitrail-edge 18s ease-in-out infinite alternate;
+}
+
+@keyframes hero-vitrail-sheen {
+  0% {
+    opacity: 0.88;
+    filter: brightness(1);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1.06);
+  }
+}
+
+@keyframes hero-vitrail-edge {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.72;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 0.95;
+  }
+}
+
+/* Language cards — instant tap, no long-press callout / text selection */
+.language-card-touch {
+  touch-action: manipulation; /* no double-tap zoom delay */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none; /* iOS long-press menu */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Hero glass media layers (upload-driven, no procedural drops)
+ * Size rules: layers are out-of-flow; media never sets Hero dimensions.
+ * Hero height = content only; media fills with object-cover.
+ */
+.hero-glass-back,
+.hero-glass-front {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: transparent;
+  /* Never participate in parent sizing */
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  max-height: none;
+  max-width: none;
+}
+
+.hero-glass-back img,
+.hero-glass-back video,
+.hero-glass-front img,
+.hero-glass-front video,
+.hero-glass-media,
+.hero-glass-media video,
+.hero-glass-media img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Still PNG textures can use soft-light for a condensation look */
+.hero-glass-front--texture {
+  mix-blend-mode: soft-light;
+}
+
+/* True alpha video: normal compositing so transparent pixels stay transparent */
+.hero-glass-front--alpha {
+  mix-blend-mode: normal;
+}
+
+/* Wallpaper alpha overlay — never paint an opaque box under the video */
+.wallpaper-alpha-video {
+  background-color: transparent !important;
+  /* Avoid filters that flatten the alpha channel */
+  filter: none;
+}
+
+/* Hero bio scroll box — thin scrollbar */
+.hero-bio-scroll > div {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(94, 234, 212, 0.35) transparent;
+}
+.hero-bio-scroll > div::-webkit-scrollbar {
+  width: 6px;
+}
+.hero-bio-scroll > div::-webkit-scrollbar-thumb {
+  background: rgba(94, 234, 212, 0.35);
+  border-radius: 999px;
+}
+.hero-bio-scroll > div::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-hero-vitrail::before,
+  .glass-hero-vitrail::after {
+    animation: none !important;
+  }
 }
 
 /* Premium soft transitions for interactive glass UI */

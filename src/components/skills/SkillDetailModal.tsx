@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SkillIconsRow } from "@/components/skills/SkillIconsRow";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { RichHtml } from "@/components/shared/RichHtml";
+import { stripHtml } from "@/lib/sanitize-html";
 import type { Skill } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -47,9 +49,10 @@ export function SkillDetailModal({
   const name = l(display.name);
   const category = display.category ? l(display.category) : "";
   const description = display.description ? l(display.description) : "";
+  const descriptionPlain = description ? stripHtml(description) : "";
   const level = display.level ?? 0;
   const hasContent =
-    Boolean(description.trim()) ||
+    Boolean(descriptionPlain.trim()) ||
     Boolean(display.image) ||
     Boolean(display.icons?.length);
 
@@ -96,10 +99,11 @@ export function SkillDetailModal({
               <SkillIconsRow icons={display.icons} size="lg" />
             )}
 
-            {description.trim() ? (
-              <p className="text-sm leading-relaxed text-zinc-300">
-                {description}
-              </p>
+            {descriptionPlain.trim() ? (
+              <RichHtml
+                html={description}
+                className="text-sm leading-relaxed text-zinc-300"
+              />
             ) : (
               <p className="text-sm text-zinc-500">
                 {matched

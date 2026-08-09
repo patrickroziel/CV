@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { ProjectMedia } from "@/components/projects/ProjectMedia";
+import { stripHtml } from "@/lib/sanitize-html";
 
 type ProjectCardProps = {
   project: Project;
@@ -71,7 +72,7 @@ export function ProjectCard({ project, index = 0, onEdit }: ProjectCardProps) {
               {l(project.title)}
             </h3>
             <p className="mt-2 line-clamp-2 text-sm text-zinc-400">
-              {l(project.description)}
+              {stripHtml(l(project.description)) || l(project.description)}
             </p>
             <div className="mt-4 flex flex-wrap gap-1.5">
               {project.tags.slice(0, 4).map((tag) => (

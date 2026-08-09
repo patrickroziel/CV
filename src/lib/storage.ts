@@ -1,33 +1,59 @@
 import type {
+  BackgroundImage,
   ContactConfig,
   Education,
   Experience,
+  ExtraDocument,
+  ExtraDocumentId,
+  ExtraDocumentsConfig,
   FeatureVideo,
   FeatureVideoType,
+  HeroBadge,
   Language,
   LanguageVideoType,
   MainShowreel,
   MediaItem,
   PortfolioData,
+  Profile,
   Project,
   ProjectMediaType,
   QuickContactIcon,
   QuickContactLink,
+  HeroGlassBackMedia,
+  HeroGlassConfig,
+  HeroGlassFrontLayer,
+  QuoteService,
+  QuoteServiceId,
+  QuotesConfig,
+  ComingSoonConfig,
+  NavConfig,
+  NavItemId,
   SectionLabelsConfig,
   Skill,
   SkillIcon,
 } from "./types";
 import {
   DATA_VERSION,
+  DEFAULT_ALPHA_VIDEO_OPACITY,
+  DEFAULT_COMING_SOON,
   DEFAULT_CONTACT,
+  DEFAULT_EXPERIENCE_BADGE,
+  DEFAULT_EXTRA_DOCUMENTS,
   DEFAULT_FEATURE_VIDEOS,
+  DEFAULT_HERO_GLASS,
   DEFAULT_MAIN_SHOWREEL,
+  DEFAULT_NAV,
   DEFAULT_QUICK_CONTACT_LINKS,
+  DEFAULT_QUOTES,
   DEFAULT_SECTION_LABELS,
   DEFAULT_WIDGET_SKILL_TAGS,
+  EXTRA_DOCUMENT_IDS,
+  NAV_ITEM_IDS,
+  QUOTE_SERVICE_IDS,
 } from "./types";
 import { DEFAULT_PORTFOLIO, DEFAULT_BACKGROUND } from "./defaults";
 import {
+  createId,
   inferMediaTypeFromUrl,
   isFileVideoUrl,
   isXUrl,
@@ -221,12 +247,18 @@ function normalizeLanguage(
     ]);
   }
 
+  const fallbackImageUrl =
+    typeof l.fallbackImageUrl === "string" && l.fallbackImageUrl.trim()
+      ? l.fallbackImageUrl.trim()
+      : null;
+
   return {
     id: l.id,
     name: nameLifted,
     level: levelLifted,
     videoType,
     videoUrl: videoType === "none" ? null : videoUrl,
+    fallbackImageUrl: videoType === "none" ? null : fallbackImageUrl,
     icons,
     outlines: outlines.map((o) => ({
       ...o,
@@ -411,7 +443,43 @@ function normalizeSkill(raw: Partial<Skill> | undefined): Skill {
   };
 }
 
+function normalizeExtraDocuments(raw: unknown): ExtraDocumentsConfig {
+  const source =
+    raw && typeof raw === "object"
+      ? (raw as Partial<Record<ExtraDocumentId, Partial<ExtraDocument>>>)
+      : {};
+
+  const result = {} as ExtraDocumentsConfig;
+  for (const id of EXTRA_DOCUMENT_IDS) {
+    const def = DEFAULT_EXTRA_DOCUMENTS[id];
+    const item = source[id];
+    const url =
+      typeof item?.url === "string"
+        ? item.url.trim() || null
+        : item?.url === null
+          ? null
+          : def.url;
+    result[id] = {
+      url,
+      show: typeof item?.show === "boolean" ? item.show : def.show,
+      label: liftToLocalized(
+        item?.label != null ? item.label : def.label
+      ),
+      showInHero:
+        typeof item?.showInHero === "boolean"
+          ? item.showInHero
+          : def.showInHero,
+      showInContact:
+        typeof item?.showInContact === "boolean"
+          ? item.showInContact
+          : def.showInContact,
+    };
+  }
+  return result;
+}
+
 function liftContact(c: ContactConfig): ContactConfig {
+  const docs = normalizeExtraDocuments(c.extraDocuments);
   return {
     ...c,
     sectionEyebrow: liftToLocalized(c.sectionEyebrow),
@@ -428,6 +496,7 @@ function liftContact(c: ContactConfig): ContactConfig {
     heroPhoneLabel: liftToLocalized(c.heroPhoneLabel),
     heroEmailLabel: liftToLocalized(c.heroEmailLabel),
     heroXLabel: liftToLocalized(c.heroXLabel),
+    extraDocuments: docs,
     widgetQuickContactTitle: liftToLocalized(c.widgetQuickContactTitle),
     widgetSkillsTitle: liftToLocalized(c.widgetSkillsTitle),
     widgetAvailabilityTitle: liftToLocalized(c.widgetAvailabilityTitle),
@@ -474,13 +543,357 @@ function normalizeSectionLabels(
   };
 }
 
+export function normalizeNav(
+  raw: Partial<Record<NavItemId, Partial<{ label: unknown; visible: unknown }>>> | undefined
+): NavConfig {
+  const out = {} as NavConfig;
+  for (const id of NAV_ITEM_IDS) {
+    const def = DEFAULT_NAV[id];
+    const item = raw?.[id];
+    out[id] = {
+      label: liftToLocalized(
+        item?.label != null ? (item.label as never) : def.label
+      ),
+      visible:
+        typeof item?.visible === "boolean" ? item.visible : def.visible,
+    };
+    // Empty label → fall back to default so nav never shows blank
+    if (!getL(out[id].label).trim()) {
+      out[id].label = liftToLocalized(def.label);
+    }
+  }
+  return out;
+}
+
+export function normalizeComingSoon(
+  raw: Partial<ComingSoonConfig> | undefined
+): ComingSoonConfig {
+  const title = liftToLocalized(
+    raw?.title != null ? (raw.title as never) : DEFAULT_COMING_SOON.title
+  );
+  return {
+    enabled: Boolean(raw?.enabled),
+    title: getL(title).trim()
+      ? title
+      : liftToLocalized(DEFAULT_COMING_SOON.title),
+  };
+}
+
 function normalizeContact(raw: Partial<ContactConfig> | undefined): ContactConfig {
   const base = { ...DEFAULT_CONTACT, ...raw };
   return liftContact({
     ...base,
+    extraDocuments: normalizeExtraDocuments(raw?.extraDocuments),
     quickContactLinks: normalizeQuickContactLinks(raw?.quickContactLinks),
     widgetSkillTags: normalizeWidgetSkillTags(raw?.widgetSkillTags),
   });
+}
+
+function normalizeQuoteService(
+  id: QuoteServiceId,
+  raw: Partial<QuoteService> | undefined
+): QuoteService {
+  const def = DEFAULT_QUOTES.services.find((s) => s.id === id)!;
+  return {
+    id,
+    show: typeof raw?.show === "boolean" ? raw.show : def.show,
+    buttonLabel: liftToLocalized(
+      raw?.buttonLabel != null ? raw.buttonLabel : def.buttonLabel
+    ),
+    pageTitle: liftToLocalized(
+      raw?.pageTitle != null ? raw.pageTitle : def.pageTitle
+    ),
+    pageIntro: liftToLocalized(
+      raw?.pageIntro != null ? raw.pageIntro : def.pageIntro
+    ),
+  };
+}
+
+/** Infer image vs video for legacy hero glass back items without `type`. */
+export function inferHeroGlassBackType(url: string): "video" | "image" {
+  const u = url.trim();
+  if (!u) return "video";
+  if (/\/video\/upload\//i.test(u)) return "video";
+  if (/\/image\/upload\//i.test(u)) return "image";
+  if (/\.(webm|mp4|mov|m4v|ogg|avi|mkv)(\?|#|$)/i.test(u)) return "video";
+  if (/\.(png|jpe?g|webp|gif|avif|svg|bmp)(\?|#|$)/i.test(u)) return "image";
+  return "video";
+}
+
+export function normalizeHeroGlass(raw: unknown): HeroGlassConfig {
+  const r =
+    raw && typeof raw === "object"
+      ? (raw as Partial<HeroGlassConfig>)
+      : {};
+
+  const backVideos: HeroGlassBackMedia[] = [];
+  if (Array.isArray(r.backVideos)) {
+    for (let i = 0; i < r.backVideos.length; i++) {
+      const item = r.backVideos[i] as Partial<HeroGlassBackMedia> | undefined;
+      if (!item || typeof item !== "object") continue;
+      const url = typeof item.url === "string" ? item.url.trim() : "";
+      if (!url) continue;
+      const type: "video" | "image" =
+        item.type === "image" || item.type === "video"
+          ? item.type
+          : inferHeroGlassBackType(url);
+      const fallbackImageUrl =
+        type === "video" &&
+        typeof item.fallbackImageUrl === "string" &&
+        item.fallbackImageUrl.trim()
+          ? item.fallbackImageUrl.trim()
+          : null;
+      backVideos.push({
+        id:
+          typeof item.id === "string" && item.id
+            ? item.id
+            : `hg-back-${i}-${createId().slice(0, 8)}`,
+        url,
+        type,
+        enabled: typeof item.enabled === "boolean" ? item.enabled : true,
+        opacity: clampUnitOpacity(
+          (item as { opacity?: unknown }).opacity,
+          1
+        ),
+        fallbackImageUrl,
+      });
+    }
+  }
+
+  const frontRaw =
+    r.front && typeof r.front === "object"
+      ? (r.front as Partial<HeroGlassFrontLayer>)
+      : {};
+  const frontType =
+    frontRaw.type === "video" || frontRaw.type === "image"
+      ? frontRaw.type
+      : "none";
+  const frontUrl =
+    typeof frontRaw.url === "string" && frontRaw.url.trim()
+      ? frontRaw.url.trim()
+      : null;
+  const frontOpacity =
+    typeof frontRaw.opacity === "number" && !Number.isNaN(frontRaw.opacity)
+      ? Math.min(1, Math.max(0, frontRaw.opacity))
+      : DEFAULT_HERO_GLASS.front.opacity;
+  const frontFallback =
+    frontType === "video" &&
+    typeof frontRaw.fallbackImageUrl === "string" &&
+    frontRaw.fallbackImageUrl.trim()
+      ? frontRaw.fallbackImageUrl.trim()
+      : null;
+
+  return {
+    backVideos,
+    front: {
+      type: frontUrl ? frontType : "none",
+      url: frontType === "none" ? null : frontUrl,
+      opacity: frontOpacity,
+      fallbackImageUrl: frontFallback,
+    },
+  };
+}
+
+export function normalizeQuotes(raw: unknown): QuotesConfig {
+  const r =
+    raw && typeof raw === "object"
+      ? (raw as Partial<QuotesConfig> & {
+          services?: Partial<QuoteService>[];
+        })
+      : {};
+  const byId = new Map<string, Partial<QuoteService>>();
+  if (Array.isArray(r.services)) {
+    for (const s of r.services) {
+      if (s && typeof s === "object" && typeof s.id === "string") {
+        byId.set(s.id, s);
+      }
+    }
+  }
+  return {
+    sectionEyebrow: liftToLocalized(
+      r.sectionEyebrow != null
+        ? r.sectionEyebrow
+        : DEFAULT_QUOTES.sectionEyebrow
+    ),
+    sectionTitle: liftToLocalized(
+      r.sectionTitle != null ? r.sectionTitle : DEFAULT_QUOTES.sectionTitle
+    ),
+    sectionDescription: liftToLocalized(
+      r.sectionDescription != null
+        ? r.sectionDescription
+        : DEFAULT_QUOTES.sectionDescription
+    ),
+    services: QUOTE_SERVICE_IDS.map((id) =>
+      normalizeQuoteService(id, byId.get(id))
+    ),
+  };
+}
+
+function clampAlphaOpacity(value: unknown): number {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return DEFAULT_ALPHA_VIDEO_OPACITY;
+  }
+  return Math.min(1, Math.max(0, value));
+}
+
+function clampUnitOpacity(value: unknown, fallback = 1): number {
+  if (typeof value !== "number" || Number.isNaN(value)) return fallback;
+  return Math.min(1, Math.max(0, value));
+}
+
+/** Build default badges from legacy location + experienceBadge fields */
+export function defaultHeroBadgesFromProfile(
+  profile: Partial<Profile>
+): HeroBadge[] {
+  const badges: HeroBadge[] = [];
+  const loc = liftToLocalized(profile.location);
+  if (Object.keys(loc).length > 0) {
+    badges.push({
+      id: "badge-location",
+      text: loc,
+      bgColor: "rgba(255,255,255,0.08)",
+      textColor: "#e4e4e7",
+    });
+  }
+  const exp = liftToLocalized(
+    profile.experienceBadge ?? DEFAULT_EXPERIENCE_BADGE
+  );
+  if (Object.keys(exp).length > 0) {
+    badges.push({
+      id: "badge-experience",
+      text: exp,
+      bgColor: "rgba(251,191,36,0.15)",
+      textColor: "#fef3c7",
+    });
+  }
+  return badges;
+}
+
+export function normalizeHeroBadges(
+  raw: unknown,
+  profile: Partial<Profile>
+): HeroBadge[] {
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return defaultHeroBadgesFromProfile(profile);
+  }
+  const out: HeroBadge[] = [];
+  for (let i = 0; i < raw.length; i++) {
+    const item = raw[i];
+    if (!item || typeof item !== "object") continue;
+    const b = item as Partial<HeroBadge>;
+    const text = liftToLocalized(b.text);
+    if (Object.keys(text).length === 0) continue;
+    out.push({
+      id:
+        typeof b.id === "string" && b.id
+          ? b.id
+          : `badge-${i}-${createId().slice(0, 6)}`,
+      text,
+      bgColor:
+        typeof b.bgColor === "string" && b.bgColor.trim()
+          ? b.bgColor.trim()
+          : "rgba(255,255,255,0.08)",
+      textColor:
+        typeof b.textColor === "string" && b.textColor.trim()
+          ? b.textColor.trim()
+          : "#f4f4f5",
+    });
+  }
+  return out.length > 0 ? out : defaultHeroBadgesFromProfile(profile);
+}
+
+function normalizeOneBackgroundImage(
+  item: unknown,
+  index: number
+): BackgroundImage | null {
+  if (typeof item === "string") {
+    const url = item.trim();
+    return url
+      ? {
+          id: `bg-migrated-${index}`,
+          url,
+          opacity: 1,
+          alphaVideoUrl: null,
+          alphaVideoEnabled: false,
+          alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
+        }
+      : null;
+  }
+  if (!item || typeof item !== "object") return null;
+
+  const obj = item as Partial<BackgroundImage>;
+  const url = typeof obj.url === "string" ? obj.url.trim() : "";
+  if (!url) return null;
+
+  const alphaVideoUrl =
+    typeof obj.alphaVideoUrl === "string" && obj.alphaVideoUrl.trim()
+      ? obj.alphaVideoUrl.trim()
+      : null;
+
+  return {
+    id:
+      typeof obj.id === "string" && obj.id
+        ? obj.id
+        : `bg-${index}-${createId().slice(0, 8)}`,
+    url,
+    opacity: clampUnitOpacity(obj.opacity, 1),
+    alphaVideoUrl,
+    alphaVideoEnabled:
+      typeof obj.alphaVideoEnabled === "boolean"
+        ? obj.alphaVideoEnabled
+        : Boolean(alphaVideoUrl),
+    alphaVideoOpacity: clampAlphaOpacity(obj.alphaVideoOpacity),
+  };
+}
+
+/**
+ * Normalize wallpaper pool. Migrates legacy single `backgroundUrl` into an array.
+ * Preserves optional alpha video overlays per image.
+ */
+export function normalizeBackgroundImages(
+  raw: unknown,
+  fallbackUrl?: string | null
+): BackgroundImage[] {
+  const fallback =
+    (typeof fallbackUrl === "string" && fallbackUrl.trim()) ||
+    DEFAULT_BACKGROUND;
+
+  if (Array.isArray(raw) && raw.length > 0) {
+    const list = raw
+      .map((item, i) => normalizeOneBackgroundImage(item, i))
+      .filter((x): x is BackgroundImage => Boolean(x));
+
+    if (list.length > 0) return list;
+  }
+
+  return [
+    {
+      id: "bg-default",
+      url: fallback,
+      opacity: 1,
+      alphaVideoUrl: null,
+      alphaVideoEnabled: false,
+      alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
+    },
+  ];
+}
+
+/** Pick a random wallpaper entry from the pool (client-side only). */
+export function pickRandomBackground(
+  images: BackgroundImage[] | undefined | null,
+  fallbackUrl?: string | null
+): BackgroundImage {
+  const list = normalizeBackgroundImages(images, fallbackUrl);
+  if (list.length === 1) return list[0];
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+/** Pick a random wallpaper URL from the pool (client-side only). */
+export function pickRandomBackgroundUrl(
+  images: BackgroundImage[] | undefined | null,
+  fallbackUrl?: string | null
+): string {
+  return pickRandomBackground(images, fallbackUrl).url;
 }
 
 function normalizeVideoType(
@@ -511,6 +924,10 @@ function normalizeFeatureVideos(raw: unknown): FeatureVideo[] {
     const videoUrl = item.videoUrl ?? null;
     let videoType = normalizeVideoType(item.videoType, videoUrl);
     if (videoType !== "none" && !videoUrl) videoType = "none";
+    const fallbackImageUrl =
+      typeof item.fallbackImageUrl === "string" && item.fallbackImageUrl.trim()
+        ? item.fallbackImageUrl.trim()
+        : null;
     return {
       id: item.id || slot.id,
       title: liftToLocalized(
@@ -518,6 +935,7 @@ function normalizeFeatureVideos(raw: unknown): FeatureVideo[] {
       ),
       videoType,
       videoUrl: videoType === "none" ? null : videoUrl,
+      fallbackImageUrl: videoType === "none" ? null : fallbackImageUrl,
     };
   });
 }
@@ -526,10 +944,14 @@ function normalizeMainShowreel(
   raw: Partial<MainShowreel> | undefined,
   legacyShowreelUrl?: string
 ): MainShowreel {
-  if (raw && (raw.videoType || raw.videoUrl || raw.title)) {
+  if (raw && (raw.videoType || raw.videoUrl || raw.title || raw.fallbackImageUrl)) {
     const videoUrl = raw.videoUrl ?? null;
     let videoType = normalizeVideoType(raw.videoType, videoUrl);
     if (videoType !== "none" && !videoUrl) videoType = "none";
+    const fallbackImageUrl =
+      typeof raw.fallbackImageUrl === "string" && raw.fallbackImageUrl.trim()
+        ? raw.fallbackImageUrl.trim()
+        : null;
     return {
       title: liftToLocalized(
         (raw.title as string | undefined) ||
@@ -537,6 +959,7 @@ function normalizeMainShowreel(
       ),
       videoType,
       videoUrl: videoType === "none" ? null : videoUrl,
+      fallbackImageUrl: videoType === "none" ? null : fallbackImageUrl,
     };
   }
   // Migrate from profile.showreelUrl
@@ -545,6 +968,7 @@ function normalizeMainShowreel(
       title: liftToLocalized(DEFAULT_MAIN_SHOWREEL.title as string),
       videoType: "youtube",
       videoUrl: legacyShowreelUrl,
+      fallbackImageUrl: null,
     };
   }
   return {
@@ -580,9 +1004,23 @@ export function loadPortfolio(): PortfolioData {
       ...parsed.profile,
     };
 
+    const backgroundImages = normalizeBackgroundImages(
+      (parsed as { backgroundImages?: unknown }).backgroundImages,
+      parsed.backgroundUrl
+    );
+    const backgroundUrl =
+      (typeof parsed.backgroundUrl === "string" &&
+        parsed.backgroundUrl.trim()) ||
+      backgroundImages[0]?.url ||
+      DEFAULT_BACKGROUND;
+
     const data: PortfolioData = {
       version: DATA_VERSION,
-      backgroundUrl: parsed.backgroundUrl || DEFAULT_BACKGROUND,
+      backgroundUrl,
+      backgroundImages,
+      heroGlass: normalizeHeroGlass(
+        (parsed as { heroGlass?: unknown }).heroGlass
+      ),
       ui: {
         overlayOpacity:
           parsed.ui?.overlayOpacity ?? DEFAULT_PORTFOLIO.ui.overlayOpacity,
@@ -596,6 +1034,21 @@ export function loadPortfolio(): PortfolioData {
         title: liftToLocalized(mergedProfile.title),
         bio: liftToLocalized(mergedProfile.bio),
         location: liftToLocalized(mergedProfile.location),
+        experienceBadge: liftToLocalized(
+          mergedProfile.experienceBadge ??
+            DEFAULT_PORTFOLIO.profile.experienceBadge ??
+            DEFAULT_EXPERIENCE_BADGE
+        ),
+        heroBadges: normalizeHeroBadges(
+          (mergedProfile as { heroBadges?: unknown }).heroBadges,
+          mergedProfile
+        ),
+        heroFontFamily:
+          typeof (mergedProfile as { heroFontFamily?: unknown })
+            .heroFontFamily === "string"
+            ? ((mergedProfile as { heroFontFamily?: string }).heroFontFamily ??
+              "")
+            : "",
       },
       experiences: (parsed.experiences ?? DEFAULT_PORTFOLIO.experiences).map(
         normalizeExperience
@@ -616,7 +1069,16 @@ export function loadPortfolio(): PortfolioData {
         (parsed as { languagesSection?: { description?: unknown } })
           .languagesSection
       ),
+      nav: normalizeNav(
+        (parsed as { nav?: Parameters<typeof normalizeNav>[0] }).nav
+      ),
+      comingSoon: normalizeComingSoon(
+        (parsed as { comingSoon?: Partial<ComingSoonConfig> }).comingSoon
+      ),
       contact: normalizeContact(parsed.contact),
+      quotes: normalizeQuotes(
+        (parsed as { quotes?: unknown }).quotes
+      ),
       mainShowreel: normalizeMainShowreel(
         parsed.mainShowreel,
         parsed.profile?.showreelUrl
@@ -650,6 +1112,10 @@ function enrichFromDefaults(data: PortfolioData): PortfolioData {
       title: fill(data.profile.title, d.profile.title),
       bio: fill(data.profile.bio, d.profile.bio),
       location: fill(data.profile.location, d.profile.location),
+      experienceBadge: fill(
+        data.profile.experienceBadge,
+        d.profile.experienceBadge
+      ),
     },
     experiences: data.experiences.map((e) => {
       const seed = d.experiences.find((x) => x.id === e.id);
@@ -751,6 +1217,27 @@ function enrichFromDefaults(data: PortfolioData): PortfolioData {
         data.sectionLabels?.languagesDescription ??
           data.languagesSection?.description,
         d.sectionLabels.languagesDescription
+      ),
+    },
+    nav: (() => {
+      const base = normalizeNav(data.nav as never);
+      const seed = normalizeNav(d.nav as never);
+      const out = {} as typeof base;
+      for (const id of NAV_ITEM_IDS) {
+        out[id] = {
+          label: fill(base[id].label, seed[id].label),
+          visible: base[id].visible,
+        };
+      }
+      return out;
+    })(),
+    comingSoon: {
+      enabled: Boolean(
+        data.comingSoon?.enabled ?? d.comingSoon?.enabled ?? false
+      ),
+      title: fill(
+        data.comingSoon?.title,
+        d.comingSoon?.title ?? DEFAULT_COMING_SOON.title
       ),
     },
     contact: {

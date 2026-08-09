@@ -1,6 +1,8 @@
 "use client";
 
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { RichHtml } from "@/components/shared/RichHtml";
+import { stripHtml } from "@/lib/sanitize-html";
 import { formatPeriod } from "@/lib/utils";
 
 /**
@@ -14,7 +16,7 @@ export function CvPrintView() {
     <div id="cv-print" className="print-only hidden">
       <header className="mb-6 border-b-2 border-zinc-900 pb-4">
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
-          {profile.name}
+          {stripHtml(profile.name) || profile.name}
         </h1>
         <p className="mt-1 text-lg font-medium text-zinc-700">
           {l(profile.title)}
@@ -29,9 +31,11 @@ export function CvPrintView() {
           </p>
         )}
         {l(profile.bio) && (
-          <p className="mt-3 text-sm leading-relaxed text-zinc-700">
-            {l(profile.bio)}
-          </p>
+          <RichHtml
+            html={l(profile.bio)}
+            plain
+            className="mt-3 text-sm leading-relaxed text-zinc-700"
+          />
         )}
       </header>
 
@@ -54,7 +58,11 @@ export function CvPrintView() {
                 <p className="text-xs text-zinc-500">{l(exp.location)}</p>
               )}
               {l(exp.description) && (
-                <p className="mt-1 text-sm text-zinc-700">{l(exp.description)}</p>
+                <RichHtml
+                  html={l(exp.description)}
+                  plain
+                  className="mt-1 text-sm text-zinc-700"
+                />
               )}
             </li>
           ))}

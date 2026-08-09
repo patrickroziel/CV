@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, EyeOff, Plus } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
 import { SectionHeading } from "@/components/shared/SectionHeading";
+import { useSectionVisible } from "@/components/shared/SectionVisibility";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { ProjectCard } from "@/components/projects/ProjectCard";
@@ -23,7 +24,9 @@ import type { Project } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export default function ProjetsPage() {
-  const { data, addProject, updateProject } = usePortfolio();
+  const { data, addProject, updateProject, editMode, l } = usePortfolio();
+  const { shouldRender, showHiddenBadge, publicVisible } =
+    useSectionVisible("gallery");
   const [tag, setTag] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
@@ -39,11 +42,36 @@ export default function ProjetsPage() {
     return data.projects.filter((p) => p.tags.includes(tag));
   }, [data.projects, tag]);
 
+  if (!shouldRender) {
+    return (
+      <main className="no-print relative z-10 pb-16 pt-28 sm:pt-32">
+        <div className="mx-auto max-w-lg px-4 text-center">
+          <p className="text-zinc-400">Cette page n’est pas disponible.</p>
+          <Link
+            href="/"
+            className="mt-4 inline-flex text-sm text-teal-300 hover:underline"
+          >
+            Retour à l’accueil
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const galleryLabel =
+    l(data.nav?.gallery?.label).trim() || "Galerie";
+
   return (
     <main className="no-print relative z-10 pb-16 pt-28 sm:pt-32">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {showHiddenBadge && (
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-amber-400/35 bg-amber-400/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-100">
+            <EyeOff className="h-3 w-3" />
+            Masquée — visible uniquement en Mode Édition
+          </div>
+        )}
         <Link
-          href="/#projects"
+          href={publicVisible ? "/#projects" : "/"}
           className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-400 transition hover:text-teal-300"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -51,7 +79,7 @@ export default function ProjetsPage() {
         </Link>
 
         <SectionHeading
-          eyebrow="Galerie"
+          eyebrow={galleryLabel}
           title="Tous les projets"
           description="Filtrez par tag et explorez le détail de chaque réalisation."
           action={
@@ -113,7 +141,7 @@ export default function ProjetsPage() {
       </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nouveau projet</DialogTitle>
           </DialogHeader>
@@ -129,7 +157,7 @@ export default function ProjetsPage() {
       </Dialog>
 
       <Dialog open={!!editing} onOpenChange={(v) => !v && setEditing(null)}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Modifier le projet</DialogTitle>
           </DialogHeader>

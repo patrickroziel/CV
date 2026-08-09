@@ -26,6 +26,7 @@ import {
   type ExperienceFormValues,
 } from "@/components/experience/ExperienceForm";
 import { MediaCarousel } from "@/components/shared/MediaCarousel";
+import { RichHtml } from "@/components/shared/RichHtml";
 import { formatPeriod } from "@/lib/utils";
 import type { Experience } from "@/lib/types";
 import { DEFAULT_SECTION_LABELS } from "@/lib/types";
@@ -158,9 +159,10 @@ export function ExperienceSection() {
                         )}
                       </div>
                       {l(exp.description) && (
-                        <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-                          {l(exp.description)}
-                        </p>
+                        <RichHtml
+                          html={l(exp.description)}
+                          className="mt-3 text-sm text-zinc-400"
+                        />
                       )}
                       {exp.technologies && exp.technologies.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -184,7 +186,7 @@ export function ExperienceSection() {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nouvelle expérience</DialogTitle>
           </DialogHeader>
@@ -203,7 +205,7 @@ export function ExperienceSection() {
         open={!!editing}
         onOpenChange={(v) => !v && setEditing(null)}
       >
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Modifier l’expérience</DialogTitle>
           </DialogHeader>

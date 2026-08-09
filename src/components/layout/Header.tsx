@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,6 +10,8 @@ import {
   ImageIcon,
   Menu,
   Pencil,
+  PanelTop,
+  Rocket,
   X,
 } from "lucide-react";
 import { cn, printCv } from "@/lib/utils";
@@ -19,26 +21,64 @@ import { WallpaperEditor } from "@/components/background/WallpaperEditor";
 import { EditGate } from "@/components/shared/EditGate";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { EditLocaleBar } from "@/components/i18n/EditLocaleBar";
+import { NavSettingsPanel } from "@/components/layout/NavSettingsPanel";
+import { ComingSoonSettingsPanel } from "@/components/coming-soon/ComingSoonSettingsPanel";
 import { downloadPortfolioSnapshot } from "@/lib/storage";
-
-const LINK_DEFS = [
-  { href: "/#hero", key: "nav.home", id: "hero" },
-  { href: "/#experience", key: "nav.experience", id: "experience" },
-  { href: "/#projects", key: "nav.projects", id: "projects" },
-  { href: "/#skills", key: "nav.skills", id: "skills" },
-  { href: "/#education", key: "nav.education", id: "education" },
-  { href: "/#languages", key: "nav.languages", id: "languages" },
-  { href: "/#contact", key: "nav.contact", id: "contact" },
-] as const;
+import {
+  DEFAULT_COMING_SOON,
+  DEFAULT_NAV,
+  NAV_ITEM_META,
+  type NavItemId,
+} from "@/lib/types";
+import { getL } from "@/lib/i18n-content";
 
 export function Header() {
-  const { editMode, setEditMode, editAllowed, t, data, showToast } =
-    usePortfolio();
+  const {
+    editMode,
+    setEditMode,
+    editAllowed,
+    t,
+    l,
+    data,
+    showToast,
+    updateComingSoon,
+  } = usePortfolio();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("hero");
   const [appearanceOpen, setAppearanceOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const [navFocus, setNavFocus] = useState<NavItemId | null>(null);
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+
+  const nav = data.nav ?? DEFAULT_NAV;
+  const comingSoonOn = Boolean(
+    (data.comingSoon ?? DEFAULT_COMING_SOON).enabled
+  );
+
+  const visibleLinks = useMemo(
+    () =>
+      NAV_ITEM_META.filter((meta) => {
+        // Sections like Devis can be toggled but stay out of the top menu
+        if (meta.showInNav === false) return false;
+        const cfg = nav[meta.id] ?? DEFAULT_NAV[meta.id];
+        return cfg?.visible !== false;
+      }).map((meta) => {
+        const cfg = nav[meta.id] ?? DEFAULT_NAV[meta.id];
+        const custom = getL(cfg.label).trim();
+        const label = custom || t(meta.i18nKey);
+        return { ...meta, label };
+      }),
+    [nav, t]
+  );
+
+  // Prefer portfolio display locale via l() for custom labels when available
+  const resolveLabel = (id: NavItemId, fallbackKey: string) => {
+    const cfg = nav[id] ?? DEFAULT_NAV[id];
+    const fromData = l(cfg.label).trim();
+    return fromData || t(fallbackKey);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -49,7 +89,9 @@ export function Header() {
 
   useEffect(() => {
     if (pathname !== "/") return;
-    const ids = LINK_DEFS.map((l) => l.id);
+    const ids = NAV_ITEM_META.map((m) => m.sectionId).filter(
+      (id): id is string => Boolean(id)
+    );
     const observers: IntersectionObserver[] = [];
     ids.forEach((id) => {
       const el = document.getElementById(id);
@@ -66,6 +108,11 @@ export function Header() {
     return () => observers.forEach((o) => o.disconnect());
   }, [pathname]);
 
+  const openNavEditor = (id?: NavItemId) => {
+    setNavFocus(id ?? null);
+    setNavOpen(true);
+  };
+
   return (
     <header
       className={cn(
@@ -77,7 +124,26 @@ export function Header() {
     >
       {editMode && (
         <div className="border-b border-teal-300/20 bg-teal-300/15 px-4 py-1.5 text-center text-xs font-medium text-teal-100 backdrop-blur-md">
-          {t("edit.modeOn")}
+          <span className="inline-flex flex-wrap items-center justify-center gap-2">
+            {t("edit.modeOn")}
+            <span className="text-teal-200/50">·</span>
+            <button
+              type="button"
+              onClick={() =>
+                updateComingSoon({ enabled: !comingSoonOn })
+              }
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold transition",
+                comingSoonOn
+                  ? "border-amber-300/40 bg-amber-400/20 text-amber-50"
+                  : "border-white/20 bg-black/20 text-teal-50 hover:bg-black/30"
+              )}
+              title="Active la page publique Coming Soon (le Mode Édition reste complet)"
+            >
+              <Rocket className="h-3 w-3" />
+              Coming Soon : {comingSoonOn ? "ON" : "OFF"}
+            </button>
+          </span>
         </div>
       )}
       <EditLocaleBar />
@@ -94,36 +160,92 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-0.5 lg:flex">
-          {LINK_DEFS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "rounded-xl px-2.5 py-2 text-sm transition-colors",
-                active === link.id && pathname === "/"
-                  ? "bg-white/10 text-teal-200"
-                  : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
-              )}
-            >
-              {t(link.key)}
-            </a>
-          ))}
-          <Link
-            href="/projets"
-            className={cn(
-              "rounded-xl px-2.5 py-2 text-sm transition-colors",
-              pathname?.startsWith("/projets")
-                ? "bg-white/10 text-teal-200"
-                : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
-            )}
-          >
-            {t("nav.gallery")}
-          </Link>
+          {visibleLinks.map((link) => {
+            const isGallery = link.id === "gallery";
+            const isActive = isGallery
+              ? pathname?.startsWith("/projets")
+              : active === link.sectionId && pathname === "/";
+            const label = resolveLabel(link.id, link.i18nKey);
+
+            if (editMode) {
+              return (
+                <button
+                  key={link.id}
+                  type="button"
+                  title="Modifier le libellé"
+                  onClick={() => openNavEditor(link.id)}
+                  className={cn(
+                    "rounded-xl px-2.5 py-2 text-sm transition-colors",
+                    isActive
+                      ? "bg-white/10 text-teal-200"
+                      : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                  )}
+                >
+                  {label}
+                </button>
+              );
+            }
+
+            if (isGallery) {
+              return (
+                <Link
+                  key={link.id}
+                  href={link.href}
+                  className={cn(
+                    "rounded-xl px-2.5 py-2 text-sm transition-colors",
+                    isActive
+                      ? "bg-white/10 text-teal-200"
+                      : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                  )}
+                >
+                  {label}
+                </Link>
+              );
+            }
+
+            return (
+              <a
+                key={link.id}
+                href={link.href}
+                className={cn(
+                  "rounded-xl px-2.5 py-2 text-sm transition-colors",
+                  isActive
+                    ? "bg-white/10 text-teal-200"
+                    : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                )}
+              >
+                {label}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <LanguageSwitcher compact />
           <EditGate>
+            <Button
+              variant={comingSoonOn ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "hidden sm:inline-flex",
+                comingSoonOn && "bg-amber-400/90 text-zinc-950 hover:bg-amber-300"
+              )}
+              onClick={() => setComingSoonOpen(true)}
+              title="Coming Soon — page publique (showreel + features)"
+            >
+              <Rocket className="h-3.5 w-3.5" />
+              Coming Soon
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden sm:inline-flex"
+              onClick={() => openNavEditor()}
+              title="Éditer les libellés du menu"
+            >
+              <PanelTop className="h-3.5 w-3.5" />
+              Menu
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -194,24 +316,71 @@ export function Header() {
             <LanguageSwitcher />
           </div>
           <nav className="flex flex-col gap-1">
-            {LINK_DEFS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/10"
-              >
-                {t(link.key)}
-              </a>
-            ))}
-            <Link
-              href="/projets"
-              onClick={() => setOpen(false)}
-              className="rounded-xl px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/10"
-            >
-              {t("nav.gallery")}
-            </Link>
+            {visibleLinks.map((link) => {
+              const label = resolveLabel(link.id, link.i18nKey);
+              if (editMode) {
+                return (
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      openNavEditor(link.id);
+                    }}
+                    className="rounded-xl px-3 py-2.5 text-left text-sm text-zinc-300 hover:bg-white/10"
+                  >
+                    {label}
+                  </button>
+                );
+              }
+              if (link.id === "gallery") {
+                return (
+                  <Link
+                    key={link.id}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="rounded-xl px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/10"
+                  >
+                    {label}
+                  </Link>
+                );
+              }
+              return (
+                <a
+                  key={link.id}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/10"
+                >
+                  {label}
+                </a>
+              );
+            })}
             <EditGate>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => {
+                  setOpen(false);
+                  setComingSoonOpen(true);
+                }}
+              >
+                <Rocket className="h-3.5 w-3.5" />
+                Coming Soon
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => {
+                  setOpen(false);
+                  openNavEditor();
+                }}
+              >
+                <PanelTop className="h-3.5 w-3.5" />
+                Éditer le menu
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -242,6 +411,15 @@ export function Header() {
       )}
 
       <WallpaperEditor open={appearanceOpen} onOpenChange={setAppearanceOpen} />
+      <NavSettingsPanel
+        open={navOpen}
+        onOpenChange={setNavOpen}
+        focusId={navFocus}
+      />
+      <ComingSoonSettingsPanel
+        open={comingSoonOpen}
+        onOpenChange={setComingSoonOpen}
+      />
     </header>
   );
 }

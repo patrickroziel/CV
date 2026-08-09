@@ -9,19 +9,115 @@ export type { Locale, LocalizedString };
  */
 export type Translatable = string | LocalizedString;
 
+/** One editable badge above the Hero name */
+export type HeroBadge = {
+  id: string;
+  text: Translatable;
+  /** Background color (hex) */
+  bgColor: string;
+  /** Text color (hex) */
+  textColor: string;
+};
+
 export type Profile = {
-  /** Proper name — not localized */
+  /**
+   * Display name — not multi-locale.
+   * May contain limited rich HTML (bold, italic, size, color, align).
+   * Always strip with stripHtml() for filenames / plain contexts.
+   */
   name: string;
+  /** May contain limited rich HTML */
   title: Translatable;
+  /** May contain limited rich HTML (bold, italic, size, color, align) */
   bio: Translatable;
   photo: string | null;
   email: string;
   phone: string;
   location: Translatable;
+  /** @deprecated prefer heroBadges — kept for migration */
+  experienceBadge?: Translatable;
+  /** Editable Hero badges (order = display). */
+  heroBadges?: HeroBadge[];
+  /**
+   * CSS font-family for Hero texts only (web-safe stack or custom name).
+   * Empty / undefined = site default (Geist).
+   */
+  heroFontFamily?: string;
   age?: number;
   showreelUrl: string;
   cvUrl: string | null;
 };
+
+/** Default hero experience badge (per locale) */
+export const DEFAULT_EXPERIENCE_BADGE = L("20+ ans d’expérience", {
+  en: "20+ years of experience",
+  pl: "20+ lat doświadczenia",
+  es: "Más de 20 años de experiencia",
+});
+
+/** Web-safe / system font choices for Hero only */
+export const HERO_FONT_OPTIONS: { id: string; label: string; stack: string }[] =
+  [
+    {
+      id: "default",
+      label: "Défaut (Geist)",
+      stack: "",
+    },
+    {
+      id: "system",
+      label: "Système",
+      stack: "system-ui, -apple-system, Segoe UI, sans-serif",
+    },
+    {
+      id: "georgia",
+      label: "Georgia (serif)",
+      stack: "Georgia, 'Times New Roman', Times, serif",
+    },
+    {
+      id: "times",
+      label: "Times New Roman",
+      stack: "'Times New Roman', Times, serif",
+    },
+    {
+      id: "arial",
+      label: "Arial",
+      stack: "Arial, Helvetica, sans-serif",
+    },
+    {
+      id: "helvetica",
+      label: "Helvetica",
+      stack: "Helvetica, Arial, sans-serif",
+    },
+    {
+      id: "verdana",
+      label: "Verdana",
+      stack: "Verdana, Geneva, sans-serif",
+    },
+    {
+      id: "trebuchet",
+      label: "Trebuchet MS",
+      stack: "'Trebuchet MS', Helvetica, sans-serif",
+    },
+    {
+      id: "courier",
+      label: "Courier New (mono)",
+      stack: "'Courier New', Courier, monospace",
+    },
+    {
+      id: "palatino",
+      label: "Palatino",
+      stack: "Palatino, 'Palatino Linotype', 'Book Antiqua', serif",
+    },
+  ];
+
+export function resolveHeroFontStack(idOrStack?: string | null): string {
+  if (!idOrStack?.trim()) return "";
+  const found = HERO_FONT_OPTIONS.find(
+    (f) => f.id === idOrStack || f.stack === idOrStack
+  );
+  if (found) return found.stack;
+  return idOrStack.trim();
+}
 
 /** Shared media for experience / education carousels */
 export type MediaItemType = "image" | "youtube" | "x" | "file";
@@ -144,6 +240,11 @@ export type Language = {
   level: Translatable;
   videoType: LanguageVideoType;
   videoUrl: string | null;
+  /**
+   * Still image shown while the demo video loads, or if it fails
+   * (unsupported format / network error). Never leaves a black hole.
+   */
+  fallbackImageUrl?: string | null;
   /** Multiple icons — fade every 2s when > 1 */
   icons: LanguageIconItem[];
   /** Outlines drawn one-by-one full-bleed on the card */
@@ -159,6 +260,204 @@ export type UiPrefs = {
   showDock: boolean;
   /** Display locale for the portfolio (persisted) */
   locale?: Locale;
+};
+
+/**
+ * Public “Coming Soon” landing (wallpaper + showreel + 3 feature cards).
+ * Only affects visitors outside Mode Édition.
+ */
+export type ComingSoonConfig = {
+  /** When true, public sees the Coming Soon page only */
+  enabled: boolean;
+  /** Optional headline (FR / EN / PL / ES) */
+  title: Translatable;
+};
+
+export const DEFAULT_COMING_SOON: ComingSoonConfig = {
+  enabled: false,
+  title: L("Coming soon", {
+    en: "Coming soon",
+    pl: "Wkrótce",
+    es: "Próximamente",
+  }),
+};
+
+/**
+ * Site sections that can be shown/hidden for the public.
+ * Includes nav destinations + Devis (quotes block).
+ * Hrefs/anchors stay fixed when labels change.
+ */
+export type NavItemId =
+  | "home"
+  | "experience"
+  | "projects"
+  | "skills"
+  | "education"
+  | "languages"
+  | "quotes"
+  | "contact"
+  | "gallery";
+
+export type NavItemConfig = {
+  /** Display label (FR / EN / PL / ES) — used in menu when showInNav */
+  label: Translatable;
+  /**
+   * When false: section hidden for the public AND removed from navigation.
+   * Still reachable in Edit Mode (with a “Masquée” badge).
+   */
+  visible: boolean;
+};
+
+export type NavConfig = Record<NavItemId, NavItemConfig>;
+
+export const NAV_ITEM_IDS: NavItemId[] = [
+  "home",
+  "experience",
+  "projects",
+  "skills",
+  "education",
+  "languages",
+  "quotes",
+  "contact",
+  "gallery",
+];
+
+/** Fixed anchors / routes — independent of editable labels */
+export type NavItemMeta = {
+  id: NavItemId;
+  href: string;
+  /** DOM section id for scroll-spy; null for route-only pages */
+  sectionId: string | null;
+  /** i18n fallback key under `nav.*` */
+  i18nKey: string;
+  /**
+   * When false, never listed in header/dock even if section is visible
+   * (e.g. Devis block is on the page but not a top-level nav link by default).
+   */
+  showInNav?: boolean;
+};
+
+export const NAV_ITEM_META: NavItemMeta[] = [
+  { id: "home", href: "/#hero", sectionId: "hero", i18nKey: "nav.home" },
+  {
+    id: "experience",
+    href: "/#experience",
+    sectionId: "experience",
+    i18nKey: "nav.experience",
+  },
+  {
+    id: "projects",
+    href: "/#projects",
+    sectionId: "projects",
+    i18nKey: "nav.projects",
+  },
+  { id: "skills", href: "/#skills", sectionId: "skills", i18nKey: "nav.skills" },
+  {
+    id: "education",
+    href: "/#education",
+    sectionId: "education",
+    i18nKey: "nav.education",
+  },
+  {
+    id: "languages",
+    href: "/#languages",
+    sectionId: "languages",
+    i18nKey: "nav.languages",
+  },
+  {
+    id: "quotes",
+    href: "/#devis",
+    sectionId: "devis",
+    i18nKey: "nav.quotes",
+    showInNav: false,
+  },
+  {
+    id: "contact",
+    href: "/#contact",
+    sectionId: "contact",
+    i18nKey: "nav.contact",
+  },
+  {
+    id: "gallery",
+    href: "/projets",
+    sectionId: null,
+    i18nKey: "nav.gallery",
+  },
+];
+
+export const DEFAULT_NAV: NavConfig = {
+  home: {
+    label: L("Accueil", {
+      en: "Home",
+      pl: "Start",
+      es: "Inicio",
+    }),
+    visible: true,
+  },
+  experience: {
+    label: L("Expériences", {
+      en: "Experience",
+      pl: "Doświadczenie",
+      es: "Experiencia",
+    }),
+    visible: true,
+  },
+  projects: {
+    label: L("Travaux", {
+      en: "Work",
+      pl: "Prace",
+      es: "Trabajos",
+    }),
+    visible: true,
+  },
+  skills: {
+    label: L("Compétences", {
+      en: "Skills",
+      pl: "Umiejętności",
+      es: "Competencias",
+    }),
+    visible: true,
+  },
+  education: {
+    label: L("Formation", {
+      en: "Education",
+      pl: "Edukacja",
+      es: "Formación",
+    }),
+    visible: true,
+  },
+  languages: {
+    label: L("Langues", {
+      en: "Languages",
+      pl: "Języki",
+      es: "Idiomas",
+    }),
+    visible: true,
+  },
+  quotes: {
+    label: L("Devis", {
+      en: "Quotes",
+      pl: "Wyceny",
+      es: "Presupuestos",
+    }),
+    visible: true,
+  },
+  contact: {
+    label: L("Contact", {
+      en: "Contact",
+      pl: "Kontakt",
+      es: "Contacto",
+    }),
+    visible: true,
+  },
+  gallery: {
+    label: L("Galerie", {
+      en: "Gallery",
+      pl: "Galeria",
+      es: "Galería",
+    }),
+    visible: true,
+  },
 };
 
 /** Icons available for Contact rapide widget lines */
@@ -182,6 +481,27 @@ export type QuickContactLink = {
   /** Action : mailto:, tel:, https://… */
   href: string;
 };
+
+/**
+ * Document téléchargeable / ouvrable (CV perso, portfolio PDF, carte HTML).
+ * URL Cloudinary (raw) ou lien externe — ouverture toujours en nouvel onglet.
+ */
+export type ExtraDocument = {
+  /** Cloudinary secure_url ou URL externe */
+  url: string | null;
+  /** Master : afficher le bouton (si URL renseignée) */
+  show: boolean;
+  /** Libellé du bouton */
+  label: Translatable;
+  /** Afficher dans le Hero */
+  showInHero: boolean;
+  /** Afficher dans la section Contact */
+  showInContact: boolean;
+};
+
+export type ExtraDocumentId = "personalCv" | "portfolioPdf" | "businessCard";
+
+export type ExtraDocumentsConfig = Record<ExtraDocumentId, ExtraDocument>;
 
 /** Fully configurable Contact section + sidebar widgets + Hero CTA labels */
 export type ContactConfig = {
@@ -234,6 +554,12 @@ export type ContactConfig = {
   /** Profil X : https://x.com/username ou @username */
   xProfileUrl: string;
 
+  /**
+   * Documents supplémentaires (en plus du CV généré par le site) :
+   * CV PDF perso, portfolio PDF, carte de visite HTML.
+   */
+  extraDocuments: ExtraDocumentsConfig;
+
   showWidgetQuickContact: boolean;
   widgetQuickContactTitle: Translatable;
   /** Lignes du widget Contact rapide (ordre = affichage) */
@@ -263,6 +589,11 @@ export type FeatureVideo = {
   title: Translatable;
   videoType: FeatureVideoType;
   videoUrl: string | null;
+  /**
+   * Poster / still shown while video loads or if playback fails.
+   * Prefer over black/empty frames.
+   */
+  fallbackImageUrl?: string | null;
 };
 
 /** Main showreel card (same options as feature cards) */
@@ -270,6 +601,8 @@ export type MainShowreel = {
   title: Translatable;
   videoType: FeatureVideoType;
   videoUrl: string | null;
+  /** Poster / still while loading or on video error */
+  fallbackImageUrl?: string | null;
 };
 
 /** Editable small labels (eyebrows) + optional description per section */
@@ -287,6 +620,105 @@ export type LanguagesSectionConfig = {
   description: Translatable;
 };
 
+/** Default opacity for per-wallpaper alpha video overlays (0–1) */
+export const DEFAULT_ALPHA_VIDEO_OPACITY = 0.85;
+
+/** One wallpaper image in the rotating background pool */
+export type BackgroundImage = {
+  id: string;
+  /** Cloudinary secure_url or remote URL */
+  url: string;
+  /** Opacity of the base wallpaper image, 0–1 (default 1) */
+  opacity?: number;
+  /**
+   * Optional transparent / alpha video overlay (WebM with alpha preferred, or MP4).
+   * Plays looped + muted on top of this wallpaper image.
+   */
+  alphaVideoUrl?: string | null;
+  /** Master toggle for the alpha video (needs alphaVideoUrl) */
+  alphaVideoEnabled?: boolean;
+  /** Opacity of the alpha video layer, 0–1 (default DEFAULT_ALPHA_VIDEO_OPACITY) */
+  alphaVideoOpacity?: number;
+};
+
+/**
+ * Professional quote-request services (not in main nav — only via CTA buttons).
+ * Slug = URL segment under /devis/[slug]
+ */
+export type QuoteServiceId =
+  | "montage"
+  | "motion"
+  | "social"
+  | "captation"
+  | "pack";
+
+export type QuoteService = {
+  id: QuoteServiceId;
+  /** Show CTA button + allow page access */
+  show: boolean;
+  /** Label on the homepage CTA button */
+  buttonLabel: Translatable;
+  /** Page H1 */
+  pageTitle: Translatable;
+  /** Short professional intro under the title */
+  pageIntro: Translatable;
+};
+
+export type QuotesConfig = {
+  sectionEyebrow: Translatable;
+  sectionTitle: Translatable;
+  sectionDescription: Translatable;
+  services: QuoteService[];
+};
+
+/**
+ * One media candidate behind the Hero glass (image or alpha video).
+ * Random pick among enabled items on each visit.
+ */
+export type HeroGlassBackMedia = {
+  id: string;
+  url: string;
+  type: "video" | "image";
+  /** Eligible for random selection on each visit */
+  enabled: boolean;
+  /** Layer opacity 0–1 (default 1) */
+  opacity?: number;
+  /**
+   * When type is "video": still image if the video fails to load.
+   * Ignored for type "image".
+   */
+  fallbackImageUrl?: string | null;
+};
+
+/** @deprecated Use HeroGlassBackMedia — kept as alias for older imports */
+export type HeroGlassBackVideo = HeroGlassBackMedia;
+
+/** Texture layer on top of glass (under text / profile photo) */
+export type HeroGlassFrontLayer = {
+  type: "none" | "video" | "image";
+  url: string | null;
+  /** 0–1 */
+  opacity: number;
+  /** When type is "video": still if the video fails to load */
+  fallbackImageUrl?: string | null;
+};
+
+export type HeroGlassConfig = {
+  /** Pool of back media (images + videos); storage key kept for compatibility */
+  backVideos: HeroGlassBackMedia[];
+  front: HeroGlassFrontLayer;
+};
+
+export const DEFAULT_HERO_GLASS: HeroGlassConfig = {
+  backVideos: [],
+  front: {
+    type: "none",
+    url: null,
+    opacity: 0.55,
+    fallbackImageUrl: null,
+  },
+};
+
 export type PortfolioData = {
   profile: Profile;
   experiences: Experience[];
@@ -297,21 +729,230 @@ export type PortfolioData = {
   /** Editable section eyebrows (+ languages description) */
   sectionLabels: SectionLabelsConfig;
   /**
+   * Editable navigation labels + visibility (header, dock, mobile).
+   * Hrefs/anchors stay fixed via NAV_ITEM_META.
+   */
+  nav: NavConfig;
+  /**
+   * Coming Soon mode for public visitors (edit mode always sees full site).
+   * Baked into production defaults via Export JSON / snapshot.
+   */
+  comingSoon: ComingSoonConfig;
+  /**
    * Legacy languages section description (migrated into sectionLabels).
    * Kept optional for older localStorage payloads.
    */
   languagesSection?: LanguagesSectionConfig;
   contact: ContactConfig;
+  /** Quote-request CTAs + dedicated /devis pages */
+  quotes: QuotesConfig;
   /** Main showreel above the 3 feature cards */
   mainShowreel: MainShowreel;
   /** Three highlight videos under the showreel */
   featureVideos: FeatureVideo[];
+  /**
+   * Fallback / last-known background URL (kept for older code & export).
+   * Prefer `backgroundImages` for the active pool.
+   */
   backgroundUrl: string;
+  /**
+   * Pool of wallpapers. On each visit/reload a random image is shown.
+   * Order is preserved for edit-mode management.
+   */
+  backgroundImages: BackgroundImage[];
+  /**
+   * Hero glass media layers (no procedural drops).
+   * Back = behind glass card · Front = on glass, under text/photo.
+   */
+  heroGlass: HeroGlassConfig;
   ui: UiPrefs;
   version: number;
 };
 
-export const DATA_VERSION = 20;
+export const DATA_VERSION = 29;
+
+export const QUOTE_SERVICE_IDS: QuoteServiceId[] = [
+  "montage",
+  "motion",
+  "social",
+  "captation",
+  "pack",
+];
+
+export const DEFAULT_QUOTES: QuotesConfig = {
+  sectionEyebrow: L("Travaillons ensemble", {
+    en: "Let’s work together",
+    pl: "Pracujmy razem",
+    es: "Trabajemos juntos",
+  }),
+  sectionTitle: L("Demander un devis", {
+    en: "Request a quote",
+    pl: "Poproś o wycenę",
+    es: "Solicitar un presupuesto",
+  }),
+  sectionDescription: L(
+    "Choisissez le type de mission. Vous serez guidé vers un brief professionnel adapté.",
+    {
+      en: "Choose the type of project. You’ll get a professional brief tailored to that need.",
+      pl: "Wybierz typ projektu. Otrzymasz profesjonalny brief dopasowany do potrzeby.",
+      es: "Elige el tipo de proyecto. Te guiaremos con un brief profesional adaptado.",
+    }
+  ),
+  services: [
+    {
+      id: "montage",
+      show: true,
+      buttonLabel: L("Devis Montage vidéo", {
+        en: "Quote — Video editing",
+        pl: "Wycena — Montaż wideo",
+        es: "Presupuesto — Montaje de vídeo",
+      }),
+      pageTitle: L("Devis — Montage vidéo", {
+        en: "Quote — Video editing",
+        pl: "Wycena — Montaż wideo",
+        es: "Presupuesto — Montaje de vídeo",
+      }),
+      pageIntro: L(
+        "Montage narratif, rythmé et soigné pour films corporate, interviews, reportages ou contenus long-form. Précisez le volume, le style et la deadline pour un chiffrage précis.",
+        {
+          en: "Narrative, paced editing for corporate films, interviews, reportage or long-form content. Share volume, style and deadline for an accurate quote.",
+          pl: "Narracyjny montaż do filmów corporate, wywiadów, reportaży i long-form. Podaj objętość, styl i deadline, aby wycenić dokładnie.",
+          es: "Montaje narrativo y rítmico para corporate, entrevistas, reportajes o long-form. Indica volumen, estilo y deadline para un presupuesto preciso.",
+        }
+      ),
+    },
+    {
+      id: "motion",
+      show: true,
+      buttonLabel: L("Devis Motion Design", {
+        en: "Quote — Motion design",
+        pl: "Wycena — Motion design",
+        es: "Presupuesto — Motion design",
+      }),
+      pageTitle: L("Devis — Motion Design", {
+        en: "Quote — Motion design",
+        pl: "Wycena — Motion design",
+        es: "Presupuesto — Motion design",
+      }),
+      pageIntro: L(
+        "Habillages, lower-thirds, transitions, explainers et animations de marque. Indiquez le nombre de séquences, la charte graphique et les livrables attendus.",
+        {
+          en: "Packaging, lower-thirds, transitions, explainers and brand animation. Share sequence count, brand guidelines and expected deliverables.",
+          pl: "Oprawy, lower-thirds, przejścia, explainery i animacje marki. Podaj liczbę sekwencji, brandbook i oczekiwane deliverables.",
+          es: "Packs, lower-thirds, transiciones, explainers y animación de marca. Indica secuencias, brandbook y entregables.",
+        }
+      ),
+    },
+    {
+      id: "social",
+      show: true,
+      buttonLabel: L("Devis Contenu Social / Shorts", {
+        en: "Quote — Social / Shorts",
+        pl: "Wycena — Social / Shorts",
+        es: "Presupuesto — Social / Shorts",
+      }),
+      pageTitle: L("Devis — Contenu Social & Shorts", {
+        en: "Quote — Social content & Shorts",
+        pl: "Wycena — Social & Shorts",
+        es: "Presupuesto — Social y Shorts",
+      }),
+      pageIntro: L(
+        "Formats verticaux, reels, shorts et cut-downs optimisés pour les réseaux. Précisez le rythme de publication, le nombre de pièces et les plateformes cibles.",
+        {
+          en: "Vertical formats, reels, shorts and cut-downs for social. Share publish cadence, piece count and target platforms.",
+          pl: "Formaty pionowe, reels, shorts i cut-downy pod social. Podaj rytm publikacji, liczbę materiałów i platformy.",
+          es: "Formatos verticales, reels, shorts y cut-downs para redes. Indica cadencia, cantidad de piezas y plataformas.",
+        }
+      ),
+    },
+    {
+      id: "captation",
+      show: true,
+      buttonLabel: L("Devis Captation & Corporate", {
+        en: "Quote — Filming & corporate",
+        pl: "Wycena — Captacja & corporate",
+        es: "Presupuesto — Captación y corporate",
+      }),
+      pageTitle: L("Devis — Captation & Corporate", {
+        en: "Quote — Filming & corporate",
+        pl: "Wycena — Captacja & corporate",
+        es: "Presupuesto — Captación y corporate",
+      }),
+      pageIntro: L(
+        "Tournage / captation pour événements, interviews ou films d’entreprise, avec ou sans post-production. Indiquez le lieu, la durée de tournage et l’équipe souhaitée.",
+        {
+          en: "Filming for events, interviews or corporate films, with or without post. Share location, shoot duration and crew needs.",
+          pl: "Zdjęcia eventowe, wywiady lub filmy firmowe, z postprodukcją lub bez. Podaj lokalizację, czas zdjęć i ekipę.",
+          es: "Captación para eventos, entrevistas o corporate, con o sin post. Indica lugar, duración de rodaje y equipo.",
+        }
+      ),
+    },
+    {
+      id: "pack",
+      show: true,
+      buttonLabel: L("Devis Pack complet", {
+        en: "Quote — Full package",
+        pl: "Wycena — Pakiet kompletny",
+        es: "Presupuesto — Pack completo",
+      }),
+      pageTitle: L("Devis — Pack complet (montage + motion + social)", {
+        en: "Quote — Full package (edit + motion + social)",
+        pl: "Wycena — Pakiet (montaż + motion + social)",
+        es: "Presupuesto — Pack (montaje + motion + social)",
+      }),
+      pageIntro: L(
+        "Accompagnement de bout en bout : captation ou rushes, montage, motion et déclinaisons social. Idéal pour un lancement, une campagne ou une série de contenus.",
+        {
+          en: "End-to-end support: shoot or rushes, edit, motion and social cut-downs. Ideal for a launch, campaign or content series.",
+          pl: "Wsparcie end-to-end: zdjęcia lub rushe, montaż, motion i social. Idealne na launch, kampanię lub serię treści.",
+          es: "Acompañamiento integral: rodaje o rushes, montaje, motion y social. Ideal para lanzamiento, campaña o serie de contenidos.",
+        }
+      ),
+    },
+  ],
+};
+
+export const EXTRA_DOCUMENT_IDS: ExtraDocumentId[] = [
+  "personalCv",
+  "portfolioPdf",
+  "businessCard",
+];
+
+export const DEFAULT_EXTRA_DOCUMENTS: ExtraDocumentsConfig = {
+  personalCv: {
+    url: null,
+    show: false,
+    label: L("CV PDF", {
+      en: "CV PDF",
+      pl: "CV PDF",
+      es: "CV PDF",
+    }),
+    showInHero: true,
+    showInContact: true,
+  },
+  portfolioPdf: {
+    url: null,
+    show: false,
+    label: L("Portfolio PDF", {
+      en: "Portfolio PDF",
+      pl: "Portfolio PDF",
+      es: "Portfolio PDF",
+    }),
+    showInHero: true,
+    showInContact: true,
+  },
+  businessCard: {
+    url: null,
+    show: false,
+    label: L("Carte de visite", {
+      en: "Business card",
+      pl: "Wizytówka",
+      es: "Tarjeta de visita",
+    }),
+    showInHero: true,
+    showInContact: true,
+  },
+};
 
 export const DEFAULT_SECTION_LABELS: SectionLabelsConfig = {
   experienceEyebrow: L("Parcours", {
@@ -355,6 +996,7 @@ export const DEFAULT_MAIN_SHOWREEL: MainShowreel = {
   title: L("Showreel"),
   videoType: "youtube",
   videoUrl: "https://youtu.be/ws0EbZOxaNs",
+  fallbackImageUrl: null,
 };
 
 export const DEFAULT_QUICK_CONTACT_LINKS: QuickContactLink[] = [
@@ -479,7 +1121,13 @@ export const DEFAULT_CONTACT: ContactConfig = {
 
   showHeroX: true,
   heroXLabel: L("X / Twitter"),
-  xProfileUrl: "https://x.com/",
+  xProfileUrl: "https://x.com/patrickroziel",
+
+  extraDocuments: {
+    personalCv: { ...DEFAULT_EXTRA_DOCUMENTS.personalCv },
+    portfolioPdf: { ...DEFAULT_EXTRA_DOCUMENTS.portfolioPdf },
+    businessCard: { ...DEFAULT_EXTRA_DOCUMENTS.businessCard },
+  },
 
   showWidgetQuickContact: true,
   widgetQuickContactTitle: L("Contact rapide", {

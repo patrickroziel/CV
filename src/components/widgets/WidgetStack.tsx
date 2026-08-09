@@ -5,6 +5,7 @@ import { Sparkles } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { GlassPanel } from "@/components/glass/GlassCard";
 import { SkillTag } from "@/components/skills/SkillTag";
+import { RichHtml } from "@/components/shared/RichHtml";
 import { QuickContactIconView } from "@/components/widgets/widget-icons";
 import { XFeedWidget } from "@/components/widgets/XFeedWidget";
 
@@ -99,9 +100,10 @@ export function WidgetStack() {
             <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
               {l(c.widgetAvailabilityTitle)}
             </p>
-            <p className="mt-2 text-sm font-medium text-teal-200">
-              {l(c.widgetAvailabilityText)}
-            </p>
+            <RichHtml
+              html={l(c.widgetAvailabilityText)}
+              className="mt-2 text-sm font-medium text-teal-200"
+            />
             {c.showLocation && (
               <p className="mt-1 text-xs text-zinc-500">{l(profile.location)}</p>
             )}

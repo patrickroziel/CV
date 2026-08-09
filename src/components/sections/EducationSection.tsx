@@ -175,7 +175,7 @@ export function EducationSection() {
           if (!v) resetForm();
         }}
       >
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editing ? "Modifier la formation" : "Nouvelle formation"}

@@ -5,24 +5,24 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  CLOUDINARY_FOLDERS,
-  uploadToCloudinary,
-  type CloudinaryFolder,
-} from "@/lib/cloudinary";
+  MEDIA_FOLDERS,
+  uploadToBlob,
+  type MediaFolder,
+} from "@/lib/blob-upload";
 
-/** Client-side guard before hitting Cloudinary (dashboard may also enforce limits) */
+/** Client-side guard before upload */
 const MAX_BYTES = 12 * 1024 * 1024;
 
 type ImageUploadProps = {
   value: string | null;
-  /** Receives Cloudinary secure_url (or null when cleared) */
+  /** Receives public Blob URL (or null when cleared) */
   onChange: (url: string | null) => void;
   className?: string;
   aspectClassName?: string;
   label?: string;
   round?: boolean;
-  /** Cloudinary folder namespace */
-  folder?: CloudinaryFolder | string;
+  /** Blob pathname prefix */
+  folder?: MediaFolder | string;
 };
 
 export function ImageUpload({
@@ -32,7 +32,7 @@ export function ImageUpload({
   aspectClassName = "aspect-video",
   label = "Glissez une image ou cliquez",
   round = false,
-  folder = CLOUDINARY_FOLDERS.media,
+  folder = MEDIA_FOLDERS.media,
 }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -60,19 +60,19 @@ export function ImageUpload({
       setLoading(true);
       setProgress(0);
       try {
-        const result = await uploadToCloudinary(file, {
+        const result = await uploadToBlob(file, {
           folder,
           resourceType: "image",
           onProgress: setProgress,
           signal: controller.signal,
         });
-        onChange(result.secure_url);
+        onChange(result.url);
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setError(
           err instanceof Error
             ? err.message
-            : "Impossible d’uploader l’image vers Cloudinary."
+            : "Impossible d’uploader l’image vers Vercel Blob."
         );
       } finally {
         setLoading(false);

@@ -6,6 +6,7 @@ export const fr = {
     skills: "Compétences",
     education: "Formation",
     languages: "Langues",
+    quotes: "Devis",
     contact: "Contact",
     gallery: "Galerie",
   },
@@ -47,7 +48,7 @@ export const fr = {
     contactDefaultTitle: "Contact",
   },
   hero: {
-    experienceBadge: "10+ ans d’expérience",
+    experienceBadge: "20+ ans d’expérience",
     editProfile: "Modifier",
     changePhoto: "Changer la photo",
   },
@@ -65,6 +66,7 @@ export const fr = {
   },
   languages: {
     demoHint: "Entendre le niveau",
+    demoHintTap: "Toucher pour la démo",
     demoPlaying: "Démo en cours",
     proofTitle: "Preuve de maîtrise",
     proofSubtitle: "Niveau réel en situation",
@@ -101,6 +103,47 @@ export const fr = {
     configureButtons: "Configurer boutons",
     editHint:
       "Mode édition : utilisez « Configurer » pour afficher / masquer et renommer chaque élément.",
+  },
+  quotes: {
+    configure: "Configurer les devis",
+    editHint:
+      "Mode édition : affichez / masquez chaque bouton et personnalisez titres & intros.",
+    backToQuotes: "Retour aux devis",
+    pageEyebrow: "Demande de devis",
+    notFoundTitle: "Devis introuvable",
+    notFoundDesc:
+      "Ce type de devis n’est pas disponible. Revenez à la sélection.",
+    hiddenPreview: "Aperçu édition — ce devis est masqué en public.",
+    privacyNote:
+      "Vos informations sont utilisées uniquement pour répondre à votre demande.",
+    firstName: "Prénom",
+    firstNamePh: "Camille",
+    lastName: "Nom",
+    lastNamePh: "Dupont",
+    email: "Email professionnel",
+    company: "Entreprise",
+    companyPh: "Nom de la société",
+    optional: "optionnel",
+    projectType: "Type de projet",
+    description: "Description du besoin",
+    descriptionPh:
+      "Contexte, objectifs, ton souhaité, formats de livraison, contraintes…",
+    volume: "Durée estimée / volume",
+    deadline: "Deadline souhaitée",
+    budget: "Budget indicatif",
+    references: "Références / liens",
+    referencesPh: "Brief, moodboard, site, drive, exemples…",
+    attachment: "Fichier joint",
+    attachmentHint: "PDF, brief, zip, image ou vidéo (max 25 Mo)",
+    uploading: "Upload…",
+    fileTooLarge: "Fichier trop lourd (max 25 Mo).",
+    fileUploadFailed: "Échec de l’upload du fichier.",
+    submit: "Envoyer la demande",
+    submitHint: "Ouvre votre client mail avec le brief pré-rempli.",
+    mailOpened: "Client mail ouvert",
+    errName: "Indiquez votre prénom et nom.",
+    errEmail: "Email invalide.",
+    errDescription: "Décrivez brièvement votre besoin.",
   },
 };
 

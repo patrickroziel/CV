@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/shared/ImageUpload";
-import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary";
+import { MEDIA_FOLDERS } from "@/lib/blob-upload";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
 import {
   getL,
@@ -174,7 +174,7 @@ export function ProjectForm({
           <ImageUpload
             value={image}
             onChange={setImage}
-            folder={CLOUDINARY_FOLDERS.projects}
+            folder={MEDIA_FOLDERS.projects}
           />
         </div>
       )}
@@ -201,7 +201,7 @@ export function ProjectForm({
               onChange={setImage}
               aspectClassName="aspect-video max-h-28"
               label="Poster avant lecture"
-              folder={CLOUDINARY_FOLDERS.projects}
+              folder={MEDIA_FOLDERS.projects}
             />
           </div>
         </div>
@@ -229,7 +229,7 @@ export function ProjectForm({
               onChange={setImage}
               aspectClassName="aspect-video max-h-28"
               label="Affichée avant le chargement de l’embed"
-              folder={CLOUDINARY_FOLDERS.projects}
+              folder={MEDIA_FOLDERS.projects}
             />
           </div>
         </div>
@@ -247,7 +247,7 @@ export function ProjectForm({
         value={description}
         onChange={setDescription}
         multiline
-        rows={2}
+        rows={3}
         id="pdesc"
       />
       <LocalizedField
@@ -255,7 +255,7 @@ export function ProjectForm({
         value={longDescription}
         onChange={setLongDescription}
         multiline
-        rows={4}
+        rows={8}
         id="plong"
       />
       <div className="grid gap-2">

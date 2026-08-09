@@ -1,10 +1,11 @@
 import * as React from "react";
+import { handlePlainPaste } from "@/lib/clipboard-paste";
 import { cn } from "@/lib/utils";
 
 const Textarea = React.forwardRef<
   HTMLTextAreaElement,
   React.ComponentProps<"textarea">
->(({ className, ...props }, ref) => {
+>(({ className, onPaste, ...props }, ref) => {
   return (
     <textarea
       className={cn(
@@ -13,6 +14,10 @@ const Textarea = React.forwardRef<
       )}
       ref={ref}
       {...props}
+      onPaste={(e) => {
+        handlePlainPaste(e, false);
+        onPaste?.(e);
+      }}
     />
   );
 });

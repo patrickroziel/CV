@@ -4,19 +4,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Camera,
+  ChevronDown,
+  ChevronUp,
   FileDown,
   Mail,
-  MapPin,
   Pencil,
   Phone,
   Play,
+  Plus,
+  Trash2,
 } from "lucide-react";
-// X logo as simple SVG component (lucide has no brand X)
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -26,22 +27,35 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ImageUpload } from "@/components/shared/ImageUpload";
+import { ExtraDocumentButtons } from "@/components/shared/ExtraDocumentButtons";
 import { GlassCard } from "@/components/glass/GlassCard";
-import { Badge } from "@/components/ui/badge";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { ShowreelEmbed } from "@/components/shared/ShowreelEmbed";
 import { HeroAmbientBackground } from "@/components/sections/hero/HeroAmbientBackground";
+import {
+  HeroGlassBackLayer,
+  HeroGlassFrontLayer,
+} from "@/components/sections/hero/HeroGlassLayers";
 import { HeroPhotoWaves } from "@/components/sections/hero/HeroPhotoWaves";
 import { ProfilePhotoAura } from "@/components/sections/hero/ProfilePhotoAura";
-import { printCv, xProfileHref } from "@/lib/utils";
-import type { Profile } from "@/lib/types";
-import { t as translateUi } from "@/i18n";
-import { LocalizedField } from "@/components/i18n/LocalizedField";
+import { createId, printCv, xProfileHref } from "@/lib/utils";
+import type { HeroBadge, Profile } from "@/lib/types";
+import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
+import { RichTextField } from "@/components/i18n/RichTextField";
+import { RichHtml } from "@/components/shared/RichHtml";
 import {
   getL,
   liftToLocalized,
   type LocalizedString,
 } from "@/lib/i18n-content";
+import { stripHtml } from "@/lib/sanitize-html";
+import { defaultHeroBadgesFromProfile } from "@/lib/storage";
+import {
+  DEFAULT_EXPERIENCE_BADGE,
+  HERO_FONT_OPTIONS,
+  resolveHeroFontStack,
+  type QuickContactLink,
+} from "@/lib/types";
 
 function XLogo({ className }: { className?: string }) {
   return (
@@ -64,13 +78,8 @@ export function HeroSection() {
     isHydrated,
     editMode,
     l,
-    t,
-    locale,
   } = usePortfolio();
   const { profile, contact: c } = data;
-  /** UI strings — prefer provider `t`, fallback to direct i18n catalog */
-  const tr = (key: string) =>
-    typeof t === "function" ? t(key) : translateUi(key, locale);
   const [editOpen, setEditOpen] = useState(false);
   const [photoOpen, setPhotoOpen] = useState(false);
   const [draft, setDraft] = useState<Profile>(profile);
@@ -96,15 +105,43 @@ export function HeroSection() {
   );
   const [xProfileUrl, setXProfileUrl] = useState(c.xProfileUrl || "");
 
+  const plainName = stripHtml(profile.name) || profile.name;
+  const phoneLabelText = l(c.heroPhoneLabel);
+  const emailLabelText = l(c.heroEmailLabel);
+  const heroBadges: HeroBadge[] =
+    profile.heroBadges && profile.heroBadges.length > 0
+      ? profile.heroBadges
+      : defaultHeroBadgesFromProfile(profile);
+  const heroFontStack = resolveHeroFontStack(profile.heroFontFamily);
+  const phoneDisplayLabel =
+    stripHtml(phoneLabelText).trim() || "Appeler";
+
   const openEdit = () => {
-    setDraft(profile);
+    setDraft({
+      ...profile,
+      experienceBadge: liftToLocalized(
+        profile.experienceBadge ?? DEFAULT_EXPERIENCE_BADGE
+      ),
+      heroBadges:
+        profile.heroBadges && profile.heroBadges.length > 0
+          ? profile.heroBadges.map((b) => ({
+              ...b,
+              text: liftToLocalized(b.text),
+            }))
+          : defaultHeroBadgesFromProfile(profile),
+      heroFontFamily: profile.heroFontFamily || "default",
+    });
     setHeroShowreelLabel(liftToLocalized(c.heroShowreelLabel));
     setHeroCvLabel(liftToLocalized(c.heroCvLabel));
     setShowHeroShowreel(c.showHeroShowreel);
     setShowHeroCv(c.showHeroCv);
     setShowHeroPhone(c.showHeroPhone);
     setShowHeroEmail(c.showHeroEmail);
-    setHeroPhoneLabel(liftToLocalized(c.heroPhoneLabel));
+    setHeroPhoneLabel(
+      liftToLocalized(
+        getL(c.heroPhoneLabel).trim() ? c.heroPhoneLabel : "Appeler"
+      )
+    );
     setHeroEmailLabel(liftToLocalized(c.heroEmailLabel));
     setShowHeroX(c.showHeroX ?? true);
     setHeroXLabel(liftToLocalized(c.heroXLabel || "X / Twitter"));
@@ -113,26 +150,69 @@ export function HeroSection() {
   };
 
   const saveProfile = () => {
+    const phone = (draft.phone ?? "").trim();
+    const oldPhone = (profile.phone ?? "").trim();
+    const digits = phone.replace(/\s/g, "");
+    const namePlain = stripHtml(draft.name || "").trim() || draft.name;
+
     updateProfile({
       ...draft,
+      name: draft.name?.trim() ? draft.name : namePlain,
+      phone,
+      experienceBadge: draft.experienceBadge ?? DEFAULT_EXPERIENCE_BADGE,
+      heroBadges: (draft.heroBadges ?? []).map((b) => ({
+        ...b,
+        text: liftToLocalized(b.text),
+      })),
+      heroFontFamily:
+        !draft.heroFontFamily || draft.heroFontFamily === "default"
+          ? ""
+          : draft.heroFontFamily,
       age: draft.age ? Number(draft.age) : undefined,
     });
+
+    const prevPhoneValue = (c.phoneValue ?? "").trim();
+    const nextPhoneValue =
+      !prevPhoneValue || prevPhoneValue === oldPhone ? "" : prevPhoneValue;
+
+    const syncQuickLinks = (links: QuickContactLink[] | undefined) =>
+      (links ?? []).map((link) => {
+        const href = link.href || "";
+        const labelText = getL(link.label);
+        const isPhoneLink =
+          link.icon === "phone" ||
+          href.startsWith("tel:") ||
+          labelText === oldPhone;
+        if (!isPhoneLink) return link;
+        const labelWasPhone =
+          !labelText ||
+          labelText === oldPhone ||
+          labelText.replace(/\s/g, "") === oldPhone.replace(/\s/g, "");
+        return {
+          ...link,
+          href: digits ? `tel:${digits}` : href,
+          label: labelWasPhone ? phone : link.label,
+        };
+      });
+
     updateContact({
       heroShowreelLabel: getL(heroShowreelLabel).trim()
         ? heroShowreelLabel
         : "Voir le showreel",
-      heroCvLabel: getL(heroCvLabel).trim()
-        ? heroCvLabel
-        : "Télécharger CV",
+      heroCvLabel: getL(heroCvLabel).trim() ? heroCvLabel : "Télécharger CV",
       showHeroShowreel,
       showHeroCv,
       showHeroPhone,
       showHeroEmail,
-      heroPhoneLabel,
+      heroPhoneLabel: getL(heroPhoneLabel).trim()
+        ? heroPhoneLabel
+        : "Appeler",
       heroEmailLabel,
       showHeroX,
       heroXLabel: getL(heroXLabel).trim() ? heroXLabel : "X / Twitter",
       xProfileUrl: xProfileUrl.trim(),
+      phoneValue: nextPhoneValue,
+      quickContactLinks: syncQuickLinks(c.quickContactLinks),
     });
     setEditOpen(false);
   };
@@ -141,7 +221,7 @@ export function HeroSection() {
     if (profile.cvUrl) {
       const a = document.createElement("a");
       a.href = profile.cvUrl;
-      a.download = `CV-${profile.name.replace(/\s+/g, "-")}.pdf`;
+      a.download = `CV-${plainName.replace(/\s+/g, "-")}.pdf`;
       a.target = "_blank";
       a.rel = "noopener noreferrer";
       a.click();
@@ -173,339 +253,692 @@ export function HeroSection() {
       className="relative z-10 overflow-hidden pb-16 pt-28 sm:pb-24 sm:pt-36"
     >
       <div className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6 sm:space-y-8">
-        <GlassCard
-          elevated
-          className="relative isolate overflow-hidden p-6 sm:p-10"
-        >
-          {/* Full-card cinematic energy (from photo zone → whole surface) */}
-          <HeroPhotoWaves />
-          {/* Scrims above waves so type stays readable */}
-          <HeroAmbientBackground />
+        {/*
+          Shell height = GlassCard content only.
+          Media layers are absolute and never set min/max height.
+        */}
+        <div className="relative isolate">
+          <HeroGlassBackLayer />
+          <GlassCard
+            elevated
+            className="glass-hero-vitrail relative z-[1] isolate overflow-hidden p-5 sm:p-7"
+          >
+            <HeroAmbientBackground />
+            <HeroGlassFrontLayer />
 
-          <div className="relative z-10 grid items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-14">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="relative z-10 mx-auto"
-            >
-              <ProfilePhotoAura photo={profile.photo} name={profile.name}>
-                <EditGate>
-                  <button
-                    type="button"
-                    onClick={() => setPhotoOpen(true)}
-                    className="absolute bottom-1 right-1 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 text-zinc-200 shadow-lg backdrop-blur-md transition hover:bg-black/70 hover:text-white"
-                    aria-label="Changer la photo"
+            {/*
+              Référence : photo gauche + infos droite
+              Mobile : photo puis textes
+            */}
+            <div className="relative z-10 grid items-center gap-6 sm:gap-8 lg:grid-cols-[auto_1fr] lg:gap-10">
+              {/* —— Photo (gauche) —— */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="relative z-10 mx-auto shrink-0 lg:mx-0"
+              >
+                <div className="relative flex items-center justify-center">
+                  <div
+                    className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[18rem] w-[18rem] -translate-x-1/2 -translate-y-1/2 sm:h-[20rem] sm:w-[20rem]"
+                    aria-hidden
                   >
-                    <Camera className="h-4 w-4" />
-                  </button>
-                </EditGate>
-              </ProfilePhotoAura>
-            </motion.div>
+                    <HeroPhotoWaves mode="photo" />
+                  </div>
+                  <ProfilePhotoAura
+                    photo={profile.photo}
+                    name={plainName}
+                    className="relative z-10 !mx-0 h-36 w-36 sm:h-44 sm:w-44 lg:h-48 lg:w-48"
+                  >
+                    <EditGate>
+                      <button
+                        type="button"
+                        onClick={() => setPhotoOpen(true)}
+                        className="absolute bottom-1 right-1 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/50 text-zinc-200 shadow-lg backdrop-blur-md transition hover:bg-black/70 hover:text-white"
+                        aria-label="Changer la photo"
+                      >
+                        <Camera className="h-4 w-4" />
+                      </button>
+                    </EditGate>
+                  </ProfilePhotoAura>
+                </div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.1,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="relative z-10 text-center drop-shadow-[0_2px_16px_rgba(0,0,0,0.75)] lg:text-left"
-            >
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-                {l(profile.location) && (
-                  <Badge variant="secondary" className="gap-1.5 px-3 py-1">
-                    <MapPin className="h-3 w-3" />
-                    {l(profile.location)}
-                  </Badge>
-                )}
-                <Badge variant="amber">{tr("hero.experienceBadge")}</Badge>
+              {/* —— Infos (droite) —— */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.55,
+                  delay: 0.06,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="relative z-10 flex min-w-0 flex-col items-center gap-2.5 text-center drop-shadow-[0_2px_16px_rgba(0,0,0,0.75)] sm:gap-3 lg:items-start lg:text-left"
+                style={
+                  heroFontStack
+                    ? { fontFamily: heroFontStack }
+                    : undefined
+                }
+              >
                 {editMode && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={openEdit}
-                    className="h-7 gap-1 text-xs text-zinc-500"
+                    className="h-7 gap-1 self-center px-2 text-xs text-zinc-400 lg:self-start"
                   >
                     <Pencil className="h-3 w-3" />
-                    Modifier
+                    Modifier le profil
                   </Button>
                 )}
-              </div>
 
-              <h1 className="text-4xl font-bold tracking-tight text-zinc-50 drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] sm:text-5xl">
-                {profile.name}
-              </h1>
-              <p className="mt-3 text-base font-medium text-teal-200 drop-shadow-[0_2px_16px_rgba(0,0,0,0.8)] sm:text-lg">
-                {l(profile.title)}
-              </p>
-              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-zinc-100 drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] lg:mx-0">
-                {l(profile.bio)}
-              </p>
-
-              {(c.showHeroPhone || c.showHeroEmail) && (
-                <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-zinc-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] lg:justify-start">
-                  {c.showHeroPhone && (
-                    <a
-                      href={`tel:${profile.phone.replace(/\s/g, "")}`}
-                      className="inline-flex items-center gap-1.5 transition hover:text-teal-300"
-                    >
-                      <Phone className="h-3.5 w-3.5" />
-                      {l(c.heroPhoneLabel) || profile.phone}
-                    </a>
-                  )}
-                  {c.showHeroEmail && (
-                    <a
-                      href={`mailto:${profile.email}`}
-                      className="inline-flex items-center gap-1.5 transition hover:text-teal-300"
-                    >
-                      <Mail className="h-3.5 w-3.5" />
-                      {l(c.heroEmailLabel) || profile.email}
-                    </a>
-                  )}
-                </div>
-              )}
-
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-                {c.showHeroShowreel && profile.showreelUrl && (
-                  <MagneticButton>
-                    <Button size="lg" onClick={scrollToShowreel}>
-                      <Play className="h-4 w-4" />
-                      {l(c.heroShowreelLabel)}
-                    </Button>
-                  </MagneticButton>
-                )}
-                {c.showHeroCv && (
-                  <MagneticButton>
-                    <Button
-                      size="lg"
-                      variant="secondary"
-                      onClick={handleDownloadCv}
-                    >
-                      <FileDown className="h-4 w-4" />
-                      {l(c.heroCvLabel)}
-                    </Button>
-                  </MagneticButton>
-                )}
-                {c.showHeroX &&
-                  xProfileHref(c.xProfileUrl || c.xUsername || "") && (
-                    <MagneticButton>
-                      <Button size="lg" variant="outline" asChild>
-                        <a
-                          href={
-                            xProfileHref(c.xProfileUrl || c.xUsername || "")!
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
+                {/* Badges (éditables) */}
+                {heroBadges.length > 0 && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+                    {heroBadges.map((badge) => {
+                      const text = l(badge.text);
+                      if (!text) return null;
+                      return (
+                        <span
+                          key={badge.id}
+                          className="inline-flex max-w-full items-center rounded-full border border-white/15 px-3 py-1 text-xs font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-md"
+                          style={{
+                            backgroundColor: badge.bgColor,
+                            color: badge.textColor,
+                          }}
                         >
-                          <XLogo className="h-4 w-4" />
-                          {l(c.heroXLabel) || "X"}
-                        </a>
+                          <RichHtml
+                            as="span"
+                            html={text}
+                            className="inline"
+                          />
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Nom */}
+                <RichHtml
+                  as="h1"
+                  html={profile.name}
+                  className="text-3xl font-bold tracking-tight text-zinc-50 drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] sm:text-4xl sm:leading-[1.1] lg:text-5xl"
+                />
+
+                {/* Titre */}
+                <RichHtml
+                  html={l(profile.title)}
+                  className="text-sm font-medium text-teal-200 drop-shadow-[0_2px_16px_rgba(0,0,0,0.8)] sm:text-base lg:text-lg"
+                />
+
+                {/* Bio scrollable — hauteur max fixe, carte reste compacte */}
+                {l(profile.bio) && (
+                  <div className="hero-bio-scroll w-full max-w-xl rounded-xl border border-white/10 bg-black/25 p-3 backdrop-blur-sm sm:p-3.5 lg:max-w-none">
+                    <div className="max-h-[7.5rem] overflow-y-auto overscroll-contain pr-1 sm:max-h-[8.5rem]">
+                      <RichHtml
+                        html={l(profile.bio)}
+                        className="text-sm leading-relaxed text-zinc-100 drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] sm:text-[0.95rem]"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Téléphone (label seul) + email */}
+                {(c.showHeroPhone || c.showHeroEmail) && (
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-zinc-200 lg:justify-start">
+                    {c.showHeroPhone && profile.phone?.trim() && (
+                      <a
+                        href={`tel:${profile.phone.replace(/\s/g, "")}`}
+                        className="inline-flex items-center gap-1.5 transition hover:text-teal-300"
+                      >
+                        <Phone className="h-3.5 w-3.5 shrink-0" />
+                        <RichHtml
+                          as="span"
+                          html={
+                            phoneLabelText?.trim()
+                              ? phoneLabelText
+                              : phoneDisplayLabel
+                          }
+                          className="inline"
+                        />
+                      </a>
+                    )}
+                    {c.showHeroEmail && (
+                      <a
+                        href={`mailto:${profile.email}`}
+                        className="inline-flex items-center gap-1.5 transition hover:text-teal-300"
+                      >
+                        <Mail className="h-3.5 w-3.5 shrink-0" />
+                        <RichHtml
+                          as="span"
+                          html={emailLabelText || profile.email}
+                          className="inline"
+                        />
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* Boutons sur une ligne */}
+                <div className="flex flex-wrap items-center justify-center gap-2.5 pt-0.5 lg:justify-start">
+                  {c.showHeroShowreel && profile.showreelUrl && (
+                    <MagneticButton>
+                      <Button size="default" onClick={scrollToShowreel}>
+                        <Play className="h-4 w-4" />
+                        <RichHtml
+                          as="span"
+                          html={l(c.heroShowreelLabel)}
+                          className="inline"
+                        />
                       </Button>
                     </MagneticButton>
                   )}
-              </div>
-            </motion.div>
-          </div>
-        </GlassCard>
+                  {c.showHeroCv && (
+                    <MagneticButton>
+                      <Button
+                        size="default"
+                        variant="secondary"
+                        onClick={handleDownloadCv}
+                      >
+                        <FileDown className="h-4 w-4" />
+                        <RichHtml
+                          as="span"
+                          html={l(c.heroCvLabel)}
+                          className="inline"
+                        />
+                      </Button>
+                    </MagneticButton>
+                  )}
+                  {c.showHeroX &&
+                    xProfileHref(c.xProfileUrl || c.xUsername || "") && (
+                      <MagneticButton>
+                        <Button size="default" variant="outline" asChild>
+                          <a
+                            href={
+                              xProfileHref(
+                                c.xProfileUrl || c.xUsername || ""
+                              )!
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <XLogo className="h-4 w-4" />
+                            <RichHtml
+                              as="span"
+                              html={l(c.heroXLabel) || "X"}
+                              className="inline"
+                            />
+                          </a>
+                        </Button>
+                      </MagneticButton>
+                    )}
+                  <ExtraDocumentButtons placement="hero" size="default" />
+                </div>
+              </motion.div>
+            </div>
+          </GlassCard>
+        </div>
 
         <ShowreelEmbed />
       </div>
 
+      {/* —— Edit dialog —— */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Modifier le profil</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nom</Label>
-              <Input
-                id="name"
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-              />
-            </div>
-            <LocalizedField
-              label="Titre"
-              value={draft.title}
-              onChange={(title) => setDraft({ ...draft, title })}
-              id="title"
-            />
-            <LocalizedField
-              label="Bio"
-              value={draft.bio}
-              onChange={(bio) => setDraft({ ...draft, bio })}
-              multiline
-              rows={4}
-              id="bio"
-            />
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Téléphone</Label>
-              <Input
-                id="phone"
-                value={draft.phone}
-                onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={draft.email}
-                onChange={(e) => setDraft({ ...draft, email: e.target.value })}
-              />
-            </div>
-            <LocalizedField
-              label="Localisation"
-              value={draft.location}
-              onChange={(location) => setDraft({ ...draft, location })}
-              id="location"
-            />
-            <div className="grid gap-2">
-              <Label htmlFor="showreel">URL Showreel</Label>
-              <Input
-                id="showreel"
-                value={draft.showreelUrl}
-                onChange={(e) =>
-                  setDraft({ ...draft, showreelUrl: e.target.value })
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="cvUrl">Lien CV externe (optionnel)</Label>
-              <Input
-                id="cvUrl"
-                placeholder="Sinon : Exporter PDF"
-                value={draft.cvUrl ?? ""}
-                onChange={(e) =>
-                  setDraft({
-                    ...draft,
-                    cvUrl: e.target.value || null,
-                  })
-                }
-              />
-            </div>
-
-            <div className="h-px bg-white/10" />
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-              Noms des boutons (Hero)
-            </p>
-
-            <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-              <span>Afficher Showreel</span>
-              <input
-                type="checkbox"
-                checked={showHeroShowreel}
-                onChange={(e) => setShowHeroShowreel(e.target.checked)}
-                className="accent-teal-300"
-              />
-            </label>
-            {showHeroShowreel && (
-              <LocalizedField
-                label="Nom du bouton Showreel"
-                value={heroShowreelLabel}
-                onChange={setHeroShowreelLabel}
-                placeholder="Voir le showreel"
-                id="hero-showreel-label"
-              />
-            )}
-
-            <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-              <span>Afficher CV</span>
-              <input
-                type="checkbox"
-                checked={showHeroCv}
-                onChange={(e) => setShowHeroCv(e.target.checked)}
-                className="accent-teal-300"
-              />
-            </label>
-            {showHeroCv && (
-              <LocalizedField
-                label="Nom du bouton CV"
-                value={heroCvLabel}
-                onChange={setHeroCvLabel}
-                placeholder="Télécharger CV"
-                id="hero-cv-label"
-              />
-            )}
-
-            <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-              <span>Afficher téléphone</span>
-              <input
-                type="checkbox"
-                checked={showHeroPhone}
-                onChange={(e) => setShowHeroPhone(e.target.checked)}
-                className="accent-teal-300"
-              />
-            </label>
-            {showHeroPhone && (
-              <LocalizedField
-                label="Nom du bouton téléphone"
-                value={heroPhoneLabel}
-                onChange={setHeroPhoneLabel}
-                placeholder="Vide = affiche le numéro"
-                id="hero-phone-label"
-              />
-            )}
-
-            <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-              <span>Afficher email</span>
-              <input
-                type="checkbox"
-                checked={showHeroEmail}
-                onChange={(e) => setShowHeroEmail(e.target.checked)}
-                className="accent-teal-300"
-              />
-            </label>
-            {showHeroEmail && (
-              <LocalizedField
-                label="Nom du bouton email"
-                value={heroEmailLabel}
-                onChange={setHeroEmailLabel}
-                placeholder="Vide = affiche l’adresse"
-                id="hero-email-label"
-              />
-            )}
-
-            <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-              <span>Afficher bouton X</span>
-              <input
-                type="checkbox"
-                checked={showHeroX}
-                onChange={(e) => setShowHeroX(e.target.checked)}
-                className="accent-teal-300"
-              />
-            </label>
-            {showHeroX && (
-              <>
-                <LocalizedField
-                  label="Nom du bouton X"
-                  value={heroXLabel}
-                  onChange={setHeroXLabel}
-                  placeholder="X / Twitter"
-                  id="hero-x-label"
-                />
-                <div className="grid gap-2">
-                  <Label htmlFor="hero-x-url">Lien profil X</Label>
-                  <Input
-                    id="hero-x-url"
-                    value={xProfileUrl}
-                    onChange={(e) => setXProfileUrl(e.target.value)}
-                    placeholder="https://x.com/votre_pseudo"
-                  />
-                </div>
-              </>
-            )}
+        <DialogContent
+          size="form"
+          className="flex max-h-[min(92dvh,900px)] flex-col gap-0 overflow-hidden p-0"
+        >
+          <div className="shrink-0 border-b border-white/10 px-6 pb-3 pt-6 pr-12">
+            <DialogHeader>
+              <DialogTitle>Modifier le profil (Hero)</DialogTitle>
+              <p className="text-xs text-zinc-500">
+                Textes avec mise en forme : gras, italique, taille, couleur,
+                alignement (pas de HTML brut).
+              </p>
+            </DialogHeader>
           </div>
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => setEditOpen(false)}>
-              Annuler
-            </Button>
-            <Button onClick={saveProfile}>Enregistrer</Button>
-          </DialogFooter>
+
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4">
+            <div className="grid gap-4">
+              <RichTextField
+                label="Nom"
+                value={draft.name}
+                onChange={(name) =>
+                  setDraft((prev) => ({ ...prev, name }))
+                }
+                compact
+                placeholder="Patrick Roziel"
+                id="name"
+              />
+
+              <RichLocalizedField
+                label="Titre"
+                value={draft.title}
+                onChange={(title) =>
+                  setDraft((prev) => ({ ...prev, title }))
+                }
+                compact
+                rows={2}
+                id="title"
+              />
+
+              <RichLocalizedField
+                label="Bio"
+                value={draft.bio}
+                onChange={(bio) => setDraft((prev) => ({ ...prev, bio }))}
+                rows={8}
+                id="bio"
+              />
+
+              <div className="grid gap-2">
+                <Label htmlFor="hero-font">Police du Hero</Label>
+                <select
+                  id="hero-font"
+                  value={draft.heroFontFamily || "default"}
+                  onChange={(e) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      heroFontFamily: e.target.value,
+                    }))
+                  }
+                  className="h-10 w-full rounded-xl border border-white/12 bg-black/35 px-3 text-sm text-zinc-100 outline-none focus:ring-1 focus:ring-teal-300/40"
+                >
+                  {HERO_FONT_OPTIONS.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-zinc-500">
+                  Appliquée au nom, titre, bio et labels du Hero uniquement.
+                </p>
+              </div>
+
+              {/* Badges editor */}
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label>Badges (haut du Hero)</Label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 gap-1 text-xs"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        heroBadges: [
+                          ...(prev.heroBadges ?? []),
+                          {
+                            id: createId(),
+                            text: liftToLocalized("Nouveau badge"),
+                            bgColor: "#134e4a",
+                            textColor: "#99f6e4",
+                          },
+                        ],
+                      }))
+                    }
+                  >
+                    <Plus className="h-3 w-3" />
+                    Ajouter
+                  </Button>
+                </div>
+                <ul className="space-y-2">
+                  {(draft.heroBadges ?? []).map((badge, index) => (
+                    <li
+                      key={badge.id}
+                      className="grid gap-2 rounded-xl border border-white/10 bg-black/30 p-2"
+                    >
+                      <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <RichLocalizedField
+                            label={`Badge ${index + 1}`}
+                            value={badge.text}
+                            onChange={(text) =>
+                              setDraft((prev) => ({
+                                ...prev,
+                                heroBadges: (prev.heroBadges ?? []).map((b) =>
+                                  b.id === badge.id ? { ...b, text } : b
+                                ),
+                              }))
+                            }
+                            compact
+                            rows={1}
+                            hint=""
+                            id={`badge-text-${badge.id}`}
+                          />
+                        </div>
+                        <div className="flex shrink-0 flex-col gap-0.5 pt-6">
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            disabled={index === 0}
+                            onClick={() =>
+                              setDraft((prev) => {
+                                const list = [...(prev.heroBadges ?? [])];
+                                if (index <= 0) return prev;
+                                [list[index - 1], list[index]] = [
+                                  list[index],
+                                  list[index - 1],
+                                ];
+                                return { ...prev, heroBadges: list };
+                              })
+                            }
+                            aria-label="Monter"
+                          >
+                            <ChevronUp className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            disabled={
+                              index >= (draft.heroBadges?.length ?? 0) - 1
+                            }
+                            onClick={() =>
+                              setDraft((prev) => {
+                                const list = [...(prev.heroBadges ?? [])];
+                                if (index >= list.length - 1) return prev;
+                                [list[index], list[index + 1]] = [
+                                  list[index + 1],
+                                  list[index],
+                                ];
+                                return { ...prev, heroBadges: list };
+                              })
+                            }
+                            aria-label="Descendre"
+                          >
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7 text-red-400"
+                            onClick={() =>
+                              setDraft((prev) => ({
+                                ...prev,
+                                heroBadges: (prev.heroBadges ?? []).filter(
+                                  (b) => b.id !== badge.id
+                                ),
+                              }))
+                            }
+                            aria-label="Supprimer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <label className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                          Fond
+                          <input
+                            type="color"
+                            value={
+                              badge.bgColor.startsWith("#")
+                                ? badge.bgColor.slice(0, 7)
+                                : "#27272a"
+                            }
+                            onChange={(e) =>
+                              setDraft((prev) => ({
+                                ...prev,
+                                heroBadges: (prev.heroBadges ?? []).map((b) =>
+                                  b.id === badge.id
+                                    ? { ...b, bgColor: e.target.value }
+                                    : b
+                                ),
+                              }))
+                            }
+                            className="h-7 w-9 cursor-pointer rounded border border-white/15 bg-transparent p-0"
+                          />
+                        </label>
+                        <label className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                          Texte
+                          <input
+                            type="color"
+                            value={
+                              badge.textColor.startsWith("#")
+                                ? badge.textColor.slice(0, 7)
+                                : "#f4f4f5"
+                            }
+                            onChange={(e) =>
+                              setDraft((prev) => ({
+                                ...prev,
+                                heroBadges: (prev.heroBadges ?? []).map((b) =>
+                                  b.id === badge.id
+                                    ? { ...b, textColor: e.target.value }
+                                    : b
+                                ),
+                              }))
+                            }
+                            className="h-7 w-9 cursor-pointer rounded border border-white/15 bg-transparent p-0"
+                          />
+                        </label>
+                        <span
+                          className="rounded-full border border-white/15 px-2.5 py-0.5 text-[11px]"
+                          style={{
+                            backgroundColor: badge.bgColor,
+                            color: badge.textColor,
+                          }}
+                        >
+                          Aperçu
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                {(draft.heroBadges ?? []).length === 0 && (
+                  <p className="text-[10px] text-zinc-500">
+                    Aucun badge. Cliquez sur « Ajouter ».
+                  </p>
+                )}
+              </div>
+
+              <RichLocalizedField
+                label="Localisation (profil / CV)"
+                value={draft.location}
+                onChange={(location) =>
+                  setDraft((prev) => ({ ...prev, location }))
+                }
+                compact
+                rows={1}
+                id="location"
+                hint="Champ profil (Contact, CV). Les badges Hero se gèrent ci-dessus."
+              />
+
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Téléphone (numéro pour le lien tel:)</Label>
+                <Input
+                  id="phone"
+                  value={draft.phone}
+                  onChange={(e) =>
+                    setDraft((prev) => ({ ...prev, phone: e.target.value }))
+                  }
+                />
+                <p className="text-[10px] text-zinc-500">
+                  Le numéro n’est plus affiché dans le Hero — seul le label
+                  cliquable apparaît (ex. « Appeler »).
+                </p>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email (lien mailto:)</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={draft.email}
+                  onChange={(e) =>
+                    setDraft((prev) => ({ ...prev, email: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="showreel">URL Showreel</Label>
+                <Input
+                  id="showreel"
+                  value={draft.showreelUrl}
+                  onChange={(e) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      showreelUrl: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cvUrl">Lien CV externe (optionnel)</Label>
+                <Input
+                  id="cvUrl"
+                  placeholder="Sinon : Exporter PDF"
+                  value={draft.cvUrl ?? ""}
+                  onChange={(e) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      cvUrl: e.target.value || null,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="h-px bg-white/10" />
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+                Labels & boutons (Hero)
+              </p>
+
+              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
+                <span>Afficher Showreel</span>
+                <input
+                  type="checkbox"
+                  checked={showHeroShowreel}
+                  onChange={(e) => setShowHeroShowreel(e.target.checked)}
+                  className="accent-teal-300"
+                />
+              </label>
+              {showHeroShowreel && (
+                <RichLocalizedField
+                  label="Label bouton Showreel"
+                  value={heroShowreelLabel}
+                  onChange={setHeroShowreelLabel}
+                  compact
+                  rows={1}
+                  placeholder="Voir le showreel"
+                  id="hero-showreel-label"
+                  hint=""
+                />
+              )}
+
+              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
+                <span>Afficher CV</span>
+                <input
+                  type="checkbox"
+                  checked={showHeroCv}
+                  onChange={(e) => setShowHeroCv(e.target.checked)}
+                  className="accent-teal-300"
+                />
+              </label>
+              {showHeroCv && (
+                <RichLocalizedField
+                  label="Label bouton CV"
+                  value={heroCvLabel}
+                  onChange={setHeroCvLabel}
+                  compact
+                  rows={1}
+                  placeholder="Télécharger CV"
+                  id="hero-cv-label"
+                  hint=""
+                />
+              )}
+
+              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
+                <span>Afficher téléphone</span>
+                <input
+                  type="checkbox"
+                  checked={showHeroPhone}
+                  onChange={(e) => setShowHeroPhone(e.target.checked)}
+                  className="accent-teal-300"
+                />
+              </label>
+              {showHeroPhone && (
+                <RichLocalizedField
+                  label="Label téléphone (affiché)"
+                  value={heroPhoneLabel}
+                  onChange={setHeroPhoneLabel}
+                  compact
+                  rows={1}
+                  placeholder="Appeler"
+                  id="hero-phone-label"
+                  hint="Texte cliquable uniquement — pas le numéro."
+                />
+              )}
+
+              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
+                <span>Afficher email</span>
+                <input
+                  type="checkbox"
+                  checked={showHeroEmail}
+                  onChange={(e) => setShowHeroEmail(e.target.checked)}
+                  className="accent-teal-300"
+                />
+              </label>
+              {showHeroEmail && (
+                <RichLocalizedField
+                  label="Label email (optionnel)"
+                  value={heroEmailLabel}
+                  onChange={setHeroEmailLabel}
+                  compact
+                  rows={1}
+                  placeholder="Vide = adresse seule"
+                  id="hero-email-label"
+                  hint=""
+                />
+              )}
+
+              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
+                <span>Afficher bouton X</span>
+                <input
+                  type="checkbox"
+                  checked={showHeroX}
+                  onChange={(e) => setShowHeroX(e.target.checked)}
+                  className="accent-teal-300"
+                />
+              </label>
+              {showHeroX && (
+                <>
+                  <RichLocalizedField
+                    label="Label bouton X"
+                    value={heroXLabel}
+                    onChange={setHeroXLabel}
+                    compact
+                    rows={1}
+                    placeholder="X / Twitter"
+                    id="hero-x-label"
+                    hint=""
+                  />
+                  <div className="grid gap-2">
+                    <Label htmlFor="hero-x-url">Lien profil X</Label>
+                    <Input
+                      id="hero-x-url"
+                      value={xProfileUrl}
+                      onChange={(e) => setXProfileUrl(e.target.value)}
+                      placeholder="https://x.com/votre_pseudo"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="shrink-0 border-t border-white/10 bg-black/20 px-6 py-3">
+            <DialogFooter className="sm:justify-end">
+              <Button variant="secondary" onClick={() => setEditOpen(false)}>
+                Annuler
+              </Button>
+              <Button onClick={saveProfile}>Enregistrer</Button>
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 

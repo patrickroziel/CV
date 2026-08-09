@@ -12,7 +12,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { EditGate } from "@/components/shared/EditGate";
+import { ExtraDocumentButtons } from "@/components/shared/ExtraDocumentButtons";
+import { RichHtml } from "@/components/shared/RichHtml";
 import { ContactSettingsPanel } from "@/components/contact/ContactSettingsPanel";
+import {
+  EXTRA_DOCUMENT_IDS,
+  type ContactConfig,
+} from "@/lib/types";
+
+function hasContactExtraDocs(c: ContactConfig): boolean {
+  const docs = c.extraDocuments;
+  if (!docs) return false;
+  return EXTRA_DOCUMENT_IDS.some((id) => {
+    const d = docs[id];
+    return Boolean(d?.show && d.url?.trim() && d.showInContact);
+  });
+}
 
 export function ContactSection() {
   const { data, showToast, editMode, l, t } = usePortfolio();
@@ -25,6 +40,7 @@ export function ContactSection() {
   const email = c.emailValue.trim() || profile.email;
   const phone = c.phoneValue.trim() || profile.phone;
   const showreel = c.showreelUrl.trim() || profile.showreelUrl;
+  const showExtraDocs = hasContactExtraDocs(c);
 
   const copyEmail = async () => {
     try {
@@ -81,11 +97,13 @@ export function ContactSection() {
                 {c.showNameTitle && (
                   <>
                     <p className="text-lg font-semibold text-zinc-50">
-                      {profile.name}
+                      {profile.name.replace(/<[^>]+>/g, "").trim() ||
+                        profile.name}
                     </p>
-                    <p className="mt-1 text-sm text-teal-300">
-                      {l(profile.title)}
-                    </p>
+                    <RichHtml
+                      html={l(profile.title)}
+                      className="mt-1 text-sm text-teal-300"
+                    />
                   </>
                 )}
                 {c.showLocation && (
@@ -95,7 +113,10 @@ export function ContactSection() {
                   </p>
                 )}
 
-                {(c.showEmail || c.showPhone || c.showShowreel) && (
+                {(c.showEmail ||
+                  c.showPhone ||
+                  c.showShowreel ||
+                  showExtraDocs) && (
                   <div className="mt-8 flex flex-wrap gap-3">
                     {c.showEmail && (
                       <MagneticButton>
@@ -131,6 +152,7 @@ export function ContactSection() {
                         </Button>
                       </MagneticButton>
                     )}
+                    <ExtraDocumentButtons placement="contact" />
                   </div>
                 )}
 

@@ -132,7 +132,7 @@ export function ExperienceForm({
         value={description}
         onChange={setDescription}
         multiline
-        rows={4}
+        rows={8}
         id="desc"
       />
       <div className="grid gap-2">

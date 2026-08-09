@@ -282,18 +282,19 @@ export function xProfileHref(urlOrUser: string): string | null {
   return `https://x.com/${user}`;
 }
 
-/** True if value looks like an uploaded video (data URL, Cloudinary, or common video path) */
+/** True if value looks like an uploaded video (data URL, Blob, Cloudinary, path) */
 export function isFileVideoUrl(url: string): boolean {
   if (url.startsWith("data:video/")) return true;
   if (url.startsWith("blob:")) return true;
-  // Cloudinary video delivery
+  // Legacy Cloudinary video delivery
   if (
     /res\.cloudinary\.com\/[^/]+\/video\//i.test(url) ||
     /\/video\/upload\//i.test(url)
   ) {
     return true;
   }
-  return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+  // Vercel Blob public URLs (extension in pathname) + common video files
+  return /\.(mp4|webm|ogg|mov|m4v)(\?|$)/i.test(url);
 }
 
 /** Infer media type from a media URL (migration helper) */
