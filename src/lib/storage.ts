@@ -571,8 +571,13 @@ export function normalizeComingSoon(
   const title = liftToLocalized(
     raw?.title != null ? (raw.title as never) : DEFAULT_COMING_SOON.title
   );
+  // Missing field → production default (currently ON). Explicit false stays false.
+  const enabled =
+    raw == null || typeof raw.enabled !== "boolean"
+      ? DEFAULT_COMING_SOON.enabled
+      : raw.enabled;
   return {
-    enabled: Boolean(raw?.enabled),
+    enabled,
     title: getL(title).trim()
       ? title
       : liftToLocalized(DEFAULT_COMING_SOON.title),

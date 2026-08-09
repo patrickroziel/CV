@@ -274,7 +274,8 @@ export type ComingSoonConfig = {
 };
 
 export const DEFAULT_COMING_SOON: ComingSoonConfig = {
-  enabled: false,
+  /** Production default: public landing until you publish OFF */
+  enabled: true,
   title: L("Coming soon", {
     en: "Coming soon",
     pl: "Wkrótce",

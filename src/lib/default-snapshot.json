@@ -1,5 +1,5 @@
 {
-  "version": 20,
+  "version": 29,
   "backgroundUrl": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80",
   "ui": {
     "overlayOpacity": 0.52,
@@ -1737,5 +1737,14 @@
       "videoType": "youtube",
       "videoUrl": "https://youtube.com/shorts/dHWIxpPRmmM"
     }
-  ]
+  ],
+  "comingSoon": {
+    "enabled": true,
+    "title": {
+      "fr": "Coming soon",
+      "en": "Coming soon",
+      "pl": "Wkrótce",
+      "es": "Próximamente"
+    }
+  }
 }
