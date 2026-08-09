@@ -1,28 +1,56 @@
 {
   "version": 29,
   "backgroundUrl": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80",
+  "backgroundImages": [
+    {
+      "id": "bg-default",
+      "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80",
+      "opacity": 0.74,
+      "alphaVideoUrl": null,
+      "alphaVideoEnabled": false,
+      "alphaVideoOpacity": 0.85
+    }
+  ],
+  "heroGlass": {
+    "backVideos": [
+      {
+        "id": "4c891744-99ac-417b-9081-02ddc7794fa5",
+        "url": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785852436/patrick-roziel/wallpaper/eqin5miirve89grbfvjc.mov",
+        "type": "video",
+        "enabled": true,
+        "opacity": 0.27,
+        "fallbackImageUrl": null
+      }
+    ],
+    "front": {
+      "type": "none",
+      "url": null,
+      "opacity": 0.74,
+      "fallbackImageUrl": null
+    }
+  },
   "ui": {
-    "overlayOpacity": 0.52,
+    "overlayOpacity": 0.36,
     "showDock": true,
     "locale": "fr"
   },
   "profile": {
     "name": "Patrick Roziel",
     "title": {
-      "fr": "Monteur vidéo | Motion designer | Chargé de communication digitale",
+      "fr": "<div data-rich-lh=\"1.25\" class=\"rich-lh\" style=\"line-height: 1.25\"><b><span style=\"color: rgb(255, 255, 255)\" data-rich-color=\"#ffffff\">Monteur vidéo • Motion designer • Chargé de communication digitale</span></b></div>",
       "en": "Video editor | Motion designer | Digital communications specialist",
       "pl": "Montażysta wideo | Motion designer | Specjalista ds. komunikacji cyfrowej",
       "es": "Editor de vídeo | Motion designer | Especialista en comunicación digital"
     },
     "bio": {
-      "fr": "Monteur vidéo et spécialiste en communication digitale avec plus de 10 ans d’expérience en production vidéo, motion design et contenus de marque. Expertise en formats réseaux sociaux, vidéos corporate et workflows à délais courts.",
+      "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><b></b><b></b><b><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">J’ai commencé à monter à 17 ans<br></span></span></b><br><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">Une compilation de destructions contrôlées de tours HLM de ma cité. Depuis, plus de vingt ans que je coupe, assemble et raconte des histoires en mouvement.\n\nCe sens du rythme, ce montage qui accroche avant le scroll, je l’ai affûté là où chaque seconde compte. </span></span></p><br><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">Là où l’attention se gagne ou se perd en un clin d’œil.\n\nLa polyvalence </span></span></p><b><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">caméra / montage / motion, je l’ai construite sur le terrain </span></span></b><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">: plateaux prompteur, productions corporate, gestion de matériel. Des contextes où j’ai dû tout porter, de la captation à la livraison. Souvent seul. Toujours efficace.\n\nMa façon de comprendre une audience vient d’avant les logiciels. Animation de personnages, vente, restauration, travail agricole à l’étranger. Vingt ans à observer, servir, incarner. Une école d’empathie et d’adaptation qu’aucun tutoriel n’enseigne. </span></span></p><br><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\"> Aujourd’hui je filme, je monte, j’anime • en français, anglais, polonais ou espagnol • avec la rigueur de celui qui sait que la créativité naît aussi de la débrouille. </span></span></p><br><span><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">Ma</span></span></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">&nbsp;boussole : J</span></span></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">anet Jackson. Rythme. Exigence. Présence. Lucidité.&nbsp;</span></span></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"></span></div>",
       "en": "Video editor and digital communications specialist with over 10 years of experience in video production, motion design and brand content. Expert in social formats, corporate films and fast-turnaround workflows.",
       "pl": "Montażysta wideo i specjalista ds. komunikacji cyfrowej z ponad 10-letnim doświadczeniem w produkcji wideo, motion designie i treściach marki. Ekspert od formatów social, filmów corporate i szybkich workflowów.",
       "es": "Editor de vídeo y especialista en comunicación digital con más de 10 años de experiencia en producción audiovisual, motion design y contenidos de marca. Experto en formatos sociales, vídeos corporativos y flujos de trabajo ágiles."
     },
     "photo": "https://res.cloudinary.com/ptp8diwd/image/upload/v1784742778/ih9243zrqradcoauy6vi.png",
     "email": "patrick.roziel@me.com",
-    "phone": "07 44 40 97 90",
+    "phone": "07 43 93 36 00",
     "location": {
       "fr": "La Courneuve (93), France",
       "en": "La Courneuve (93), France",
@@ -30,7 +58,38 @@
       "es": "La Courneuve (93), Francia"
     },
     "showreelUrl": "https://youtu.be/ws0EbZOxaNs",
-    "cvUrl": null
+    "cvUrl": null,
+    "experienceBadge": {
+      "fr": "20+ ans d’expérience",
+      "en": "20+ years of experience",
+      "pl": "20+ lat doświadczenia",
+      "es": "Más de 20 años de experiencia"
+    },
+    "heroBadges": [
+      {
+        "id": "badge-location",
+        "text": {
+          "fr": "La Courneuve (93), France",
+          "en": "La Courneuve (93), France",
+          "pl": "La Courneuve (93), Francja",
+          "es": "La Courneuve (93), Francia"
+        },
+        "bgColor": "rgba(255,255,255,0.08)",
+        "textColor": "#e4e4e7"
+      },
+      {
+        "id": "badge-experience",
+        "text": {
+          "fr": "20+ ans d’expérience",
+          "en": "20+ years of experience",
+          "pl": "20+ lat doświadczenia",
+          "es": "Más de 20 años de experiencia"
+        },
+        "bgColor": "rgba(251,191,36,0.15)",
+        "textColor": "#fef3c7"
+      }
+    ],
+    "heroFontFamily": ""
   },
   "experiences": [
     {
@@ -39,7 +98,7 @@
         "fr": "SAV"
       },
       "role": {
-        "fr": "Technicien audiovisuel",
+        "fr": "🎛️🔧 Technicien Audiovisuel",
         "en": "Audiovisual technician",
         "pl": "Technik audiowizualny",
         "es": "Técnico audiovisual"
@@ -50,7 +109,7 @@
       "startDate": "2024-09",
       "endDate": "2025-02",
       "description": {
-        "fr": "Gestion de stock matériel audiovisuel, préparation de commandes et optimisation de l’atelier (−30 % de temps de préparation). Création d’une vidéo récapitulative pour documenter les process.",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(192, 192, 192)\" data-rich-color=\"#c0c0c0\"><b>Missions principales</b></span></p><ul><li><b>Gestion des stocks</b> : suivi rigoureux des entrées/sorties de <b>matériel audiovisuel</b> (caméras, prompteurs, caisses techniques)</li><li><b>Préparation des commandes</b> : assemblage et mise à disposition du matériel pour <b>prestations internes et externes</b><b></b></li><li><b>Contrôle qualité</b> : tests systématiques pour garantir la fiabilité des équipements</li><li><b>Maintenance atelier</b> : organisation et rangement optimisés de l’atelier pour améliorer la <b>productivité et l’efficacité</b><b></b></li><li><b>Support technique</b> : interventions sur <b>plateaux TV</b> pour résoudre les problèmes en temps réel</li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation de l’espace de stockage</b> : refonte complète du mobilier et de l’organisation, réduction du temps de préparation de 30 %</li><li><b>Création de contenu vidéo</b> : réalisation d’une <b>vidéo récapitulative des prestations 2024</b>, renforçant la communication externe</li><li><b>Amélioration des interventions techniques</b> : résolution rapide des pannes sur les plateaux, assurant la continuité des émissions</li></ul><br></div>",
         "en": "AV equipment stock management, order prep and workshop optimization (−30% prep time). Created a summary video to document processes.",
         "pl": "Zarządzanie magazynem sprzętu AV, przygotowanie zamówień i optymalizacja warsztatu (−30% czasu przygotowania). Film podsumowujący procesy.",
         "es": "Gestión de stock de material AV, preparación de pedidos y optimización del taller (−30% de tiempo de prep.). Vídeo resumen de los procesos."
@@ -60,7 +119,23 @@
         "Logistique",
         "Vidéo"
       ],
-      "media": []
+      "media": [
+        {
+          "id": "f99e1b9a-055b-47dc-9fe8-95fccdf17335",
+          "type": "youtube",
+          "url": "https://youtu.be/VDL2wKfdPfE"
+        },
+        {
+          "id": "41abefc2-9b2d-456e-b80a-7e00183fc343",
+          "type": "youtube",
+          "url": "https://youtu.be/VDL2wKfdPfE"
+        },
+        {
+          "id": "214011bc-d5b0-43fd-bc01-2dc957b3d392",
+          "type": "image",
+          "url": "https://zeymkns3sxejoeni.public.blob.vercel-storage.com/patrick-roziel/projects/1786285530898-IMG-20250109-WA0008-RR3cSh1W56rLG2Ih2jYgD29g9tSKHu.jpg"
+        }
+      ]
     },
     {
       "id": "exp-prompteur",
@@ -68,7 +143,7 @@
         "fr": "Solutions Prompteur"
       },
       "role": {
-        "fr": "Monteur vidéo / Opérateur prompteur",
+        "fr": "🎬📝 Monteur vidéo / Opérateur prompteur",
         "en": "Video editor / Teleprompter operator",
         "pl": "Montażysta wideo / Operator promptera",
         "es": "Editor de vídeo / Operador de teleprompter"
@@ -82,7 +157,7 @@
       "startDate": "2023",
       "endDate": "2024",
       "description": {
-        "fr": "Montage vidéo, création graphique et opération de prompteur pour des productions événementielles et corporate.",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Montage vidéo</b> : réalisation de vidéos promotionnelles et tutoriels pour le secteur <b>corporate et institutionnel</b><b></b></li><li><b>Gestion du matériel</b> : réglages techniques du <b>prompteur, caméra, éclairage, micro et moniteur</b> sur tournages TV, plateaux d’interviews et événements corporate</li><li><b>Adaptation du discours</b> : ajustement du texte prompteur aux contraintes de <b>régie et de plateau</b><b></b></li><li><b>Collaboration</b> : travail étroit avec <b>réalisateurs et chefs de projet</b> pour assurer la fluidité des enregistrements</li></ul><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b><br></b></span></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation de la synchronisation prompteur/plateau</b>, réduisant les erreurs en direct</li><li><b>Montage de vidéos institutionnelles et tutoriels</b> pour plusieurs clients majeurs</li><li><b>Interventions techniques efficaces</b> sur événements en direct, garantissant la continuité des présentations</li></ul><br></div>",
         "en": "Video editing, graphic creation and teleprompter operation for live and corporate productions.",
         "pl": "Montaż wideo, grafika i obsługa promptera na produkcjach eventowych i corporate.",
         "es": "Edición de vídeo, creación gráfica y operación de teleprompter para eventos y corporate."
@@ -93,7 +168,38 @@
         "Prompteur",
         "Graphisme"
       ],
-      "media": []
+      "media": [
+        {
+          "id": "bdb7393d-aa96-4f45-b997-a271a0e00615",
+          "type": "youtube",
+          "url": "https://youtu.be/Q0o0EZmy-nw"
+        },
+        {
+          "id": "9e12c179-4256-45eb-888a-23fab1a05683",
+          "type": "youtube",
+          "url": "https://youtu.be/AbpC305Hxdg"
+        },
+        {
+          "id": "42cf9e32-3c46-40a5-b83f-5d0d8e1cbb62",
+          "type": "youtube",
+          "url": "https://youtube.com/shorts/EiXzCdQBRuU?feature=share"
+        },
+        {
+          "id": "65ab3724-a7cb-4af5-92ef-85fb55616bad",
+          "type": "image",
+          "url": "https://res.cloudinary.com/ptp8diwd/image/upload/v1786281530/patrick-roziel/projects/lxbhtsex0hfclsgjosoi.png"
+        },
+        {
+          "id": "1856ed6a-c814-4eed-b1cc-ed35958adec8",
+          "type": "youtube",
+          "url": "https://youtu.be/m24hMzh5tPs"
+        },
+        {
+          "id": "a017a316-ec75-4f3b-b6db-9d0b9b9ddf63",
+          "type": "youtube",
+          "url": "https://youtube.com/shorts/EgApLd2I_aw?feature=share"
+        }
+      ]
     },
     {
       "id": "exp-dietplus-2022",
@@ -101,7 +207,7 @@
         "fr": "Dietplus"
       },
       "role": {
-        "fr": "Réalisateur / Monteur vidéo freelance",
+        "fr": "📹🎬 Réalisateur / Monteur vidéo (Mission Freelance)",
         "en": "Director / Freelance video editor",
         "pl": "Reżyser / Freelancer montażysta wideo",
         "es": "Realizador / Editor de vídeo freelance"
@@ -115,7 +221,7 @@
       "startDate": "2022",
       "endDate": "2022",
       "description": {
-        "fr": "Captation Steadicam, interviews et montage pour des contenus de marque nutrition / bien-être.",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><b><span style=\"font-size: 1rem\"><span style=\"color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\">Missions principales</span></span></b></p><ul><li><b>Captation de témoignages clients</b> et tournages en entreprise (<b>GH5, DJI Ronin</b>, intérieur/extérieur)</li><li><b>Préparation et test du matériel</b> : chargement des batteries, vérification des équipements avant tournage</li><li><b>Prise de son et lumière</b>, stabilisation d’image</li><li><b>Interaction avec les participants</b> : adaptation selon qu’ils soient déjà connus ou rencontrés pour la première fois</li><li><b>Montage vidéo</b> : création de contenus institutionnels destinés aux <b>franchisés et réseaux sociaux</b><b></b></li><li><b>Habillage graphique et animations</b> : intégration de visuels et motion design</li></ul><p><br></p><p><b><span style=\"font-size: 1rem\">Réalisations</span></b></p><ul><li><b>Optimisation du matériel et des réglages techniques</b> pour des tournages fluides</li><li><b>Captation naturelle des témoignages clients</b> grâce à une approche relationnelle adaptée</li><li><b>Montage de contenus institutionnels attractifs</b>, prêts à la diffusion sur les réseaux</li></ul></div>",
         "en": "Steadicam capture, interviews and editing for nutrition / wellness brand content.",
         "pl": "Zdjęcia Steadicam, wywiady i montaż dla marki nutrition / wellness.",
         "es": "Captación con Steadicam, entrevistas y montaje para marca de nutrición / bienestar."
@@ -134,7 +240,7 @@
         "fr": "Jellysmack"
       },
       "role": {
-        "fr": "Monteur vidéo",
+        "fr": "🎬 Monteur vidéo",
         "en": "Video editor",
         "pl": "Montażysta wideo",
         "es": "Editor de vídeo"
@@ -145,7 +251,7 @@
       "startDate": "2022",
       "endDate": "2022",
       "description": {
-        "fr": "Montage de contenus pour créateurs et influenceurs : rythme social, hooks, formats verticaux et horizontaux (Facebook, Shorts).",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><b></b></p><p><b><span style=\"font-size: 1rem\">Missions principales</span></b></p><ul><li><b>Montage de vidéos virales</b> pour créateurs internationaux sur <b>Facebook, Instagram et YouTube</b><b></b></li><li><b>Application des standards Jellysmack</b> : formats <b>1:1</b>, AB testing (<b>AB1, AB2, AB3</b>), optimisations <b>SEO visuelles</b><b></b></li><li><b>Création de thumbnails et vignettes</b>, transitions dynamiques, effets typographiques, <b>habillage graphique</b></li></ul><p><br></p><p><b><span style=\"font-size: 1rem\">Réalisations</span></b></p><ul><li><b>Optimisation des vidéos courtes</b> pour maximiser la <b>visibilité et l’engagement</b><b></b></li><li>Respect des <b>délais serrés</b> tout en maintenant la qualité et la cohérence visuelle</li></ul></div>",
         "en": "Editing for creators and influencers: social pacing, hooks, vertical and horizontal formats (Facebook, Shorts).",
         "pl": "Montaż dla twórców i influencerów: tempo social, hooki, formaty pionowe i poziome (Facebook, Shorts).",
         "es": "Edición para creadores e influencers: ritmo social, hooks, formatos verticales y horizontales (Facebook, Shorts)."
@@ -746,6 +852,7 @@
       },
       "videoType": "file",
       "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784762544/iukryqcmt5iz8odkujre.mov",
+      "fallbackImageUrl": null,
       "icons": [
         {
           "id": "1bec3389-cc7f-416a-8965-eb7335bf2189-flag-FR-0",
@@ -944,6 +1051,7 @@
       },
       "videoType": "file",
       "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784763043/jz0nfo5hx2yjzlpoeohb.mov",
+      "fallbackImageUrl": null,
       "icons": [
         {
           "id": "367041c6-2bda-4251-a6dc-e33d9ddfb3a2-flag-GB-0",
@@ -1198,6 +1306,7 @@
       },
       "videoType": "file",
       "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784763107/sipmppyiwyzu20awd2iw.mov",
+      "fallbackImageUrl": null,
       "icons": [
         {
           "id": "56a6cc7a-8e46-472b-af19-3d4504bfa607-flag-PL-0",
@@ -1340,6 +1449,7 @@
       },
       "videoType": "file",
       "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784763248/oravm91gccwsn1fpx1vt.mov",
+      "fallbackImageUrl": null,
       "icons": [
         {
           "id": "385e74f2-8362-4095-91ac-8317118b4c67-flag-ES-0",
@@ -1560,6 +1670,98 @@
       "es": "Pasa el cursor sobre una tarjeta para ver el vídeo demo"
     }
   },
+  "nav": {
+    "home": {
+      "label": {
+        "fr": "Accueil",
+        "en": "Home",
+        "pl": "Start",
+        "es": "Inicio"
+      },
+      "visible": true
+    },
+    "experience": {
+      "label": {
+        "fr": "Expériences",
+        "en": "Experience",
+        "pl": "Doświadczenie",
+        "es": "Experiencia"
+      },
+      "visible": true
+    },
+    "projects": {
+      "label": {
+        "fr": "Travaux",
+        "en": "Work",
+        "pl": "Prace",
+        "es": "Trabajos"
+      },
+      "visible": false
+    },
+    "skills": {
+      "label": {
+        "fr": "Compétences",
+        "en": "Skills",
+        "pl": "Umiejętności",
+        "es": "Competencias"
+      },
+      "visible": true
+    },
+    "education": {
+      "label": {
+        "fr": "Formation",
+        "en": "Education",
+        "pl": "Edukacja",
+        "es": "Formación"
+      },
+      "visible": true
+    },
+    "languages": {
+      "label": {
+        "fr": "Langues",
+        "en": "Languages",
+        "pl": "Języki",
+        "es": "Idiomas"
+      },
+      "visible": true
+    },
+    "quotes": {
+      "label": {
+        "fr": "Devis",
+        "en": "Quotes",
+        "pl": "Wyceny",
+        "es": "Presupuestos"
+      },
+      "visible": true
+    },
+    "contact": {
+      "label": {
+        "fr": "Contact",
+        "en": "Contact",
+        "pl": "Kontakt",
+        "es": "Contacto"
+      },
+      "visible": true
+    },
+    "gallery": {
+      "label": {
+        "fr": "Galerie",
+        "en": "Gallery",
+        "pl": "Galeria",
+        "es": "Galería"
+      },
+      "visible": false
+    }
+  },
+  "comingSoon": {
+    "enabled": true,
+    "title": {
+      "fr": "Coming soon",
+      "en": "Coming soon",
+      "pl": "Wkrótce",
+      "es": "Próximamente"
+    }
+  },
   "contact": {
     "sectionEyebrow": {
       "fr": "Restons en contact",
@@ -1637,7 +1839,45 @@
     "heroXLabel": {
       "fr": "X / Twitter"
     },
-    "xProfileUrl": "https://x.com/",
+    "xProfileUrl": "https://x.com/patrickroziel",
+    "extraDocuments": {
+      "personalCv": {
+        "url": null,
+        "show": false,
+        "label": {
+          "fr": "CV PDF",
+          "en": "CV PDF",
+          "pl": "CV PDF",
+          "es": "CV PDF"
+        },
+        "showInHero": true,
+        "showInContact": true
+      },
+      "portfolioPdf": {
+        "url": null,
+        "show": false,
+        "label": {
+          "fr": "Portfolio PDF",
+          "en": "Portfolio PDF",
+          "pl": "Portfolio PDF",
+          "es": "Portfolio PDF"
+        },
+        "showInHero": true,
+        "showInContact": true
+      },
+      "businessCard": {
+        "url": null,
+        "show": false,
+        "label": {
+          "fr": "Carte de visite",
+          "en": "Business card",
+          "pl": "Wizytówka",
+          "es": "Tarjeta de visita"
+        },
+        "showInHero": true,
+        "showInContact": true
+      }
+    },
     "showWidgetQuickContact": true,
     "widgetQuickContactTitle": {
       "fr": "Contact rapide",
@@ -1658,9 +1898,9 @@
         "id": "qc-phone",
         "icon": "phone",
         "label": {
-          "fr": "07 44 40 97 90"
+          "fr": "Téléphone"
         },
-        "href": "tel:0744409790"
+        "href": "tel:0743933600"
       },
       {
         "id": "qc-showreel",
@@ -1705,12 +1945,145 @@
     },
     "xUsername": "@patrickroziel"
   },
+  "quotes": {
+    "sectionEyebrow": {
+      "fr": "Travaillons ensemble",
+      "en": "Let’s work together",
+      "pl": "Pracujmy razem",
+      "es": "Trabajemos juntos"
+    },
+    "sectionTitle": {
+      "fr": "Demander un devis",
+      "en": "Request a quote",
+      "pl": "Poproś o wycenę",
+      "es": "Solicitar un presupuesto"
+    },
+    "sectionDescription": {
+      "fr": "Choisissez le type de mission. Vous serez guidé vers un brief professionnel adapté.",
+      "en": "Choose the type of project. You’ll get a professional brief tailored to that need.",
+      "pl": "Wybierz typ projektu. Otrzymasz profesjonalny brief dopasowany do potrzeby.",
+      "es": "Elige el tipo de proyecto. Te guiaremos con un brief profesional adaptado."
+    },
+    "services": [
+      {
+        "id": "montage",
+        "show": true,
+        "buttonLabel": {
+          "fr": "Montage vidéo",
+          "en": "Quote — Video editing",
+          "pl": "Wycena — Montaż wideo",
+          "es": "Presupuesto — Montaje de vídeo"
+        },
+        "pageTitle": {
+          "fr": "Devis — Montage vidéo",
+          "en": "Quote — Video editing",
+          "pl": "Wycena — Montaż wideo",
+          "es": "Presupuesto — Montaje de vídeo"
+        },
+        "pageIntro": {
+          "fr": "Montage narratif, rythmé et soigné pour films corporate, interviews, reportages ou contenus long-form. Précisez le volume, le style et la deadline pour un chiffrage précis.",
+          "en": "Narrative, paced editing for corporate films, interviews, reportage or long-form content. Share volume, style and deadline for an accurate quote.",
+          "pl": "Narracyjny montaż do filmów corporate, wywiadów, reportaży i long-form. Podaj objętość, styl i deadline, aby wycenić dokładnie.",
+          "es": "Montaje narrativo y rítmico para corporate, entrevistas, reportajes o long-form. Indica volumen, estilo y deadline para un presupuesto preciso."
+        }
+      },
+      {
+        "id": "motion",
+        "show": true,
+        "buttonLabel": {
+          "fr": "Motion Design",
+          "en": "Quote — Motion design",
+          "pl": "Wycena — Motion design",
+          "es": "Presupuesto — Motion design"
+        },
+        "pageTitle": {
+          "fr": "Devis — Motion Design",
+          "en": "Quote — Motion design",
+          "pl": "Wycena — Motion design",
+          "es": "Presupuesto — Motion design"
+        },
+        "pageIntro": {
+          "fr": "Habillages, lower-thirds, transitions, explainers et animations de marque. Indiquez le nombre de séquences, la charte graphique et les livrables attendus.",
+          "en": "Packaging, lower-thirds, transitions, explainers and brand animation. Share sequence count, brand guidelines and expected deliverables.",
+          "pl": "Oprawy, lower-thirds, przejścia, explainery i animacje marki. Podaj liczbę sekwencji, brandbook i oczekiwane deliverables.",
+          "es": "Packs, lower-thirds, transiciones, explainers y animación de marca. Indica secuencias, brandbook y entregables."
+        }
+      },
+      {
+        "id": "social",
+        "show": true,
+        "buttonLabel": {
+          "fr": "Contenu Social / Shorts",
+          "en": "Quote — Social / Shorts",
+          "pl": "Wycena — Social / Shorts",
+          "es": "Presupuesto — Social / Shorts"
+        },
+        "pageTitle": {
+          "fr": "Devis — Contenu Social & Shorts",
+          "en": "Quote — Social content & Shorts",
+          "pl": "Wycena — Social & Shorts",
+          "es": "Presupuesto — Social y Shorts"
+        },
+        "pageIntro": {
+          "fr": "Formats verticaux, reels, shorts et cut-downs optimisés pour les réseaux. Précisez le rythme de publication, le nombre de pièces et les plateformes cibles.",
+          "en": "Vertical formats, reels, shorts and cut-downs for social. Share publish cadence, piece count and target platforms.",
+          "pl": "Formaty pionowe, reels, shorts i cut-downy pod social. Podaj rytm publikacji, liczbę materiałów i platformy.",
+          "es": "Formatos verticales, reels, shorts y cut-downs para redes. Indica cadencia, cantidad de piezas y plataformas."
+        }
+      },
+      {
+        "id": "captation",
+        "show": true,
+        "buttonLabel": {
+          "fr": "Captation & Corporate",
+          "en": "Quote — Filming & corporate",
+          "pl": "Wycena — Captacja & corporate",
+          "es": "Presupuesto — Captación y corporate"
+        },
+        "pageTitle": {
+          "fr": "Devis — Captation & Corporate",
+          "en": "Quote — Filming & corporate",
+          "pl": "Wycena — Captacja & corporate",
+          "es": "Presupuesto — Captación y corporate"
+        },
+        "pageIntro": {
+          "fr": "Tournage / captation pour événements, interviews ou films d’entreprise, avec ou sans post-production. Indiquez le lieu, la durée de tournage et l’équipe souhaitée.",
+          "en": "Filming for events, interviews or corporate films, with or without post. Share location, shoot duration and crew needs.",
+          "pl": "Zdjęcia eventowe, wywiady lub filmy firmowe, z postprodukcją lub bez. Podaj lokalizację, czas zdjęć i ekipę.",
+          "es": "Captación para eventos, entrevistas o corporate, con o sin post. Indica lugar, duración de rodaje y equipo."
+        }
+      },
+      {
+        "id": "pack",
+        "show": true,
+        "buttonLabel": {
+          "fr": "Pack complet",
+          "en": "Quote — Full package",
+          "pl": "Wycena — Pakiet kompletny",
+          "es": "Presupuesto — Pack completo"
+        },
+        "pageTitle": {
+          "fr": "Devis — Pack complet (montage + motion + social)",
+          "en": "Quote — Full package (edit + motion + social)",
+          "pl": "Wycena — Pakiet (montaż + motion + social)",
+          "es": "Presupuesto — Pack (montaje + motion + social)"
+        },
+        "pageIntro": {
+          "fr": "Accompagnement de bout en bout : captation ou rushes, montage, motion et déclinaisons social. Idéal pour un lancement, une campagne ou une série de contenus.",
+          "en": "End-to-end support: shoot or rushes, edit, motion and social cut-downs. Ideal for a launch, campaign or content series.",
+          "pl": "Wsparcie end-to-end: zdjęcia lub rushe, montaż, motion i social. Idealne na launch, kampanię lub serię treści.",
+          "es": "Acompañamiento integral: rodaje o rushes, montaje, motion y social. Ideal para lanzamiento, campaña o serie de contenidos."
+        }
+      }
+    ]
+  },
   "mainShowreel": {
     "title": {
       "fr": "Showreel"
     },
     "videoType": "youtube",
-    "videoUrl": "https://youtu.be/ws0EbZOxaNs"
+    "videoUrl": "https://youtu.be/ws0EbZOxaNs",
+    "fallbackImageUrl": null
   },
   "featureVideos": [
     {
@@ -1719,7 +2092,8 @@
         "fr": "Timelapse"
       },
       "videoType": "file",
-      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784743251/fpydktqqqq4d7ibymdsu.mov"
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841914/patrick-roziel/showreel/gz0djttjwfj9hkffofxa.mov",
+      "fallbackImageUrl": null
     },
     {
       "id": "feat-2",
@@ -1727,24 +2101,17 @@
         "fr": "Motion Design"
       },
       "videoType": "file",
-      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784748535/pcqayn0d8gw7cmssuqmy.mov"
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784748535/pcqayn0d8gw7cmssuqmy.mov",
+      "fallbackImageUrl": null
     },
     {
       "id": "feat-3",
       "title": {
-        "fr": "AI + Sources"
+        "fr": "Social & AI"
       },
-      "videoType": "youtube",
-      "videoUrl": "https://youtube.com/shorts/dHWIxpPRmmM"
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841588/patrick-roziel/showreel/ckcjdggyszoaeknsrm3c.mp4",
+      "fallbackImageUrl": null
     }
-  ],
-  "comingSoon": {
-    "enabled": true,
-    "title": {
-      "fr": "Coming soon",
-      "en": "Coming soon",
-      "pl": "Wkrótce",
-      "es": "Próximamente"
-    }
-  }
+  ]
 }

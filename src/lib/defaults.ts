@@ -80,14 +80,21 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
     (snap as { heroGlass?: typeof DEFAULT_HERO_GLASS }).heroGlass ??
       DEFAULT_HERO_GLASS
   ),
-  quotes: structuredClone(DEFAULT_QUOTES),
+  // Prefer baked snapshot content (showreel / features / quotes) for production
+  mainShowreel: structuredClone(snap.mainShowreel),
+  featureVideos: structuredClone(snap.featureVideos ?? []),
+  quotes: structuredClone(snap.quotes ?? DEFAULT_QUOTES),
   nav: structuredClone(
     (snap as { nav?: typeof DEFAULT_NAV }).nav ?? DEFAULT_NAV
   ),
-  comingSoon: structuredClone(
-    (snap as { comingSoon?: typeof DEFAULT_COMING_SOON }).comingSoon ??
-      DEFAULT_COMING_SOON
-  ),
+  comingSoon: {
+    ...structuredClone(
+      (snap as { comingSoon?: typeof DEFAULT_COMING_SOON }).comingSoon ??
+        DEFAULT_COMING_SOON
+    ),
+    // Production public landing until explicitly published OFF
+    enabled: true,
+  },
   contact: {
     ...DEFAULT_CONTACT,
     ...snap.contact,
