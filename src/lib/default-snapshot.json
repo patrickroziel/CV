@@ -1,5 +1,5 @@
 {
-  "version": 29,
+  "version": 34,
   "backgroundUrl": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80",
   "backgroundImages": [
     {
@@ -93,6 +93,42 @@
   },
   "experiences": [
     {
+      "id": "exp-job-search",
+      "company": {
+        "fr": "Recherche d’emploi",
+        "en": "Job search",
+        "pl": "Poszukiwanie pracy",
+        "es": "Búsqueda de empleo"
+      },
+      "role": {
+        "fr": "💼🔍 Recherche active d’emploi",
+        "en": "Active job search",
+        "pl": "Aktywne poszukiwanie pracy",
+        "es": "Búsqueda activa de empleo"
+      },
+      "location": {
+        "fr": "France",
+        "en": "France",
+        "pl": "Francja",
+        "es": "Francia"
+      },
+      "startDate": "2025-03",
+      "endDate": null,
+      "description": {
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><ul><li><b>Candidatures ciblées</b> : plus de <b>200 CV et lettres personnalisées</b></li><li><b>Entretiens</b> : participation à <b>2 entretiens</b> (téléphonique et physique)</li><li><b>Compétences transversales</b> : <b>réseautage</b>, adaptation CV/lettres, <b>gestion du stress</b></li><li><b>Formation continue</b> : autodidacte, perfectionnement en <b>anglais</b>, formations en ligne en <b>montage vidéo</b>, <b>motion design</b>, <b>graphisme</b></li><li><b>Activité personnelle</b> : pratique autonome de la <b>natation</b>, création d’une <b>chaîne YouTube</b></li></ul></div>",
+        "en": "Targeted applications (200+ CVs), interviews, continuous learning (video, motion, design), networking and personal projects (swimming, YouTube).",
+        "pl": "Aplikacje celowane (200+ CV), rozmowy, nauka ciągła (wideo, motion, design), networking i projekty osobiste.",
+        "es": "Candidaturas dirigidas (200+ CV), entrevistas, formación continua (vídeo, motion, diseño), networking y proyectos personales."
+      },
+      "technologies": [
+        "Candidatures",
+        "Réseautage",
+        "Formation",
+        "YouTube"
+      ],
+      "media": []
+    },
+    {
       "id": "exp-sav",
       "company": {
         "fr": "SAV"
@@ -104,12 +140,15 @@
         "es": "Técnico audiovisual"
       },
       "location": {
-        "fr": "Saint-Denis"
+        "fr": "Saint-Denis (93)",
+        "en": "Saint-Denis (93)",
+        "pl": "Saint-Denis (93)",
+        "es": "Saint-Denis (93)"
       },
       "startDate": "2024-09",
       "endDate": "2025-02",
       "description": {
-        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(192, 192, 192)\" data-rich-color=\"#c0c0c0\"><b>Missions principales</b></span></p><ul><li><b>Gestion des stocks</b> : suivi rigoureux des entrées/sorties de <b>matériel audiovisuel</b> (caméras, prompteurs, caisses techniques)</li><li><b>Préparation des commandes</b> : assemblage et mise à disposition du matériel pour <b>prestations internes et externes</b><b></b></li><li><b>Contrôle qualité</b> : tests systématiques pour garantir la fiabilité des équipements</li><li><b>Maintenance atelier</b> : organisation et rangement optimisés de l’atelier pour améliorer la <b>productivité et l’efficacité</b><b></b></li><li><b>Support technique</b> : interventions sur <b>plateaux TV</b> pour résoudre les problèmes en temps réel</li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation de l’espace de stockage</b> : refonte complète du mobilier et de l’organisation, réduction du temps de préparation de 30 %</li><li><b>Création de contenu vidéo</b> : réalisation d’une <b>vidéo récapitulative des prestations 2024</b>, renforçant la communication externe</li><li><b>Amélioration des interventions techniques</b> : résolution rapide des pannes sur les plateaux, assurant la continuité des émissions</li></ul><br></div>",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Gestion des stocks</b> : suivi rigoureux des entrées/sorties de <b>matériel audiovisuel</b> (caméras, prompteurs, caisses techniques)</li><li><b>Préparation des commandes</b> : assemblage et mise à disposition du matériel pour <b>prestations internes et externes</b></li><li><b>Contrôle qualité</b> : tests systématiques pour garantir la fiabilité des équipements</li><li><b>Maintenance atelier</b> : organisation et rangement optimisés de l’atelier pour améliorer la <b>productivité et l’efficacité</b></li><li><b>Support technique</b> : interventions sur <b>plateaux TV</b> pour résoudre les problèmes en temps réel</li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation de l’espace de stockage</b> : refonte complète du mobilier et de l’organisation, réduction du temps de préparation de <b>30&nbsp;%</b></li><li><b>Création de contenu vidéo</b> : réalisation d’une <b>vidéo récapitulative des prestations 2024</b>, renforçant la communication externe</li><li><b>Amélioration des interventions techniques</b> : résolution rapide des pannes sur les plateaux, assurant la continuité des émissions</li></ul></div>",
         "en": "AV equipment stock management, order prep and workshop optimization (−30% prep time). Created a summary video to document processes.",
         "pl": "Zarządzanie magazynem sprzętu AV, przygotowanie zamówień i optymalizacja warsztatu (−30% czasu przygotowania). Film podsumowujący procesy.",
         "es": "Gestión de stock de material AV, preparación de pedidos y optimización del taller (−30% de tiempo de prep.). Vídeo resumen de los procesos."
@@ -149,15 +188,15 @@
         "es": "Editor de vídeo / Operador de teleprompter"
       },
       "location": {
-        "fr": "Île-de-France",
-        "en": "Île-de-France",
-        "pl": "Île-de-France",
-        "es": "Isla de Francia"
+        "fr": "Paris (75)",
+        "en": "Paris (75)",
+        "pl": "Paryż (75)",
+        "es": "París (75)"
       },
       "startDate": "2023",
       "endDate": "2024",
       "description": {
-        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Montage vidéo</b> : réalisation de vidéos promotionnelles et tutoriels pour le secteur <b>corporate et institutionnel</b><b></b></li><li><b>Gestion du matériel</b> : réglages techniques du <b>prompteur, caméra, éclairage, micro et moniteur</b> sur tournages TV, plateaux d’interviews et événements corporate</li><li><b>Adaptation du discours</b> : ajustement du texte prompteur aux contraintes de <b>régie et de plateau</b><b></b></li><li><b>Collaboration</b> : travail étroit avec <b>réalisateurs et chefs de projet</b> pour assurer la fluidité des enregistrements</li></ul><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b><br></b></span></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation de la synchronisation prompteur/plateau</b>, réduisant les erreurs en direct</li><li><b>Montage de vidéos institutionnelles et tutoriels</b> pour plusieurs clients majeurs</li><li><b>Interventions techniques efficaces</b> sur événements en direct, garantissant la continuité des présentations</li></ul><br></div>",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Montage vidéo</b> : réalisation de vidéos promotionnelles et tutoriels pour le secteur <b>corporate et institutionnel</b></li><li><b>Gestion du matériel</b> : réglages techniques du <b>prompteur, caméra, éclairage, micro et moniteur</b> sur tournages TV, plateaux d’interviews et événements corporate</li><li><b>Adaptation du discours</b> : ajustement du texte prompteur aux contraintes de <b>régie et de plateau</b></li><li><b>Collaboration</b> : travail étroit avec <b>réalisateurs et chefs de projet</b> pour assurer la fluidité des enregistrements</li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation de la synchronisation prompteur/plateau</b> : réduisant les erreurs en direct</li><li><b>Montage de vidéos institutionnelles et tutoriels</b> : pour plusieurs clients majeurs</li><li><b>Interventions techniques efficaces</b> : sur événements en direct, garantissant la continuité des présentations</li></ul></div>",
         "en": "Video editing, graphic creation and teleprompter operation for live and corporate productions.",
         "pl": "Montaż wideo, grafika i obsługa promptera na produkcjach eventowych i corporate.",
         "es": "Edición de vídeo, creación gráfica y operación de teleprompter para eventos y corporate."
@@ -221,7 +260,7 @@
       "startDate": "2022",
       "endDate": "2022",
       "description": {
-        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><b><span style=\"font-size: 1rem\"><span style=\"color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\">Missions principales</span></span></b></p><ul><li><b>Captation de témoignages clients</b> et tournages en entreprise (<b>GH5, DJI Ronin</b>, intérieur/extérieur)</li><li><b>Préparation et test du matériel</b> : chargement des batteries, vérification des équipements avant tournage</li><li><b>Prise de son et lumière</b>, stabilisation d’image</li><li><b>Interaction avec les participants</b> : adaptation selon qu’ils soient déjà connus ou rencontrés pour la première fois</li><li><b>Montage vidéo</b> : création de contenus institutionnels destinés aux <b>franchisés et réseaux sociaux</b><b></b></li><li><b>Habillage graphique et animations</b> : intégration de visuels et motion design</li></ul><p><br></p><p><b><span style=\"font-size: 1rem\">Réalisations</span></b></p><ul><li><b>Optimisation du matériel et des réglages techniques</b> pour des tournages fluides</li><li><b>Captation naturelle des témoignages clients</b> grâce à une approche relationnelle adaptée</li><li><b>Montage de contenus institutionnels attractifs</b>, prêts à la diffusion sur les réseaux</li></ul></div>",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Captation de témoignages clients</b> : et tournages en entreprise (<b>GH5, DJI Ronin</b>, intérieur/extérieur)</li><li><b>Préparation et test du matériel</b> : chargement des batteries, vérification des équipements avant tournage</li><li><b>Prise de son et lumière</b> : stabilisation d’image</li><li><b>Interaction avec les participants</b> : adaptation selon qu’ils soient déjà connus ou rencontrés pour la première fois</li><li><b>Montage vidéo</b> : création de contenus institutionnels destinés aux <b>franchisés et réseaux sociaux</b></li><li><b>Habillage graphique et animations</b> : intégration de visuels et motion design</li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation du matériel et des réglages techniques</b> : pour des tournages fluides</li><li><b>Captation naturelle des témoignages clients</b> : grâce à une approche relationnelle adaptée</li><li><b>Montage de contenus institutionnels attractifs</b> : prêts à la diffusion sur les réseaux</li></ul></div>",
         "en": "Steadicam capture, interviews and editing for nutrition / wellness brand content.",
         "pl": "Zdjęcia Steadicam, wywiady i montaż dla marki nutrition / wellness.",
         "es": "Captación con Steadicam, entrevistas y montaje para marca de nutrición / bienestar."
@@ -246,21 +285,24 @@
         "es": "Editor de vídeo"
       },
       "location": {
-        "fr": "Paris"
+        "fr": "Paris (75)",
+        "en": "Paris (75)",
+        "pl": "Paryż (75)",
+        "es": "París (75)"
       },
       "startDate": "2022",
       "endDate": "2022",
       "description": {
-        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><b></b></p><p><b><span style=\"font-size: 1rem\">Missions principales</span></b></p><ul><li><b>Montage de vidéos virales</b> pour créateurs internationaux sur <b>Facebook, Instagram et YouTube</b><b></b></li><li><b>Application des standards Jellysmack</b> : formats <b>1:1</b>, AB testing (<b>AB1, AB2, AB3</b>), optimisations <b>SEO visuelles</b><b></b></li><li><b>Création de thumbnails et vignettes</b>, transitions dynamiques, effets typographiques, <b>habillage graphique</b></li></ul><p><br></p><p><b><span style=\"font-size: 1rem\">Réalisations</span></b></p><ul><li><b>Optimisation des vidéos courtes</b> pour maximiser la <b>visibilité et l’engagement</b><b></b></li><li>Respect des <b>délais serrés</b> tout en maintenant la qualité et la cohérence visuelle</li></ul></div>",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Montage de vidéos virales</b> : pour créateurs internationaux sur <b>Facebook, Instagram et YouTube</b></li><li><b>Application des standards Jellysmack</b> : formats <b>1:1</b>, AB testing (<b>AB1, AB2, AB3</b>), optimisations <b>SEO visuelles</b></li><li><b>Création de thumbnails et vignettes</b> : transitions dynamiques, effets typographiques, <b>habillage graphique</b></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Optimisation des vidéos courtes</b> : pour maximiser la <b>visibilité et l’engagement</b></li><li><b>Respect des délais serrés</b> : tout en maintenant la qualité et la cohérence visuelle</li></ul></div>",
         "en": "Editing for creators and influencers: social pacing, hooks, vertical and horizontal formats (Facebook, Shorts).",
         "pl": "Montaż dla twórców i influencerów: tempo social, hooki, formaty pionowe i poziome (Facebook, Shorts).",
         "es": "Edición para creadores e influencers: ritmo social, hooks, formatos verticales y horizontales (Facebook, Shorts)."
       },
       "technologies": [
-        "Premiere Pro",
-        "Social Media",
-        "Facebook",
-        "YouTube"
+        "Montage",
+        "Social",
+        "Thumbnails",
+        "AB testing"
       ],
       "media": []
     },
@@ -270,27 +312,30 @@
         "fr": "Sputnik France"
       },
       "role": {
-        "fr": "Monteur vidéo / Graphiste",
+        "fr": "🎬🖥️ Monteur / Graphiste",
         "en": "Video editor / Graphic designer",
         "pl": "Montażysta wideo / Grafik",
         "es": "Editor de vídeo / Diseñador gráfico"
       },
       "location": {
-        "fr": "Paris"
+        "fr": "Paris (75)",
+        "en": "Paris (75)",
+        "pl": "Paryż (75)",
+        "es": "París (75)"
       },
       "startDate": "2021",
       "endDate": "2022",
       "description": {
-        "fr": "Montage d’actualités et de reportages, habillage graphique et motion pour un média d’information.",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Montage d’émissions d’information</b> : séries web et reportages pour <b>YouTube</b></li><li><b>Installation technique complète</b> : caméras, éclairage, <b>sonorisation de plateau</b></li><li><b>Création de génériques</b> : <b>templates d’habillage (MOGRT)</b>, visuels promotionnels</li><li><b>Gestion des workflows rapides</b> : pour diffusion quotidienne</li><li><b>Travail avec invités controversés</b> : dont candidats présidentiels ou leurs équipes de communication</li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Réalisation complète de reportages et interviews</b> : du tournage au montage</li><li><b>Production de contenus graphiques et vidéos adaptés</b> : à la diffusion multilingue</li><li><b>Habillage et sous-titrage optimisés</b> : pour maintenir l’impact éditorial tout en respectant les délais</li></ul></div>",
         "en": "News and reportage editing, graphic packaging and motion for a news media outlet.",
         "pl": "Montaż newsów i reportaży, oprawa graficzna i motion dla medium informacyjnego.",
         "es": "Montaje de noticias y reportajes, packaging gráfico y motion para un medio de información."
       },
       "technologies": [
-        "Premiere Pro",
-        "After Effects",
-        "News",
-        "Motion"
+        "Montage",
+        "Graphisme",
+        "MOGRT",
+        "YouTube"
       ],
       "media": []
     },
@@ -300,29 +345,102 @@
         "fr": "Dietplus"
       },
       "role": {
-        "fr": "Monteur vidéo",
+        "fr": "🎬 Monteur Vidéo",
         "en": "Video editor",
         "pl": "Montażysta wideo",
         "es": "Editor de vídeo"
       },
       "location": {
-        "fr": "France",
-        "en": "France",
-        "pl": "Francja",
-        "es": "Francia"
+        "fr": "Paris (75)",
+        "en": "Paris (75)",
+        "pl": "Paryż (75)",
+        "es": "París (75)"
       },
       "startDate": "2018",
       "endDate": "2019",
       "description": {
-        "fr": "Production vidéo et supports graphiques pour la communication de marque.",
-        "en": "Video production and graphic assets for brand communication.",
-        "pl": "Produkcja wideo i materiały graficzne do komunikacji marki.",
-        "es": "Producción de vídeo y soportes gráficos para la comunicación de marca."
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Missions principales</b></span></p><ul><li><b>Conception et montage de vidéos</b> : <b>promotionnelles</b>, <b>tutoriels et formations internes</b></li><li><b>Maîtrise de la charte graphique</b> : <b>storytelling marketing</b></li><li><b>Préparation et gestion du matériel</b> : caméras, lumières, son, stabilisation</li><li><b>Coordination</b> : avec équipes internes et franchisés</li><li><b>Adaptation des vidéos aux formats</b> : <b>Facebook, Instagram, YouTube, IGTV, Story</b></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Réalisations</b></span></p><ul><li><b>Production de contenus B2C et B2B</b></li><li><b>Vidéos de présentation et témoignages de franchisés</b> : diffusion web et Espagne</li><li><b>Plus de 150 vidéos de formation interne</b> : durée <b>1–30 min</b></li><li><b>Colorgrading et habillage graphique</b> optimisés</li></ul></div>",
+        "en": "Video production and graphic assets for brand communication; internal training videos and social formats.",
+        "pl": "Produkcja wideo i materiały graficzne do komunikacji marki; filmy szkoleniowe i formaty social.",
+        "es": "Producción de vídeo y soportes gráficos para la comunicación de marca; formaciones internas y formatos sociales."
       },
       "technologies": [
         "Montage",
-        "Photoshop",
-        "Illustrator"
+        "Formation",
+        "Social",
+        "Color grading"
+      ],
+      "media": []
+    },
+    {
+      "id": "exp-com-multimedia",
+      "company": {
+        "fr": "CDD, Alternance et CDI",
+        "en": "Fixed-term, apprenticeship & permanent roles",
+        "pl": "CDD, praktyki i etat",
+        "es": "CDD, prácticas y CDI"
+      },
+      "role": {
+        "fr": "🖌️🖥️ Expériences en communication et multimédia",
+        "en": "Communications and multimedia experience",
+        "pl": "Doświadczenie w komunikacji i multimediach",
+        "es": "Experiencia en comunicación y multimedia"
+      },
+      "location": {
+        "fr": "Île-de-France",
+        "en": "Île-de-France",
+        "pl": "Île-de-France",
+        "es": "Isla de Francia"
+      },
+      "startDate": "2009",
+      "endDate": "2018",
+      "description": {
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><ul><li><b>Responsable Communication – Projective (75) (2017–2018)</b> : mise en place pôle communication, création graphique et <b>vidéos corporate</b>, organisation voyages internationaux (<b>NY, Copenhague, Malmö</b>)</li><li><b>Infographiste – Mairie de Roissy-en-France (95) (2014–2015)</b> : conception print, montage vidéo pour festival <b>«&nbsp;Les Visitables&nbsp;»</b>, conseils stratégiques et coordination avec équipes municipales</li><li><b>Chargé de communication – ATOL Les Opticiens (92) &amp; AD REM Technology (75) (2011–2013)</b> : création visuels print et <b>vidéos produit</b>, rédaction web, gestion newsletter interne, participation à salons</li><li><b>Assistant Communication – Mairie de Roissy-en-France (95) (2010–2011)</b> : captation photo, création affiches/plaquettes, gestion <b>site web/blog</b> et fichier presse</li><li><b>Spécialiste – Apple Store Paris (75) (2009–2011)</b> : accompagnement clients, démonstrations logiciels créatifs (<b>Final Cut, iMovie, suite Adobe</b>)</li></ul></div>",
+        "en": "Communications lead, graphic design, municipal and retail communication roles across Projective, Roissy-en-France, ATOL, AD REM and Apple Store Paris.",
+        "pl": "Role komunikacyjne i graficzne: Projective, Roissy-en-France, ATOL, AD REM oraz Apple Store Paris.",
+        "es": "Roles de comunicación y diseño: Projective, Roissy-en-France, ATOL, AD REM y Apple Store París."
+      },
+      "technologies": [
+        "Communication",
+        "Graphisme",
+        "Print",
+        "Vidéo"
+      ],
+      "media": []
+    },
+    {
+      "id": "exp-atypical",
+      "company": {
+        "fr": "Australie · France",
+        "en": "Australia · France",
+        "pl": "Australia · Francja",
+        "es": "Australia · Francia"
+      },
+      "role": {
+        "fr": "✈️🌱 Autres expériences et parcours atypique",
+        "en": "Other experience and atypical path",
+        "pl": "Inne doświadczenia i nietypowa ścieżka",
+        "es": "Otras experiencias y trayectoria atípica"
+      },
+      "location": {
+        "fr": "Australie · France",
+        "en": "Australia · France",
+        "pl": "Australia · Francja",
+        "es": "Australia · Francia"
+      },
+      "startDate": "2006",
+      "endDate": "2017",
+      "description": {
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>Australie (2015–2017)</b></span></p><ul><li><b>Travaux saisonniers et polyvalents</b> : ferme (cueillette et entretien de fruits et légumes : finger limes, oignons, salades, pommes), jardinage, récupération de miel dans une <b>ruche domestique</b>, accompagnement d’une <b>attrapeuse de serpents</b>, manipulation d’un <b>carpet snake</b>, observation et immersion dans la <b>faune et la flore australienne</b></li><li><b>Communication visuelle</b> pour start-up locales (<b>Motion Journal, Go-Frais</b>)</li><li><b>Développement de l’anglais oral</b> et forte <b>adaptabilité interculturelle</b></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><b>France (2006–2015)</b></span></p><ul><li><b>Gibus Club et boîtes de nuit</b> : bar &amp; vestiaires</li><li><b>Disneyland Paris</b> : restauration, attractions, bagagerie, réceptions hôtels, animation de personnages Disney (<b>Baloo, Tigrou, le Génie…</b>)</li><li><b>Buffalo Grill et McDonald’s</b> : service, caisse, cuisine</li></ul></div>",
+        "en": "Seasonal work in Australia (farm, wildlife, local startups) and service roles in France (nightlife, Disneyland Paris, restaurants).",
+        "pl": "Praca sezonowa w Australii (farma, przyroda, lokalne startupy) oraz role usługowe we Francji (kluby, Disneyland, restauracje).",
+        "es": "Trabajo estacional en Australia (granja, fauna, startups locales) y roles de servicio en Francia (vida nocturna, Disneyland París, restauración)."
+      },
+      "technologies": [
+        "Polyvalence",
+        "Anglais",
+        "Service",
+        "Adaptabilité"
       ],
       "media": []
     }
@@ -1835,11 +1953,6 @@
     "heroEmailLabel": {
       "fr": "Envoyer un email"
     },
-    "showHeroX": true,
-    "heroXLabel": {
-      "fr": "X / Twitter"
-    },
-    "xProfileUrl": "https://x.com/patrickroziel",
     "extraDocuments": {
       "personalCv": {
         "url": null,
@@ -1935,15 +2048,7 @@
       "en": "Open to missions",
       "pl": "Otwarty na projekty",
       "es": "Abierto a misiones"
-    },
-    "showWidgetXFeed": true,
-    "widgetXFeedTitle": {
-      "fr": "Sur X",
-      "en": "On X",
-      "pl": "Na X",
-      "es": "En X"
-    },
-    "xUsername": "@patrickroziel"
+    }
   },
   "quotes": {
     "sectionEyebrow": {
@@ -2089,29 +2194,77 @@
     {
       "id": "feat-1",
       "title": {
-        "fr": "Timelapse"
+        "fr": "Motion Design",
+        "en": "Motion Design",
+        "pl": "Motion Design",
+        "es": "Motion Design"
       },
-      "videoType": "file",
-      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841914/patrick-roziel/showreel/gz0djttjwfj9hkffofxa.mov",
-      "fallbackImageUrl": null
-    },
-    {
-      "id": "feat-2",
-      "title": {
-        "fr": "Motion Design"
+      "description": {
+        "fr": "Habillages, lower-thirds et animations de marque.",
+        "en": "Packaging, lower-thirds and brand animation.",
+        "pl": "Oprawy, lower-thirds i animacje marki.",
+        "es": "Packs, lower-thirds y animación de marca."
       },
       "videoType": "file",
       "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784748535/pcqayn0d8gw7cmssuqmy.mov",
       "fallbackImageUrl": null
     },
     {
-      "id": "feat-3",
+      "id": "feat-2",
       "title": {
-        "fr": "Social & AI"
+        "fr": "Dynamic Short-Form",
+        "en": "Dynamic Short-Form",
+        "pl": "Dynamic Short-Form",
+        "es": "Dynamic Short-Form"
+      },
+      "description": {
+        "fr": "Reels, Shorts et formats verticaux rythmés.",
+        "en": "Reels, Shorts and paced vertical formats.",
+        "pl": "Reels, Shorts i dynamiczne formaty pionowe.",
+        "es": "Reels, Shorts y formatos verticales con ritmo."
       },
       "videoType": "file",
       "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841588/patrick-roziel/showreel/ckcjdggyszoaeknsrm3c.mp4",
       "fallbackImageUrl": null
+    },
+    {
+      "id": "feat-3",
+      "title": {
+        "fr": "AI-Enhanced Content",
+        "en": "AI-Enhanced Content",
+        "pl": "AI-Enhanced Content",
+        "es": "AI-Enhanced Content"
+      },
+      "description": {
+        "fr": "Génération, compositing et workflows assistés par l’IA.",
+        "en": "Generation, compositing and AI-assisted workflows.",
+        "pl": "Generowanie, compositing i workflow wspierane przez AI.",
+        "es": "Generación, compositing y flujos asistidos por IA."
+      },
+      "videoType": "file",
+      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841914/patrick-roziel/showreel/gz0djttjwfj9hkffofxa.mov",
+      "fallbackImageUrl": null
     }
-  ]
+  ],
+  "social": {
+    "eyebrow": {
+      "fr": "Fil social",
+      "en": "Social feed",
+      "pl": "Kanał",
+      "es": "Feed social"
+    },
+    "title": {
+      "fr": "Médias",
+      "en": "Media",
+      "pl": "Media",
+      "es": "Medios"
+    },
+    "description": {
+      "fr": "Notes, documents téléchargeables et vidéos — un univers à part du portfolio.",
+      "en": "Notes, downloadable documents and videos — a separate space from the portfolio.",
+      "pl": "Notatki, dokumenty do pobrania i filmy — osobny świat poza portfolio.",
+      "es": "Notas, documentos descargables y vídeos — un universo aparte del portfolio."
+    }
+  },
+  "socialPosts": []
 }

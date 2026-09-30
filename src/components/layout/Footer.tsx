@@ -1,18 +1,29 @@
 "use client";
 
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { useUniverse } from "@/components/layout/UniverseSwitch";
+import { cn } from "@/lib/utils";
 
 export function Footer() {
-  const { data, resetToDefaults, editMode } = usePortfolio();
+  const { data, resetToDefaults, editMode, t } = usePortfolio();
+  const universe = useUniverse();
   const year = new Date().getFullYear();
+  const name =
+    data.profile.name.replace(/<[^>]+>/g, "").trim() || data.profile.name;
 
   return (
-    <footer className="no-print relative z-10 border-t border-white/12 bg-gradient-to-t from-black/40 to-transparent pb-28 pt-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] lg:pb-24">
+    <footer
+      className={cn(
+        "no-print relative z-10 border-t border-white/12 bg-gradient-to-t from-black/40 to-transparent pt-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]",
+        universe === "medias" ? "pb-10" : "pb-28 lg:pb-24"
+      )}
+    >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p className="text-xs text-zinc-500">
-          © {year}{" "}
-          {data.profile.name.replace(/<[^>]+>/g, "").trim() || data.profile.name}
-          . Portfolio personnel — glassmorphism.
+          © {year} {name}
+          {universe === "medias"
+            ? ` · ${t("nav.medias")}`
+            : " · Portfolio personnel — glassmorphism."}
         </p>
         {editMode && (
           <button

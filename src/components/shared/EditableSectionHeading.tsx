@@ -12,12 +12,16 @@ type EditableSectionHeadingProps = {
   eyebrow: MaybeLocalized;
   onEyebrowChange: (next: ReturnType<typeof liftToLocalized>) => void;
   title: string;
+  /** Optional localized title (edit mode) */
+  titleValue?: MaybeLocalized;
+  onTitleChange?: (next: ReturnType<typeof liftToLocalized>) => void;
   /** Optional description under the title */
   description?: MaybeLocalized;
   onDescriptionChange?: (next: ReturnType<typeof liftToLocalized>) => void;
   descriptionFallback?: string;
   action?: React.ReactNode;
   className?: string;
+  eyebrowClassName?: string;
 };
 
 /**
@@ -27,11 +31,14 @@ export function EditableSectionHeading({
   eyebrow,
   onEyebrowChange,
   title,
+  titleValue,
+  onTitleChange,
   description,
   onDescriptionChange,
   descriptionFallback,
   action,
   className,
+  eyebrowClassName,
 }: EditableSectionHeadingProps) {
   const { l } = usePortfolio();
 
@@ -45,8 +52,11 @@ export function EditableSectionHeading({
     <>
       <SectionHeading
         className={className}
+        eyebrowClassName={eyebrowClassName}
         eyebrow={eyebrowText || undefined}
-        title={title}
+        title={
+          titleValue != null ? l(titleValue).trim() || title : title
+        }
         description={descriptionText}
         action={action}
       />
@@ -58,6 +68,14 @@ export function EditableSectionHeading({
             onChange={onEyebrowChange}
             placeholder="Ex. International, Expertise…"
           />
+          {onTitleChange && (
+            <LocalizedField
+              label="Titre"
+              value={titleValue ?? title}
+              onChange={onTitleChange}
+              placeholder={title}
+            />
+          )}
           {onDescriptionChange && (
             <LocalizedField
               label="Description sous le titre"

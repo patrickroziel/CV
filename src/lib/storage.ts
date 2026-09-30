@@ -31,6 +31,9 @@ import type {
   SectionLabelsConfig,
   Skill,
   SkillIcon,
+  SocialConfig,
+  SocialPost,
+  SocialPostFileKind,
 } from "./types";
 import {
   DATA_VERSION,
@@ -46,6 +49,8 @@ import {
   DEFAULT_QUICK_CONTACT_LINKS,
   DEFAULT_QUOTES,
   DEFAULT_SECTION_LABELS,
+  DEFAULT_SOCIAL,
+  DEFAULT_SOCIAL_POSTS,
   DEFAULT_WIDGET_SKILL_TAGS,
   EXTRA_DOCUMENT_IDS,
   NAV_ITEM_IDS,
@@ -495,13 +500,11 @@ function liftContact(c: ContactConfig): ContactConfig {
     heroCvLabel: liftToLocalized(c.heroCvLabel),
     heroPhoneLabel: liftToLocalized(c.heroPhoneLabel),
     heroEmailLabel: liftToLocalized(c.heroEmailLabel),
-    heroXLabel: liftToLocalized(c.heroXLabel),
     extraDocuments: docs,
     widgetQuickContactTitle: liftToLocalized(c.widgetQuickContactTitle),
     widgetSkillsTitle: liftToLocalized(c.widgetSkillsTitle),
     widgetAvailabilityTitle: liftToLocalized(c.widgetAvailabilityTitle),
     widgetAvailabilityText: liftToLocalized(c.widgetAvailabilityText),
-    widgetXFeedTitle: liftToLocalized(c.widgetXFeedTitle),
     quickContactLinks: (c.quickContactLinks ?? []).map((l) => ({
       ...l,
       label: liftToLocalized(l.label),
@@ -565,6 +568,90 @@ export function normalizeNav(
   return out;
 }
 
+export function normalizeSocial(
+  raw: Partial<SocialConfig> | undefined
+): SocialConfig {
+  return {
+    eyebrow: liftToLocalized(
+      raw?.eyebrow != null ? (raw.eyebrow as never) : DEFAULT_SOCIAL.eyebrow
+    ),
+    title: liftToLocalized(
+      raw?.title != null ? (raw.title as never) : DEFAULT_SOCIAL.title
+    ),
+    description: liftToLocalized(
+      raw?.description != null
+        ? (raw.description as never)
+        : DEFAULT_SOCIAL.description
+    ),
+  };
+}
+
+function inferSocialFileKind(
+  url: string | null,
+  hinted: unknown
+): SocialPostFileKind | null {
+  if (hinted === "pdf" || hinted === "image") return hinted;
+  if (!url) return null;
+  const lower = url.toLowerCase();
+  if (lower.includes(".pdf") || /\/raw\//i.test(lower)) return "pdf";
+  if (/\.(png|jpe?g|webp|gif|avif|svg|bmp)(\?|#|$)/i.test(lower)) return "image";
+  return "pdf";
+}
+
+export function normalizeSocialPost(
+  raw: Partial<SocialPost> | undefined,
+  index = 0
+): SocialPost | null {
+  if (!raw || typeof raw !== "object") return null;
+  const youtubeUrl =
+    typeof raw.youtubeUrl === "string" && raw.youtubeUrl.trim()
+      ? raw.youtubeUrl.trim()
+      : null;
+  const fileUrl =
+    typeof raw.fileUrl === "string" && raw.fileUrl.trim()
+      ? raw.fileUrl.trim()
+      : null;
+  const dateRaw = typeof raw.date === "string" ? raw.date.trim() : "";
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(dateRaw)
+    ? dateRaw
+    : new Date().toISOString().slice(0, 10);
+  const fileName =
+    typeof raw.fileName === "string" && raw.fileName.trim()
+      ? raw.fileName.trim()
+      : null;
+  return {
+    id:
+      typeof raw.id === "string" && raw.id
+        ? raw.id
+        : `social-${index}-${createId().slice(0, 8)}`,
+    title: liftToLocalized(raw.title ?? ""),
+    description: liftToLocalized(raw.description ?? ""),
+    date,
+    youtubeUrl,
+    fileUrl,
+    fileKind: fileUrl ? inferSocialFileKind(fileUrl, raw.fileKind) : null,
+    fileName,
+    tags: Array.isArray(raw.tags)
+      ? raw.tags
+          .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
+          .filter(Boolean)
+      : [],
+    visible: typeof raw.visible === "boolean" ? raw.visible : true,
+    order: typeof raw.order === "number" && !Number.isNaN(raw.order) ? raw.order : index,
+  };
+}
+
+export function normalizeSocialPosts(raw: unknown): SocialPost[] {
+  if (!Array.isArray(raw)) {
+    return DEFAULT_SOCIAL_POSTS.map((p) => ({ ...p }));
+  }
+  return raw
+    .map((item, i) =>
+      normalizeSocialPost(item as Partial<SocialPost> | undefined, i)
+    )
+    .filter((p): p is SocialPost => Boolean(p));
+}
+
 export function normalizeComingSoon(
   raw: Partial<ComingSoonConfig> | undefined
 ): ComingSoonConfig {
@@ -584,8 +671,28 @@ export function normalizeComingSoon(
   };
 }
 
+/** Drop legacy X/Twitter account fields from older localStorage / snapshots. */
+function omitLegacyXAccount(
+  raw: Partial<ContactConfig> | undefined
+): Partial<ContactConfig> {
+  if (!raw || typeof raw !== "object") return {};
+  const rest = { ...(raw as Record<string, unknown>) };
+  for (const key of [
+    "showHeroX",
+    "heroXLabel",
+    "xProfileUrl",
+    "showWidgetXFeed",
+    "widgetXFeedTitle",
+    "xUsername",
+  ]) {
+    delete rest[key];
+  }
+  return rest as Partial<ContactConfig>;
+}
+
 function normalizeContact(raw: Partial<ContactConfig> | undefined): ContactConfig {
-  const base = { ...DEFAULT_CONTACT, ...raw };
+  const cleaned = omitLegacyXAccount(raw);
+  const base = { ...DEFAULT_CONTACT, ...cleaned };
   return liftContact({
     ...base,
     extraDocuments: normalizeExtraDocuments(raw?.extraDocuments),
@@ -938,6 +1045,10 @@ function normalizeFeatureVideos(raw: unknown): FeatureVideo[] {
       title: liftToLocalized(
         (item.title as string | undefined) || (slot.title as string)
       ),
+      description: liftToLocalized(
+        (item.description as string | undefined) ||
+          (slot.description as string | undefined)
+      ),
       videoType,
       videoUrl: videoType === "none" ? null : videoUrl,
       fallbackImageUrl: videoType === "none" ? null : fallbackImageUrl,
@@ -1055,9 +1166,29 @@ export function loadPortfolio(): PortfolioData {
               "")
             : "",
       },
-      experiences: (parsed.experiences ?? DEFAULT_PORTFOLIO.experiences).map(
-        normalizeExperience
-      ),
+      experiences: (() => {
+        // v30–31: full CV experience rewrite (job search + com block + atypical path)
+        if ((parsed.version ?? 0) < 31) {
+          const prevMedia = new Map(
+            (parsed.experiences ?? []).map((e) => [
+              e.id,
+              normalizeMediaItems(e.media),
+            ])
+          );
+          return DEFAULT_PORTFOLIO.experiences.map((e) =>
+            normalizeExperience({
+              ...e,
+              media:
+                prevMedia.get(e.id)?.length
+                  ? prevMedia.get(e.id)
+                  : e.media,
+            })
+          );
+        }
+        return (parsed.experiences ?? DEFAULT_PORTFOLIO.experiences).map(
+          normalizeExperience
+        );
+      })(),
       projects: (parsed.projects ?? DEFAULT_PORTFOLIO.projects).map(
         normalizeProject
       ),
@@ -1088,7 +1219,17 @@ export function loadPortfolio(): PortfolioData {
         parsed.mainShowreel,
         parsed.profile?.showreelUrl
       ),
-      featureVideos: normalizeFeatureVideos(parsed.featureVideos),
+      // v33–34: rename + remap the 3 feature cards (Motion / Short-Form / AI)
+      featureVideos:
+        (parsed.version ?? 0) < 34
+          ? structuredClone(DEFAULT_PORTFOLIO.featureVideos)
+          : normalizeFeatureVideos(parsed.featureVideos),
+      social: normalizeSocial(
+        (parsed as { social?: Partial<SocialConfig> }).social
+      ),
+      socialPosts: normalizeSocialPosts(
+        (parsed as { socialPosts?: unknown }).socialPosts
+      ),
     };
 
     // Fill missing EN/PL/ES from defaults when IDs match (keep user FR edits)
@@ -1245,6 +1386,38 @@ function enrichFromDefaults(data: PortfolioData): PortfolioData {
         d.comingSoon?.title ?? DEFAULT_COMING_SOON.title
       ),
     },
+    featureVideos: (data.featureVideos ?? []).map((video, i) => {
+      const seed = (d.featureVideos ?? [])[i];
+      if (!seed) return video;
+      return {
+        ...video,
+        title: fill(video.title, seed.title),
+        description:
+          video.description != null || seed.description != null
+            ? fill(video.description, seed.description)
+            : video.description,
+      };
+    }),
+    social: {
+      eyebrow: fill(
+        data.social?.eyebrow,
+        d.social?.eyebrow ?? DEFAULT_SOCIAL.eyebrow
+      ),
+      title: fill(data.social?.title, d.social?.title ?? DEFAULT_SOCIAL.title),
+      description: fill(
+        data.social?.description,
+        d.social?.description ?? DEFAULT_SOCIAL.description
+      ),
+    },
+    socialPosts: (data.socialPosts ?? []).map((p) => {
+      const seed = (d.socialPosts ?? []).find((x) => x.id === p.id);
+      if (!seed) return p;
+      return {
+        ...p,
+        title: fill(p.title, seed.title),
+        description: fill(p.description, seed.description),
+      };
+    }),
     contact: {
       ...data.contact,
       sectionEyebrow: fill(data.contact.sectionEyebrow, d.contact.sectionEyebrow),
@@ -1263,7 +1436,6 @@ function enrichFromDefaults(data: PortfolioData): PortfolioData {
         d.contact.heroShowreelLabel
       ),
       heroCvLabel: fill(data.contact.heroCvLabel, d.contact.heroCvLabel),
-      heroXLabel: fill(data.contact.heroXLabel, d.contact.heroXLabel),
       widgetQuickContactTitle: fill(
         data.contact.widgetQuickContactTitle,
         d.contact.widgetQuickContactTitle
@@ -1279,10 +1451,6 @@ function enrichFromDefaults(data: PortfolioData): PortfolioData {
       widgetAvailabilityText: fill(
         data.contact.widgetAvailabilityText,
         d.contact.widgetAvailabilityText
-      ),
-      widgetXFeedTitle: fill(
-        data.contact.widgetXFeedTitle,
-        d.contact.widgetXFeedTitle
       ),
     },
   };

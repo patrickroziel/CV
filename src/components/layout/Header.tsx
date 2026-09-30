@@ -11,10 +11,11 @@ import {
   Menu,
   Pencil,
   PanelTop,
+  Radio,
   Rocket,
   X,
 } from "lucide-react";
-import { cn, printCv } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { WallpaperEditor } from "@/components/background/WallpaperEditor";
@@ -23,6 +24,10 @@ import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { EditLocaleBar } from "@/components/i18n/EditLocaleBar";
 import { NavSettingsPanel } from "@/components/layout/NavSettingsPanel";
 import { ComingSoonSettingsPanel } from "@/components/coming-soon/ComingSoonSettingsPanel";
+import {
+  UniverseSwitch,
+  useUniverse,
+} from "@/components/layout/UniverseSwitch";
 import { downloadPortfolioSnapshot } from "@/lib/storage";
 import {
   DEFAULT_COMING_SOON,
@@ -44,6 +49,8 @@ export function Header() {
     updateComingSoon,
   } = usePortfolio();
   const pathname = usePathname();
+  const universe = useUniverse();
+  const isMedias = universe === "medias";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("hero");
@@ -118,12 +125,22 @@ export function Header() {
       className={cn(
         "no-print fixed inset-x-0 top-0 z-40 transition-all duration-300",
         scrolled || editMode
-          ? "border-b border-white/12 bg-black/40 shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-2xl supports-[backdrop-filter]:bg-black/30"
+          ? cn(
+              "border-b bg-black/40 shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-2xl supports-[backdrop-filter]:bg-black/30",
+              isMedias ? "border-violet-300/20" : "border-white/12"
+            )
           : "bg-transparent"
       )}
     >
       {editMode && (
-        <div className="border-b border-teal-300/20 bg-teal-300/15 px-4 py-1.5 text-center text-xs font-medium text-teal-100 backdrop-blur-md">
+        <div
+          className={cn(
+            "border-b px-4 py-1.5 text-center text-xs font-medium backdrop-blur-md",
+            isMedias
+              ? "border-violet-300/20 bg-violet-400/15 text-violet-100"
+              : "border-teal-300/20 bg-teal-300/15 text-teal-100"
+          )}
+        >
           <span className="inline-flex flex-wrap items-center justify-center gap-2">
             {t("edit.modeOn")}
             <span className="text-teal-200/50">·</span>
@@ -148,18 +165,34 @@ export function Header() {
       )}
       <EditLocaleBar />
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link
-          href="/#hero"
-          className="flex items-center gap-2 font-semibold tracking-tight text-zinc-50"
-        >
-          <span className="glass-chip flex h-9 w-9 items-center justify-center rounded-2xl text-teal-300 shadow-lg">
-            <Clapperboard className="h-4 w-4" />
-          </span>
-          <span className="hidden sm:inline">Patrick Roziel</span>
-          <span className="sm:hidden">PR</span>
-        </Link>
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <Link
+            href={isMedias ? "/medias" : "/#hero"}
+            className="flex items-center gap-2 font-semibold tracking-tight text-zinc-50"
+          >
+            <span
+              className={cn(
+                "glass-chip flex h-9 w-9 items-center justify-center rounded-2xl shadow-lg",
+                isMedias ? "text-violet-300" : "text-teal-300"
+              )}
+            >
+              {isMedias ? (
+                <Radio className="h-4 w-4" />
+              ) : (
+                <Clapperboard className="h-4 w-4" />
+              )}
+            </span>
+            <span className="hidden sm:inline">Patrick Roziel</span>
+          </Link>
+          <UniverseSwitch />
+        </div>
 
-        <nav className="hidden items-center gap-0.5 lg:flex">
+        <nav
+          className={cn(
+            "hidden items-center gap-0.5 lg:flex",
+            isMedias && "lg:hidden"
+          )}
+        >
           {visibleLinks.map((link) => {
             const isGallery = link.id === "gallery";
             const isActive = isGallery
@@ -269,15 +302,6 @@ export function Header() {
               Export JSON
             </Button>
           </EditGate>
-          <Button
-            variant="outline"
-            size="sm"
-            className="hidden sm:inline-flex"
-            onClick={() => printCv()}
-          >
-            <FileDown className="h-3.5 w-3.5" />
-            PDF
-          </Button>
           {editAllowed && (
             <Button
               variant={editMode ? "default" : "secondary"}
@@ -316,7 +340,12 @@ export function Header() {
             <LanguageSwitcher />
           </div>
           <nav className="flex flex-col gap-1">
-            {visibleLinks.map((link) => {
+            {isMedias ? (
+              <p className="px-3 py-2 text-xs text-violet-200/80">
+                {t("medias.mediasHint")}
+              </p>
+            ) : (
+              visibleLinks.map((link) => {
               const label = resolveLabel(link.id, link.i18nKey);
               if (editMode) {
                 return (
@@ -355,7 +384,8 @@ export function Header() {
                   {label}
                 </a>
               );
-            })}
+            })
+            )}
             <EditGate>
               <Button
                 variant="outline"
@@ -394,18 +424,6 @@ export function Header() {
                 Apparence
               </Button>
             </EditGate>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-1 sm:hidden"
-              onClick={() => {
-                setOpen(false);
-                printCv();
-              }}
-            >
-              <FileDown className="h-3.5 w-3.5" />
-              Exporter PDF
-            </Button>
           </nav>
         </div>
       )}

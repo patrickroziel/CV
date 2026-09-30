@@ -50,6 +50,7 @@ import {
 
 type MediaSlot = {
   title: Translatable;
+  description?: Translatable;
   videoType: FeatureVideoType;
   videoUrl: string | null;
   fallbackImageUrl?: string | null;
@@ -582,6 +583,7 @@ function FeatureVideoCard({
 }) {
   const { l } = usePortfolio();
   const title = l(video.title);
+  const description = l(video.description);
 
   return (
     <motion.div
@@ -608,19 +610,25 @@ function FeatureVideoCard({
             aria-hidden
           />
 
-          {/* Title as glass badge */}
+          {/* Title + short description as glass badge */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-1.5 sm:p-3.5 md:p-4">
             <span
               className={cn(
-                "glass-chip inline-flex max-w-full items-center justify-center",
-                "rounded-full px-2 py-1 sm:px-3.5 sm:py-1.5 md:px-4 md:py-2",
+                "glass-chip inline-flex max-w-full flex-col items-center justify-center",
+                "rounded-2xl px-2 py-1 sm:rounded-full sm:px-3.5 sm:py-1.5 md:px-4 md:py-2",
                 "border border-white/18",
-                "text-center text-[10px] font-semibold leading-snug tracking-tight text-zinc-50",
-                "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.55)]",
-                "sm:text-xs md:text-sm"
+                "text-center font-semibold leading-snug tracking-tight text-zinc-50",
+                "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.55)]"
               )}
             >
-              <span className="truncate">{title}</span>
+              <span className="max-w-full truncate text-[10px] sm:text-xs md:text-sm">
+                {title}
+              </span>
+              {description ? (
+                <span className="mt-0.5 max-w-full text-[10px] font-normal leading-tight text-zinc-200/80 max-sm:hidden sm:line-clamp-2 md:text-[11px]">
+                  {description}
+                </span>
+              ) : null}
             </span>
           </div>
         </div>
@@ -658,7 +666,11 @@ function cleanSlot(
   videoType: FeatureVideoType,
   videoUrl: string | null,
   label: string,
-  options?: { allowX?: boolean; fallbackImageUrl?: string | null }
+  options?: {
+    allowX?: boolean;
+    fallbackImageUrl?: string | null;
+    description?: Translatable;
+  }
 ): { ok: true; slot: MediaSlot } | { ok: false; error: string } {
   let type = videoType;
   let url = videoUrl;
@@ -668,6 +680,7 @@ function cleanSlot(
     options.fallbackImageUrl.trim()
       ? options.fallbackImageUrl.trim()
       : null;
+  const description = options?.description;
 
   // Feature cards: drop legacy X
   if (!allowX && type === "x") {
@@ -707,6 +720,8 @@ function cleanSlot(
     ok: true,
     slot: {
       title: getL(title).trim() ? title : label,
+      description:
+        description && getL(description).trim() ? description : undefined,
       videoType: type,
       videoUrl: type === "none" ? null : url,
       fallbackImageUrl: type === "none" ? null : fallback,
@@ -717,19 +732,23 @@ function cleanSlot(
 function SlotEditor({
   heading,
   title,
+  description,
   videoType,
   videoUrl,
   fallbackImageUrl,
   onChange,
   types = MAIN_VIDEO_TYPES,
+  showDescription = false,
 }: {
   heading: string;
   title: Translatable;
+  description?: Translatable;
   videoType: FeatureVideoType;
   videoUrl: string | null;
   fallbackImageUrl?: string | null;
   onChange: (partial: Partial<MediaSlot>) => void;
   types?: typeof MAIN_VIDEO_TYPES;
+  showDescription?: boolean;
 }) {
   const cols =
     types.length <= 3 ? "grid-cols-3" : "grid-cols-4";
@@ -745,6 +764,17 @@ function SlotEditor({
         onChange={(next) => onChange({ title: next })}
         placeholder="Ex. Showreel, Motion design…"
       />
+      {showDescription ? (
+        <LocalizedField
+          label="Description courte"
+          value={description}
+          onChange={(next) => onChange({ description: next })}
+          placeholder="Ex. Habillages, lower-thirds et animations de marque."
+          multiline
+          rows={2}
+          plain
+        />
+      ) : null}
       <div className="grid gap-2">
         <Label>Type de média</Label>
         <div className={cn("grid gap-1.5", cols)}>
@@ -896,6 +926,7 @@ export function ShowreelEmbed({ className }: { className?: string }) {
         {
           allowX: false,
           fallbackImageUrl: f.fallbackImageUrl,
+          description: f.description,
         }
       );
       if (!r.ok) {
@@ -1020,12 +1051,14 @@ export function ShowreelEmbed({ className }: { className?: string }) {
                 key={feat.id}
                 heading={`Carte ${index + 1}`}
                 title={feat.title}
+                description={feat.description}
                 videoType={
                   feat.videoType === "x" ? "none" : feat.videoType
                 }
                 videoUrl={feat.videoType === "x" ? null : feat.videoUrl}
                 fallbackImageUrl={feat.fallbackImageUrl}
                 types={FEATURE_VIDEO_TYPES}
+                showDescription
                 onChange={(partial) =>
                   setDraftFeatures((list) =>
                     list.map((f, i) =>

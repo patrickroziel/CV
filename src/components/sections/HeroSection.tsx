@@ -38,7 +38,7 @@ import {
 } from "@/components/sections/hero/HeroGlassLayers";
 import { HeroPhotoWaves } from "@/components/sections/hero/HeroPhotoWaves";
 import { ProfilePhotoAura } from "@/components/sections/hero/ProfilePhotoAura";
-import { createId, printCv, xProfileHref } from "@/lib/utils";
+import { createId, printCv } from "@/lib/utils";
 import type { HeroBadge, Profile } from "@/lib/types";
 import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
 import { RichTextField } from "@/components/i18n/RichTextField";
@@ -56,19 +56,6 @@ import {
   resolveHeroFontStack,
   type QuickContactLink,
 } from "@/lib/types";
-
-function XLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.913L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
-    </svg>
-  );
-}
 
 export function HeroSection() {
   const {
@@ -99,11 +86,6 @@ export function HeroSection() {
   const [heroEmailLabel, setHeroEmailLabel] = useState<LocalizedString>(
     liftToLocalized(c.heroEmailLabel)
   );
-  const [showHeroX, setShowHeroX] = useState(c.showHeroX ?? true);
-  const [heroXLabel, setHeroXLabel] = useState<LocalizedString>(
-    liftToLocalized(c.heroXLabel || "X / Twitter")
-  );
-  const [xProfileUrl, setXProfileUrl] = useState(c.xProfileUrl || "");
 
   const plainName = stripHtml(profile.name) || profile.name;
   const phoneLabelText = l(c.heroPhoneLabel);
@@ -143,9 +125,6 @@ export function HeroSection() {
       )
     );
     setHeroEmailLabel(liftToLocalized(c.heroEmailLabel));
-    setShowHeroX(c.showHeroX ?? true);
-    setHeroXLabel(liftToLocalized(c.heroXLabel || "X / Twitter"));
-    setXProfileUrl(c.xProfileUrl || "");
     setEditOpen(true);
   };
 
@@ -208,9 +187,6 @@ export function HeroSection() {
         ? heroPhoneLabel
         : "Appeler",
       heroEmailLabel,
-      showHeroX,
-      heroXLabel: getL(heroXLabel).trim() ? heroXLabel : "X / Twitter",
-      xProfileUrl: xProfileUrl.trim(),
       phoneValue: nextPhoneValue,
       quickContactLinks: syncQuickLinks(c.quickContactLinks),
     });
@@ -449,29 +425,6 @@ export function HeroSection() {
                       </Button>
                     </MagneticButton>
                   )}
-                  {c.showHeroX &&
-                    xProfileHref(c.xProfileUrl || c.xUsername || "") && (
-                      <MagneticButton>
-                        <Button size="default" variant="outline" asChild>
-                          <a
-                            href={
-                              xProfileHref(
-                                c.xProfileUrl || c.xUsername || ""
-                              )!
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <XLogo className="h-4 w-4" />
-                            <RichHtml
-                              as="span"
-                              html={l(c.heroXLabel) || "X"}
-                              className="inline"
-                            />
-                          </a>
-                        </Button>
-                      </MagneticButton>
-                    )}
                   <ExtraDocumentButtons placement="hero" size="default" />
                 </div>
               </motion.div>
@@ -894,39 +847,6 @@ export function HeroSection() {
                   id="hero-email-label"
                   hint=""
                 />
-              )}
-
-              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-                <span>Afficher bouton X</span>
-                <input
-                  type="checkbox"
-                  checked={showHeroX}
-                  onChange={(e) => setShowHeroX(e.target.checked)}
-                  className="accent-teal-300"
-                />
-              </label>
-              {showHeroX && (
-                <>
-                  <RichLocalizedField
-                    label="Label bouton X"
-                    value={heroXLabel}
-                    onChange={setHeroXLabel}
-                    compact
-                    rows={1}
-                    placeholder="X / Twitter"
-                    id="hero-x-label"
-                    hint=""
-                  />
-                  <div className="grid gap-2">
-                    <Label htmlFor="hero-x-url">Lien profil X</Label>
-                    <Input
-                      id="hero-x-url"
-                      value={xProfileUrl}
-                      onChange={(e) => setXProfileUrl(e.target.value)}
-                      placeholder="https://x.com/votre_pseudo"
-                    />
-                  </div>
-                </>
               )}
             </div>
           </div>

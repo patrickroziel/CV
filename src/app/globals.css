@@ -44,6 +44,21 @@ html {
   color-scheme: dark;
 }
 
+/* Médias universe — same glass system, violet / fuchsia accent */
+html[data-universe="medias"] {
+  --mint: #c4b5fd;
+  --mint-dim: rgba(196, 181, 253, 0.16);
+  --amber: #e879f9;
+}
+
+html[data-universe="medias"] .glass-glow {
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.22),
+    0 22px 56px -14px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(196, 181, 253, 0.08),
+    0 0 40px -12px rgba(167, 139, 250, 0.28);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

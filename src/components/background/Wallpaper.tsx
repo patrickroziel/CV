@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { DEFAULT_BACKGROUND } from "@/lib/defaults";
+import { MEDIAS_BACKGROUND_URL, universeFromPath } from "@/lib/universe";
 import {
   normalizeBackgroundImages,
   pickRandomBackground,
@@ -36,6 +38,7 @@ const FADE_MS = 900;
  */
 export function Wallpaper() {
   const { data, isHydrated } = usePortfolio();
+  const isMedias = universeFromPath(usePathname()) === "medias";
   const overlayOpacity = isHydrated ? data.ui.overlayOpacity : 0.52;
   const didPickRef = useRef(false);
 
@@ -69,7 +72,16 @@ export function Wallpaper() {
 
     setActive((current) => {
       let next: BackgroundImage;
-      if (!didPickRef.current) {
+      if (isMedias) {
+        next = {
+          id: "bg-medias",
+          url: MEDIAS_BACKGROUND_URL,
+          opacity: 0.92,
+          alphaVideoUrl: null,
+          alphaVideoEnabled: false,
+          alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
+        };
+      } else if (!didPickRef.current) {
         didPickRef.current = true;
         next = pickRandomBackground(list, data.backgroundUrl);
       } else {
@@ -89,7 +101,7 @@ export function Wallpaper() {
       return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHydrated, poolKey]);
+  }, [isHydrated, poolKey, isMedias]);
 
   useEffect(() => {
     setAlphaFailed(false);
@@ -181,6 +193,12 @@ export function Wallpaper() {
         className="absolute inset-0 z-[2]"
         style={{ backgroundColor: `rgba(0,0,0,${overlayOpacity})` }}
       />
+      {isMedias && (
+        <div
+          className="absolute inset-0 z-[2] bg-gradient-to-br from-violet-950/35 via-transparent to-fuchsia-950/25"
+          aria-hidden
+        />
+      )}
       <div className="absolute inset-0 z-[2] bg-gradient-to-b from-black/30 via-transparent to-black/75" />
       <div
         className="absolute inset-0 z-[2]"

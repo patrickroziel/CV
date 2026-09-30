@@ -26,6 +26,8 @@ import type {
   QuotesConfig,
   SectionLabelsConfig,
   Skill,
+  SocialConfig,
+  SocialPost,
   UiPrefs,
 } from "@/lib/types";
 import { DATA_VERSION, DEFAULT_COMING_SOON, DEFAULT_NAV } from "@/lib/types";
@@ -110,6 +112,11 @@ type PortfolioContextValue = {
   addLanguage: (lang: Omit<Language, "id">) => void;
   updateLanguage: (id: string, partial: Partial<Language>) => void;
   removeLanguage: (id: string) => void;
+  updateSocial: (partial: Partial<SocialConfig>) => void;
+  addSocialPost: (post: Omit<SocialPost, "id">) => void;
+  updateSocialPost: (id: string, partial: Partial<SocialPost>) => void;
+  removeSocialPost: (id: string) => void;
+  reorderSocialPosts: (orderedIds: string[]) => void;
   resetToDefaults: () => void;
 };
 
@@ -667,6 +674,92 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     [persist]
   );
 
+  const updateSocial = useCallback(
+    (partial: Partial<SocialConfig>) => {
+      persist(
+        (prev) => ({
+          ...prev,
+          social: {
+            ...(prev.social ?? DEFAULT_PORTFOLIO.social),
+            ...partial,
+          },
+        }),
+        "Médias mis à jour"
+      );
+    },
+    [persist]
+  );
+
+  const addSocialPost = useCallback(
+    (post: Omit<SocialPost, "id">) => {
+      persist((prev) => {
+        const current = prev.socialPosts ?? [];
+        const minOrder = current.reduce(
+          (min, p) => Math.min(min, p.order),
+          0
+        );
+        return {
+          ...prev,
+          socialPosts: [
+            { ...post, id: createId(), order: minOrder - 1 },
+            ...current,
+          ],
+        };
+      }, "Post ajouté");
+    },
+    [persist]
+  );
+
+  const updateSocialPost = useCallback(
+    (id: string, partial: Partial<SocialPost>) => {
+      persist(
+        (prev) => ({
+          ...prev,
+          socialPosts: (prev.socialPosts ?? []).map((p) =>
+            p.id === id ? { ...p, ...partial } : p
+          ),
+        }),
+        "Enregistré"
+      );
+    },
+    [persist]
+  );
+
+  const removeSocialPost = useCallback(
+    (id: string) => {
+      persist(
+        (prev) => ({
+          ...prev,
+          socialPosts: (prev.socialPosts ?? []).filter((p) => p.id !== id),
+        }),
+        "Post supprimé"
+      );
+    },
+    [persist]
+  );
+
+  const reorderSocialPosts = useCallback(
+    (orderedIds: string[]) => {
+      persist((prev) => {
+        const byId = new Map((prev.socialPosts ?? []).map((p) => [p.id, p]));
+        const next: SocialPost[] = [];
+        orderedIds.forEach((id, i) => {
+          const post = byId.get(id);
+          if (post) {
+            next.push({ ...post, order: i });
+            byId.delete(id);
+          }
+        });
+        // Keep any leftover posts at the end
+        for (const leftover of byId.values()) {
+          next.push({ ...leftover, order: next.length });
+        }
+        return { ...prev, socialPosts: next };
+      });
+    },
+    [persist]
+  );
+
   const resetToDefaults = useCallback(() => {
     persist(structuredClone(DEFAULT_PORTFOLIO), "Données réinitialisées");
   }, [persist]);
@@ -714,6 +807,11 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       addLanguage,
       updateLanguage,
       removeLanguage,
+      updateSocial,
+      addSocialPost,
+      updateSocialPost,
+      removeSocialPost,
+      reorderSocialPosts,
       resetToDefaults,
     }),
     [
@@ -757,6 +855,11 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       addLanguage,
       updateLanguage,
       removeLanguage,
+      updateSocial,
+      addSocialPost,
+      updateSocialPost,
+      removeSocialPost,
+      reorderSocialPosts,
       resetToDefaults,
     ]
   );

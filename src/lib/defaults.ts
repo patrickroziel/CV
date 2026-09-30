@@ -9,6 +9,8 @@ import {
   DEFAULT_HERO_GLASS,
   DEFAULT_NAV,
   DEFAULT_QUOTES,
+  DEFAULT_SOCIAL,
+  DEFAULT_SOCIAL_POSTS,
 } from "./types";
 import snapshot from "./default-snapshot.json";
 
@@ -95,6 +97,13 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
     // Production public landing until explicitly published OFF
     enabled: true,
   },
+  social: {
+    ...DEFAULT_SOCIAL,
+    ...(snap as { social?: typeof DEFAULT_SOCIAL }).social,
+  },
+  socialPosts: Array.isArray((snap as { socialPosts?: unknown }).socialPosts)
+    ? structuredClone((snap as { socialPosts: typeof DEFAULT_SOCIAL_POSTS }).socialPosts)
+    : DEFAULT_SOCIAL_POSTS.map((p) => ({ ...p })),
   contact: {
     ...DEFAULT_CONTACT,
     ...snap.contact,

@@ -340,27 +340,6 @@ export function ContactSettingsPanel({
             />
           </ToggleRow>
 
-          <ToggleRow
-            label="Bouton X (Twitter) — Hero"
-            checked={draft.showHeroX}
-            onChange={(v) => set("showHeroX", v)}
-          >
-            <ButtonNameField
-              value={draft.heroXLabel}
-              onChange={(v) => set("heroXLabel", v)}
-              placeholder="X / Twitter"
-            />
-            <Label className="text-xs text-zinc-400">Lien du profil X</Label>
-            <Input
-              value={draft.xProfileUrl}
-              onChange={(e) => set("xProfileUrl", e.target.value)}
-              placeholder="https://x.com/votre_pseudo"
-            />
-            <p className="text-[10px] text-zinc-500">
-              Ouvre le profil dans un nouvel onglet.
-            </p>
-          </ToggleRow>
-
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
             Documents (CV, Portfolio, Carte)
           </p>
@@ -765,43 +744,6 @@ export function ContactSettingsPanel({
               value={draft.widgetAvailabilityText}
               onChange={(v) => set("widgetAvailabilityText", v)}
             />
-          </ToggleRow>
-
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-            Widget feed X
-          </p>
-
-          <ToggleRow
-            label="Afficher le feed X (sidebar)"
-            checked={draft.showWidgetXFeed}
-            onChange={(v) => set("showWidgetXFeed", v)}
-          >
-            <LocalizedField
-              label="Titre du widget"
-              value={draft.widgetXFeedTitle}
-              onChange={(v) => set("widgetXFeedTitle", v)}
-              placeholder="Sur X"
-            />
-            <Label className="text-xs text-zinc-400">
-              Nom d’utilisateur X (@pseudo)
-            </Label>
-            <Input
-              value={draft.xUsername}
-              onChange={(e) => set("xUsername", e.target.value)}
-              placeholder="@votre_pseudo ou votre_pseudo"
-            />
-            <Label className="text-xs text-zinc-400">
-              Lien profil (si différent)
-            </Label>
-            <Input
-              value={draft.xProfileUrl}
-              onChange={(e) => set("xProfileUrl", e.target.value)}
-              placeholder="https://x.com/votre_pseudo"
-            />
-            <p className="text-[10px] text-zinc-500">
-              Timeline officielle X (thème sombre). Visible sur grand écran
-              (sidebar). Un bloqueur de pubs peut empêcher l’embed.
-            </p>
           </ToggleRow>
         </div>
 

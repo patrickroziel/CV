@@ -20,6 +20,7 @@ export const MEDIA_FOLDERS = {
   showreel: "patrick-roziel/showreel",
   languages: "patrick-roziel/languages",
   documents: "patrick-roziel/documents",
+  social: "patrick-roziel/social",
 } as const;
 
 export type MediaFolder =

@@ -7,7 +7,6 @@ import { GlassPanel } from "@/components/glass/GlassCard";
 import { SkillTag } from "@/components/skills/SkillTag";
 import { RichHtml } from "@/components/shared/RichHtml";
 import { QuickContactIconView } from "@/components/widgets/widget-icons";
-import { XFeedWidget } from "@/components/widgets/XFeedWidget";
 
 export function WidgetStack() {
   const { data, isHydrated, l } = usePortfolio();
@@ -20,8 +19,7 @@ export function WidgetStack() {
   const showAny =
     c.showWidgetQuickContact ||
     c.showWidgetSkills ||
-    c.showWidgetAvailability ||
-    c.showWidgetXFeed;
+    c.showWidgetAvailability;
   if (!showAny) return null;
 
   return (
@@ -108,21 +106,6 @@ export function WidgetStack() {
               <p className="mt-1 text-xs text-zinc-500">{l(profile.location)}</p>
             )}
           </GlassPanel>
-        </motion.div>
-      )}
-
-      {c.showWidgetXFeed && (
-        <motion.div
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.85, duration: 0.5 }}
-          className="pointer-events-auto shrink-0"
-        >
-          <XFeedWidget
-            username={c.xUsername || c.xProfileUrl || ""}
-            title={l(c.widgetXFeedTitle) || "Sur X"}
-            profileUrl={c.xProfileUrl}
-          />
         </motion.div>
       )}
     </div>

@@ -9,6 +9,7 @@ type SectionHeadingProps = {
   title: string;
   description?: string;
   className?: string;
+  eyebrowClassName?: string;
   action?: React.ReactNode;
 };
 
@@ -17,6 +18,7 @@ export function SectionHeading({
   title,
   description,
   className,
+  eyebrowClassName,
   action,
 }: SectionHeadingProps) {
   return (
@@ -34,7 +36,12 @@ export function SectionHeading({
         className="max-w-2xl"
       >
         {eyebrow && (
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+          <p
+            className={cn(
+              "mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400",
+              eyebrowClassName
+            )}
+          >
             {eyebrow}
           </p>
         )}

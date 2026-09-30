@@ -549,12 +549,6 @@ export type ContactConfig = {
   /** Nom du lien email hero (vide = affiche l’adresse) */
   heroEmailLabel: Translatable;
 
-  /** Bouton X (Twitter) dans le Hero */
-  showHeroX: boolean;
-  heroXLabel: Translatable;
-  /** Profil X : https://x.com/username ou @username */
-  xProfileUrl: string;
-
   /**
    * Documents supplémentaires (en plus du CV généré par le site) :
    * CV PDF perso, portfolio PDF, carte de visite HTML.
@@ -574,12 +568,6 @@ export type ContactConfig = {
   showWidgetAvailability: boolean;
   widgetAvailabilityTitle: Translatable;
   widgetAvailabilityText: Translatable;
-
-  /** Feed X (Twitter) dans la sidebar */
-  showWidgetXFeed: boolean;
-  widgetXFeedTitle: Translatable;
-  /** @username sans @ (ou extrait de xProfileUrl) */
-  xUsername: string;
 };
 
 /** Media type for main showreel + feature cards */
@@ -588,6 +576,8 @@ export type FeatureVideoType = "none" | "youtube" | "x" | "file";
 export type FeatureVideo = {
   id: string;
   title: Translatable;
+  /** Short line under the title on the 1:1 card */
+  description?: Translatable;
   videoType: FeatureVideoType;
   videoUrl: string | null;
   /**
@@ -710,6 +700,64 @@ export type HeroGlassConfig = {
   front: HeroGlassFrontLayer;
 };
 
+/** Attachment on a Médias / Social post (Vercel Blob) */
+export type SocialPostFileKind = "pdf" | "image";
+
+/**
+ * One post in the Médias universe (text + optional YouTube + optional file).
+ * Distinct from Portfolio projects.
+ */
+export type SocialPost = {
+  id: string;
+  title: Translatable;
+  description: Translatable;
+  /** ISO date YYYY-MM-DD */
+  date: string;
+  /** Optional YouTube watch / share / Shorts URL */
+  youtubeUrl: string | null;
+  /** Optional PDF or image (Vercel Blob public URL) */
+  fileUrl: string | null;
+  fileKind: SocialPostFileKind | null;
+  /** Original filename for download labels */
+  fileName: string | null;
+  /** Free-form tags — shared across locales, used by Médias search */
+  tags: string[];
+  /** When false: hidden from the public, visible in Mode Édition */
+  visible: boolean;
+  /** Lower = higher in the list */
+  order: number;
+};
+
+/** Editable headings for the Médias universe */
+export type SocialConfig = {
+  eyebrow: Translatable;
+  title: Translatable;
+  description: Translatable;
+};
+
+export const DEFAULT_SOCIAL: SocialConfig = {
+  eyebrow: L("Fil social", {
+    en: "Social feed",
+    pl: "Kanał",
+    es: "Feed social",
+  }),
+  title: L("Médias", {
+    en: "Media",
+    pl: "Media",
+    es: "Medios",
+  }),
+  description: L(
+    "Notes, documents téléchargeables et vidéos — un univers à part du portfolio.",
+    {
+      en: "Notes, downloadable documents and videos — a separate space from the portfolio.",
+      pl: "Notatki, dokumenty do pobrania i filmy — osobny świat poza portfolio.",
+      es: "Notas, documentos descargables y vídeos — un universo aparte del portfolio.",
+    }
+  ),
+};
+
+export const DEFAULT_SOCIAL_POSTS: SocialPost[] = [];
+
 export const DEFAULT_HERO_GLASS: HeroGlassConfig = {
   backVideos: [],
   front: {
@@ -767,10 +815,16 @@ export type PortfolioData = {
    */
   heroGlass: HeroGlassConfig;
   ui: UiPrefs;
+  /**
+   * Médias / Social universe — posts with text, YouTube, PDF/image.
+   * Completely separate from Portfolio projects.
+   */
+  social: SocialConfig;
+  socialPosts: SocialPost[];
   version: number;
 };
 
-export const DATA_VERSION = 29;
+export const DATA_VERSION = 34;
 
 export const QUOTE_SERVICE_IDS: QuoteServiceId[] = [
   "montage",
@@ -1034,23 +1088,51 @@ export const DEFAULT_WIDGET_SKILL_TAGS: string[] = [
 export const DEFAULT_FEATURE_VIDEOS: FeatureVideo[] = [
   {
     id: "feat-1",
-    title: L("Timelapse"),
-    videoType: "file",
-    videoUrl:
-      "https://res.cloudinary.com/ptp8diwd/video/upload/v1784743251/fpydktqqqq4d7ibymdsu.mov",
-  },
-  {
-    id: "feat-2",
-    title: L("Motion Design"),
+    title: L("Motion Design", {
+      en: "Motion Design",
+      pl: "Motion Design",
+      es: "Motion Design",
+    }),
+    description: L("Habillages, lower-thirds et animations de marque.", {
+      en: "Packaging, lower-thirds and brand animation.",
+      pl: "Oprawy, lower-thirds i animacje marki.",
+      es: "Packs, lower-thirds y animación de marca.",
+    }),
     videoType: "file",
     videoUrl:
       "https://res.cloudinary.com/ptp8diwd/video/upload/v1784748535/pcqayn0d8gw7cmssuqmy.mov",
   },
   {
+    id: "feat-2",
+    title: L("Dynamic Short-Form", {
+      en: "Dynamic Short-Form",
+      pl: "Dynamic Short-Form",
+      es: "Dynamic Short-Form",
+    }),
+    description: L("Reels, Shorts et formats verticaux rythmés.", {
+      en: "Reels, Shorts and paced vertical formats.",
+      pl: "Reels, Shorts i dynamiczne formaty pionowe.",
+      es: "Reels, Shorts y formatos verticales con ritmo.",
+    }),
+    videoType: "file",
+    videoUrl:
+      "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841588/patrick-roziel/showreel/ckcjdggyszoaeknsrm3c.mp4",
+  },
+  {
     id: "feat-3",
-    title: L("AI + Sources"),
-    videoType: "youtube",
-    videoUrl: "https://youtube.com/shorts/dHWIxpPRmmM",
+    title: L("AI-Enhanced Content", {
+      en: "AI-Enhanced Content",
+      pl: "AI-Enhanced Content",
+      es: "AI-Enhanced Content",
+    }),
+    description: L("Génération, compositing et workflows assistés par l’IA.", {
+      en: "Generation, compositing and AI-assisted workflows.",
+      pl: "Generowanie, compositing i workflow wspierane przez AI.",
+      es: "Generación, compositing y flujos asistidos por IA.",
+    }),
+    videoType: "file",
+    videoUrl:
+      "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841914/patrick-roziel/showreel/gz0djttjwfj9hkffofxa.mov",
   },
 ];
 
@@ -1120,10 +1202,6 @@ export const DEFAULT_CONTACT: ContactConfig = {
   showHeroEmail: true,
   heroEmailLabel: L(""),
 
-  showHeroX: true,
-  heroXLabel: L("X / Twitter"),
-  xProfileUrl: "https://x.com/patrickroziel",
-
   extraDocuments: {
     personalCv: { ...DEFAULT_EXTRA_DOCUMENTS.personalCv },
     portfolioPdf: { ...DEFAULT_EXTRA_DOCUMENTS.portfolioPdf },
@@ -1151,12 +1229,4 @@ export const DEFAULT_CONTACT: ContactConfig = {
     pl: "Otwarty na projekty",
     es: "Abierto a misiones",
   }),
-
-  showWidgetXFeed: true,
-  widgetXFeedTitle: L("Sur X", {
-    en: "On X",
-    pl: "Na X",
-    es: "En X",
-  }),
-  xUsername: "@patrickroziel",
 };

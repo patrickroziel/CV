@@ -227,61 +227,6 @@ export function xVideoPlayerUrl(url: string): string | null {
   return `https://twitter.com/i/videos/tweet/${id}`;
 }
 
-/**
- * Extract X/Twitter username from @user, x.com/user, twitter.com/user, etc.
- */
-export function extractXUsername(input: string): string | null {
-  const raw = input.trim();
-  if (!raw) return null;
-  if (raw.startsWith("@")) {
-    const u = raw.slice(1).replace(/[^\w]/g, "");
-    return u || null;
-  }
-  try {
-    const withProto = raw.includes("://") ? raw : `https://${raw}`;
-    const u = new URL(withProto);
-    const host = u.hostname.replace(/^www\./, "").toLowerCase();
-    if (
-      !host.endsWith("x.com") &&
-      !host.endsWith("twitter.com") &&
-      !host.endsWith("mobile.twitter.com")
-    ) {
-      // bare username without domain
-      if (/^[\w]{1,15}$/.test(raw)) return raw;
-      return null;
-    }
-    const part = u.pathname.split("/").filter(Boolean)[0];
-    if (!part || ["i", "intent", "share", "home", "explore"].includes(part)) {
-      return null;
-    }
-    return part.replace(/[^\w]/g, "") || null;
-  } catch {
-    if (/^[\w]{1,15}$/.test(raw)) return raw;
-    return null;
-  }
-}
-
-/** Canonical profile URL for X */
-export function xProfileHref(urlOrUser: string): string | null {
-  const user = extractXUsername(urlOrUser);
-  if (!user) {
-    // try as full URL with no parseable user
-    try {
-      const withProto = urlOrUser.includes("://")
-        ? urlOrUser
-        : `https://${urlOrUser}`;
-      const u = new URL(withProto);
-      if (u.hostname.includes("x.com") || u.hostname.includes("twitter.com")) {
-        return u.toString();
-      }
-    } catch {
-      /* ignore */
-    }
-    return null;
-  }
-  return `https://x.com/${user}`;
-}
-
 /** True if value looks like an uploaded video (data URL, Blob, Cloudinary, path) */
 export function isFileVideoUrl(url: string): boolean {
   if (url.startsWith("data:video/")) return true;
