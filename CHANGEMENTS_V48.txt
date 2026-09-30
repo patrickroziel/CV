@@ -1,0 +1,9 @@
+V48 — Work en sidebar sticky
+
+- Carte profil déplacée dans la colonne gauche sur desktop.
+- Carte profil sticky pendant le scroll.
+- Navigation des sections uniquement dans cette colonne gauche.
+- Suppression de la barre de navigation des sections en haut de Work.
+- Showreel et contenus restent dans la colonne principale.
+- Navigation globale Work | Notes conservée dans le header.
+- Mobile : la mise en page reste empilée pour rester lisible.

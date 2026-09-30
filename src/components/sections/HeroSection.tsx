@@ -46,7 +46,13 @@ import { stripHtml } from "@/lib/sanitize-html";
 import { defaultHeroBadgesFromProfile } from "@/lib/storage";
 import { DEFAULT_EXPERIENCE_BADGE } from "@/lib/types";
 
-export function HeroSection() {
+export function HeroSection({
+  sidebarMode = false,
+  showShowreel = true,
+}: {
+  sidebarMode?: boolean;
+  showShowreel?: boolean;
+} = {}) {
   const {
     data,
     updateProfile,
@@ -163,10 +169,13 @@ export function HeroSection() {
 
   if (!isHydrated) {
     return (
-      <section id="hero" className="relative min-h-[70vh] pb-16 pt-28">
-        <div className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6">
-          <div className="h-72 animate-pulse rounded-3xl bg-white/5" />
-          <div className="aspect-video animate-pulse rounded-3xl bg-white/5" />
+      <section
+        id="hero"
+        className={sidebarMode ? "relative" : "relative min-h-[70vh] pb-16 pt-28"}
+      >
+        <div className={sidebarMode ? "space-y-4" : "mx-auto max-w-6xl space-y-6 px-4 sm:px-6"}>
+          <div className={sidebarMode ? "h-56 animate-pulse rounded-3xl bg-white/5" : "h-72 animate-pulse rounded-3xl bg-white/5"} />
+          {!sidebarMode && <div className="aspect-video animate-pulse rounded-3xl bg-white/5" />}
         </div>
       </section>
     );
@@ -175,16 +184,20 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative z-10 overflow-hidden pb-12 pt-24 sm:pb-16 sm:pt-28"
+      className={sidebarMode ? "relative z-10" : "relative z-10 overflow-hidden pb-12 pt-24 sm:pb-16 sm:pt-28"}
     >
-      <div className="mx-auto max-w-5xl space-y-6 px-4 sm:px-6 sm:space-y-8">
+      <div className={sidebarMode ? "space-y-4" : "mx-auto max-w-6xl space-y-6 px-4 sm:px-6 sm:space-y-8"}>
         {/*
           Shell height = GlassCard content only.
           Media layers are absolute and never set min/max height.
         */}
-        <div className="relative isolate mx-auto max-w-3xl">
+        <div className={sidebarMode ? "relative isolate w-full" : "relative isolate max-w-xl sm:max-w-2xl"}>
           <GlassCard
-            className="work-hero-card relative z-[1] isolate overflow-hidden p-6 sm:p-8 lg:p-9"
+            className={
+              sidebarMode
+                ? "work-hero-card relative z-[1] isolate overflow-hidden p-3.5 sm:p-4"
+                : "work-hero-card relative z-[1] isolate overflow-hidden p-5 sm:p-6 lg:p-7"
+            }
           >
 
             {/*
@@ -234,7 +247,11 @@ export function HeroSection() {
                   delay: 0.06,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="relative z-10 flex min-w-0 flex-col items-start gap-3 text-left sm:gap-3.5"
+                className={
+                  sidebarMode
+                    ? "relative z-10 flex min-w-0 flex-col items-start gap-1.5 text-left"
+                    : "relative z-10 flex min-w-0 flex-col items-start gap-2.5 text-left sm:gap-3"
+                }
               >
                 {editMode && (
                   <Button
@@ -257,7 +274,11 @@ export function HeroSection() {
                       return (
                         <span
                           key={badge.id}
-                          className="inline-flex max-w-full items-center rounded-full border border-white/15 px-3 py-1 text-xs font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-md"
+                          className={
+                            sidebarMode
+                              ? "inline-flex max-w-full items-center rounded-full border border-white/10 px-2 py-0.5 text-[9px] font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+                              : "inline-flex max-w-full items-center rounded-full border border-white/15 px-3 py-1 text-xs font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-md"
+                          }
                           style={{
                             backgroundColor: badge.bgColor,
                             color: badge.textColor,
@@ -278,16 +299,24 @@ export function HeroSection() {
                 <RichHtml
                   as="h1"
                   html={profile.name}
-                  className="text-3xl font-semibold tracking-[-0.025em] text-zinc-50 sm:text-4xl"
+                  className={
+                    sidebarMode
+                      ? "text-[1.08rem] font-medium tracking-[-0.015em] text-zinc-50 sm:text-lg"
+                      : "text-2xl font-semibold tracking-[-0.02em] text-zinc-50 sm:text-3xl"
+                  }
                 />
 
                 {/* Titre */}
                 <RichHtml
                   html={l(profile.title)}
-                  className="text-base font-medium text-teal-200 sm:text-lg"
+                  className={
+                    sidebarMode
+                      ? "text-[0.72rem] font-normal leading-[1.45] tracking-[0.005em] text-zinc-300/80 sm:text-xs"
+                      : "text-sm font-normal tracking-[0.01em] text-zinc-200/90 sm:text-base"
+                  }
                 />
 
-                <div aria-hidden className="h-px w-16 bg-gradient-to-r from-teal-300/70 to-transparent" />
+                <div aria-hidden className={sidebarMode ? "h-px w-8 bg-gradient-to-r from-white/14 to-transparent" : "h-px w-12 bg-gradient-to-r from-white/30 to-transparent"} />
 
                 {/* Bio */}
                 {l(profile.bio) && (
@@ -295,7 +324,11 @@ export function HeroSection() {
                     <div className="max-w-2xl">
                       <RichHtml
                         html={l(profile.bio)}
-                        className="text-[0.95rem] leading-7 text-zinc-300 sm:text-base"
+                        className={
+                          sidebarMode
+                            ? "text-[0.72rem] leading-[1.5] text-zinc-400 sm:text-xs"
+                            : "text-sm leading-6 text-zinc-300/90 sm:text-[0.95rem]"
+                        }
                       />
                     </div>
                   </div>
@@ -357,7 +390,7 @@ export function HeroSection() {
           </GlassCard>
         </div>
 
-        <ShowreelEmbed />
+        {showShowreel && <ShowreelEmbed />}
       </div>
 
       {/* —— Edit dialog —— */}

@@ -1,0 +1,10 @@
+V47 — Hero Work / direction B
+
+- Carte Hero alignée sur le côté gauche et plus étroite.
+- Nom réduit pour une hiérarchie plus élégante.
+- Sous-titre neutralisé (suppression du turquoise dominant).
+- Bio légèrement plus compacte et plus lisible.
+- Verre plus sombre et neutre pour mieux fonctionner avec le fond forêt.
+- Ligne décorative rendue discrète.
+- Aucun changement de contenu ou de visibilité.
+- Correction hydration de la V46 conservée.

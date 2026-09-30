@@ -1,0 +1,7 @@
+V49 FINAL
+- Menu Work lisible dans un panneau glass sombre à gauche.
+- Carte identité affinée et plus compacte.
+- Nom et sous-titre réduits.
+- Bio plus discrète.
+- Sidebar sticky conservée.
+- Aucun contenu ni réglage utilisateur supprimé.

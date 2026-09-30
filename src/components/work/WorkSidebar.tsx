@@ -25,16 +25,20 @@ export function WorkSidebar() {
   }, [data.nav, l, t]);
 
   return (
-    <div className="mb-10 overflow-x-auto pb-2 sm:mb-12">
+    <div className="mt-3 rounded-[1.35rem] border border-white/10 bg-[rgba(4,16,20,0.82)] p-3.5 shadow-[0_18px_44px_-30px_rgba(0,0,0,0.95)] backdrop-blur-xl">
+      <p className="mb-2.5 px-2 text-[9px] font-medium uppercase tracking-[0.26em] text-zinc-400">
+        Parcourir
+      </p>
+
       <nav
         aria-label="Navigation Work"
-        className="inline-flex min-w-max items-center gap-1 rounded-2xl border border-cyan-100/10 bg-[#06171b]/70 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl"
+        className="flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0"
       >
         {items.map((item) => (
           <a
             key={item.id}
             href={item.href}
-            className="shrink-0 rounded-xl px-3.5 py-2 text-sm text-zinc-400 transition hover:bg-cyan-100/[0.08] hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
+            className="flex shrink-0 items-center rounded-xl px-2.5 py-2 text-[0.78rem] font-medium text-zinc-300 transition hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 lg:w-full"
           >
             {item.label}
           </a>
