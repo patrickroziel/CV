@@ -7,24 +7,22 @@ import { Wallpaper } from "@/components/background/Wallpaper";
 import { AmbientOrbs } from "@/components/background/AmbientOrbs";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { DockNav } from "@/components/layout/DockNav";
 import { ScrollProgress } from "@/components/shared/ScrollProgress";
-import { WidgetStack } from "@/components/widgets/WidgetStack";
 import { CvPrintView } from "@/components/print/CvPrintView";
 import { ComingSoonView } from "@/components/coming-soon/ComingSoonView";
 import { DEFAULT_COMING_SOON } from "@/lib/types";
 import { universeFromPath } from "@/lib/universe";
 
 /**
- * App shell: wallpaper always on; when Coming Soon is enabled for the public
- * (not edit mode), only the Coming Soon landing is shown.
+ * Shared shell for Work + Notes.
+ * Both universes intentionally use the same simple chrome:
+ * one top bar, no secondary top navigation, no floating bottom dock.
  */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const { data, editMode } = usePortfolio();
   const pathname = usePathname();
   const universe = universeFromPath(pathname);
   const enabled = (data.comingSoon ?? DEFAULT_COMING_SOON).enabled;
-  /** Public visitors only — Mode Édition always gets the full site */
   const publicComingSoon = !editMode && enabled;
 
   useEffect(() => {
@@ -44,18 +42,14 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const isMedias = universe === "medias";
-
   return (
     <>
       <Wallpaper />
       <AmbientOrbs />
       <ScrollProgress />
       <Header />
-      {!isMedias && <WidgetStack />}
       <div className="relative z-10">{children}</div>
       <Footer />
-      {!isMedias && <DockNav />}
       <CvPrintView />
     </>
   );

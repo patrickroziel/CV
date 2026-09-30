@@ -94,8 +94,8 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
       (snap as { comingSoon?: typeof DEFAULT_COMING_SOON }).comingSoon ??
         DEFAULT_COMING_SOON
     ),
-    // Production public landing until explicitly published OFF
-    enabled: true,
+    // Public release: full Work + Notes site is live.
+    enabled: false,
   },
   social: {
     ...DEFAULT_SOCIAL,

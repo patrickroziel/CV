@@ -121,22 +121,6 @@ const ICON_KINDS: {
   { kind: "upload", label: "Upload", icon: Upload },
 ];
 
-/** Desktop / trackpad: true hover. Touch / coarse: tap-to-toggle. */
-function canHoverFine(): boolean {
-  if (typeof window === "undefined") return true;
-  return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-}
-
-function isInteractiveTarget(target: EventTarget | null): boolean {
-  const el = target as HTMLElement | null;
-  return Boolean(
-    el?.closest?.("button, a, input, textarea, select, label, [role='button']")
-  );
-}
-
-/** Max finger travel (px) still counted as a tap, not a scroll */
-const TAP_MOVE_PX = 12;
-
 function LanguageCard({
   lang,
   editMode,
@@ -148,477 +132,70 @@ function LanguageCard({
   editMode: boolean;
   onEdit: () => void;
   onDelete: () => void;
-  /** Total language cards — drives compact sizing on one desktop row */
   totalCount?: number;
 }) {
-  const { l, t } = usePortfolio();
-  const reduceMotion = useReducedMotion();
-  /** Demo layer visible (playing or paused mid-demo) */
-  const [demoActive, setDemoActive] = useState(false);
-  /** Paused while layer still visible (mobile tap-to-pause) */
-  const [demoPaused, setDemoPaused] = useState(false);
-  const [inView, setInView] = useState(false);
-  const [activeOutlineId, setActiveOutlineId] = useState<string | null>(null);
-  const demoVideoRef = useRef<LanguageHoverVideoHandle>(null);
-  /** Suppress synthetic click after we already handled touch */
-  const suppressClickUntil = useRef(0);
-  const touchStartRef = useRef<{
-    x: number;
-    y: number;
-    id: number;
-  } | null>(null);
-  const hasVideo = lang.videoType !== "none" && Boolean(lang.videoUrl);
-  const videoPlaying = hasVideo && demoActive;
-  const compact = totalCount >= 4;
-  const dense = totalCount >= 5;
+  const { l } = usePortfolio();
+  void totalCount;
 
-  const startDemo = useCallback(() => {
-    setDemoActive(true);
-    setDemoPaused(false);
-    // Same user-gesture turn so audio is allowed (hover or tap)
-    demoVideoRef.current?.playUnmuted();
-  }, []);
+  const mainRegion =
+    lang.primaryRegion ||
+    lang.regions?.[0] ||
+    lang.icons?.find(
+      (item) => item.kind === "flag" && Boolean(item.region)
+    )?.region ||
+    "FR";
 
-  const stopDemo = useCallback(() => {
-    setDemoActive(false);
-    setDemoPaused(false);
-    demoVideoRef.current?.stop();
-  }, []);
-
-  const pauseDemo = useCallback(() => {
-    setDemoPaused(true);
-    demoVideoRef.current?.pause();
-  }, []);
-
-  const resumeDemo = useCallback(() => {
-    setDemoPaused(false);
-    demoVideoRef.current?.resume();
-  }, []);
-
-  /**
-   * Mobile tap cycle: play → pause → resume → …
-   * Must run synchronously in the gesture for unmuted autoplay.
-   */
-  const toggleDemoFromGesture = useCallback(() => {
-    if (!hasVideo) return;
-    if (!demoActive) {
-      startDemo();
-      return;
-    }
-    if (demoPaused) resumeDemo();
-    else pauseDemo();
-  }, [hasVideo, demoActive, demoPaused, startDemo, resumeDemo, pauseDemo]);
-
-  const onMouseEnter = useCallback(() => {
-    if (canHoverFine()) startDemo();
-  }, [startDemo]);
-
-  const onMouseLeave = useCallback(() => {
-    if (canHoverFine()) stopDemo();
-  }, [stopDemo]);
-
-  const onTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      if (canHoverFine() || !hasVideo) return;
-      if (isInteractiveTarget(e.target)) return;
-      if (e.touches.length !== 1) {
-        touchStartRef.current = null;
-        return;
-      }
-      const t0 = e.touches[0];
-      touchStartRef.current = {
-        x: t0.clientX,
-        y: t0.clientY,
-        id: t0.identifier,
-      };
-    },
-    [hasVideo]
-  );
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    const start = touchStartRef.current;
-    if (!start) return;
-    const t0 = Array.from(e.touches).find((x) => x.identifier === start.id);
-    if (!t0) return;
-    const dx = t0.clientX - start.x;
-    const dy = t0.clientY - start.y;
-    if (dx * dx + dy * dy > TAP_MOVE_PX * TAP_MOVE_PX) {
-      // Scroll / drag — cancel pending tap
-      touchStartRef.current = null;
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (canHoverFine() || !hasVideo) return;
-      const start = touchStartRef.current;
-      touchStartRef.current = null;
-      if (!start) return;
-      if (isInteractiveTarget(e.target)) return;
-
-      const t0 = Array.from(e.changedTouches).find(
-        (x) => x.identifier === start.id
-      );
-      if (!t0) return;
-      const dx = t0.clientX - start.x;
-      const dy = t0.clientY - start.y;
-      if (dx * dx + dy * dy > TAP_MOVE_PX * TAP_MOVE_PX) return;
-
-      // Immediate toggle in the same gesture chain (no 300ms wait)
-      e.preventDefault();
-      toggleDemoFromGesture();
-      // Block the ghost click that follows touchend on iOS/Android
-      suppressClickUntil.current = performance.now() + 650;
-    },
-    [hasVideo, toggleDemoFromGesture]
-  );
-
-  const onTouchCancel = useCallback(() => {
-    touchStartRef.current = null;
-  }, []);
-
-  /** Fallback for environments that only emit click (or pen) */
-  const onCardClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (canHoverFine()) return;
-      if (!hasVideo) return;
-      if (isInteractiveTarget(e.target)) return;
-      if (performance.now() < suppressClickUntil.current) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-      toggleDemoFromGesture();
-    },
-    [hasVideo, toggleDemoFromGesture]
-  );
-
-  const onContextMenu = useCallback((e: React.MouseEvent) => {
-    // Block long-press context menu / callout on the card
-    if (!canHoverFine()) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, []);
-  const outlines =
-    lang.outlines?.length > 0
-      ? lang.outlines
-      : (lang.regions || []).map((code, i) => ({
-          id: `r-${code}-${i}`,
-          code,
-          label: REGION_LABELS[code] || code,
-        }));
-  const allowedRegions = outlines
-    .map((o) => o.code)
-    .filter((c): c is string => Boolean(c));
-  const icons =
-    lang.icons?.length > 0
-      ? lang.icons
-      : [
-          {
-            id: "fb",
-            kind: "flag" as const,
-            region: allowedRegions[0] || lang.primaryRegion || "FR",
-          },
-        ];
-
-  const onActiveIdChange = useCallback((id: string | null) => {
-    setActiveOutlineId(id);
-  }, []);
-
-  /** Permanent country chips — flag + ISO code, bottom of card */
-  const countryLabels = outlines.map((o) => {
-    const code = o.code?.toUpperCase() || null;
-    return {
-      id: o.id,
-      code,
-      flag: code ? regionFlag(code) : undefined,
-      // Prefer ISO code for compact bottom labels
-      text: code || l(o.label) || "—",
-    };
-  });
+  const flag = regionFlag(mainRegion.toUpperCase());
+  const level = l(lang.level).trim();
 
   return (
-    <motion.div
-      variants={cardItemVariants}
-      onViewportEnter={() => setInView(true)}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-      onTouchCancel={onTouchCancel}
-      onClick={onCardClick}
-      onContextMenu={onContextMenu}
-      className={cn(
-        "language-card-touch h-full min-w-0 w-full",
-        hasVideo && "select-none"
-      )}
-    >
-      {/* Hover lift + glow entirely driven by Framer Motion (no CSS glass-glow) */}
-      <motion.div
-        animate={
-          reduceMotion
-            ? undefined
-            : {
-                y: demoActive ? -7 : 0,
-                boxShadow: demoActive
-                  ? "0 28px 56px -18px rgba(0,0,0,0.72), 0 0 48px -8px rgba(245,158,11,0.22)"
-                  : "0 16px 40px -20px rgba(0,0,0,0.45)",
-                borderColor: demoActive
-                  ? "rgba(255,255,255,0.24)"
-                  : "rgba(255,255,255,0.14)",
-                scale: demoActive ? 1.012 : 1,
-              }
-        }
-        transition={
-          reduceMotion
-            ? { duration: 0 }
-            : {
-                type: "spring",
-                stiffness: 280,
-                damping: 28,
-                mass: 0.7,
-              }
-        }
-        className="h-full will-change-transform"
-      >
-        <GlassCard
-          className={cn(
-            "group relative isolate flex h-full flex-col overflow-hidden p-0 !transition-none",
-            dense
-              ? "min-h-[220px] sm:min-h-[240px]"
-              : compact
-                ? "min-h-[260px] sm:min-h-[280px]"
-                : "min-h-[300px]",
-            hasVideo && "cursor-pointer sm:cursor-default"
-          )}
-        >
-          <LanguageRegionsMap
-            outlines={outlines}
-            active={inView && !demoActive}
-            className="z-0"
-            onActiveIdChange={onActiveIdChange}
-          />
-
-          <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-black/25 to-black/35" />
-
-          {/* Demo video with sound — mounted for uploads so hover can playUnmuted() */}
-          {hasVideo && (
-            <div
-              className={cn(
-                "absolute inset-0 z-[5] transition-opacity duration-300",
-                videoPlaying ? "opacity-100" : "pointer-events-none opacity-0"
-              )}
+    <motion.div variants={cardItemVariants} className="h-full">
+      <GlassCard className="relative flex h-full min-h-[145px] flex-col p-5 sm:p-6">
+        {editMode && (
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-1">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="rounded-full p-2 text-zinc-400 transition hover:bg-white/10 hover:text-white"
+              aria-label="Modifier la langue"
             >
-              <LanguageHoverVideo
-                ref={demoVideoRef}
-                videoType={lang.videoType}
-                videoUrl={lang.videoUrl}
-                fallbackImageUrl={lang.fallbackImageUrl}
-                languageName={l(lang.name)}
-                // File: keep layer mounted while demoActive (pause without unmount).
-                // YouTube/X: unmount when paused so the iframe stops.
-                active={
-                  lang.videoType === "file"
-                    ? videoPlaying
-                    : videoPlaying && !demoPaused
-                }
-              />
-              {videoPlaying && (
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
-              )}
-            </div>
-          )}
+              <Pencil className="h-4 w-4" />
+            </button>
 
-          <div
-            className={cn(
-              "relative z-20 flex min-h-0 flex-1 flex-col",
-              dense ? "p-3.5 sm:p-4" : compact ? "p-4 sm:p-5" : "p-5"
-            )}
-          >
-            <div className="flex w-full shrink-0 items-start justify-between gap-1.5 sm:gap-2">
-              <LanguageIconCarousel
-                icons={icons}
-                allowedRegions={allowedRegions}
-                languageName={l(lang.name)}
-              />
-              <div className="relative z-30 flex shrink-0 items-center gap-1">
-                {/* Idle only — hide while the demo video is playing */}
-                {hasVideo && !videoPlaying && (
-                  <motion.span
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.35, ease: EASE }}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 font-medium text-zinc-200 backdrop-blur-md",
-                      dense
-                        ? "px-1.5 py-0.5 text-[9px]"
-                        : "px-2.5 py-1 text-[10px]"
-                    )}
-                  >
-                    <Volume2 className="h-3 w-3 shrink-0 text-amber-300/90" />
-                    {/* Touch: tap · Desktop: hover (CSS media) */}
-                    <span className="max-sm:hidden">{t("languages.demoHint")}</span>
-                    <span className="sm:hidden">{t("languages.demoHintTap")}</span>
-                  </motion.span>
-                )}
-                {editMode && (
-                  <div className="flex gap-0.5 rounded-xl border border-white/10 bg-black/50 p-0.5 backdrop-blur-md">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0 hover:bg-white/10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit();
-                      }}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0 hover:bg-white/10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete();
-                      }}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 text-red-400" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div
-              className={cn(
-                "relative z-20 flex min-h-0 flex-1 flex-col",
-                dense ? "mt-3" : "mt-5"
-              )}
+            <button
+              type="button"
+              onClick={onDelete}
+              className="rounded-full p-2 text-zinc-500 transition hover:bg-red-500/10 hover:text-red-300"
+              aria-label="Supprimer la langue"
             >
-              <motion.h3
-                layout
-                className={cn(
-                  "font-semibold tracking-tight text-zinc-50 drop-shadow-md",
-                  dense ? "text-base" : "text-lg"
-                )}
-              >
-                {l(lang.name)}
-              </motion.h3>
-              <Badge
-                variant="amber"
-                className={cn(
-                  "mt-2 w-fit shrink-0",
-                  dense && "text-[10px] px-2 py-0.5"
-                )}
-              >
-                {l(lang.level)}
-              </Badge>
-
-              {/* Bottom area: zones (idle) OR proof title (while demo plays) */}
-              <div className="mt-auto flex flex-col items-center pt-6">
-                <AnimatePresence mode="wait">
-                  {videoPlaying ? (
-                    <motion.div
-                      key="proof"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      transition={{ duration: 0.4, ease: EASE }}
-                      className="flex w-full items-center justify-center px-3"
-                    >
-                      {/* Same Badge as level labels (e.g. « Natif ») */}
-                      <Badge variant="amber">{t("languages.proofTitle")}</Badge>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="zones"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      transition={{ duration: 0.35, ease: EASE }}
-                      className="flex w-full flex-col items-center"
-                    >
-                      {countryLabels.length > 0 ? (
-                        <div className="flex w-full flex-wrap items-center justify-center gap-2">
-                          {countryLabels.map((c) => {
-                            const isActive =
-                              c.id === activeOutlineId && !demoActive;
-                            return (
-                              <motion.span
-                                key={c.id}
-                                layout
-                                initial={false}
-                                animate={{
-                                  scale: isActive ? 1.08 : 1,
-                                  borderColor: isActive
-                                    ? "rgba(251, 191, 36, 0.6)"
-                                    : "rgba(255, 255, 255, 0.15)",
-                                  backgroundColor: isActive
-                                    ? "rgba(251, 191, 36, 0.3)"
-                                    : "rgba(0, 0, 0, 0.45)",
-                                  color: isActive
-                                    ? "rgba(255, 251, 235, 1)"
-                                    : "rgba(228, 228, 231, 1)",
-                                  boxShadow: isActive
-                                    ? "0 0 22px rgba(245,158,11,0.48), 0 0 0 1px rgba(251,191,36,0.25)"
-                                    : "0 0 0 0 transparent",
-                                }}
-                                transition={
-                                  reduceMotion
-                                    ? { duration: 0.15 }
-                                    : {
-                                        type: "spring",
-                                        stiffness: 280,
-                                        damping: 24,
-                                        mass: 0.5,
-                                      }
-                                }
-                                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide backdrop-blur-md"
-                                title={
-                                  c.code
-                                    ? REGION_LABELS[c.code] || c.code
-                                    : c.text
-                                }
-                              >
-                                {c.flag && (
-                                  <motion.span
-                                    animate={{
-                                      scale: isActive ? 1.14 : 1,
-                                      rotate: isActive
-                                        ? [0, -4, 4, 0]
-                                        : 0,
-                                    }}
-                                    transition={{
-                                      duration: 0.45,
-                                      ease: EASE,
-                                    }}
-                                    className="text-[13px] leading-none"
-                                  >
-                                    {c.flag}
-                                  </motion.span>
-                                )}
-                                <span className="uppercase">{c.text}</span>
-                              </motion.span>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <p className="text-center text-xs text-zinc-500">
-                          Aucun pays configuré
-                        </p>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
+              <Trash2 className="h-4 w-4" />
+            </button>
           </div>
-        </GlassCard>
-      </motion.div>
+        )}
+
+        <div className={cn("flex items-start gap-4", editMode && "pr-14")}>
+          <div
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-3xl shadow-inner"
+            aria-hidden
+          >
+            {flag}
+          </div>
+
+          <div className="min-w-0 pt-0.5">
+            <h3 className="text-lg font-semibold tracking-tight text-zinc-100">
+              {l(lang.name)}
+            </h3>
+
+            <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+              Niveau
+            </p>
+
+            <p className="mt-1.5 text-sm leading-6 text-zinc-400">
+              {level || "Niveau à préciser"}
+            </p>
+          </div>
+        </div>
+      </GlassCard>
     </motion.div>
   );
 }
@@ -954,8 +531,10 @@ export function LanguagesSection() {
           }
           title={t("sections.languagesTitle")}
           description={
-            data.sectionLabels?.languagesDescription ??
-            DEFAULT_SECTION_LABELS.languagesDescription
+            editMode
+              ? data.sectionLabels?.languagesDescription ??
+                DEFAULT_SECTION_LABELS.languagesDescription
+              : "Langues de travail et niveaux de pratique."
           }
           onDescriptionChange={(languagesDescription) =>
             updateSectionLabels({ languagesDescription })
@@ -978,26 +557,14 @@ export function LanguagesSection() {
         />
 
         <motion.div
-          className={cn(
-            // Mobile: stack · Desktop: one row, equal flex shrink (no wrap)
-            "flex flex-col gap-4",
-            "sm:flex-row sm:flex-nowrap sm:items-stretch",
-            data.languages.length >= 5
-              ? "sm:gap-2.5"
-              : data.languages.length >= 4
-                ? "sm:gap-3"
-                : "sm:gap-4"
-          )}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2"
           variants={cardGridVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
         >
           {data.languages.map((lang) => (
-            <div
-              key={lang.id}
-              className="min-w-0 w-full sm:flex-1 sm:basis-0"
-            >
+            <div key={lang.id} className="min-w-0">
               <LanguageCard
                 lang={lang}
                 editMode={editMode}
@@ -1038,10 +605,10 @@ export function LanguagesSection() {
               />
             </div>
             <LocalizedField
-              label="Niveau"
+              label="Niveau / explication"
               value={level}
               onChange={setLevel}
-              placeholder="Natif, Courant…"
+              placeholder="Ex. Courant — utilisé quotidiennement à l’oral et à l’écrit"
             />
 
             {/* —— Icons multi —— */}

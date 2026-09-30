@@ -1,0 +1,9 @@
+V38 — COMPÉTENCES SIMPLIFIÉES
+
+Modification unique :
+- suppression des cartes de compétences dans Work ;
+- suppression de l'affichage public des logiciels, niveaux, icônes et détails ;
+- affichage uniquement des catégories existantes : Montage vidéo, Motion design, Vidéo réseaux sociaux, Graphisme, Autres ;
+- les données détaillées restent présentes dans le portfolio et ne sont pas supprimées.
+
+Aucune autre partie du site n'a été modifiée dans cette version.

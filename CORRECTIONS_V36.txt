@@ -1,0 +1,9 @@
+CORRECTIONS V36
+
+- Notes : arborescence unique Tout / Livre / Réflexions / Documents / Images / Vidéos.
+- Aucun niveau Tome I / Tome II dans l’interface.
+- /branding-preview et /medias redirigent vers /notes.
+- Solutions Prompteur est restauré automatiquement une fois si absent.
+- Coming Soon reste ACTIVÉ par défaut pour le public.
+- Les 3 cartes vidéo sont masquées partout ; leurs données restent conservées.
+- Work | Notes reste la navigation du site complet en mode édition.

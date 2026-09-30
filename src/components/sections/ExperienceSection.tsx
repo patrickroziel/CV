@@ -109,19 +109,19 @@ export function ExperienceSection() {
                     <span className="absolute left-0 top-5 flex h-6 w-6 items-center justify-center sm:h-8 sm:w-8">
                       <span className="h-3 w-3 rounded-full bg-teal-300 shadow-[0_0_12px_rgba(94,234,212,0.7)] ring-4 ring-teal-300/20" />
                     </span>
-                    <GlassCard nested glow className="group p-5">
+                    <GlassCard nested glow className="group p-5 sm:p-6">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-lg font-semibold text-zinc-50">
+                          <h3 className="text-base font-medium tracking-tight text-zinc-50 sm:text-[1.05rem]">
                             {l(exp.role)}
                           </h3>
-                          <p className="text-sm font-medium text-amber-400">
+                          <p className="mt-0.5 text-sm font-normal text-amber-300/90">
                             {l(exp.company)}
                             {exp.location && l(exp.location)
                               ? ` · ${l(exp.location)}`
                               : ""}
                           </p>
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className="mt-1.5 text-xs text-zinc-500">
                             {formatPeriod(exp.startDate, exp.endDate)}
                           </p>
                         </div>
@@ -161,7 +161,7 @@ export function ExperienceSection() {
                       {l(exp.description) && (
                         <RichHtml
                           html={l(exp.description)}
-                          className="mt-3 text-sm text-zinc-400"
+                          className="experience-copy mt-4 text-[0.95rem] text-zinc-300/90"
                         />
                       )}
                       {exp.technologies && exp.technologies.length > 0 && (
@@ -171,7 +171,7 @@ export function ExperienceSection() {
                           ))}
                         </div>
                       )}
-                      {exp.media && exp.media.length > 0 && (
+                      {editMode && exp.media && exp.media.length > 0 && (
                         <div className="mt-4">
                           <MediaCarousel items={exp.media} compact />
                         </div>

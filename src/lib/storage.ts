@@ -34,6 +34,7 @@ import type {
   SocialConfig,
   SocialPost,
   SocialPostFileKind,
+  NotesCategory,
 } from "./types";
 import {
   DATA_VERSION,
@@ -633,6 +634,25 @@ export function normalizeSocialPost(
     typeof raw.fileName === "string" && raw.fileName.trim()
       ? raw.fileName.trim()
       : null;
+  const allowedCategories: NotesCategory[] = [
+    "Livre",
+    "Réflexions",
+    "Documents",
+    "Images",
+    "Vidéos",
+  ];
+  const rawCategory =
+    typeof raw.category === "string" ? raw.category.trim() : "";
+  const inferredCategory: NotesCategory = youtubeUrl
+    ? "Vidéos"
+    : fileUrl && inferSocialFileKind(fileUrl, raw.fileKind) === "image"
+      ? "Images"
+      : fileUrl
+        ? "Documents"
+        : "Réflexions";
+  const category = allowedCategories.includes(rawCategory as NotesCategory)
+    ? (rawCategory as NotesCategory)
+    : inferredCategory;
   return {
     id:
       typeof raw.id === "string" && raw.id
@@ -645,6 +665,7 @@ export function normalizeSocialPost(
     fileUrl,
     fileKind: fileUrl ? inferSocialFileKind(fileUrl, raw.fileKind) : null,
     fileName,
+    category,
     tags: Array.isArray(raw.tags)
       ? raw.tags
           .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
@@ -1245,6 +1266,27 @@ export function loadPortfolio(): PortfolioData {
         (parsed as { socialPosts?: unknown }).socialPosts
       ),
     };
+
+    // v36: corrective migration. Restore the accidentally deleted
+    // Solutions Prompteur experience and keep the public site on Coming Soon.
+    // This intentionally reruns for installs that already migrated to v35.
+    if ((parsed.version ?? 0) < 36) {
+      if (!data.experiences.some((e) => e.id === "exp-prompteur")) {
+        const seed = DEFAULT_PORTFOLIO.experiences.find(
+          (e) => e.id === "exp-prompteur"
+        );
+        if (seed) {
+          const restored = normalizeExperience(structuredClone(seed));
+          const savIndex = data.experiences.findIndex((e) => e.id === "exp-sav");
+          data.experiences.splice(savIndex >= 0 ? savIndex + 1 : 0, 0, restored);
+        }
+      }
+      data.comingSoon.enabled = true;
+      data.nav.projects.visible = false;
+      data.nav.quotes.visible = false;
+      data.contact.showEmail = false;
+      data.contact.showHeroEmail = false;
+    }
 
     // Fill missing EN/PL/ES from defaults when IDs match (keep user FR edits)
     const enriched = enrichFromDefaults(data);

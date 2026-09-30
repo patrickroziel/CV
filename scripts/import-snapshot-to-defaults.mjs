@@ -36,7 +36,7 @@ if (!raw.profile || !raw.skills) {
 
 // Persist as JSON consumed by defaults (clean version stamp)
 const outJson = path.join(root, "src/lib/default-snapshot.json");
-const snapshot = { ...raw, version: 20 };
+const snapshot = { ...raw, version: 35 };
 fs.writeFileSync(outJson, JSON.stringify(snapshot, null, 2));
 console.log("Wrote", outJson);
 console.log("  photo:", String(snapshot.profile?.photo || "").slice(0, 90));

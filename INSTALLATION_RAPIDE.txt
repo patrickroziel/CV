@@ -1,0 +1,39 @@
+VERSION FINALE — WORK | NOTES
+
+Cette archive est faite pour remplacer les fichiers correspondants dans :
+~/mon-portfolio-v2
+
+1. Arrêter le serveur local avec Ctrl+C si besoin.
+2. Décompresser cette archive directement dans ~/mon-portfolio-v2 en remplaçant les fichiers existants.
+3. Dans Terminal :
+
+cd ~/mon-portfolio-v2
+npm run build
+npm run dev
+
+4. Ouvrir : http://localhost:3000
+
+Résultat attendu :
+- navigation Work | Notes ;
+- Work sur un fond bleu/eau harmonisé ;
+- une seule famille de police (Geist) ;
+- Coming Soon désactivé ;
+- Solutions Prompteur restauré automatiquement si l'entrée avait été supprimée du localStorage ;
+- projets et devis masqués publiquement mais toujours disponibles en mode édition ;
+- email masqué par défaut ;
+- showreel principal conservé, 3 cartes vidéo masquées publiquement ;
+- carrousels de médias des expériences/formations masqués publiquement mais conservés en édition ;
+- Notes disponible sur /notes ;
+- catégories Notes : Tout, Livre, Réflexions, Documents, Images, Vidéos ;
+- ajout / modification / suppression de publications Notes en mode édition ;
+- images, PDF et vidéos YouTube pris en charge par Notes ;
+- anciennes URLs /medias et /branding-preview redirigées vers /notes.
+
+MISE EN LIGNE (après validation sur localhost)
+
+cd ~/mon-portfolio-v2
+git add -A
+git commit -m "Finalize Work and Notes"
+git push origin HEAD:main
+
+Si Vercel est toujours relié à la branche main de ce dépôt, le déploiement de production se lancera ensuite automatiquement.

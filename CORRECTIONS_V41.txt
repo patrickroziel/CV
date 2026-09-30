@@ -1,0 +1,14 @@
+V41 — Work reprend le style simple de Notes
+
+- Même barre supérieure minimaliste sur Work et Notes.
+- Navigation principale limitée à Work | Notes.
+- Suppression du menu de sections dans le header Work.
+- Suppression du dock flottant en bas de Work.
+- Suppression des widgets flottants de Work.
+- Work utilise maintenant une colonne latérale simple, comme Notes.
+- La colonne latérale respecte automatiquement les sections masquées.
+- Les sections Work sont resserrées pour s'intégrer dans cette mise en page.
+- Le fond Work reste le fond historique géré par le portfolio (arbres inclus).
+- Le fond Notes reste l'image aquatique générée.
+- Coming Soon reste activé.
+- Les données et contenus existants ne sont pas supprimés.

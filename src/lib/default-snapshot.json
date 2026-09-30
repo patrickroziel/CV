@@ -1,5 +1,5 @@
 {
-  "version": 34,
+  "version": 36,
   "backgroundUrl": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80",
   "backgroundImages": [
     {
@@ -1850,7 +1850,7 @@
         "pl": "Wyceny",
         "es": "Presupuestos"
       },
-      "visible": true
+      "visible": false
     },
     "contact": {
       "label": {
@@ -1872,7 +1872,7 @@
     }
   },
   "comingSoon": {
-    "enabled": true,
+    "enabled": false,
     "title": {
       "fr": "Coming soon",
       "en": "Coming soon",
@@ -1898,7 +1898,7 @@
     },
     "showNameTitle": true,
     "showLocation": true,
-    "showEmail": true,
+    "showEmail": false,
     "emailLabel": {
       "fr": "Email"
     },
@@ -1952,7 +1952,7 @@
       "pl": "",
       "es": ""
     },
-    "showHeroEmail": true,
+    "showHeroEmail": false,
     "heroEmailLabel": {
       "fr": "Envoyer un email"
     },
@@ -2243,23 +2243,45 @@
   ],
   "social": {
     "eyebrow": {
-      "fr": "Fil social",
-      "en": "Social feed",
-      "pl": "Kanał",
-      "es": "Feed social"
+      "fr": "Journal",
+      "en": "Journal",
+      "pl": "Dziennik",
+      "es": "Diario"
     },
     "title": {
-      "fr": "Médias",
-      "en": "Media",
-      "pl": "Media",
-      "es": "Medios"
+      "fr": "Notes",
+      "en": "Notes",
+      "pl": "Notatki",
+      "es": "Notas"
     },
     "description": {
-      "fr": "Notes, documents téléchargeables et vidéos — un univers à part du portfolio.",
-      "en": "Notes, downloadable documents and videos — a separate space from the portfolio.",
-      "pl": "Notatki, dokumenty do pobrania i filmy — osobny świat poza portfolio.",
-      "es": "Notas, documentos descargables y vídeos — un universo aparte del portfolio."
+      "fr": "Livre, réflexions, documents, images et vidéos.",
+      "en": "Book, reflections, documents, images and videos.",
+      "pl": "Książka, refleksje, dokumenty, obrazy i filmy.",
+      "es": "Libro, reflexiones, documentos, imágenes y vídeos."
     }
   },
-  "socialPosts": []
+  "socialPosts": [
+    {
+      "id": "notes-welcome-2026-10-01",
+      "title": {
+        "fr": "Bienvenue dans Notes"
+      },
+      "description": {
+        "fr": "Cette partie du site me sert à partager ce que j’écris, ce que j’apprends et ce que je veux transmettre.\n\nJ’y publierai au fil du temps plusieurs types de contenus : des chapitres du livre que j’écris, des réflexions, des documents utiles, des images et des vidéos.\n\nL’idée est simple : faire de cet espace un lieu à la fois personnel et pratique.\n\nOn y trouvera donc des textes liés au livre, des réflexions et prises de position, des documents et ressources utiles, des images et des vidéos.\n\nCe n’est pas un blog au sens classique du terme, ni un journal intime. C’est plutôt un espace de publication évolutif, dans lequel je rassemble ce qui mérite d’être partagé, gardé ou transmis."
+      },
+      "date": "2026-10-01",
+      "youtubeUrl": null,
+      "fileUrl": null,
+      "fileKind": null,
+      "fileName": null,
+      "category": "Réflexions",
+      "tags": [
+        "Notes",
+        "Bienvenue"
+      ],
+      "visible": true,
+      "order": 0
+    }
+  ]
 }

@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Public landing when Coming Soon is enabled:
- * wallpaper (layout) + optional title + showreel + 3 feature cards.
+ * wallpaper (layout) + optional title + showreel.
  */
 export function ComingSoonView() {
   const { data, l, editAllowed, setEditMode, t } = usePortfolio();
@@ -69,7 +69,7 @@ export function ComingSoonView() {
               </h1>
             </header>
 
-            {/* Showreel + 3 feature cards (same editor as full site) */}
+            {/* Showreel (same editor as full site) */}
             <ShowreelEmbed />
           </div>
         </GlassCard>

@@ -1,0 +1,19 @@
+V43 — PUBLICATION
+
+- Coming Soon désactivé dans le snapshot et dans defaults.ts.
+- Work + Notes deviennent publics.
+- Premier post Notes ajouté aux données par défaut.
+- Fond aquatique Notes conservé.
+- Fond Work original (arbres) conservé et modifiable depuis le bouton Fond en mode édition.
+
+Installation :
+cd ~/mon-portfolio-v2
+unzip -o ~/Downloads/portfolio-v43-publication.zip -d ~/mon-portfolio-v2
+rm -rf .next
+npm run build
+npm run dev
+
+Publication après vérification locale :
+git add -A
+git commit -m "Publish Work and Notes"
+git push origin HEAD:main

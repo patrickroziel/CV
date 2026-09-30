@@ -274,8 +274,8 @@ export type ComingSoonConfig = {
 };
 
 export const DEFAULT_COMING_SOON: ComingSoonConfig = {
-  /** Production default: public landing until you publish OFF */
-  enabled: true,
+  /** Full site is public by default. */
+  enabled: false,
   title: L("Coming soon", {
     en: "Coming soon",
     pl: "Wkrótce",
@@ -702,9 +702,15 @@ export type HeroGlassConfig = {
 
 /** Attachment on a Médias / Social post (Vercel Blob) */
 export type SocialPostFileKind = "pdf" | "image";
+export type NotesCategory =
+  | "Livre"
+  | "Réflexions"
+  | "Documents"
+  | "Images"
+  | "Vidéos";
 
 /**
- * One post in the Médias universe (text + optional YouTube + optional file).
+ * One post in the Notes universe (text + optional YouTube + optional file).
  * Distinct from Portfolio projects.
  */
 export type SocialPost = {
@@ -720,7 +726,9 @@ export type SocialPost = {
   fileKind: SocialPostFileKind | null;
   /** Original filename for download labels */
   fileName: string | null;
-  /** Free-form tags — shared across locales, used by Médias search */
+  /** Primary Notes category. */
+  category?: NotesCategory;
+  /** Free-form tags — shared across locales, used by search. */
   tags: string[];
   /** When false: hidden from the public, visible in Mode Édition */
   visible: boolean;
@@ -736,22 +744,22 @@ export type SocialConfig = {
 };
 
 export const DEFAULT_SOCIAL: SocialConfig = {
-  eyebrow: L("Fil social", {
-    en: "Social feed",
-    pl: "Kanał",
-    es: "Feed social",
+  eyebrow: L("Journal", {
+    en: "Journal",
+    pl: "Dziennik",
+    es: "Diario",
   }),
-  title: L("Médias", {
-    en: "Media",
-    pl: "Media",
-    es: "Medios",
+  title: L("Notes", {
+    en: "Notes",
+    pl: "Notatki",
+    es: "Notas",
   }),
   description: L(
-    "Notes, documents téléchargeables et vidéos — un univers à part du portfolio.",
+    "Livre, réflexions, documents, images et vidéos.",
     {
-      en: "Notes, downloadable documents and videos — a separate space from the portfolio.",
-      pl: "Notatki, dokumenty do pobrania i filmy — osobny świat poza portfolio.",
-      es: "Notas, documentos descargables y vídeos — un universo aparte del portfolio.",
+      en: "Book, reflections, documents, images and videos.",
+      pl: "Książka, refleksje, dokumenty, obrazy i filmy.",
+      es: "Libro, reflexiones, documentos, imágenes y vídeos.",
     }
   ),
 };
@@ -824,7 +832,7 @@ export type PortfolioData = {
   version: number;
 };
 
-export const DATA_VERSION = 34;
+export const DATA_VERSION = 36;
 
 export const QUOTE_SERVICE_IDS: QuoteServiceId[] = [
   "montage",

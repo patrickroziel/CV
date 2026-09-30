@@ -44,26 +44,35 @@ html {
   color-scheme: dark;
 }
 
-/* Médias universe — same glass system, violet / fuchsia accent */
+/* Notes universe — same glass system, blue / water accent */
 html[data-universe="medias"] {
-  --mint: #c4b5fd;
-  --mint-dim: rgba(196, 181, 253, 0.16);
-  --amber: #e879f9;
+  --mint: #67e8f9;
+  --mint-dim: rgba(103, 232, 249, 0.15);
+  --amber: #5eead4;
 }
 
 html[data-universe="medias"] .glass-glow {
   box-shadow:
     0 4px 18px rgba(0, 0, 0, 0.22),
     0 22px 56px -14px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(196, 181, 253, 0.08),
-    0 0 40px -12px rgba(167, 139, 250, 0.28);
+    0 0 0 1px rgba(103, 232, 249, 0.08),
+    0 0 40px -12px rgba(34, 211, 238, 0.22);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-work-sans), system-ui, sans-serif;
   min-height: 100vh;
+}
+
+/* One typographic system across the whole site. */
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-work-sans), system-ui, sans-serif;
 }
 
 /* Rich text editor — placeholder when empty */
@@ -723,4 +732,48 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* Work — one font family everywhere. Sizes, weights and hierarchy stay unchanged. */
+html[data-universe="portfolio"] body,
+html[data-universe="portfolio"] body * {
+  font-family: var(--font-work-sans), system-ui, sans-serif !important;
+}
+
+
+/* Experience: airy typography — keep emphasis without the heavy/condensed look. */
+html[data-universe="portfolio"] .experience-copy {
+  font-family: var(--font-work-sans), system-ui, sans-serif !important;
+  font-weight: 400;
+  line-height: 1.65 !important;
+  letter-spacing: 0.002em;
+}
+html[data-universe="portfolio"] .experience-copy p,
+html[data-universe="portfolio"] .experience-copy li,
+html[data-universe="portfolio"] .experience-copy div,
+html[data-universe="portfolio"] .experience-copy span {
+  line-height: 1.65 !important;
+}
+html[data-universe="portfolio"] .experience-copy strong,
+html[data-universe="portfolio"] .experience-copy b {
+  font-weight: 600 !important;
+}
+html[data-universe="portfolio"] .experience-copy li + li {
+  margin-top: 0.16rem;
+}
+
+/* V41 — Work reprend la composition simple de Notes. */
+html[data-universe="portfolio"] .work-notes-main .work-note-section > div > section {
+  min-height: 0 !important;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+html[data-universe="portfolio"] .work-notes-main .work-note-section:first-child > div > section {
+  padding-top: 0 !important;
+}
+html[data-universe="portfolio"] .work-notes-main .work-note-section > div > section > div {
+  max-width: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }

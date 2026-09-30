@@ -1019,18 +1019,13 @@ export function ShowreelEmbed({ className }: { className?: string }) {
           )}
         </GlassCard>
 
-        {/* 3 square feature cards — always side-by-side (mobile + desktop) */}
-        <div className="grid w-full grid-cols-3 gap-2 sm:gap-4 md:gap-5">
-          {featureVideos.map((video, i) => (
-            <FeatureVideoCard key={video.id} video={video} index={i} />
-          ))}
-        </div>
+        {/* Feature-card data is intentionally preserved but no longer rendered. */}
       </motion.div>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Showreel & 3 cartes vidéo</DialogTitle>
+            <DialogTitle>Showreel</DialogTitle>
           </DialogHeader>
           <div className="grid gap-5">
             <SlotEditor
@@ -1043,31 +1038,6 @@ export function ShowreelEmbed({ className }: { className?: string }) {
                 setDraftMain((m) => ({ ...m, ...partial }))
               }
             />
-
-            <div className="h-px bg-white/10" />
-
-            {draftFeatures.map((feat, index) => (
-              <SlotEditor
-                key={feat.id}
-                heading={`Carte ${index + 1}`}
-                title={feat.title}
-                description={feat.description}
-                videoType={
-                  feat.videoType === "x" ? "none" : feat.videoType
-                }
-                videoUrl={feat.videoType === "x" ? null : feat.videoUrl}
-                fallbackImageUrl={feat.fallbackImageUrl}
-                types={FEATURE_VIDEO_TYPES}
-                showDescription
-                onChange={(partial) =>
-                  setDraftFeatures((list) =>
-                    list.map((f, i) =>
-                      i === index ? { ...f, ...partial } : f
-                    )
-                  )
-                }
-              />
-            ))}
 
             {error && <p className="text-sm text-red-400">{error}</p>}
           </div>

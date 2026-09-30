@@ -88,9 +88,8 @@ export function ComingSoonSettingsPanel({
 
         <p className="text-xs leading-relaxed text-zinc-500">
           Active une page publique avec uniquement le{" "}
-          <strong className="text-zinc-300">fond</strong>, le{" "}
-          <strong className="text-zinc-300">showreel</strong> et les{" "}
-          <strong className="text-zinc-300">3 cartes feature</strong>. Le Mode
+          <strong className="text-zinc-300">fond</strong> et le{" "}
+          <strong className="text-zinc-300">showreel</strong>. Le Mode
           Édition affiche toujours le site complet pour travailler.
         </p>
 

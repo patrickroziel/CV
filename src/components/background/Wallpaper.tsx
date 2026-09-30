@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { DEFAULT_BACKGROUND } from "@/lib/defaults";
-import { MEDIAS_BACKGROUND_URL, universeFromPath } from "@/lib/universe";
 import {
   normalizeBackgroundImages,
   pickRandomBackground,
@@ -13,6 +12,7 @@ import {
   DEFAULT_ALPHA_VIDEO_OPACITY,
   type BackgroundImage,
 } from "@/lib/types";
+import { universeFromPath } from "@/lib/universe";
 
 function fallbackBackground(data: {
   backgroundImages?: BackgroundImage[];
@@ -33,12 +33,12 @@ function fallbackBackground(data: {
 const FADE_MS = 900;
 
 /**
- * Full-viewport wallpaper with optional alpha video.
- * Crossfades on media change; respects per-image / alpha opacities.
+ * Work = user-managed wallpaper pool (restores the editable trees background).
+ * Notes = fixed ocean/light background chosen for the Notes universe.
  */
 export function Wallpaper() {
   const { data, isHydrated } = usePortfolio();
-  const isMedias = universeFromPath(usePathname()) === "medias";
+  const isNotes = universeFromPath(usePathname()) === "medias";
   const overlayOpacity = isHydrated ? data.ui.overlayOpacity : 0.52;
   const didPickRef = useRef(false);
 
@@ -72,11 +72,11 @@ export function Wallpaper() {
 
     setActive((current) => {
       let next: BackgroundImage;
-      if (isMedias) {
+      if (isNotes) {
         next = {
-          id: "bg-medias",
-          url: MEDIAS_BACKGROUND_URL,
-          opacity: 0.92,
+          id: "bg-notes-ocean",
+          url: "/notes-water-bg.png",
+          opacity: 1,
           alphaVideoUrl: null,
           alphaVideoEnabled: false,
           alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
@@ -92,7 +92,6 @@ export function Wallpaper() {
       if (current.id !== next.id || current.url !== next.url) {
         setPrev(current);
         setFadeIn(false);
-        // Next paint: fade in new layer
         requestAnimationFrame(() => {
           requestAnimationFrame(() => setFadeIn(true));
         });
@@ -101,7 +100,7 @@ export function Wallpaper() {
       return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHydrated, poolKey, isMedias]);
+  }, [isHydrated, poolKey, isNotes]);
 
   useEffect(() => {
     setAlphaFailed(false);
@@ -193,13 +192,20 @@ export function Wallpaper() {
         className="absolute inset-0 z-[2]"
         style={{ backgroundColor: `rgba(0,0,0,${overlayOpacity})` }}
       />
-      {isMedias && (
-        <div
-          className="absolute inset-0 z-[2] bg-gradient-to-br from-violet-950/35 via-transparent to-fuchsia-950/25"
-          aria-hidden
-        />
+      {isNotes ? (
+        <>
+          <div className="absolute inset-0 z-[2] bg-gradient-to-b from-[#02131a]/30 via-transparent to-[#01070a]/68" />
+          <div
+            className="absolute inset-0 z-[2]"
+            style={{
+              background:
+                "radial-gradient(circle at 78% 16%, rgba(190,245,255,0.16), transparent 18%), radial-gradient(circle at 88% 8%, rgba(255,255,255,0.10), transparent 12%), radial-gradient(circle at 76% 56%, rgba(64,220,255,0.09), transparent 24%)",
+            }}
+          />
+        </>
+      ) : (
+        <div className="absolute inset-0 z-[2] bg-gradient-to-b from-black/30 via-transparent to-black/75" />
       )}
-      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-black/30 via-transparent to-black/75" />
       <div
         className="absolute inset-0 z-[2]"
         style={{

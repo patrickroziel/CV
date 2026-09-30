@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { FileUp, Loader2, X } from "lucide-react";
-import type { SocialPost, SocialPostFileKind } from "@/lib/types";
+import type { NotesCategory, SocialPost, SocialPostFileKind } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,14 @@ type SocialPostFormProps = {
 };
 
 const MAX_BYTES = 20 * 1024 * 1024;
+
+const NOTES_CATEGORIES: NotesCategory[] = [
+  "Livre",
+  "Réflexions",
+  "Documents",
+  "Images",
+  "Vidéos",
+];
 
 function detectFileKind(file: File): SocialPostFileKind | null {
   const name = file.name.toLowerCase();
@@ -51,6 +59,16 @@ export function SocialPostForm({
   );
   const [date, setDate] = useState(
     initial?.date || new Date().toISOString().slice(0, 10)
+  );
+  const [category, setCategory] = useState<NotesCategory>(
+    initial?.category ??
+      (initial?.youtubeUrl
+        ? "Vidéos"
+        : initial?.fileKind === "image"
+          ? "Images"
+          : initial?.fileKind === "pdf"
+            ? "Documents"
+            : "Réflexions")
   );
   const [youtubeUrl, setYoutubeUrl] = useState(initial?.youtubeUrl ?? "");
   const [fileUrl, setFileUrl] = useState<string | null>(initial?.fileUrl ?? null);
@@ -127,6 +145,7 @@ export function SocialPostForm({
       fileUrl,
       fileKind: fileUrl ? fileKind : null,
       fileName: fileUrl ? fileName : null,
+      category,
       tags: tags
         .split(",")
         .map((tag) => tag.trim())
@@ -153,6 +172,21 @@ export function SocialPostForm({
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="grid gap-2">
+          <Label htmlFor="notes-category">Catégorie</Label>
+          <select
+            id="notes-category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as NotesCategory)}
+            className="h-10 w-full rounded-xl border border-white/12 bg-black/35 px-3 text-sm text-zinc-100 outline-none focus:ring-1 focus:ring-cyan-300/40"
+          >
+            {NOTES_CATEGORIES.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="grid gap-2">
           <Label htmlFor="social-date">{t("medias.date")}</Label>
           <Input
             id="social-date"
@@ -166,7 +200,7 @@ export function SocialPostForm({
             type="checkbox"
             checked={visible}
             onChange={(e) => setVisible(e.target.checked)}
-            className="h-4 w-4 rounded border-white/20 bg-black/40 accent-violet-300"
+            className="h-4 w-4 rounded border-white/20 bg-black/40 accent-cyan-300"
           />
           {t("medias.visible")}
         </label>
@@ -223,7 +257,7 @@ export function SocialPostForm({
           className={cn(
             "relative flex min-h-[80px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-3 transition-colors",
             dragging
-              ? "border-violet-300/60 bg-violet-300/10"
+              ? "border-cyan-300/60 bg-cyan-300/10"
               : "border-white/20 bg-black/20 hover:border-white/35 hover:bg-white/5",
             fileUrl && "border-solid border-white/15",
             uploading && "pointer-events-none"
@@ -231,7 +265,7 @@ export function SocialPostForm({
         >
           {fileUrl && !uploading ? (
             <div className="flex w-full items-center gap-2 pr-8 text-left">
-              <FileUp className="h-5 w-5 shrink-0 text-violet-300" />
+              <FileUp className="h-5 w-5 shrink-0 text-cyan-200" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium text-zinc-200">
                   {fileName || fileUrl.split("/").pop()}
@@ -244,7 +278,7 @@ export function SocialPostForm({
           ) : (
             <div className="flex flex-col items-center gap-1.5 text-center text-zinc-400">
               {uploading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-violet-300/80" />
+                <Loader2 className="h-6 w-6 animate-spin text-cyan-200/80" />
               ) : (
                 <FileUp className="h-6 w-6 text-zinc-500" />
               )}
@@ -256,7 +290,7 @@ export function SocialPostForm({
           {uploading && (
             <div className="absolute inset-x-0 bottom-0 h-1 bg-black/40" aria-hidden>
               <div
-                className="h-full bg-gradient-to-r from-violet-400 to-fuchsia-300 transition-[width] duration-150"
+                className="h-full bg-gradient-to-r from-cyan-400 to-teal-300 transition-[width] duration-150"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -303,7 +337,7 @@ export function SocialPostForm({
         <Button
           type="submit"
           disabled={uploading}
-          className="bg-violet-300 text-zinc-950 hover:bg-violet-200"
+          className="bg-cyan-200 text-zinc-950 hover:bg-cyan-100"
         >
           {submitLabel || t("actions.save")}
         </Button>

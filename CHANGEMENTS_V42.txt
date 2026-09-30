@@ -1,0 +1,8 @@
+V42 — derniers ajustements Work
+
+- Le menu Work est revenu en haut de la page (plus de navigation latérale).
+- Le bouton « Fond » est de nouveau disponible en mode édition sur Work et ouvre l’éditeur de fonds.
+- La section Langues passe en grille 2 colonnes sur écran moyen/large pour éviter les cartes écrasées.
+- Le texte public de la section Langues est simplifié et ne parle plus de survol/démo vidéo.
+- Le sélecteur de langue/traduction reste disponible en public, mais est masqué en mode édition pour alléger la barre (la barre d’édition des langues reste disponible).
+- Notes et Coming Soon restent inchangés.

@@ -49,11 +49,7 @@ import {
 } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
 import { defaultHeroBadgesFromProfile } from "@/lib/storage";
-import {
-  DEFAULT_EXPERIENCE_BADGE,
-  HERO_FONT_OPTIONS,
-  resolveHeroFontStack,
-} from "@/lib/types";
+import { DEFAULT_EXPERIENCE_BADGE } from "@/lib/types";
 
 export function HeroSection() {
   const {
@@ -87,7 +83,6 @@ export function HeroSection() {
     profile.heroBadges && profile.heroBadges.length > 0
       ? profile.heroBadges
       : defaultHeroBadgesFromProfile(profile);
-  const heroFontStack = resolveHeroFontStack(profile.heroFontFamily);
 
   const openEdit = () => {
     setDraft({
@@ -102,7 +97,7 @@ export function HeroSection() {
               text: liftToLocalized(b.text),
             }))
           : defaultHeroBadgesFromProfile(profile),
-      heroFontFamily: profile.heroFontFamily || "default",
+      heroFontFamily: "",
     });
     setHeroShowreelLabel(liftToLocalized(c.heroShowreelLabel));
     setHeroCvLabel(liftToLocalized(c.heroCvLabel));
@@ -125,10 +120,7 @@ export function HeroSection() {
         ...b,
         text: liftToLocalized(b.text),
       })),
-      heroFontFamily:
-        !draft.heroFontFamily || draft.heroFontFamily === "default"
-          ? ""
-          : draft.heroFontFamily,
+      heroFontFamily: "",
       age: draft.age ? Number(draft.age) : undefined,
     });
 
@@ -208,13 +200,13 @@ export function HeroSection() {
               Référence : photo gauche + infos droite
               Mobile : photo puis textes
             */}
-            <div className="relative z-10 grid items-center gap-6 sm:gap-8 lg:grid-cols-[auto_1fr] lg:gap-10">
+            <div className="relative z-10 grid items-center gap-6 sm:gap-8 lg:grid-cols-1 lg:gap-10">
               {/* —— Photo (gauche) —— */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="relative z-10 mx-auto shrink-0 lg:mx-0"
+                className="hidden"
               >
                 <div className="relative flex items-center justify-center">
                   <div
@@ -252,11 +244,6 @@ export function HeroSection() {
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="relative z-10 flex min-w-0 flex-col items-center gap-2.5 text-center drop-shadow-[0_2px_16px_rgba(0,0,0,0.75)] sm:gap-3 lg:items-start lg:text-left"
-                style={
-                  heroFontStack
-                    ? { fontFamily: heroFontStack }
-                    : undefined
-                }
               >
                 {editMode && (
                   <Button
@@ -300,22 +287,22 @@ export function HeroSection() {
                 <RichHtml
                   as="h1"
                   html={profile.name}
-                  className="text-3xl font-bold tracking-tight text-zinc-50 drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] sm:text-4xl sm:leading-[1.1] lg:text-5xl"
+                  className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl lg:text-4xl"
                 />
 
                 {/* Titre */}
                 <RichHtml
                   html={l(profile.title)}
-                  className="text-sm font-medium text-teal-200 drop-shadow-[0_2px_16px_rgba(0,0,0,0.8)] sm:text-base lg:text-lg"
+                  className="text-sm font-medium text-teal-200 sm:text-base"
                 />
 
                 {/* Bio scrollable — hauteur max fixe, carte reste compacte */}
                 {l(profile.bio) && (
-                  <div className="hero-bio-scroll w-full max-w-xl rounded-xl border border-white/10 bg-black/25 p-3 backdrop-blur-sm sm:p-3.5 lg:max-w-none">
-                    <div className="max-h-[7.5rem] overflow-y-auto overscroll-contain pr-1 sm:max-h-[8.5rem]">
+                  <div className="w-full max-w-2xl">
+                    <div className="max-w-2xl">
                       <RichHtml
                         html={l(profile.bio)}
-                        className="text-sm leading-relaxed text-zinc-100 drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] sm:text-[0.95rem]"
+                        className="text-sm leading-6 text-zinc-300"
                       />
                     </div>
                   </div>
@@ -427,30 +414,6 @@ export function HeroSection() {
                 rows={8}
                 id="bio"
               />
-
-              <div className="grid gap-2">
-                <Label htmlFor="hero-font">Police du Hero</Label>
-                <select
-                  id="hero-font"
-                  value={draft.heroFontFamily || "default"}
-                  onChange={(e) =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      heroFontFamily: e.target.value,
-                    }))
-                  }
-                  className="h-10 w-full rounded-xl border border-white/12 bg-black/35 px-3 text-sm text-zinc-100 outline-none focus:ring-1 focus:ring-teal-300/40"
-                >
-                  {HERO_FONT_OPTIONS.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[10px] text-zinc-500">
-                  Appliquée au nom, titre, bio et labels du Hero uniquement.
-                </p>
-              </div>
 
               {/* Badges editor */}
               <div className="grid gap-2">

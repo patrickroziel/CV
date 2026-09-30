@@ -22,7 +22,7 @@ import {
 import { RichHtml } from "@/components/shared/RichHtml";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import type { Locale } from "@/i18n/locales";
-import type { SocialPost } from "@/lib/types";
+import type { NotesCategory, SocialPost } from "@/lib/types";
 import { cn, isYoutubeUrl, youtubeEmbedUrl, youtubeThumb } from "@/lib/utils";
 
 function formatSocialDate(iso: string, locale: Locale): string {
@@ -77,6 +77,15 @@ export function SocialPostCard({
   const yt = post.youtubeUrl?.trim() || "";
   const embed = yt && isYoutubeUrl(yt) ? youtubeEmbedUrl(yt) : null;
   const thumb = yt && isYoutubeUrl(yt) ? youtubeThumb(yt) : null;
+  const category: NotesCategory =
+    post.category ??
+    (yt
+      ? "Vidéos"
+      : post.fileKind === "image"
+        ? "Images"
+        : post.fileKind === "pdf"
+          ? "Documents"
+          : "Réflexions");
 
   return (
     <motion.article
@@ -88,17 +97,20 @@ export function SocialPostCard({
         glow
         className={cn(
           "overflow-hidden p-0",
-          "ring-1 ring-violet-300/10",
+          "ring-1 ring-cyan-300/10",
           !post.visible && "opacity-70"
         )}
       >
         <div className="flex flex-col gap-4 p-5 sm:p-6">
           <header className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="mb-1.5 flex flex-wrap items-center gap-2">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-cyan-100/15 bg-cyan-100/[0.06] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100/75">
+                  {category}
+                </span>
                 <time
                   dateTime={post.date}
-                  className="text-[11px] font-semibold uppercase tracking-[0.16em] text-violet-300/90"
+                  className="text-[11px] font-medium text-zinc-500"
                 >
                   {formatSocialDate(post.date, locale)}
                 </time>
@@ -189,7 +201,7 @@ export function SocialPostCard({
                   <button
                     type="button"
                     onClick={() => onTagClick?.(tag)}
-                    className="rounded-full border border-violet-300/20 bg-violet-400/10 px-2.5 py-0.5 text-[11px] font-medium text-violet-100 transition hover:bg-violet-400/20"
+                    className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-2.5 py-0.5 text-[11px] font-medium text-cyan-50 transition hover:bg-cyan-400/20"
                   >
                     {tag}
                   </button>
@@ -238,7 +250,7 @@ export function SocialPostCard({
               href={post.fileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-fit items-center gap-2 rounded-full border border-violet-300/30 bg-violet-400/15 px-3.5 py-2 text-sm font-medium text-violet-100 transition hover:bg-violet-400/25"
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/15 px-3.5 py-2 text-sm font-medium text-cyan-50 transition hover:bg-cyan-400/25"
             >
               <FileDown className="h-4 w-4" />
               {post.fileName?.trim() || t("medias.downloadPdf")}

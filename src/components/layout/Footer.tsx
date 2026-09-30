@@ -5,7 +5,7 @@ import { useUniverse } from "@/components/layout/UniverseSwitch";
 import { cn } from "@/lib/utils";
 
 export function Footer() {
-  const { data, resetToDefaults, editMode, t } = usePortfolio();
+  const { data, resetToDefaults, editMode } = usePortfolio();
   const universe = useUniverse();
   const year = new Date().getFullYear();
   const name =
@@ -22,8 +22,8 @@ export function Footer() {
         <p className="text-xs text-zinc-500">
           © {year} {name}
           {universe === "medias"
-            ? ` · ${t("nav.medias")}`
-            : " · Portfolio personnel — glassmorphism."}
+            ? " · Notes"
+            : " · Work"}
         </p>
         {editMode && (
           <button

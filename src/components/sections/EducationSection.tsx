@@ -155,7 +155,7 @@ export function EducationSection() {
                         </div>
                       )}
                     </div>
-                    {edu.media && edu.media.length > 0 && (
+                    {editMode && edu.media && edu.media.length > 0 && (
                       <div className="mt-4">
                         <MediaCarousel items={edu.media} compact />
                       </div>
