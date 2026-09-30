@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Copy, Mail, MapPin, Phone, Play, Settings2 } from "lucide-react";
+import { Check, Copy, Mail, MapPin, Play, Settings2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { GlassCard } from "@/components/glass/GlassCard";
@@ -38,7 +38,6 @@ export function ContactSection() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const email = c.emailValue.trim() || profile.email;
-  const phone = c.phoneValue.trim() || profile.phone;
   const showreel = c.showreelUrl.trim() || profile.showreelUrl;
   const showExtraDocs = hasContactExtraDocs(c);
 
@@ -114,7 +113,6 @@ export function ContactSection() {
                 )}
 
                 {(c.showEmail ||
-                  c.showPhone ||
                   c.showShowreel ||
                   showExtraDocs) && (
                   <div className="mt-8 flex flex-wrap gap-3">
@@ -124,16 +122,6 @@ export function ContactSection() {
                           <a href={`mailto:${email}`}>
                             <Mail className="h-4 w-4" />
                             {l(c.emailLabel)}
-                          </a>
-                        </Button>
-                      </MagneticButton>
-                    )}
-                    {c.showPhone && (
-                      <MagneticButton>
-                        <Button size="lg" variant="secondary" asChild>
-                          <a href={`tel:${phone.replace(/\s/g, "")}`}>
-                            <Phone className="h-4 w-4" />
-                            {l(c.phoneLabel)}
                           </a>
                         </Button>
                       </MagneticButton>

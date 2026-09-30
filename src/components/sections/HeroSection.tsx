@@ -9,7 +9,6 @@ import {
   FileDown,
   Mail,
   Pencil,
-  Phone,
   Play,
   Plus,
   Trash2,
@@ -54,7 +53,6 @@ import {
   DEFAULT_EXPERIENCE_BADGE,
   HERO_FONT_OPTIONS,
   resolveHeroFontStack,
-  type QuickContactLink,
 } from "@/lib/types";
 
 export function HeroSection() {
@@ -78,25 +76,18 @@ export function HeroSection() {
   );
   const [showHeroShowreel, setShowHeroShowreel] = useState(c.showHeroShowreel);
   const [showHeroCv, setShowHeroCv] = useState(c.showHeroCv);
-  const [showHeroPhone, setShowHeroPhone] = useState(c.showHeroPhone);
   const [showHeroEmail, setShowHeroEmail] = useState(c.showHeroEmail);
-  const [heroPhoneLabel, setHeroPhoneLabel] = useState<LocalizedString>(
-    liftToLocalized(c.heroPhoneLabel)
-  );
   const [heroEmailLabel, setHeroEmailLabel] = useState<LocalizedString>(
     liftToLocalized(c.heroEmailLabel)
   );
 
   const plainName = stripHtml(profile.name) || profile.name;
-  const phoneLabelText = l(c.heroPhoneLabel);
   const emailLabelText = l(c.heroEmailLabel);
   const heroBadges: HeroBadge[] =
     profile.heroBadges && profile.heroBadges.length > 0
       ? profile.heroBadges
       : defaultHeroBadgesFromProfile(profile);
   const heroFontStack = resolveHeroFontStack(profile.heroFontFamily);
-  const phoneDisplayLabel =
-    stripHtml(phoneLabelText).trim() || "Appeler";
 
   const openEdit = () => {
     setDraft({
@@ -117,27 +108,18 @@ export function HeroSection() {
     setHeroCvLabel(liftToLocalized(c.heroCvLabel));
     setShowHeroShowreel(c.showHeroShowreel);
     setShowHeroCv(c.showHeroCv);
-    setShowHeroPhone(c.showHeroPhone);
     setShowHeroEmail(c.showHeroEmail);
-    setHeroPhoneLabel(
-      liftToLocalized(
-        getL(c.heroPhoneLabel).trim() ? c.heroPhoneLabel : "Appeler"
-      )
-    );
     setHeroEmailLabel(liftToLocalized(c.heroEmailLabel));
     setEditOpen(true);
   };
 
   const saveProfile = () => {
-    const phone = (draft.phone ?? "").trim();
-    const oldPhone = (profile.phone ?? "").trim();
-    const digits = phone.replace(/\s/g, "");
     const namePlain = stripHtml(draft.name || "").trim() || draft.name;
 
     updateProfile({
       ...draft,
       name: draft.name?.trim() ? draft.name : namePlain,
-      phone,
+      phone: "",
       experienceBadge: draft.experienceBadge ?? DEFAULT_EXPERIENCE_BADGE,
       heroBadges: (draft.heroBadges ?? []).map((b) => ({
         ...b,
@@ -150,30 +132,6 @@ export function HeroSection() {
       age: draft.age ? Number(draft.age) : undefined,
     });
 
-    const prevPhoneValue = (c.phoneValue ?? "").trim();
-    const nextPhoneValue =
-      !prevPhoneValue || prevPhoneValue === oldPhone ? "" : prevPhoneValue;
-
-    const syncQuickLinks = (links: QuickContactLink[] | undefined) =>
-      (links ?? []).map((link) => {
-        const href = link.href || "";
-        const labelText = getL(link.label);
-        const isPhoneLink =
-          link.icon === "phone" ||
-          href.startsWith("tel:") ||
-          labelText === oldPhone;
-        if (!isPhoneLink) return link;
-        const labelWasPhone =
-          !labelText ||
-          labelText === oldPhone ||
-          labelText.replace(/\s/g, "") === oldPhone.replace(/\s/g, "");
-        return {
-          ...link,
-          href: digits ? `tel:${digits}` : href,
-          label: labelWasPhone ? phone : link.label,
-        };
-      });
-
     updateContact({
       heroShowreelLabel: getL(heroShowreelLabel).trim()
         ? heroShowreelLabel
@@ -181,14 +139,18 @@ export function HeroSection() {
       heroCvLabel: getL(heroCvLabel).trim() ? heroCvLabel : "Télécharger CV",
       showHeroShowreel,
       showHeroCv,
-      showHeroPhone,
+      showHeroPhone: false,
       showHeroEmail,
-      heroPhoneLabel: getL(heroPhoneLabel).trim()
-        ? heroPhoneLabel
-        : "Appeler",
+      heroPhoneLabel: "",
       heroEmailLabel,
-      phoneValue: nextPhoneValue,
-      quickContactLinks: syncQuickLinks(c.quickContactLinks),
+      showPhone: false,
+      phoneLabel: "",
+      phoneValue: "",
+      quickContactLinks: (c.quickContactLinks ?? []).filter(
+        (link) =>
+          link.icon !== "phone" &&
+          !String(link.href || "").trim().toLowerCase().startsWith("tel:")
+      ),
     });
     setEditOpen(false);
   };
@@ -359,26 +321,9 @@ export function HeroSection() {
                   </div>
                 )}
 
-                {/* Téléphone (label seul) + email */}
-                {(c.showHeroPhone || c.showHeroEmail) && (
+                {/* Email */}
+                {c.showHeroEmail && (
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-zinc-200 lg:justify-start">
-                    {c.showHeroPhone && profile.phone?.trim() && (
-                      <a
-                        href={`tel:${profile.phone.replace(/\s/g, "")}`}
-                        className="inline-flex items-center gap-1.5 transition hover:text-teal-300"
-                      >
-                        <Phone className="h-3.5 w-3.5 shrink-0" />
-                        <RichHtml
-                          as="span"
-                          html={
-                            phoneLabelText?.trim()
-                              ? phoneLabelText
-                              : phoneDisplayLabel
-                          }
-                          className="inline"
-                        />
-                      </a>
-                    )}
                     {c.showHeroEmail && (
                       <a
                         href={`mailto:${profile.email}`}
@@ -702,21 +647,6 @@ export function HeroSection() {
               />
 
               <div className="grid gap-2">
-                <Label htmlFor="phone">Téléphone (numéro pour le lien tel:)</Label>
-                <Input
-                  id="phone"
-                  value={draft.phone}
-                  onChange={(e) =>
-                    setDraft((prev) => ({ ...prev, phone: e.target.value }))
-                  }
-                />
-                <p className="text-[10px] text-zinc-500">
-                  Le numéro n’est plus affiché dans le Hero — seul le label
-                  cliquable apparaît (ex. « Appeler »).
-                </p>
-              </div>
-
-              <div className="grid gap-2">
                 <Label htmlFor="email">Email (lien mailto:)</Label>
                 <Input
                   id="email"
@@ -802,28 +732,6 @@ export function HeroSection() {
                   placeholder="Télécharger CV"
                   id="hero-cv-label"
                   hint=""
-                />
-              )}
-
-              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-                <span>Afficher téléphone</span>
-                <input
-                  type="checkbox"
-                  checked={showHeroPhone}
-                  onChange={(e) => setShowHeroPhone(e.target.checked)}
-                  className="accent-teal-300"
-                />
-              </label>
-              {showHeroPhone && (
-                <RichLocalizedField
-                  label="Label téléphone (affiché)"
-                  value={heroPhoneLabel}
-                  onChange={setHeroPhoneLabel}
-                  compact
-                  rows={1}
-                  placeholder="Appeler"
-                  id="hero-phone-label"
-                  hint="Texte cliquable uniquement — pas le numéro."
                 />
               )}
 

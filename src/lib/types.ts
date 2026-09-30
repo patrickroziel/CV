@@ -1062,12 +1062,6 @@ export const DEFAULT_QUICK_CONTACT_LINKS: QuickContactLink[] = [
     href: "mailto:patrick.roziel@me.com",
   },
   {
-    id: "qc-phone",
-    icon: "phone",
-    label: L("07 44 40 97 90"),
-    href: "tel:0744409790",
-  },
-  {
     id: "qc-showreel",
     icon: "play",
     label: L("Showreel"),
@@ -1158,12 +1152,8 @@ export const DEFAULT_CONTACT: ContactConfig = {
   emailLabel: L("Email"),
   emailValue: "",
 
-  showPhone: true,
-  phoneLabel: L("Appeler", {
-    en: "Call",
-    pl: "Zadzwoń",
-    es: "Llamar",
-  }),
+  showPhone: false,
+  phoneLabel: L(""),
   phoneValue: "",
 
   showShowreel: true,
@@ -1197,7 +1187,7 @@ export const DEFAULT_CONTACT: ContactConfig = {
     pl: "Pobierz CV",
     es: "Descargar CV",
   }),
-  showHeroPhone: true,
+  showHeroPhone: false,
   heroPhoneLabel: L(""),
   showHeroEmail: true,
   heroEmailLabel: L(""),

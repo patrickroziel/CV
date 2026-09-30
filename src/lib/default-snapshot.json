@@ -50,7 +50,7 @@
     },
     "photo": "https://res.cloudinary.com/ptp8diwd/image/upload/v1784742778/ih9243zrqradcoauy6vi.png",
     "email": "patrick.roziel@me.com",
-    "phone": "07 43 93 36 00",
+    "phone": "",
     "location": {
       "fr": "La Courneuve (93), France",
       "en": "La Courneuve (93), France",
@@ -1903,12 +1903,12 @@
       "fr": "Email"
     },
     "emailValue": "",
-    "showPhone": true,
+    "showPhone": false,
     "phoneLabel": {
-      "fr": "Appeler",
-      "en": "Call",
-      "pl": "Zadzwoń",
-      "es": "Llamar"
+      "fr": "",
+      "en": "",
+      "pl": "",
+      "es": ""
     },
     "phoneValue": "",
     "showShowreel": true,
@@ -1945,9 +1945,12 @@
       "pl": "Pobierz CV",
       "es": "Descargar CV"
     },
-    "showHeroPhone": true,
+    "showHeroPhone": false,
     "heroPhoneLabel": {
-      "fr": "Appeler"
+      "fr": "",
+      "en": "",
+      "pl": "",
+      "es": ""
     },
     "showHeroEmail": true,
     "heroEmailLabel": {
@@ -2006,14 +2009,6 @@
           "fr": "Email"
         },
         "href": "mailto:patrick.roziel@me.com"
-      },
-      {
-        "id": "qc-phone",
-        "icon": "phone",
-        "label": {
-          "fr": "Téléphone"
-        },
-        "href": "tel:0743933600"
       },
       {
         "id": "qc-showreel",

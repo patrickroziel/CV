@@ -8,16 +8,14 @@ import {
   Mail,
   MapPin,
   MessageCircle,
-  Phone,
   Play,
   Share2,
   type LucideIcon,
 } from "lucide-react";
 import type { QuickContactIcon } from "@/lib/types";
 
-export const QUICK_CONTACT_ICON_MAP: Record<QuickContactIcon, LucideIcon> = {
+export const QUICK_CONTACT_ICON_MAP: Partial<Record<QuickContactIcon, LucideIcon>> = {
   mail: Mail,
-  phone: Phone,
   play: Play,
   link: Link2,
   linkedin: Share2,
@@ -33,7 +31,6 @@ export const QUICK_CONTACT_ICON_OPTIONS: {
   label: string;
 }[] = [
   { value: "mail", label: "Email" },
-  { value: "phone", label: "Téléphone" },
   { value: "play", label: "Play / Showreel" },
   { value: "link", label: "Lien" },
   { value: "linkedin", label: "LinkedIn / Réseau" },

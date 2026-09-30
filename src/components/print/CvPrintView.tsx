@@ -23,7 +23,7 @@ export function CvPrintView() {
         </p>
         <p className="mt-2 text-sm text-zinc-600">{l(profile.location)}</p>
         <p className="mt-1 text-sm text-zinc-600">
-          {profile.phone} · {profile.email}
+          {profile.email}
         </p>
         {profile.showreelUrl && (
           <p className="mt-1 text-sm text-zinc-600">

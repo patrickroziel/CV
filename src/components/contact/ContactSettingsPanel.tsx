@@ -317,18 +317,6 @@ export function ContactSettingsPanel({
           </ToggleRow>
 
           <ToggleRow
-            label="Lien téléphone (Hero)"
-            checked={draft.showHeroPhone}
-            onChange={(v) => set("showHeroPhone", v)}
-          >
-            <ButtonNameField
-              value={draft.heroPhoneLabel}
-              onChange={(v) => set("heroPhoneLabel", v)}
-              placeholder="Vide = affiche le numéro"
-            />
-          </ToggleRow>
-
-          <ToggleRow
             label="Lien email (Hero)"
             checked={draft.showHeroEmail}
             onChange={(v) => set("showHeroEmail", v)}
@@ -475,26 +463,6 @@ export function ContactSettingsPanel({
           </ToggleRow>
 
           <ToggleRow
-            label="Bouton Téléphone"
-            checked={draft.showPhone}
-            onChange={(v) => set("showPhone", v)}
-          >
-            <ButtonNameField
-              value={draft.phoneLabel}
-              onChange={(v) => set("phoneLabel", v)}
-              placeholder="Appeler, Me joindre…"
-            />
-            <Label className="text-xs text-zinc-400">
-              Valeur téléphone (vide = profil)
-            </Label>
-            <Input
-              value={draft.phoneValue}
-              onChange={(e) => set("phoneValue", e.target.value)}
-              placeholder={data.profile.phone}
-            />
-          </ToggleRow>
-
-          <ToggleRow
             label="Bouton Showreel"
             checked={draft.showShowreel}
             onChange={(v) => set("showShowreel", v)}
@@ -577,7 +545,7 @@ export function ContactSettingsPanel({
 
               {links.length === 0 && (
                 <p className="text-xs text-zinc-500">
-                  Aucune ligne. Ajoutez email, téléphone, réseaux…
+                  Aucune ligne. Ajoutez email, réseaux ou autres liens…
                 </p>
               )}
 
@@ -668,10 +636,10 @@ export function ContactSettingsPanel({
                       onChange={(e) =>
                         updateLink(link.id, { href: e.target.value })
                       }
-                      placeholder="mailto:…, tel:…, https://…"
+                      placeholder="mailto:…, https://…"
                     />
                     <p className="text-[10px] text-zinc-500">
-                      Ex. mailto:contact@mail.com · tel:0612345678 ·
+                      Ex. mailto:contact@mail.com ·
                       https://linkedin.com/in/…
                     </p>
                   </div>

@@ -310,7 +310,6 @@ function normalizeEducation(e: Partial<Education> & { id: string }): Education {
 
 const QUICK_ICONS: QuickContactIcon[] = [
   "mail",
-  "phone",
   "play",
   "link",
   "linkedin",
@@ -325,7 +324,16 @@ function normalizeQuickContactLinks(raw: unknown): QuickContactLink[] {
   if (!Array.isArray(raw) || raw.length === 0) {
     return DEFAULT_QUICK_CONTACT_LINKS.map((l) => ({ ...l }));
   }
-  return raw
+
+  const cleaned = raw.filter((item) => {
+    if (!item || typeof item !== "object") return true;
+    const link = item as Partial<QuickContactLink>;
+    return (
+      link.icon !== "phone" &&
+      !String(link.href ?? "").trim().toLowerCase().startsWith("tel:")
+    );
+  });
+  return cleaned
     .filter((item): item is Partial<QuickContactLink> =>
       Boolean(item && typeof item === "object")
     )
@@ -505,10 +513,16 @@ function liftContact(c: ContactConfig): ContactConfig {
     widgetSkillsTitle: liftToLocalized(c.widgetSkillsTitle),
     widgetAvailabilityTitle: liftToLocalized(c.widgetAvailabilityTitle),
     widgetAvailabilityText: liftToLocalized(c.widgetAvailabilityText),
-    quickContactLinks: (c.quickContactLinks ?? []).map((l) => ({
-      ...l,
-      label: liftToLocalized(l.label),
-    })),
+    quickContactLinks: (c.quickContactLinks ?? [])
+      .filter(
+        (l) =>
+          l.icon !== "phone" &&
+          !String(l.href ?? "").trim().toLowerCase().startsWith("tel:")
+      )
+      .map((l) => ({
+        ...l,
+        label: liftToLocalized(l.label),
+      })),
   };
 }
 
