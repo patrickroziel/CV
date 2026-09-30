@@ -832,7 +832,7 @@ export type PortfolioData = {
   version: number;
 };
 
-export const DATA_VERSION = 36;
+export const DATA_VERSION = 37;
 
 export const QUOTE_SERVICE_IDS: QuoteServiceId[] = [
   "montage",

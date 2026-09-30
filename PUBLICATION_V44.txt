@@ -1,0 +1,11 @@
+V44 — Synchronisation du snapshot public
+
+- Snapshot Work remplacé par l’export exact fourni depuis localhost.
+- Hero : texte court actuel restauré.
+- Boutons Hero : showreel / CV / email restent masqués selon le snapshot.
+- Sections : visibilité reprise exactement depuis le snapshot.
+- Solutions Prompteur présente dans les données.
+- Premier post Notes : image Blob Vercel restaurée avec fileKind=image.
+- Fond Work : forêt du snapshot.
+- Fond Notes : eau conservée.
+- Migration v37 : réinitialisation unique des anciennes données locales de production afin d’éviter le retour de l’ancien Hero.

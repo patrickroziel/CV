@@ -1,0 +1,8 @@
+V45 — Hero Work revu
+
+- Carte Hero plus compacte et moins large
+- Suppression de la couche vidéo/vitrail qui brouillait le fond forêt
+- Verre sombre et propre, proche de Notes
+- Hiérarchie plus claire : nom, fonction, séparateur, bio
+- Badges conservés mais plus discrets
+- Contenu et réglages de visibilité inchangés

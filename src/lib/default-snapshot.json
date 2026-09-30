@@ -5,7 +5,7 @@
     {
       "id": "bg-default",
       "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80",
-      "opacity": 0.74,
+      "opacity": 1,
       "alphaVideoUrl": null,
       "alphaVideoEnabled": false,
       "alphaVideoOpacity": 0.85
@@ -37,13 +37,13 @@
   "profile": {
     "name": "Patrick Roziel",
     "title": {
-      "fr": "<div data-rich-lh=\"1.25\" class=\"rich-lh\" style=\"line-height: 1.25\"><b><span style=\"color: rgb(255, 255, 255)\" data-rich-color=\"#ffffff\">Monteur vidéo • Motion designer • Chargé de communication digitale</span></b></div>",
+      "fr": "<div data-rich-lh=\"1.25\" class=\"rich-lh\" style=\"line-height: 1.25\"><p>Montage vidéo · Motion design · Contenus digitaux</p></div>",
       "en": "Video editor | Motion designer | Digital communications specialist",
       "pl": "Montażysta wideo | Motion designer | Specjalista ds. komunikacji cyfrowej",
       "es": "Editor de vídeo | Motion designer | Especialista en comunicación digital"
     },
     "bio": {
-      "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><b></b><b></b><b><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">J’ai commencé à monter à 17 ans<br></span></span></b><br><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">Une compilation de destructions contrôlées de tours HLM de ma cité. Depuis, plus de vingt ans que je coupe, assemble et raconte des histoires en mouvement.\n\nCe sens du rythme, ce montage qui accroche avant le scroll, je l’ai affûté là où chaque seconde compte. </span></span></p><br><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">Là où l’attention se gagne ou se perd en un clin d’œil.\n\nLa polyvalence </span></span></p><b><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">caméra / montage / motion, je l’ai construite sur le terrain </span></span></b><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">: plateaux prompteur, productions corporate, gestion de matériel. Des contextes où j’ai dû tout porter, de la captation à la livraison. Souvent seul. Toujours efficace.\n\nMa façon de comprendre une audience vient d’avant les logiciels. Animation de personnages, vente, restauration, travail agricole à l’étranger. Vingt ans à observer, servir, incarner. Une école d’empathie et d’adaptation qu’aucun tutoriel n’enseigne. </span></span></p><br><p><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\"> Aujourd’hui je filme, je monte, j’anime • en français, anglais, polonais ou espagnol • avec la rigueur de celui qui sait que la créativité naît aussi de la débrouille. </span></span></p><br><span><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">Ma</span></span></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">&nbsp;boussole : J</span></span></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"><span style=\"font-size: 0.875rem\"><span style=\"color: rgb(235, 235, 235)\" data-rich-color=\"#ebebeb\">anet Jackson. Rythme. Exigence. Présence. Lucidité.&nbsp;</span></span></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"></span><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"></span></div>",
+      "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><br><p>Je crée et monte des contenus pour le web, les réseaux sociaux et la communication.</p><b></b><span style=\"color: lab(96.163399 0.099331 -0.364041)\" data-rich-color=\"lab(96.163399 0.099331 -0.364041)\"></span></div>",
       "en": "Video editor and digital communications specialist with over 10 years of experience in video production, motion design and brand content. Expert in social formats, corporate films and fast-turnaround workflows.",
       "pl": "Montażysta wideo i specjalista ds. komunikacji cyfrowej z ponad 10-letnim doświadczeniem w produkcji wideo, motion designie i treściach marki. Ekspert od formatów social, filmów corporate i szybkich workflowów.",
       "es": "Editor de vídeo y especialista en comunicación digital con más de 10 años de experiencia en producción audiovisual, motion design y contenidos de marca. Experto en formatos sociales, vídeos corporativos y flujos de trabajo ágiles."
@@ -57,7 +57,7 @@
       "pl": "La Courneuve (93), Francja",
       "es": "La Courneuve (93), Francia"
     },
-    "showreelUrl": "https://youtu.be/ws0EbZOxaNs",
+    "showreelUrl": "https://youtu.be/iPLN2ODs0jE",
     "cvUrl": null,
     "experienceBadge": {
       "fr": "20+ ans d’expérience",
@@ -158,23 +158,7 @@
         "Logistique",
         "Vidéo"
       ],
-      "media": [
-        {
-          "id": "f99e1b9a-055b-47dc-9fe8-95fccdf17335",
-          "type": "youtube",
-          "url": "https://youtu.be/VDL2wKfdPfE"
-        },
-        {
-          "id": "41abefc2-9b2d-456e-b80a-7e00183fc343",
-          "type": "youtube",
-          "url": "https://youtu.be/VDL2wKfdPfE"
-        },
-        {
-          "id": "214011bc-d5b0-43fd-bc01-2dc957b3d392",
-          "type": "image",
-          "url": "https://zeymkns3sxejoeni.public.blob.vercel-storage.com/patrick-roziel/projects/1786285530898-IMG-20250109-WA0008-RR3cSh1W56rLG2Ih2jYgD29g9tSKHu.jpg"
-        }
-      ]
+      "media": []
     },
     {
       "id": "exp-prompteur",
@@ -207,38 +191,7 @@
         "Prompteur",
         "Graphisme"
       ],
-      "media": [
-        {
-          "id": "bdb7393d-aa96-4f45-b997-a271a0e00615",
-          "type": "youtube",
-          "url": "https://youtu.be/Q0o0EZmy-nw"
-        },
-        {
-          "id": "9e12c179-4256-45eb-888a-23fab1a05683",
-          "type": "youtube",
-          "url": "https://youtu.be/AbpC305Hxdg"
-        },
-        {
-          "id": "42cf9e32-3c46-40a5-b83f-5d0d8e1cbb62",
-          "type": "youtube",
-          "url": "https://youtube.com/shorts/EiXzCdQBRuU?feature=share"
-        },
-        {
-          "id": "65ab3724-a7cb-4af5-92ef-85fb55616bad",
-          "type": "image",
-          "url": "https://res.cloudinary.com/ptp8diwd/image/upload/v1786281530/patrick-roziel/projects/lxbhtsex0hfclsgjosoi.png"
-        },
-        {
-          "id": "1856ed6a-c814-4eed-b1cc-ed35958adec8",
-          "type": "youtube",
-          "url": "https://youtu.be/m24hMzh5tPs"
-        },
-        {
-          "id": "a017a316-ec75-4f3b-b6db-9d0b9b9ddf63",
-          "type": "youtube",
-          "url": "https://youtube.com/shorts/EgApLd2I_aw?feature=share"
-        }
-      ]
+      "media": []
     },
     {
       "id": "exp-dietplus-2022",
@@ -395,7 +348,7 @@
       "startDate": "2009",
       "endDate": "2018",
       "description": {
-        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><ul><li><b>Responsable Communication – Projective (75) (2017–2018)</b> : mise en place pôle communication, création graphique et <b>vidéos corporate</b>, organisation voyages internationaux (<b>NY, Copenhague, Malmö</b>)</li><li><b>Infographiste – Mairie de Roissy-en-France (95) (2014–2015)</b> : conception print, montage vidéo pour festival <b>«&nbsp;Les Visitables&nbsp;»</b>, conseils stratégiques et coordination avec équipes municipales</li><li><b>Chargé de communication – ATOL Les Opticiens (92) &amp; AD REM Technology (75) (2011–2013)</b> : création visuels print et <b>vidéos produit</b>, rédaction web, gestion newsletter interne, participation à salons</li><li><b>Assistant Communication – Mairie de Roissy-en-France (95) (2010–2011)</b> : captation photo, création affiches/plaquettes, gestion <b>site web/blog</b> et fichier presse</li><li><b>Spécialiste – Apple Store Paris (75) (2009–2011)</b> : accompagnement clients, démonstrations logiciels créatifs (<b>Final Cut, iMovie, suite Adobe</b>)</li></ul></div>",
+        "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p><span style=\"color: rgb(192, 192, 192)\" data-rich-color=\"#c0c0c0\"><i>CDD, Alternance et CDI</i></span></p><ul><li><b>Responsable Communication – Projective (75) (2017–2018)</b> : mise en place pôle communication, création graphique et <b>vidéos corporate</b>, organisation voyages internationaux (<b>NY, Copenhague, Malmö</b>)</li><li><b>Infographiste – Mairie de Roissy-en-France (95) (2014–2015)</b> : conception print, montage vidéo pour festival <b>«&nbsp;Les Visitables&nbsp;»</b>, conseils stratégiques et coordination avec équipes municipales</li><li><b>Chargé de communication – ATOL Les Opticiens (92) &amp; AD REM Technology (75) (2011–2013)</b> : création visuels print et <b>vidéos produit</b>, rédaction web, gestion newsletter interne, participation à salons</li><li><b>Assistant Communication – Mairie de Roissy-en-France (95) (2010–2011)</b> : captation photo, création affiches/plaquettes, gestion <b>site web/blog</b> et fichier presse</li><li><b>Spécialiste – Apple Store Paris (75) (2009–2011)</b> : accompagnement clients, démonstrations logiciels créatifs (<b>Final Cut, iMovie, suite Adobe</b>)</li></ul></div>",
         "en": "Communications lead, graphic design, municipal and retail communication roles across Projective, Roissy-en-France, ATOL, AD REM and Apple Store Paris.",
         "pl": "Role komunikacyjne i graficzne: Projective, Roissy-en-France, ATOL, AD REM oraz Apple Store Paris.",
         "es": "Roles de comunicación y diseño: Projective, Roissy-en-France, ATOL, AD REM y Apple Store París."
@@ -564,167 +517,6 @@
   ],
   "skills": [
     {
-      "id": "sk-premiere",
-      "name": {
-        "fr": "Adobe Premiere Pro",
-        "en": "Adobe Premiere Pro",
-        "pl": "Adobe Premiere Pro",
-        "es": "Adobe Premiere Pro"
-      },
-      "level": 95,
-      "category": {
-        "fr": "Montage vidéo",
-        "en": "Video editing",
-        "pl": "Montaż wideo",
-        "es": "Montaje de vídeo"
-      },
-      "description": {
-        "fr": "Montage multi-caméras, storytelling rythmé, workflows proxy et livraison broadcast / social. Maîtrise des timelines complexes, de l’audio mix et des exports optimisés.",
-        "en": "Multi-cam editing, paced storytelling, proxy workflows and broadcast/social delivery. Complex timelines, audio mix and optimized exports.",
-        "pl": "Montaż multi-cam, storytelling, workflow proxy i dostawy broadcast/social. Złożone timeline’y, mix audio i eksporty.",
-        "es": "Montaje multi-cámara, storytelling rítmico, workflows proxy y entrega broadcast/social. Timelines complejas, mezcla de audio y exports."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-fcp",
-      "name": {
-        "fr": "Final Cut Pro",
-        "en": "Final Cut Pro",
-        "pl": "Final Cut Pro",
-        "es": "Final Cut Pro"
-      },
-      "level": 85,
-      "category": {
-        "fr": "Montage vidéo",
-        "en": "Video editing",
-        "pl": "Montaż wideo",
-        "es": "Montaje de vídeo"
-      },
-      "description": {
-        "fr": "Montage magnétique rapide, étalonnage intégré et livraisons multi-formats sur écosystème Apple.",
-        "en": "Fast magnetic timeline editing, built-in grading and multi-format delivery on Apple ecosystem.",
-        "pl": "Szybki montaż magnetyczny, grading wbudowany i dostawy multi-format w ekosystemie Apple.",
-        "es": "Montaje magnético rápido, etalonaje integrado y entregas multi-formato en ecosistema Apple."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-resolve",
-      "name": {
-        "fr": "DaVinci Resolve",
-        "en": "DaVinci Resolve",
-        "pl": "DaVinci Resolve",
-        "es": "DaVinci Resolve"
-      },
-      "level": 82,
-      "category": {
-        "fr": "Montage vidéo",
-        "en": "Video editing",
-        "pl": "Montaż wideo",
-        "es": "Montaje de vídeo"
-      },
-      "description": {
-        "fr": "Color grading avancé, nodes, looks cinéma et finishing pour films corporate et clips.",
-        "en": "Advanced color grading, nodes, cinematic looks and finishing for corporate films and clips.",
-        "pl": "Zaawansowany color grading, nodes, looki filmowe i finishing dla corporate i klipów.",
-        "es": "Etalonaje avanzado, nodos, looks cine y finishing para films corporate y clips."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-ae",
-      "name": {
-        "fr": "Adobe After Effects",
-        "en": "Adobe After Effects",
-        "pl": "Adobe After Effects",
-        "es": "Adobe After Effects"
-      },
-      "level": 92,
-      "category": {
-        "fr": "Motion design",
-        "en": "Motion design",
-        "pl": "Motion design",
-        "es": "Motion design"
-      },
-      "description": {
-        "fr": "Motion design, habillage, lower-thirds, animations 2D et intégration de templates dynamiques.",
-        "en": "Motion design, packaging, lower-thirds, 2D animation and dynamic template integration.",
-        "pl": "Motion design, oprawa, lower-thirds, animacja 2D i dynamiczne szablony.",
-        "es": "Motion design, packaging, lower-thirds, animación 2D e integración de plantillas dinámicas."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-motion",
-      "name": {
-        "fr": "Apple Motion",
-        "en": "Apple Motion",
-        "pl": "Apple Motion",
-        "es": "Apple Motion"
-      },
-      "level": 80,
-      "category": {
-        "fr": "Motion design",
-        "en": "Motion design",
-        "pl": "Motion design",
-        "es": "Motion design"
-      },
-      "description": {
-        "fr": "Templates Motion / FCP, titres animés et graphiques temps réel pour broadcasts légers.",
-        "en": "Motion / FCP templates, animated titles and real-time graphics for light broadcast.",
-        "pl": "Szablony Motion / FCP, animowane tytuły i grafika real-time.",
-        "es": "Plantillas Motion / FCP, títulos animados y gráficos en tiempo real."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-mogrt",
-      "name": {
-        "fr": "Templates MOGRT",
-        "en": "Templates MOGRT",
-        "pl": "Templates MOGRT",
-        "es": "Templates MOGRT"
-      },
-      "level": 88,
-      "category": {
-        "fr": "Motion design",
-        "en": "Motion design",
-        "pl": "Motion design",
-        "es": "Motion design"
-      },
-      "description": {
-        "fr": "Création et adaptation de Motion Graphics Templates pour Premiere, réutilisables en série.",
-        "en": "Creating and adapting Motion Graphics Templates for Premiere, reusable at scale.",
-        "pl": "Tworzenie i adaptacja szablonów MOGRT do Premiere, wielokrotnego użytku.",
-        "es": "Creación y adaptación de plantillas MOGRT para Premiere, reutilizables en serie."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-yt",
-      "name": {
-        "fr": "YouTube / Shorts",
-        "en": "YouTube / Shorts",
-        "pl": "YouTube / Shorts",
-        "es": "YouTube / Shorts"
-      },
-      "level": 90,
-      "category": {
-        "fr": "Vidéo réseaux sociaux",
-        "en": "Social video",
-        "pl": "Wideo w social media",
-        "es": "Vídeo redes sociales"
-      },
-      "description": {
-        "fr": "Formats verticaux et horizontaux, hooks, pacing algorithmique et miniatures cohérentes.",
-        "en": "Vertical and horizontal formats, hooks, algorithm-friendly pacing and consistent thumbnails.",
-        "pl": "Formaty pionowe i poziome, hooki, pacing pod algorytm i spójne miniatury.",
-        "es": "Formatos verticales y horizontales, hooks, pacing algorítmico y miniaturas coherentes."
-      },
-      "icons": []
-    },
-    {
       "id": "sk-ig",
       "name": {
         "fr": "Instagram / Reels",
@@ -744,29 +536,6 @@
         "en": "Engaging Reels, beat cuts, overlays and finishes tailored for Instagram feed.",
         "pl": "Angażujące Reels, cięcia do beatu, overlaye i finisz pod Instagram.",
         "es": "Reels atractivos, cortes al beat, overlays y acabados para el feed de Instagram."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-fb",
-      "name": {
-        "fr": "Facebook / formats social",
-        "en": "Facebook / social formats",
-        "pl": "Facebook / formaty social",
-        "es": "Facebook / formatos social"
-      },
-      "level": 90,
-      "category": {
-        "fr": "Vidéo réseaux sociaux",
-        "en": "Social video",
-        "pl": "Wideo w social media",
-        "es": "Vídeo redes sociales"
-      },
-      "description": {
-        "fr": "Formats ads et organiques Facebook, ratios multiples et messages clairs dès les premières secondes.",
-        "en": "Facebook ads and organic formats, multiple ratios and clear messages from the first seconds.",
-        "pl": "Formaty ads i organiczne na Facebooku, wiele ratio i jasny przekaz od pierwszych sekund.",
-        "es": "Formatos ads y orgánicos de Facebook, múltiples ratios y mensajes claros desde el primer segundo."
       },
       "icons": []
     },
@@ -813,52 +582,6 @@
         "en": "Logos, icons, vector art and brand system assets for motion and print.",
         "pl": "Loga, piktogramy, wektory i system identyfikacji do motion i printu.",
         "es": "Logos, pictos, vectorial y declinaciones de marca para motion y print."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-id",
-      "name": {
-        "fr": "InDesign",
-        "en": "InDesign",
-        "pl": "InDesign",
-        "es": "InDesign"
-      },
-      "level": 82,
-      "category": {
-        "fr": "Graphisme",
-        "en": "Graphic design",
-        "pl": "Grafika",
-        "es": "Diseño gráfico"
-      },
-      "description": {
-        "fr": "Mises en page éditoriales, dossiers de presse et supports print multi-pages.",
-        "en": "Editorial layouts, press kits and multi-page print materials.",
-        "pl": "Skład edytorski, press kitty i materiały print multi-page.",
-        "es": "Maquetación editorial, dossiers de prensa y soportes print multipágina."
-      },
-      "icons": []
-    },
-    {
-      "id": "sk-color",
-      "name": {
-        "fr": "Colorimétrie",
-        "en": "Color grading",
-        "pl": "Kolorystyka",
-        "es": "Etalonaje"
-      },
-      "level": 85,
-      "category": {
-        "fr": "Autres",
-        "en": "Other",
-        "pl": "Inne",
-        "es": "Otros"
-      },
-      "description": {
-        "fr": "Looks cohérents de projet, matching multi-cam et finitions cinema / corporate.",
-        "en": "Consistent project looks, multi-cam matching and cinema / corporate finishing.",
-        "pl": "Spójne looki projektu, matching multi-cam i finishing cinema / corporate.",
-        "es": "Looks coherentes de proyecto, matching multi-cam y finishing cine / corporate."
       },
       "icons": []
     },
@@ -1823,7 +1546,7 @@
         "pl": "Umiejętności",
         "es": "Competencias"
       },
-      "visible": true
+      "visible": false
     },
     "education": {
       "label": {
@@ -1904,19 +1627,14 @@
     },
     "emailValue": "",
     "showPhone": false,
-    "phoneLabel": {
-      "fr": "",
-      "en": "",
-      "pl": "",
-      "es": ""
-    },
+    "phoneLabel": {},
     "phoneValue": "",
-    "showShowreel": true,
+    "showShowreel": false,
     "showreelLabel": {
       "fr": "Showreel"
     },
     "showreelUrl": "",
-    "showCopyEmail": true,
+    "showCopyEmail": false,
     "copyEmailLabel": {},
     "showForm": true,
     "formTitle": {
@@ -1931,14 +1649,14 @@
       "pl": "Wyślij mailem",
       "es": "Enviar por correo"
     },
-    "showHeroShowreel": true,
+    "showHeroShowreel": false,
     "heroShowreelLabel": {
       "fr": "Voir le showreel",
       "en": "Watch showreel",
       "pl": "Zobacz showreel",
       "es": "Ver showreel"
     },
-    "showHeroCv": true,
+    "showHeroCv": false,
     "heroCvLabel": {
       "fr": "Télécharger CV",
       "en": "Download CV",
@@ -1946,12 +1664,7 @@
       "es": "Descargar CV"
     },
     "showHeroPhone": false,
-    "heroPhoneLabel": {
-      "fr": "",
-      "en": "",
-      "pl": "",
-      "es": ""
-    },
+    "heroPhoneLabel": {},
     "showHeroEmail": false,
     "heroEmailLabel": {
       "fr": "Envoyer un email"
@@ -2008,7 +1721,7 @@
         "label": {
           "fr": "Email"
         },
-        "href": "mailto:patrick.roziel@me.com"
+        "href": "mailto:prstudio@mail.fr"
       },
       {
         "id": "qc-showreel",
@@ -2182,7 +1895,7 @@
       "fr": "Showreel"
     },
     "videoType": "youtube",
-    "videoUrl": "https://youtu.be/ws0EbZOxaNs",
+    "videoUrl": "https://youtu.be/iPLN2ODs0jE",
     "fallbackImageUrl": null
   },
   "featureVideos": [
@@ -2200,8 +1913,8 @@
         "pl": "Oprawy, lower-thirds i animacje marki.",
         "es": "Packs, lower-thirds y animación de marca."
       },
-      "videoType": "file",
-      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784748535/pcqayn0d8gw7cmssuqmy.mov",
+      "videoType": "none",
+      "videoUrl": null,
       "fallbackImageUrl": null
     },
     {
@@ -2218,8 +1931,8 @@
         "pl": "Reels, Shorts i dynamiczne formaty pionowe.",
         "es": "Reels, Shorts y formatos verticales con ritmo."
       },
-      "videoType": "file",
-      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841588/patrick-roziel/showreel/ckcjdggyszoaeknsrm3c.mp4",
+      "videoType": "none",
+      "videoUrl": null,
       "fallbackImageUrl": null
     },
     {
@@ -2236,52 +1949,49 @@
         "pl": "Generowanie, compositing i workflow wspierane przez AI.",
         "es": "Generación, compositing y flujos asistidos por IA."
       },
-      "videoType": "file",
-      "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1785841914/patrick-roziel/showreel/gz0djttjwfj9hkffofxa.mov",
+      "videoType": "none",
+      "videoUrl": null,
       "fallbackImageUrl": null
     }
   ],
   "social": {
     "eyebrow": {
-      "fr": "Journal",
-      "en": "Journal",
-      "pl": "Dziennik",
-      "es": "Diario"
+      "fr": "Fil social",
+      "en": "Social feed",
+      "pl": "Kanał",
+      "es": "Feed social"
     },
     "title": {
-      "fr": "Notes",
-      "en": "Notes",
-      "pl": "Notatki",
-      "es": "Notas"
+      "fr": "Médias",
+      "en": "Media",
+      "pl": "Media",
+      "es": "Medios"
     },
     "description": {
-      "fr": "Livre, réflexions, documents, images et vidéos.",
-      "en": "Book, reflections, documents, images and videos.",
-      "pl": "Książka, refleksje, dokumenty, obrazy i filmy.",
-      "es": "Libro, reflexiones, documentos, imágenes y vídeos."
+      "fr": "Notes, documents téléchargeables et vidéos — un univers à part du portfolio.",
+      "en": "Notes, downloadable documents and videos — a separate space from the portfolio.",
+      "pl": "Notatki, dokumenty do pobrania i filmy — osobny świat poza portfolio.",
+      "es": "Notas, documentos descargables y vídeos — un universo aparte del portfolio."
     }
   },
   "socialPosts": [
     {
-      "id": "notes-welcome-2026-10-01",
+      "id": "48e8d59e-1048-493b-9aca-096ae9330180",
       "title": {
         "fr": "Bienvenue dans Notes"
       },
       "description": {
-        "fr": "Cette partie du site me sert à partager ce que j’écris, ce que j’apprends et ce que je veux transmettre.\n\nJ’y publierai au fil du temps plusieurs types de contenus : des chapitres du livre que j’écris, des réflexions, des documents utiles, des images et des vidéos.\n\nL’idée est simple : faire de cet espace un lieu à la fois personnel et pratique.\n\nOn y trouvera donc des textes liés au livre, des réflexions et prises de position, des documents et ressources utiles, des images et des vidéos.\n\nCe n’est pas un blog au sens classique du terme, ni un journal intime. C’est plutôt un espace de publication évolutif, dans lequel je rassemble ce qui mérite d’être partagé, gardé ou transmis."
+        "fr": "<div data-rich-lh=\"1.25\" class=\"rich-lh\" style=\"line-height: 1.25\"><p>Cette partie du site me sert à partager ce que j’écris, ce que j’apprends et ce que je veux transmettre.</p><p>J’y publierai au fil du temps plusieurs types de contenus : des chapitres du livre que j’écris, des réflexions, des documents utiles, des images et des vidéos.</p><p>L’idée est simple : faire de cet espace un lieu à la fois personnel et pratique.</p><p>On y trouvera donc :</p><ul><li>des textes liés au livre ;</li><li>des réflexions et prises de position ;</li><li>des documents et ressources utiles ;</li><li>des images ;</li><li>des vidéos.</li></ul><p>Ce n’est pas un blog au sens classique du terme, ni un journal intime. C’est plutôt un espace de publication évolutif, dans lequel je rassemble ce qui mérite d’être partagé, gardé ou transmis.</p></div>"
       },
-      "date": "2026-10-01",
+      "date": "2026-09-30",
       "youtubeUrl": null,
-      "fileUrl": null,
-      "fileKind": null,
-      "fileName": null,
+      "fileUrl": "https://zeymkns3sxejoeni.public.blob.vercel-storage.com/patrick-roziel/social/1790805413280-Image-ChatGPT-30-sept.-2026-a-23_55_59-3brelq2BKSvmaYJLiAup1GdDRABWFO.png",
+      "fileKind": "image",
+      "fileName": "Image ChatGPT 30 sept. 2026 à 23_55_59.png",
       "category": "Réflexions",
-      "tags": [
-        "Notes",
-        "Bienvenue"
-      ],
+      "tags": [],
       "visible": true,
-      "order": 0
+      "order": -1
     }
   ]
 }

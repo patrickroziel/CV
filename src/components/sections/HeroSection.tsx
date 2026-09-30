@@ -30,11 +30,6 @@ import { ExtraDocumentButtons } from "@/components/shared/ExtraDocumentButtons";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { ShowreelEmbed } from "@/components/shared/ShowreelEmbed";
-import { HeroAmbientBackground } from "@/components/sections/hero/HeroAmbientBackground";
-import {
-  HeroGlassBackLayer,
-  HeroGlassFrontLayer,
-} from "@/components/sections/hero/HeroGlassLayers";
 import { HeroPhotoWaves } from "@/components/sections/hero/HeroPhotoWaves";
 import { ProfilePhotoAura } from "@/components/sections/hero/ProfilePhotoAura";
 import { createId, printCv } from "@/lib/utils";
@@ -180,27 +175,23 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative z-10 overflow-hidden pb-16 pt-28 sm:pb-24 sm:pt-36"
+      className="relative z-10 overflow-hidden pb-12 pt-24 sm:pb-16 sm:pt-28"
     >
-      <div className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6 sm:space-y-8">
+      <div className="mx-auto max-w-5xl space-y-6 px-4 sm:px-6 sm:space-y-8">
         {/*
           Shell height = GlassCard content only.
           Media layers are absolute and never set min/max height.
         */}
-        <div className="relative isolate">
-          <HeroGlassBackLayer />
+        <div className="relative isolate mx-auto max-w-3xl">
           <GlassCard
-            elevated
-            className="glass-hero-vitrail relative z-[1] isolate overflow-hidden p-5 sm:p-7"
+            className="work-hero-card relative z-[1] isolate overflow-hidden p-6 sm:p-8 lg:p-9"
           >
-            <HeroAmbientBackground />
-            <HeroGlassFrontLayer />
 
             {/*
               Référence : photo gauche + infos droite
               Mobile : photo puis textes
             */}
-            <div className="relative z-10 grid items-center gap-6 sm:gap-8 lg:grid-cols-1 lg:gap-10">
+            <div className="relative z-10">
               {/* —— Photo (gauche) —— */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.94 }}
@@ -243,14 +234,14 @@ export function HeroSection() {
                   delay: 0.06,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="relative z-10 flex min-w-0 flex-col items-center gap-2.5 text-center drop-shadow-[0_2px_16px_rgba(0,0,0,0.75)] sm:gap-3 lg:items-start lg:text-left"
+                className="relative z-10 flex min-w-0 flex-col items-start gap-3 text-left sm:gap-3.5"
               >
                 {editMode && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={openEdit}
-                    className="h-7 gap-1 self-center px-2 text-xs text-zinc-400 lg:self-start"
+                    className="h-7 gap-1 self-start px-2 text-xs text-zinc-400"
                   >
                     <Pencil className="h-3 w-3" />
                     Modifier le profil
@@ -259,7 +250,7 @@ export function HeroSection() {
 
                 {/* Badges (éditables) */}
                 {heroBadges.length > 0 && (
-                  <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+                  <div className="flex flex-wrap items-center justify-start gap-2">
                     {heroBadges.map((badge) => {
                       const text = l(badge.text);
                       if (!text) return null;
@@ -287,22 +278,24 @@ export function HeroSection() {
                 <RichHtml
                   as="h1"
                   html={profile.name}
-                  className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl lg:text-4xl"
+                  className="text-3xl font-semibold tracking-[-0.025em] text-zinc-50 sm:text-4xl"
                 />
 
                 {/* Titre */}
                 <RichHtml
                   html={l(profile.title)}
-                  className="text-sm font-medium text-teal-200 sm:text-base"
+                  className="text-base font-medium text-teal-200 sm:text-lg"
                 />
 
-                {/* Bio scrollable — hauteur max fixe, carte reste compacte */}
+                <div aria-hidden className="h-px w-16 bg-gradient-to-r from-teal-300/70 to-transparent" />
+
+                {/* Bio */}
                 {l(profile.bio) && (
                   <div className="w-full max-w-2xl">
                     <div className="max-w-2xl">
                       <RichHtml
                         html={l(profile.bio)}
-                        className="text-sm leading-6 text-zinc-300"
+                        className="text-[0.95rem] leading-7 text-zinc-300 sm:text-base"
                       />
                     </div>
                   </div>

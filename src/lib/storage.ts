@@ -1150,6 +1150,15 @@ export function loadPortfolio(): PortfolioData {
       return fresh;
     }
 
+    // v37: publish exactly the user-exported state.
+    // This one-time reset prevents stale production localStorage from
+    // resurrecting the old Hero, buttons, section visibility or Notes media.
+    if ((parsed.version ?? 0) < 37) {
+      const fresh = structuredClone(DEFAULT_PORTFOLIO);
+      savePortfolio(fresh);
+      return fresh;
+    }
+
     const mergedProfile = {
       ...DEFAULT_PORTFOLIO.profile,
       ...parsed.profile,

@@ -253,7 +253,9 @@ export function stripHtml(input: string): string {
       .replace(/<\/(p|div|li|h[1-6])>/gi, "\n")
       .replace(/<li[^>]*>/gi, "• ")
       .replace(/<[^>]+>/g, "")
-      .replace(/&nbsp;/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&#(?:160|xA0);/gi, " ")
+      .replace(/\u00a0/g, " ")
       .replace(/&amp;/g, "&")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
@@ -273,6 +275,7 @@ export function stripHtml(input: string): string {
     block.append("\n");
   });
   return (div.textContent || "")
+    .replace(/\u00a0/g, " ")
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]{2,}/g, " ")

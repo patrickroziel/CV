@@ -1,0 +1,5 @@
+V46 — correction hydration
+
+- Normalise les espaces insécables (&nbsp; / U+00A0) de manière identique côté serveur et navigateur.
+- Corrige le mismatch React observé dans CvPrintView / RichHtml plain.
+- Aucun changement visuel du Hero ou de Notes.
