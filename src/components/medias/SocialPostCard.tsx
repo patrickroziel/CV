@@ -127,65 +127,20 @@ export function SocialPostCard({
             </div>
 
             {editMode && (
-              <div className="flex shrink-0 items-center gap-0.5">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-zinc-400"
-                  disabled={!canMoveUp}
-                  title={t("medias.moveUp")}
-                  onClick={() => onMove(post.id, -1)}
-                >
-                  <ArrowUp className="h-4 w-4" />
+              <div className="flex shrink-0 items-center gap-1">
+                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-zinc-400" title="Modifier" onClick={() => onEdit(post)}>
+                  <Pencil className="h-4 w-4" />
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-zinc-400"
-                  disabled={!canMoveDown}
-                  title={t("medias.moveDown")}
-                  onClick={() => onMove(post.id, 1)}
+                  className="h-8 w-8 text-red-400"
+                  title="Supprimer"
+                  onClick={() => { if (confirm("Supprimer ce post ?")) removeSocialPost(post.id); }}
                 >
-                  <ArrowDown className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-zinc-400"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit(post)}>
-                      <Pencil />
-                      {t("actions.edit")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        updateSocialPost(post.id, { visible: !post.visible })
-                      }
-                    >
-                      {post.visible ? <EyeOff /> : <Eye />}
-                      {post.visible ? t("medias.hide") : t("medias.show")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-red-400 focus:text-red-300"
-                      onClick={() => {
-                        if (confirm(t("medias.deleteConfirm"))) {
-                          removeSocialPost(post.id);
-                        }
-                      }}
-                    >
-                      <Trash2 />
-                      {t("medias.delete")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             )}
           </header>

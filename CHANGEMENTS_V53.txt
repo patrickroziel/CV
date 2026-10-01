@@ -1,0 +1,13 @@
+V53 — SIMPLIFICATION GÉNÉRALE
+
+- Site public et édition en français uniquement.
+- Suppression du sélecteur FR/EN/PL/ES et de la barre d’édition par langue.
+- Désactivation de la traduction automatique.
+- Barre d’édition texte réduite : gras, italique, taille numérique, liste, effacer format.
+- Hero : seulement nom, métier, présentation.
+- Expériences : seulement poste, entreprise, lieu, dates, description.
+- Formation : seulement année, diplôme, école.
+- Langues : seulement nom et niveau/explication.
+- Contact : seulement titres, texte, affichage du formulaire.
+- Notes : titre, texte, catégorie, YouTube facultatif, image/PDF facultatif.
+- Les anciennes données avancées restent conservées mais ne sont plus exposées dans les éditeurs.

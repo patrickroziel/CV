@@ -1,15 +1,9 @@
 "use client";
 
-import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
-import { LOCALES, LOCALE_META } from "@/i18n/locales";
-import {
-  isLocaleFilled,
-  setL,
-  type MaybeLocalized,
-} from "@/lib/i18n-content";
+import { getL, setL, type MaybeLocalized } from "@/lib/i18n-content";
 import { cn } from "@/lib/utils";
 
 type LocalizedFieldProps = {
@@ -21,18 +15,10 @@ type LocalizedFieldProps = {
   placeholder?: string;
   id?: string;
   className?: string;
-  /**
-   * Force plain single-line input even if multiline (rare).
-   * Multiline fields always use rich editor + smart paste.
-   */
   plain?: boolean;
 };
 
-/**
- * Form field bound to one locale of a LocalizedString.
- * - Single-line: input with emoji-safe paste
- * - Multiline: rich editor (lists, bold/italic, structure-preserving paste)
- */
+/** Éditeur volontairement mono-langue : le site est maintenant édité en français uniquement. */
 export function LocalizedField({
   label,
   value,
@@ -44,9 +30,8 @@ export function LocalizedField({
   className,
   plain = false,
 }: LocalizedFieldProps) {
-  const { editingLocale, le, t } = usePortfolio();
-  const fieldId = id || `loc-${label.replace(/\s+/g, "-").toLowerCase()}`;
-  const current = le(value);
+  const fieldId = id || `field-${label.replace(/\s+/g, "-").toLowerCase()}`;
+  const current = getL(value, "fr");
 
   if (multiline && !plain) {
     return (
@@ -64,37 +49,12 @@ export function LocalizedField({
 
   return (
     <div className={cn("grid gap-2", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Label htmlFor={fieldId}>{label}</Label>
-        <div className="flex gap-0.5">
-          {LOCALES.map((code) => {
-            const filled = isLocaleFilled(value, code);
-            const active = code === editingLocale;
-            return (
-              <span
-                key={code}
-                title={filled ? t("edit.filled") : t("edit.missing")}
-                className={cn(
-                  "rounded px-1 text-[9px] font-bold uppercase",
-                  active && "ring-1 ring-amber-300/50",
-                  filled
-                    ? "bg-teal-300/20 text-teal-200"
-                    : "bg-white/5 text-zinc-600"
-                )}
-              >
-                {LOCALE_META[code].short}
-              </span>
-            );
-          })}
-        </div>
-      </div>
+      <Label htmlFor={fieldId}>{label}</Label>
       <Input
         id={fieldId}
         value={current}
-        placeholder={placeholder || t("edit.fallbackHint")}
-        onChange={(e) =>
-          onChange(setL(value, editingLocale, e.target.value))
-        }
+        placeholder={placeholder}
+        onChange={(e) => onChange(setL(value, "fr", e.target.value))}
       />
     </div>
   );

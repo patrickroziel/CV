@@ -202,7 +202,6 @@ export function EducationSection() {
               onChange={setSchool}
               id="school"
             />
-            <MediaCarouselEditor items={media} onChange={setMedia} />
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setOpen(false)}>

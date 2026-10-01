@@ -41,17 +41,13 @@ import {
 } from "@/lib/storage";
 import { createId } from "@/lib/utils";
 import { isEditEnvironment } from "@/lib/edit-env";
-import {
-  DEFAULT_LOCALE,
-  isLocale,
-  LOCALE_STORAGE_KEY,
-} from "@/i18n/locales";
+
 import { t as translate } from "@/i18n";
 import {
   getL,
   type MaybeLocalized,
 } from "@/lib/i18n-content";
-import { ensureLanguageLocales } from "@/lib/auto-localize";
+
 
 type PortfolioContextValue = {
   data: PortfolioData;
@@ -128,59 +124,34 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [editAllowed, setEditAllowed] = useState(false);
   const [editModeRaw, setEditModeRaw] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
-  const [editingLocale, setEditingLocale] = useState<Locale>(DEFAULT_LOCALE);
+  const locale: Locale = "fr";
+  const editingLocale: Locale = "fr";
 
   // editMode is always false for public/production visitors
   const editMode = editAllowed && editModeRaw;
 
   useEffect(() => {
-    const loaded = loadPortfolio();
-    setData(loaded);
     const allowed = isEditEnvironment();
+    // Public production must always reflect the deployed snapshot.
+    // Browser localStorage is only an editing workspace on localhost (or when
+    // NEXT_PUBLIC_ALLOW_EDIT=true). This prevents an old local draft from
+    // masking freshly published content after a Vercel deployment.
+    const loaded = allowed ? loadPortfolio() : structuredClone(DEFAULT_PORTFOLIO);
+    setData(loaded);
     setEditAllowed(allowed);
     if (!allowed) setEditModeRaw(false);
 
-    let initial: Locale = DEFAULT_LOCALE;
-    try {
-      const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-      if (isLocale(stored)) initial = stored;
-      else if (isLocale(loaded.ui?.locale)) initial = loaded.ui.locale;
-    } catch {
-      if (isLocale(loaded.ui?.locale)) initial = loaded.ui.locale;
-    }
-    setLocaleState(initial);
-    setEditingLocale(initial);
     if (typeof document !== "undefined") {
-      document.documentElement.lang = initial;
+      document.documentElement.lang = "fr";
     }
     setIsHydrated(true);
-
-    // Backfill FR/EN/PL/ES for language names & levels (custom levels included)
-    void ensureLanguageLocales(loaded.languages).then((updates) => {
-      if (!updates) return;
-      setData((prev) => {
-        const languages = prev.languages.map((lang) => {
-          const u = updates.find((x) => x.id === lang.id);
-          if (!u) return lang;
-          return { ...lang, name: u.name, level: u.level };
-        });
-        const next = { ...prev, languages, version: DATA_VERSION };
-        try {
-          savePortfolio(next);
-        } catch {
-          /* ignore */
-        }
-        return next;
-      });
-    });
   }, []);
 
   // Safety net: persist the latest provider state again after React settles.
   // Individual mutations already save synchronously; this debounced write
   // prevents a later render/remount from reviving an older value.
   useEffect(() => {
-    if (!isHydrated) return;
+    if (!isHydrated || !editAllowed) return;
     const timer = window.setTimeout(() => {
       try {
         savePortfolio(data);
@@ -189,36 +160,16 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       }
     }, 250);
     return () => window.clearTimeout(timer);
-  }, [data, isHydrated]);
+  }, [data, isHydrated, editAllowed]);
 
-  const setLocale = useCallback(
-    (next: Locale) => {
-      setLocaleState(next);
-      try {
-        localStorage.setItem(LOCALE_STORAGE_KEY, next);
-      } catch {
-        /* ignore */
-      }
-      if (typeof document !== "undefined") {
-        document.documentElement.lang = next;
-      }
-      // Persist inside portfolio blob too
-      setData((prev) => {
-        const withUi = {
-          ...prev,
-          ui: { ...prev.ui, locale: next },
-          version: DATA_VERSION,
-        };
-        try {
-          savePortfolio(withUi);
-        } catch {
-          /* ignore */
-        }
-        return withUi;
-      });
-    },
-    []
-  );
+  const setLocale = useCallback((_next: Locale) => {
+    // Site volontairement mono-langue.
+    if (typeof document !== "undefined") document.documentElement.lang = "fr";
+  }, []);
+
+  const setEditingLocale = useCallback((_next: Locale) => {
+    // Site volontairement mono-langue.
+  }, []);
 
   const setEditMode = useCallback((v: boolean) => {
     if (!isEditEnvironment()) {
@@ -229,20 +180,20 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: string) => translate(key, locale),
-    [locale]
+    (key: string) => translate(key, "fr"),
+    []
   );
 
   /** Display content: follow editingLocale in edit mode for WYSIWYG */
   const l = useCallback(
     (value: MaybeLocalized) =>
-      getL(value, editMode ? editingLocale : locale),
-    [editMode, editingLocale, locale]
+      getL(value, "fr"),
+    []
   );
 
   const le = useCallback(
-    (value: MaybeLocalized) => getL(value, editingLocale),
-    [editingLocale]
+    (value: MaybeLocalized) => getL(value, "fr"),
+    []
   );
 
   const showToast = useCallback((msg: string) => {

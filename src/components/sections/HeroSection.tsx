@@ -402,10 +402,7 @@ export function HeroSection({
           <div className="shrink-0 border-b border-white/10 px-6 pb-3 pt-6 pr-12">
             <DialogHeader>
               <DialogTitle>Modifier le profil (Hero)</DialogTitle>
-              <p className="text-xs text-zinc-500">
-                Textes avec mise en forme : gras, italique, taille, couleur,
-                alignement (pas de HTML brut).
-              </p>
+              <p className="text-xs text-zinc-500">Nom, métier et présentation. Rien de plus.</p>
             </DialogHeader>
           </div>
 
@@ -414,337 +411,27 @@ export function HeroSection({
               <RichTextField
                 label="Nom"
                 value={draft.name}
-                onChange={(name) =>
-                  setDraft((prev) => ({ ...prev, name }))
-                }
+                onChange={(name) => setDraft((prev) => ({ ...prev, name }))}
                 compact
                 placeholder="Patrick Roziel"
                 id="name"
               />
-
               <RichLocalizedField
-                label="Titre"
+                label="Ce que je fais"
                 value={draft.title}
-                onChange={(title) =>
-                  setDraft((prev) => ({ ...prev, title }))
-                }
+                onChange={(title) => setDraft((prev) => ({ ...prev, title }))}
                 compact
                 rows={2}
                 id="title"
               />
-
               <RichLocalizedField
-                label="Bio"
+                label="Présentation"
                 value={draft.bio}
                 onChange={(bio) => setDraft((prev) => ({ ...prev, bio }))}
-                rows={8}
+                rows={5}
                 id="bio"
               />
-
-              {/* Badges editor */}
-              <div className="grid gap-2">
-                <div className="flex items-center justify-between gap-2">
-                  <Label>Badges (haut du Hero)</Label>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    className="h-7 gap-1 text-xs"
-                    onClick={() =>
-                      setDraft((prev) => ({
-                        ...prev,
-                        heroBadges: [
-                          ...(prev.heroBadges ?? []),
-                          {
-                            id: createId(),
-                            text: liftToLocalized("Nouveau badge"),
-                            bgColor: "#134e4a",
-                            textColor: "#99f6e4",
-                          },
-                        ],
-                      }))
-                    }
-                  >
-                    <Plus className="h-3 w-3" />
-                    Ajouter
-                  </Button>
-                </div>
-                <ul className="space-y-2">
-                  {(draft.heroBadges ?? []).map((badge, index) => (
-                    <li
-                      key={badge.id}
-                      className="grid gap-2 rounded-xl border border-white/10 bg-black/30 p-2"
-                    >
-                      <div className="flex items-start gap-2">
-                        <div className="min-w-0 flex-1">
-                          <RichLocalizedField
-                            label={`Badge ${index + 1}`}
-                            value={badge.text}
-                            onChange={(text) =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                heroBadges: (prev.heroBadges ?? []).map((b) =>
-                                  b.id === badge.id ? { ...b, text } : b
-                                ),
-                              }))
-                            }
-                            compact
-                            rows={1}
-                            hint=""
-                            id={`badge-text-${badge.id}`}
-                          />
-                        </div>
-                        <div className="flex shrink-0 flex-col gap-0.5 pt-6">
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7"
-                            disabled={index === 0}
-                            onClick={() =>
-                              setDraft((prev) => {
-                                const list = [...(prev.heroBadges ?? [])];
-                                if (index <= 0) return prev;
-                                [list[index - 1], list[index]] = [
-                                  list[index],
-                                  list[index - 1],
-                                ];
-                                return { ...prev, heroBadges: list };
-                              })
-                            }
-                            aria-label="Monter"
-                          >
-                            <ChevronUp className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7"
-                            disabled={
-                              index >= (draft.heroBadges?.length ?? 0) - 1
-                            }
-                            onClick={() =>
-                              setDraft((prev) => {
-                                const list = [...(prev.heroBadges ?? [])];
-                                if (index >= list.length - 1) return prev;
-                                [list[index], list[index + 1]] = [
-                                  list[index + 1],
-                                  list[index],
-                                ];
-                                return { ...prev, heroBadges: list };
-                              })
-                            }
-                            aria-label="Descendre"
-                          >
-                            <ChevronDown className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 text-red-400"
-                            onClick={() =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                heroBadges: (prev.heroBadges ?? []).filter(
-                                  (b) => b.id !== badge.id
-                                ),
-                              }))
-                            }
-                            aria-label="Supprimer"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <label className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                          Fond
-                          <input
-                            type="color"
-                            value={
-                              badge.bgColor.startsWith("#")
-                                ? badge.bgColor.slice(0, 7)
-                                : "#27272a"
-                            }
-                            onChange={(e) =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                heroBadges: (prev.heroBadges ?? []).map((b) =>
-                                  b.id === badge.id
-                                    ? { ...b, bgColor: e.target.value }
-                                    : b
-                                ),
-                              }))
-                            }
-                            className="h-7 w-9 cursor-pointer rounded border border-white/15 bg-transparent p-0"
-                          />
-                        </label>
-                        <label className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                          Texte
-                          <input
-                            type="color"
-                            value={
-                              badge.textColor.startsWith("#")
-                                ? badge.textColor.slice(0, 7)
-                                : "#f4f4f5"
-                            }
-                            onChange={(e) =>
-                              setDraft((prev) => ({
-                                ...prev,
-                                heroBadges: (prev.heroBadges ?? []).map((b) =>
-                                  b.id === badge.id
-                                    ? { ...b, textColor: e.target.value }
-                                    : b
-                                ),
-                              }))
-                            }
-                            className="h-7 w-9 cursor-pointer rounded border border-white/15 bg-transparent p-0"
-                          />
-                        </label>
-                        <span
-                          className="rounded-full border border-white/15 px-2.5 py-0.5 text-[11px]"
-                          style={{
-                            backgroundColor: badge.bgColor,
-                            color: badge.textColor,
-                          }}
-                        >
-                          Aperçu
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                {(draft.heroBadges ?? []).length === 0 && (
-                  <p className="text-[10px] text-zinc-500">
-                    Aucun badge. Cliquez sur « Ajouter ».
-                  </p>
-                )}
-              </div>
-
-              <RichLocalizedField
-                label="Localisation (profil / CV)"
-                value={draft.location}
-                onChange={(location) =>
-                  setDraft((prev) => ({ ...prev, location }))
-                }
-                compact
-                rows={1}
-                id="location"
-                hint="Champ profil (Contact, CV). Les badges Hero se gèrent ci-dessus."
-              />
-
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email (lien mailto:)</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={draft.email}
-                  onChange={(e) =>
-                    setDraft((prev) => ({ ...prev, email: e.target.value }))
-                  }
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="showreel">URL Showreel</Label>
-                <Input
-                  id="showreel"
-                  value={draft.showreelUrl}
-                  onChange={(e) =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      showreelUrl: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="cvUrl">Lien CV externe (optionnel)</Label>
-                <Input
-                  id="cvUrl"
-                  placeholder="Sinon : Exporter PDF"
-                  value={draft.cvUrl ?? ""}
-                  onChange={(e) =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      cvUrl: e.target.value || null,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="h-px bg-white/10" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
-                Labels & boutons (Hero)
-              </p>
-
-              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-                <span>Afficher Showreel</span>
-                <input
-                  type="checkbox"
-                  checked={showHeroShowreel}
-                  onChange={(e) => setShowHeroShowreel(e.target.checked)}
-                  className="accent-teal-300"
-                />
-              </label>
-              {showHeroShowreel && (
-                <RichLocalizedField
-                  label="Label bouton Showreel"
-                  value={heroShowreelLabel}
-                  onChange={setHeroShowreelLabel}
-                  compact
-                  rows={1}
-                  placeholder="Voir le showreel"
-                  id="hero-showreel-label"
-                  hint=""
-                />
-              )}
-
-              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-                <span>Afficher CV</span>
-                <input
-                  type="checkbox"
-                  checked={showHeroCv}
-                  onChange={(e) => setShowHeroCv(e.target.checked)}
-                  className="accent-teal-300"
-                />
-              </label>
-              {showHeroCv && (
-                <RichLocalizedField
-                  label="Label bouton CV"
-                  value={heroCvLabel}
-                  onChange={setHeroCvLabel}
-                  compact
-                  rows={1}
-                  placeholder="Télécharger CV"
-                  id="hero-cv-label"
-                  hint=""
-                />
-              )}
-
-              <label className="flex items-center justify-between gap-3 text-sm text-zinc-300">
-                <span>Afficher email</span>
-                <input
-                  type="checkbox"
-                  checked={showHeroEmail}
-                  onChange={(e) => setShowHeroEmail(e.target.checked)}
-                  className="accent-teal-300"
-                />
-              </label>
-              {showHeroEmail && (
-                <RichLocalizedField
-                  label="Label email (optionnel)"
-                  value={heroEmailLabel}
-                  onChange={setHeroEmailLabel}
-                  compact
-                  rows={1}
-                  placeholder="Vide = adresse seule"
-                  id="hero-email-label"
-                  hint=""
-                />
-              )}
+              <p className="text-[11px] leading-relaxed text-zinc-500">Le fond se change avec le bouton « Fond » dans la barre du haut. Les autres réglages avancés sont conservés mais volontairement masqués.</p>
             </div>
           </div>
 
