@@ -13,7 +13,7 @@ import { WorkSidebar } from "@/components/work/WorkSidebar";
 export default function Home() {
   return (
     <main className="no-print relative z-10 min-h-screen pb-20 pt-24 sm:pt-28">
-      <div className="mx-auto grid max-w-[1180px] gap-8 px-5 sm:px-8 lg:grid-cols-[285px_minmax(0,1fr)] lg:gap-12">
+      <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 sm:px-6 lg:grid-cols-[285px_minmax(0,1fr)] lg:gap-12 lg:px-8">
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <HeroSection sidebarMode showShowreel={false} />
           <WorkSidebar />

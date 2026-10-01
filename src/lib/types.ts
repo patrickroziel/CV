@@ -716,6 +716,8 @@ export type NotesCategory =
 export type SocialPost = {
   id: string;
   title: Translatable;
+  /** Optional subtitle, mainly used by Livre entries. */
+  subtitle?: Translatable;
   description: Translatable;
   /** ISO date YYYY-MM-DD */
   date: string;
@@ -726,6 +728,12 @@ export type SocialPost = {
   fileKind: SocialPostFileKind | null;
   /** Original filename for download labels */
   fileName: string | null;
+  /** Optional Livre cover image. */
+  bookCoverUrl?: string | null;
+  bookCoverName?: string | null;
+  /** Optional downloadable PDF version of a Livre entry. */
+  bookPdfUrl?: string | null;
+  bookPdfName?: string | null;
   /** Primary Notes category. */
   category?: NotesCategory;
   /** Free-form tags — shared across locales, used by search. */

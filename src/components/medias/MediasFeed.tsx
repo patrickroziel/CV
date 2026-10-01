@@ -35,7 +35,6 @@ export function MediasFeed() {
     updateSocial,
     addSocialPost,
     updateSocialPost,
-    reorderSocialPosts,
   } = usePortfolio();
 
   const social = data.social ?? DEFAULT_SOCIAL;
@@ -66,18 +65,6 @@ export function MediasFeed() {
   const clearSearch = () => {
     setQuery("");
     setKind("all");
-  };
-
-  const handleMove = (id: string, dir: -1 | 1) => {
-    const ids = posts.map((p) => p.id);
-    const i = ids.indexOf(id);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= ids.length) return;
-    const next = [...ids];
-    const tmp = next[i];
-    next[i] = next[j];
-    next[j] = tmp;
-    reorderSocialPosts(next);
   };
 
   const handleCreate = (values: SocialPostFormValues) => {
@@ -164,16 +151,12 @@ export function MediasFeed() {
       ) : (
         <div className="mx-auto flex max-w-3xl flex-col gap-5 sm:gap-6">
           {filtered.map((post, i) => {
-            const sourceIndex = posts.findIndex((p) => p.id === post.id);
             return (
               <SocialPostCard
                 key={post.id}
                 post={post}
                 index={i}
-                canMoveUp={sourceIndex > 0}
-                canMoveDown={sourceIndex < posts.length - 1}
                 onEdit={setEditing}
-                onMove={handleMove}
                 onTagClick={setQuery}
               />
             );

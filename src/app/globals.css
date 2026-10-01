@@ -847,3 +847,87 @@ html[data-universe="portfolio"] .work-notes-main .work-note-section > div > sect
     opacity: 0.12;
   }
 }
+
+/* ── Mobile safety: every content block must stay inside the viewport ── */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+main,
+section,
+article,
+aside,
+header,
+footer,
+div,
+form {
+  min-width: 0;
+}
+
+img,
+video,
+iframe,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+.rich-html,
+.rich-bio-editor,
+.book-reading-text,
+.work-notes-main,
+.work-note-section,
+.glass-card,
+.glass-panel {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.rich-html *,
+.rich-bio-editor *,
+.book-reading-text * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+.rich-html a,
+.rich-bio-editor a,
+.book-reading-text a {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.rich-html pre,
+.rich-bio-editor pre,
+.book-reading-text pre,
+.rich-html code,
+.rich-bio-editor code,
+.book-reading-text code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 639px) {
+  .glass-card {
+    border-radius: 1.15rem;
+  }
+
+  .rich-html,
+  .book-reading-text {
+    width: 100%;
+  }
+
+  .rich-html ul,
+  .rich-html ol,
+  .book-reading-text ul,
+  .book-reading-text ol {
+    padding-left: 1.05rem;
+  }
+}

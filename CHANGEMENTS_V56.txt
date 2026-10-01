@@ -1,0 +1,20 @@
+V56 — Chapitres au survol + brouillons JSON
+
+NOTES / LIVRE
+- Sur ordinateur, survoler « Livre » dans la colonne de gauche ouvre désormais la liste des chapitres.
+- Chaque titre mène directement à la page de lecture du chapitre.
+- En mode édition, les chapitres brouillons apparaissent aussi dans ce menu et sont signalés « Brouillon ».
+- Sur mobile, le comportement reste simple : pas de menu hover fragile ; les cartes Livre restent la navigation principale.
+
+BROUILLONS
+- Le formulaire Notes possède maintenant un vrai bouton « Enregistrer le brouillon ».
+- Un brouillon peut être enregistré avant que le titre ou le texte du chapitre soient finalisés.
+- Un post publié peut être repassé en brouillon avec le même bouton.
+- « Publier » rend le post visible ; « Enregistrer » conserve un post déjà publié comme publié.
+- Les brouillons sont stockés avec les autres posts et sont inclus dans Export JSON.
+- Les brouillons restent invisibles pour les visiteurs.
+- En mode édition, un brouillon sans titre est affiché comme « Brouillon sans titre » afin de rester retrouvable.
+
+SIMPLIFICATION
+- Suppression du commutateur Publié/Brouillon dans le formulaire : deux boutons explicites à la place.
+- Correction du libellé « Catégorie » qui était affiché deux fois dans le formulaire.

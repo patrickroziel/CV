@@ -119,6 +119,10 @@ function cleanPortfolioRichText(data: PortfolioData): PortfolioData {
     })),
     socialPosts: (data.socialPosts ?? []).map((post) => ({
       ...post,
+      subtitle:
+        post.subtitle != null
+          ? cleanMaybeLocalized(post.subtitle, true)
+          : post.subtitle,
       description: cleanMaybeLocalized(post.description, false),
     })),
   };
@@ -686,6 +690,22 @@ export function normalizeSocialPost(
     typeof raw.fileName === "string" && raw.fileName.trim()
       ? raw.fileName.trim()
       : null;
+  const bookCoverUrl =
+    typeof raw.bookCoverUrl === "string" && raw.bookCoverUrl.trim()
+      ? raw.bookCoverUrl.trim()
+      : null;
+  const bookCoverName =
+    typeof raw.bookCoverName === "string" && raw.bookCoverName.trim()
+      ? raw.bookCoverName.trim()
+      : null;
+  const bookPdfUrl =
+    typeof raw.bookPdfUrl === "string" && raw.bookPdfUrl.trim()
+      ? raw.bookPdfUrl.trim()
+      : null;
+  const bookPdfName =
+    typeof raw.bookPdfName === "string" && raw.bookPdfName.trim()
+      ? raw.bookPdfName.trim()
+      : null;
   const allowedCategories: NotesCategory[] = [
     "Livre",
     "Réflexions",
@@ -711,12 +731,18 @@ export function normalizeSocialPost(
         ? raw.id
         : `social-${index}-${createId().slice(0, 8)}`,
     title: liftToLocalized(raw.title ?? ""),
+    subtitle:
+      raw.subtitle != null ? liftToLocalized(raw.subtitle as never) : undefined,
     description: liftToLocalized(raw.description ?? ""),
     date,
     youtubeUrl,
     fileUrl,
     fileKind: fileUrl ? inferSocialFileKind(fileUrl, raw.fileKind) : null,
     fileName,
+    bookCoverUrl,
+    bookCoverName,
+    bookPdfUrl,
+    bookPdfName,
     category,
     tags: Array.isArray(raw.tags)
       ? raw.tags

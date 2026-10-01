@@ -1,0 +1,8 @@
+V58 — Notes navigation hover correction
+Base: v56/v57 code, snapshot v39-2
+
+- Hover is now visibly distinct: soft glass plate, subtle border, brighter label/icon.
+- Active state is stronger than hover.
+- No movement/scale/translation added.
+- Livre keeps its hover plate while the chapter panel is open.
+- Chapters/drafts behavior unchanged.

@@ -1,0 +1,22 @@
+V55 — Livre + mobile clean
+
+NOTES / LIVRE
+- Mode Livre dédié dans l'éditeur Notes.
+- Titre du chapitre, sous-titre facultatif, texte long, tags.
+- Image de couverture facultative.
+- PDF du chapitre facultatif en complément du texte.
+- Statut Publié / brouillon.
+- Dans le fil Notes, un chapitre apparaît sous forme de carte courte avec « Lire le chapitre → ».
+- Nouvelle page de lecture /notes/[id], avec chapitre précédent / suivant.
+- Les tags restent disponibles et sont désormais réellement cliquables dans Notes.
+
+MOBILE
+- Protection globale contre les débordements horizontaux.
+- Texte riche, listes, liens, médias et cartes limités à la largeur du téléphone.
+- Retours à la ligne forcés pour les longues URL / mots.
+- Marges Notes et Work réduites sur petit écran.
+- Fenêtres d'édition quasiment pleine largeur sur mobile, avec padding réduit.
+- Boutons du formulaire empilés proprement sur téléphone.
+
+CONTENU
+- Le snapshot v39 fourni a été repris comme base afin de conserver les dernières modifications.

@@ -1,0 +1,8 @@
+V59 — Sous-menu Livre intégré
+Base : v58 + snapshot v39-2
+
+- Le sous-menu des chapitres n’est plus un panneau flottant.
+- Les chapitres s’ouvrent directement sous « Livre », exactement sur le modèle du sous-menu Expériences de Work.
+- Le menu reste stable tant que le pointeur est dans la zone Livre + chapitres.
+- Aucun chevauchement avec les cartes/posts Notes.
+- Brouillons, chapitres et contenu du snapshot v39-2 conservés.

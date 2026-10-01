@@ -1,0 +1,12 @@
+V57 — Navigation Notes / hover Livre
+
+Base code : v56-chapitres-brouillons
+Contenu : portfolio-snapshot-v39-2.json
+
+Corrections ciblées :
+- Navigation « Parcourir » : état normal sans fond, hover verre léger, état actif plus visible.
+- Aucun mouvement au survol : pas de translate, scale, déplacement d’icône ni grosse ombre.
+- « Livre » reste visuellement en hover tant que le pointeur est dans le panneau des chapitres.
+- Zone de passage vers le panneau des chapitres élargie et chevauchée pour supprimer le trou qui provoquait clignotement/disparition.
+- Chapitres et brouillons de la v56 conservés.
+- Snapshot v39-2 intégré sans réintroduire le téléphone et avec Coming Soon désactivé.

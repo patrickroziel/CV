@@ -49,10 +49,10 @@ export function Header() {
             <Button
               variant="ghost"
               size="sm"
-              title="Exporter le contenu pour le publier"
+              title="Exporter tout le contenu, brouillons inclus"
               onClick={() => {
                 downloadPortfolioSnapshot(data);
-                showToast("Export JSON téléchargé");
+                showToast("Export JSON téléchargé · brouillons inclus");
               }}
             >
               <FileDown className="h-3.5 w-3.5" />

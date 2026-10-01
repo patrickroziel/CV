@@ -41,7 +41,7 @@ const dialogSizeClass: Record<NonNullable<DialogContentProps["size"]>, string> =
     sm: "max-w-sm",
     default: "max-w-lg",
     // Desktop 720–900px, never past 90vw; mobile already ~full via width
-    form: "max-w-[min(90vw,52rem)] sm:max-w-[min(90vw,52rem)] gap-5 p-5 sm:p-8",
+    form: "max-w-[calc(100vw-0.75rem)] gap-4 p-4 sm:max-w-[min(92vw,52rem)] sm:gap-5 sm:p-8",
   };
 
 const DialogContent = React.forwardRef<
@@ -54,7 +54,7 @@ const DialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         // Centered, always fully on-screen: max height + flex-friendly defaults
-        "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-1.25rem)] max-h-[min(92dvh,920px)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto border border-white/18 bg-[linear-gradient(155deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03)),rgba(9,9,12,0.78)] p-6 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.65),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-3xl duration-200 sm:rounded-3xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-0.75rem)] max-h-[min(94dvh,920px)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto border border-white/18 bg-[linear-gradient(155deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03)),rgba(9,9,12,0.78)] p-6 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.65),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-3xl duration-200 rounded-2xl sm:rounded-3xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         dialogSizeClass[size],
         className
       )}
