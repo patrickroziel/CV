@@ -12,7 +12,7 @@ import {
 } from "@/lib/i18n-content";
 import { handleRichPaste } from "@/lib/clipboard-paste";
 import { captureEditorSelection } from "@/lib/rich-editor";
-import { applyRichFormat, normalizeRichBody } from "@/lib/rich-format";
+import { applyRichFormat, normalizeCompactRichBody, normalizeRichBody } from "@/lib/rich-format";
 import {
   DEFAULT_LINE_HEIGHT,
   clampLineHeight,
@@ -53,6 +53,7 @@ export function RichLocalizedField({
   const { editingLocale, le, t } = usePortfolio();
   const fieldId = id || `rich-${label.replace(/\s+/g, "-").toLowerCase()}`;
   const editorRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const lastLocale = useRef(editingLocale);
   const lineHeightRef = useRef(DEFAULT_LINE_HEIGHT);
   const savedRangeRef = useRef<Range | null>(null);
@@ -79,7 +80,7 @@ export function RichLocalizedField({
     }
 
     // Never clobber the live editor while focused (typing / selection)
-    if (!localeChanged && document.activeElement === el) return;
+    if (!localeChanged && rootRef.current?.contains(document.activeElement)) return;
 
     const html = toEditableHtml(next || "");
     if (el.innerHTML !== html) el.innerHTML = html;
@@ -90,7 +91,9 @@ export function RichLocalizedField({
     if (!el) return;
     const lh = nextLh ?? lineHeightRef.current;
     // Normalize → sanitize so every block (incl. list items) keeps inline styles
-    const flat = normalizeRichBody(el.innerHTML);
+    const flat = compact
+      ? normalizeCompactRichBody(el.innerHTML)
+      : normalizeRichBody(el.innerHTML);
     const body = sanitizeBioHtml(flat);
     const html = wrapWithRichSpacing(body, lh);
     skipSyncRef.current = true;
@@ -119,7 +122,7 @@ export function RichLocalizedField({
   };
 
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div ref={rootRef} className={cn("grid gap-2", className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Label htmlFor={fieldId}>{label}</Label>
         <div className="flex gap-0.5">
@@ -166,13 +169,24 @@ export function RichLocalizedField({
         onInput={() => commit()}
         onBlur={() => commit()}
         onMouseUp={rememberSelection}
+        onKeyDown={(e) => {
+          if (compact && e.key === "Enter") {
+            e.preventDefault();
+            // Compact fields use a single visual line break, not a new
+            // paragraph with extra spacing.
+            document.execCommand("insertHTML", false, "<br>");
+            requestAnimationFrame(() => commit());
+          }
+        }}
         onKeyUp={rememberSelection}
         onPaste={(e) => {
           if (handleRichPaste(e)) {
             requestAnimationFrame(() => {
               const el = editorRef.current;
               if (!el) return;
-              el.innerHTML = normalizeRichBody(el.innerHTML);
+              el.innerHTML = compact
+                ? normalizeCompactRichBody(el.innerHTML)
+                : normalizeRichBody(el.innerHTML);
               commit();
             });
           }

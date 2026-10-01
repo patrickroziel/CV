@@ -45,6 +45,13 @@ function wrapRangeWith(
   try {
     const wrapper = createWrapper();
     r.surroundContents(wrapper);
+    if (wrapper.style.fontSize) {
+      wrapper.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
+        if (el === wrapper) return;
+        el.style.removeProperty("font-size");
+        if (!el.getAttribute("style")?.trim()) el.removeAttribute("style");
+      });
+    }
     selectNodeContents(wrapper);
     return;
   } catch {
@@ -62,6 +69,13 @@ function wrapRangeWith(
     } else {
       const wrapper = createWrapper();
       wrapper.appendChild(contents);
+      if (wrapper.style.fontSize) {
+        wrapper.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
+          if (el === wrapper) return;
+          el.style.removeProperty("font-size");
+          if (!el.getAttribute("style")?.trim()) el.removeAttribute("style");
+        });
+      }
       r.insertNode(wrapper);
       selectNodeContents(wrapper);
     }
@@ -135,27 +149,12 @@ export function applyRichFormat(
     }
   }
 
-  if (command === "bold") {
-    if (!live.collapsed) {
-      wrapRangeWith(live, () => document.createElement("strong"));
-      return true;
-    }
+  if (command === "bold" || command === "italic") {
+    // Let the browser TOGGLE the formatting. The former custom wrapper only
+    // ever added <strong>/<em>, so clicking Bold twice could never remove it.
     try {
-      document.execCommand("bold", false);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  if (command === "italic") {
-    if (!live.collapsed) {
-      wrapRangeWith(live, () => document.createElement("em"));
-      return true;
-    }
-    try {
-      document.execCommand("italic", false);
-      return true;
+      document.execCommand("styleWithCSS", false, "false");
+      return document.execCommand(command, false);
     } catch {
       return false;
     }
@@ -176,6 +175,32 @@ export function applyRichFormat(
     try {
       document.execCommand("styleWithCSS", false, "true");
       document.execCommand("foreColor", false, color);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  if (command === "fontSizePx" && arg) {
+    const parsed = Number(String(arg).replace(",", "."));
+    if (!Number.isFinite(parsed)) return false;
+    const px = Math.min(96, Math.max(6, parsed));
+    const size = `${Math.round(px * 10) / 10}px`;
+
+    if (!live.collapsed) {
+      wrapRangeWith(live, () => {
+        const span = document.createElement("span");
+        span.style.fontSize = size;
+        return span;
+      });
+      return true;
+    }
+
+    // With no selection, keep the caret usable: apply the nearest browser size
+    // so newly typed text is still formatted. Exact px is intended for a selection.
+    try {
+      document.execCommand("styleWithCSS", false, "true");
+      document.execCommand("fontSize", false, px < 13 ? "1" : px < 15 ? "2" : px < 18 ? "3" : px < 21 ? "4" : px < 25 ? "5" : px < 30 ? "6" : "7");
       return true;
     } catch {
       return false;
@@ -216,6 +241,82 @@ export function applyRichFormat(
   } catch {
     return false;
   }
+}
+
+function unwrapElement(el: HTMLElement): void {
+  const parent = el.parentNode;
+  if (!parent) return;
+  while (el.firstChild) parent.insertBefore(el.firstChild, el);
+  parent.removeChild(el);
+}
+
+/**
+ * Keep editor markup small and predictable.
+ * Repeated toolbar clicks used to create chains such as
+ * <strong><strong>…</strong></strong> and nested font-size spans.
+ */
+function cleanupInlineFormatting(root: HTMLElement): void {
+  // Canonical semantic tags first.
+  root.querySelectorAll("b").forEach((el) => {
+    const strong = document.createElement("strong");
+    while (el.firstChild) strong.appendChild(el.firstChild);
+    for (const attr of Array.from(el.attributes)) strong.setAttribute(attr.name, attr.value);
+    el.replaceWith(strong);
+  });
+  root.querySelectorAll("i").forEach((el) => {
+    const em = document.createElement("em");
+    while (el.firstChild) em.appendChild(el.firstChild);
+    for (const attr of Array.from(el.attributes)) em.setAttribute(attr.name, attr.value);
+    el.replaceWith(em);
+  });
+
+  // Collapse duplicate bold/italic wrappers.
+  let guard = 0;
+  while (guard++ < 12) {
+    const duplicate = root.querySelector<HTMLElement>("strong strong, em em");
+    if (!duplicate) break;
+    unwrapElement(duplicate);
+  }
+
+  // Merge a span whose only meaningful child is another span. Child styles
+  // are newer and therefore win over the outer legacy style.
+  guard = 0;
+  while (guard++ < 20) {
+    let changed = false;
+    const spans = Array.from(root.querySelectorAll<HTMLElement>("span")).reverse();
+    for (const outer of spans) {
+      const meaningful = Array.from(outer.childNodes).filter(
+        (n) => n.nodeType !== Node.TEXT_NODE || Boolean(n.textContent?.trim())
+      );
+      if (meaningful.length !== 1) continue;
+      const only = meaningful[0];
+      if (!(only instanceof HTMLElement) || only.tagName !== "SPAN") continue;
+      const inner = only as HTMLElement;
+      const outerStyle = outer.style.cssText;
+      const innerStyle = inner.style.cssText;
+      if (outerStyle) inner.style.cssText = `${outerStyle};${innerStyle}`;
+      const outerColor = outer.getAttribute("data-rich-color");
+      if (outerColor && !inner.getAttribute("data-rich-color")) {
+        inner.setAttribute("data-rich-color", outerColor);
+      }
+      const parent = outer.parentNode;
+      if (!parent) continue;
+      outer.removeChild(inner);
+      parent.replaceChild(inner, outer);
+      changed = true;
+    }
+    if (!changed) break;
+  }
+
+  // Empty formatting nodes are noise and make toggling unpredictable.
+  root.querySelectorAll<HTMLElement>("span,strong,em").forEach((el) => {
+    const hasBreak = Boolean(el.querySelector("br"));
+    if (!hasBreak && !(el.textContent || "").replace(/\u00a0/g, " ").trim()) {
+      el.remove();
+      return;
+    }
+    if (el.tagName === "SPAN" && el.attributes.length === 0) unwrapElement(el);
+  });
 }
 
 /**
@@ -308,6 +409,44 @@ export function normalizeRichBody(html: string): string {
     if (c) el.style.color = c;
   });
 
+  cleanupInlineFormatting(shell);
+  return shell.innerHTML;
+}
+
+/** Compact fields (name/title/badges) use one visual line per Enter. */
+export function normalizeCompactRichBody(html: string): string {
+  if (!html || typeof document === "undefined") return html || "";
+  const shell = document.createElement("div");
+  shell.innerHTML = normalizeRichBody(html);
+
+  // Empty paragraphs are accidental in compact fields. Non-empty paragraphs
+  // become a simple <br>, avoiding the apparent “double Enter” spacing.
+  const blocks = Array.from(shell.children).filter(
+    (el): el is HTMLElement => el instanceof HTMLElement && (el.tagName === "P" || el.tagName === "DIV")
+  );
+  for (const block of blocks) {
+    const hasContent = Boolean((block.textContent || "").replace(/\u00a0/g, " ").trim()) || Boolean(block.querySelector("br"));
+    if (!hasContent) {
+      block.remove();
+      continue;
+    }
+    const frag = document.createDocumentFragment();
+    while (block.firstChild) frag.appendChild(block.firstChild);
+    const br = document.createElement("br");
+    block.replaceWith(frag, br);
+  }
+
+  // One break maximum, and never at the beginning/end.
+  let previousWasBr = false;
+  for (const node of Array.from(shell.childNodes)) {
+    const isBr = node instanceof HTMLElement && node.tagName === "BR";
+    if (isBr && previousWasBr) node.remove();
+    previousWasBr = isBr;
+  }
+  while (shell.firstElementChild?.tagName === "BR") shell.firstElementChild.remove();
+  while (shell.lastElementChild?.tagName === "BR") shell.lastElementChild.remove();
+
+  cleanupInlineFormatting(shell);
   return shell.innerHTML;
 }
 

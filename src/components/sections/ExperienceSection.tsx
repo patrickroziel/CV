@@ -97,6 +97,7 @@ export function ExperienceSection() {
                 {experiences.map((exp, i) => (
                   <motion.li
                     key={exp.id}
+                    id={`experience-${exp.id}`}
                     initial={{ opacity: 0, x: -12 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
@@ -104,7 +105,7 @@ export function ExperienceSection() {
                       duration: 0.4,
                       delay: Math.min(i * 0.04, 0.3),
                     }}
-                    className="relative pl-10 sm:pl-12"
+                    className="relative scroll-mt-28 pl-10 sm:pl-12"
                   >
                     <span className="absolute left-0 top-5 flex h-6 w-6 items-center justify-center sm:h-8 sm:w-8">
                       <span className="h-3 w-3 rounded-full bg-teal-300 shadow-[0_0_12px_rgba(94,234,212,0.7)] ring-4 ring-teal-300/20" />

@@ -1,0 +1,9 @@
+V50 — ÉDITION TYPO + SOUS-MENU EXPÉRIENCES
+
+- Remplace les boutons S / M / L / XL par un réglage numérique de taille en pixels.
+- Valeurs de 6 à 96 px, saisie directe + boutons − / +.
+- Le réglage est disponible dans tous les champs riches qui utilisent la barre d’édition.
+- Sur Work, le survol de « Expériences » révèle les intitulés des postes uniquement.
+- Chaque intitulé est cliquable et amène directement à la carte correspondante.
+- Les noms d’entreprise et les lieux ne sont pas affichés dans ce sous-menu.
+- Le snapshot v37 fourni par Patrick est intégré comme nouvelle base publique (version de données 38).

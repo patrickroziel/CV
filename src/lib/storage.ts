@@ -35,6 +35,7 @@ import type {
   SocialPost,
   SocialPostFileKind,
   NotesCategory,
+  Translatable,
 } from "./types";
 import {
   DATA_VERSION,
@@ -69,8 +70,59 @@ import { getL, liftToLocalized, mergeMissingLocales } from "./i18n-content";
 import { expandLocalizedSync } from "./auto-localize";
 import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 import type { LocalizedString, MaybeLocalized } from "./i18n-content";
+import { normalizeCompactRichBody, normalizeRichBody } from "./rich-format";
+import { extractRichSpacing, wrapWithRichSpacing } from "./rich-spacing";
+import { looksLikeHtml, sanitizeBioHtml } from "./sanitize-html";
 
 export const STORAGE_KEY = "mon-portfolio-v2-data";
+export const STORAGE_BACKUP_KEY = "mon-portfolio-v2-data-backup";
+
+function cleanRichString(value: string, compact = false): string {
+  if (!value || typeof document === "undefined" || !looksLikeHtml(value)) return value || "";
+  const { lineHeight, body } = extractRichSpacing(value);
+  const normalized = compact
+    ? normalizeCompactRichBody(body || value)
+    : normalizeRichBody(body || value);
+  return wrapWithRichSpacing(sanitizeBioHtml(normalized), lineHeight);
+}
+
+function cleanMaybeLocalized(value: Translatable, compact = false): Translatable {
+  if (typeof value === "string") return cleanRichString(value, compact);
+  if (!value || typeof value !== "object") return value;
+  const next: LocalizedString = { ...value };
+  for (const loc of ["fr", "en", "pl", "es"] as const) {
+    if (typeof next[loc] === "string") next[loc] = cleanRichString(next[loc]!, compact);
+  }
+  return next;
+}
+
+function cleanPortfolioRichText(data: PortfolioData): PortfolioData {
+  return {
+    ...data,
+    profile: {
+      ...data.profile,
+      name: cleanRichString(data.profile.name || "", true),
+      title: cleanMaybeLocalized(data.profile.title, true),
+      bio: cleanMaybeLocalized(data.profile.bio, false),
+      heroBadges: (data.profile.heroBadges ?? []).map((badge) => ({
+        ...badge,
+        text: cleanMaybeLocalized(badge.text, true),
+      })),
+    },
+    experiences: data.experiences.map((exp) => ({
+      ...exp,
+      description: cleanMaybeLocalized(exp.description, false),
+    })),
+    education: data.education.map((edu) => ({
+      ...edu,
+      detail: edu.detail != null ? cleanMaybeLocalized(edu.detail, false) : edu.detail,
+    })),
+    socialPosts: (data.socialPosts ?? []).map((post) => ({
+      ...post,
+      description: cleanMaybeLocalized(post.description, false),
+    })),
+  };
+}
 
 function normalizeMediaType(
   raw: string | undefined,
@@ -1150,15 +1202,6 @@ export function loadPortfolio(): PortfolioData {
       return fresh;
     }
 
-    // v37: publish exactly the user-exported state.
-    // This one-time reset prevents stale production localStorage from
-    // resurrecting the old Hero, buttons, section visibility or Notes media.
-    if ((parsed.version ?? 0) < 37) {
-      const fresh = structuredClone(DEFAULT_PORTFOLIO);
-      savePortfolio(fresh);
-      return fresh;
-    }
-
     const mergedProfile = {
       ...DEFAULT_PORTFOLIO.profile,
       ...parsed.profile,
@@ -1297,10 +1340,15 @@ export function loadPortfolio(): PortfolioData {
       data.contact.showHeroEmail = false;
     }
 
-    // Fill missing EN/PL/ES from defaults when IDs match (keep user FR edits)
-    const enriched = enrichFromDefaults(data);
+    // v39: compact legacy editor markup without changing the visible text.
+    // This removes nested <strong>/<span font-size> chains that made Bold
+    // impossible to toggle and caused formatting to appear to revert.
+    const cleaned = (parsed.version ?? 0) < 39 ? cleanPortfolioRichText(data) : data;
 
-    if (parsed.version < DATA_VERSION) {
+    // Fill missing EN/PL/ES from defaults when IDs match (keep user FR edits)
+    const enriched = enrichFromDefaults(cleaned);
+
+    if ((parsed.version ?? 0) < DATA_VERSION) {
       savePortfolio(enriched);
     }
 
@@ -1524,10 +1572,12 @@ function enrichFromDefaults(data: PortfolioData): PortfolioData {
 export function savePortfolio(data: PortfolioData): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ ...data, version: DATA_VERSION })
-    );
+    const payload = JSON.stringify({ ...data, version: DATA_VERSION });
+    const previous = localStorage.getItem(STORAGE_KEY);
+    if (previous && previous !== payload) {
+      localStorage.setItem(STORAGE_BACKUP_KEY, previous);
+    }
+    localStorage.setItem(STORAGE_KEY, payload);
   } catch (e) {
     console.error("Impossible de sauvegarder (quota localStorage ?)", e);
     throw e;

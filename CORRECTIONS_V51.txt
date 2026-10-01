@@ -1,0 +1,11 @@
+V51 — ÉDITEUR RICHE FIABILISÉ
+
+- Gras / italique réellement activables ET désactivables.
+- Taille numérique conservée (6–96 px), avec nettoyage des tailles imbriquées.
+- Dans les champs compacts (Nom, Titre, badges), Entrée crée une seule ligne visuelle.
+- Nettoyage automatique des anciens empilements <strong>/<span font-size> hérités des versions précédentes.
+- Protection contre les resynchronisations de l’éditeur pendant une interaction avec la barre d’outils.
+- Sauvegarde de sécurité différée après chaque modification du PortfolioProvider.
+- Copie de sauvegarde du localStorage précédent avant chaque écriture.
+- Migration v39 non destructive : les données existantes v38 sont conservées et nettoyées, jamais remplacées par les valeurs par défaut.
+- Le snapshot v38 fourni par Patrick est utilisé comme nouvelle base du site.

@@ -176,6 +176,21 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // Safety net: persist the latest provider state again after React settles.
+  // Individual mutations already save synchronously; this debounced write
+  // prevents a later render/remount from reviving an older value.
+  useEffect(() => {
+    if (!isHydrated) return;
+    const timer = window.setTimeout(() => {
+      try {
+        savePortfolio(data);
+      } catch {
+        /* the normal mutation path already surfaces storage errors */
+      }
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [data, isHydrated]);
+
   const setLocale = useCallback(
     (next: Locale) => {
       setLocaleState(next);

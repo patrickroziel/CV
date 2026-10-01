@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RichTextToolbar } from "@/components/i18n/RichTextToolbar";
 import { handleRichPaste } from "@/lib/clipboard-paste";
 import { captureEditorSelection } from "@/lib/rich-editor";
-import { applyRichFormat, normalizeRichBody } from "@/lib/rich-format";
+import { applyRichFormat, normalizeCompactRichBody, normalizeRichBody } from "@/lib/rich-format";
 import {
   DEFAULT_LINE_HEIGHT,
   clampLineHeight,
@@ -41,6 +41,7 @@ export function RichTextField({
 }: RichTextFieldProps) {
   const fieldId = id || `rich-plain-${label.replace(/\s+/g, "-").toLowerCase()}`;
   const editorRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const lineHeightRef = useRef(DEFAULT_LINE_HEIGHT);
   const savedRangeRef = useRef<Range | null>(null);
   const skipSyncRef = useRef(false);
@@ -54,7 +55,7 @@ export function RichTextField({
       skipSyncRef.current = false;
       return;
     }
-    if (document.activeElement === el) return;
+    if (rootRef.current?.contains(document.activeElement)) return;
     const { lineHeight: storedLh } = extractRichSpacing(value || "");
     lineHeightRef.current = storedLh;
     setLineHeight(storedLh);
@@ -66,7 +67,9 @@ export function RichTextField({
     const el = editorRef.current;
     if (!el) return;
     const lh = nextLh ?? lineHeightRef.current;
-    const flat = normalizeRichBody(el.innerHTML);
+    const flat = compact
+      ? normalizeCompactRichBody(el.innerHTML)
+      : normalizeRichBody(el.innerHTML);
     const body = sanitizeBioHtml(flat);
     skipSyncRef.current = true;
     onChange(wrapWithRichSpacing(body, lh));
@@ -93,7 +96,7 @@ export function RichTextField({
   };
 
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div ref={rootRef} className={cn("grid gap-2", className)}>
       <Label htmlFor={fieldId}>{label}</Label>
       <div onMouseDownCapture={rememberSelection}>
         <RichTextToolbar
@@ -115,13 +118,24 @@ export function RichTextField({
         onInput={() => commit()}
         onBlur={() => commit()}
         onMouseUp={rememberSelection}
+        onKeyDown={(e) => {
+          if (compact && e.key === "Enter") {
+            e.preventDefault();
+            // Compact fields use a single visual line break, not a new
+            // paragraph with extra spacing.
+            document.execCommand("insertHTML", false, "<br>");
+            requestAnimationFrame(() => commit());
+          }
+        }}
         onKeyUp={rememberSelection}
         onPaste={(e) => {
           if (handleRichPaste(e)) {
             requestAnimationFrame(() => {
               const el = editorRef.current;
               if (!el) return;
-              el.innerHTML = normalizeRichBody(el.innerHTML);
+              el.innerHTML = compact
+                ? normalizeCompactRichBody(el.innerHTML)
+                : normalizeRichBody(el.innerHTML);
               commit();
             });
           }
