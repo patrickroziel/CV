@@ -686,7 +686,7 @@
         "es": "Francés"
       },
       "level": {
-        "fr": "Je suis né en France et j’y ai toujours vécu. Le français est donc ma langue maternelle, celle que je parle au quotidien, sans effort.",
+        "fr": "Natif",
         "en": "Native",
         "pl": "Ojczysty",
         "es": "Nativo"
@@ -885,7 +885,7 @@
         "es": "Inglés"
       },
       "level": {
-        "fr": "I started learning English very early at school. Later I travelled and worked in several English-speaking countries, especially Australia, where I lived for two years.",
+        "fr": "Courant",
         "en": "Fluent",
         "pl": "Biegły",
         "es": "Fluido"
@@ -1140,7 +1140,7 @@
         "es": "Polaco"
       },
       "level": {
-        "fr": "Moi rodzice są Polakami. Mówię po polsku tylko trochę. Całe życie mieszkam we Francji i rozmawiam po polsku tylko z rodziną.",
+        "fr": "Courant",
         "en": "Fluent",
         "pl": "Biegły",
         "es": "Fluido"
@@ -1283,7 +1283,7 @@
         "es": "Español"
       },
       "level": {
-        "fr": "Entiendo mucho el español, pero con concentración. He trabajado en proyectos en español. Puedo escribir y producir contenido, pero no hablo fluido.",
+        "fr": "Je me débrouille… pas vraiment lol",
         "en": "I get by… not really lol",
         "pl": "Radzę sobie… no nie bardzo lol",
         "es": "Me defiendo… la verdad no mucho lol"
@@ -1627,7 +1627,7 @@
     },
     "emailValue": "",
     "showPhone": false,
-    "phoneLabel": "",
+    "phoneLabel": {},
     "phoneValue": "",
     "showShowreel": false,
     "showreelLabel": {
@@ -1664,7 +1664,7 @@
       "es": "Descargar CV"
     },
     "showHeroPhone": false,
-    "heroPhoneLabel": "",
+    "heroPhoneLabel": {},
     "showHeroEmail": false,
     "heroEmailLabel": {
       "fr": "Envoyer un email"
@@ -1975,6 +1975,24 @@
     }
   },
   "socialPosts": [
+    {
+      "title": {
+        "fr": "A Place of My Own — Alicia Keys"
+      },
+      "description": {
+        "fr": "<div data-rich-lh=\"1.25\" class=\"rich-lh\" style=\"line-height: 1.25\"><p></p><p></p><p><span style=\"font-size: 12px\">Je me souviens être immédiatement tombé amoureux de cette chanson.</span></p><p><span style=\"font-size: 12px\">Quand Alicia Keys l’a interprétée pour la première fois en public, elle a mis des mots sur quelque chose qui m’accompagne depuis très longtemps :</span></p><p><strong><span style=\"font-size: 12px\">“Looking for a place to call my own.”</span></strong></p><p><span style=\"font-size: 12px\">J’ai toujours été en mouvement.</span></p><p><span style=\"font-size: 12px\">J’ai vécu à différents endroits, je suis parti, revenu, recommencé ailleurs. Et derrière tous ces déplacements, il y a toujours eu cette même envie : avoir enfin&nbsp;</span><strong><span style=\"font-size: 12px\">un endroit que je puisse vraiment appeler le mien</span></strong><span style=\"font-size: 12px\">.</span></p><p><span style=\"font-size: 12px\">Pas simplement un appartement.</span><br><span style=\"font-size: 12px\">Pas simplement une adresse.</span></p><p><span style=\"font-size: 12px\">Un endroit que j’aurais réellement choisi.</span></p><p><span style=\"font-size: 12px\">Quand j’y pense, beaucoup de choses que j’ai obtenues dans ma vie l’ont été sous une forme de contrainte : le temps disponible, l’argent que j’avais à ce moment-là, l’urgence, les circonstances, ce qui était possible plutôt que ce que je voulais vraiment.</span></p><p><span style=\"font-size: 12px\">Même aujourd’hui, l’appartement dans lequel je vis ne me correspond pas vraiment. J’ai envie d’en partir. Et cette vieille recherche est toujours là.</span></p><p><span style=\"font-size: 12px\">Trouver un lieu dans lequel je ne me sentirais pas simplement installé, mais&nbsp;</span><strong><span style=\"font-size: 12px\">chez moi</span></strong><span style=\"font-size: 12px\">.</span></p><p><span style=\"font-size: 12px\">C’est probablement pour cela que&nbsp;</span><em><span style=\"font-size: 12px\">A Place of My Own</span></em><span style=\"font-size: 12px\">&nbsp;me touche autant.</span></p><p><span style=\"font-size: 12px\">Parce que derrière l’idée d’une maison, j’y entends quelque chose de beaucoup plus grand : la possibilité de construire une vie qui ne soit plus seulement une adaptation aux circonstances.</span></p><p><span style=\"font-size: 12px\">Un espace à soi.</span><br><span style=\"font-size: 12px\">Une vie à soi.</span><br><span style=\"font-size: 12px\">Quelque chose que l’on n’occupe pas par défaut, mais que l’on a choisi.</span></p><p><span style=\"font-size: 12px\">Et ce qui est étrange, c’est qu’en réécoutant cette chanson aujourd’hui, je ne l’entends plus exactement comme à l’époque.</span></p><p><span style=\"font-size: 12px\">À l’époque, j’entendais surtout&nbsp;</span><strong><span style=\"font-size: 12px\">la recherche</span></strong><span style=\"font-size: 12px\">.</span></p><p><span style=\"font-size: 12px\">Aujourd’hui, j’entends aussi tout ce qu’il reste encore à construire.</span></p><p></p><p></p></div>"
+      },
+      "date": "2026-10-01",
+      "youtubeUrl": "https://youtu.be/IFUn7Gup6PE?si=3ZJFrgty2WgDCm9L",
+      "fileUrl": null,
+      "fileKind": null,
+      "fileName": null,
+      "category": "Réflexions",
+      "tags": [],
+      "visible": true,
+      "order": -2,
+      "id": "584e1f27-ee0a-42fc-8262-d9eba8d831ad"
+    },
     {
       "id": "48e8d59e-1048-493b-9aca-096ae9330180",
       "title": {
