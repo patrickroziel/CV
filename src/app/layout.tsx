@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Manrope } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PortfolioProvider } from "@/components/providers/PortfolioProvider";
 import { SkillDetailProvider } from "@/components/skills/SkillDetailProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -37,6 +38,7 @@ export default function RootLayout({
             <SiteChrome>{children}</SiteChrome>
           </SkillDetailProvider>
         </PortfolioProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
