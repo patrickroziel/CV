@@ -1,0 +1,12 @@
+V65 — Ivoirien, Turc, Congolais, Vietnamien
+
+- Ajout de Ivoirien (Nouchi) — 🇨🇮.
+- Ajout de Turc — Türkçe — 🇹🇷.
+- Ajout de Congolais (Lingala) — Lingála — 🇨🇩🇨🇬.
+- Ajout de Vietnamien — Tiếng Việt — 🇻🇳.
+- Nouchi passe par Vertex AI / Gemini pour conserver une variante ivoirienne naturelle.
+- Lingala, turc et vietnamien passent par Cloud Translation standard pour rester rapides.
+- Ordre prioritaire inchangé : Français, Polski, British English, American English, Español, puis le reste.
+- Patch STRICTEMENT limité au moteur/menu de traduction : aucun default-snapshot.json, aucun fichier de contenu, aucun LanguagesSection.tsx.
+- Ce patch ne modifie donc ni les descriptions des cartes Langues, ni les niveaux, ni les textes du portfolio.
+- Aucune nouvelle API à activer si Cloud Translation et Vertex AI sont déjà activées.

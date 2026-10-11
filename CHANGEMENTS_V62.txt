@@ -1,0 +1,28 @@
+V62 — optimisation de la traduction Google (patch code uniquement)
+
+Objectif : réduire fortement le temps de traduction et le nombre d'appels API sans toucher au contenu du portfolio.
+
+- NMT Google utilisé directement pour toutes les langues sauf en-GB / en-US.
+- en-GB / en-US essaient Translation LLM pour conserver la nuance régionale, puis retombent sur NMT en cas d'échec.
+- Lots construits autour de 4 800 caractères (recommandation Google pour limiter la latence) et jusqu'à 80 textes.
+- Jusqu'à 4 lots traités en parallèle au lieu d'une longue file séquentielle.
+- Réutilisation d'une seule instance GoogleAuth afin de profiter du cache ADC/token.
+- Le cache de traduction navigateur est appliqué immédiatement avant les nouveaux appels réseau.
+- Le MutationObserver ne retraduit plus toute la page à chaque petite mutation : seuls les nouveaux sous-arbres sont traités.
+- Les changements de texte produits par la traduction elle-même ne déclenchent plus de boucle de retraduction.
+- Une requête partiellement ratée ne remet plus tout le site en français et ne bloque plus la page.
+- Les appels en cours sont annulés quand l'utilisateur change rapidement de langue.
+- Le menu de langue est explicitement exclu de la traduction, y compris lorsqu'il est rendu dans un portal.
+- L'assombrissement global de la page n'est plus utilisé pendant l'attente ; seul le bouton affiche un spinner.
+
+IMPORTANT : ce ZIP NE contient PAS src/lib/default-snapshot.json.
+Il ne remplace aucun texte, post, chapitre, brouillon ou contenu éditorial.
+
+Installation locale :
+  cd ~/mon-portfolio-v2
+  unzip -o ~/Downloads/portfolio-v62-traduction-performance.zip -d ~/mon-portfolio-v2
+  rm -rf .next
+  npm run build
+  npm run dev
+
+Ne pas publier sur Vercel avant validation locale.

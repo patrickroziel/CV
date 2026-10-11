@@ -1,0 +1,12 @@
+V67 — patch combiné Langues
+
+Cette version regroupe les changements de la v65 et de la v66 afin qu'il ne soit pas nécessaire d'installer la v65 séparément.
+
+Inclus :
+- menu de traduction avec les ajouts précédents, dont Bambara, Soninké, Ivoirien (Nouchi), Turc, Congolais (Lingala) et Vietnamien ;
+- textes publics Français / Anglais / Polonais / Espagnol verrouillés directement dans LanguagesSection.tsx avec les formulations validées.
+
+Important :
+- aucun default-snapshot.json n'est inclus ;
+- aucun snapshot de contenu n'est remplacé ;
+- il s'agit uniquement d'un patch de code.

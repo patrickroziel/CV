@@ -1,0 +1,20 @@
+V66 — Textes Langues verrouillés
+
+Correctif ciblé uniquement sur la section Langues.
+
+Les quatre descriptions déjà validées sont désormais inscrites directement dans
+LanguagesSection.tsx afin qu'un ancien snapshot/localStorage ne puisse plus les
+remplacer visuellement :
+- Français
+- Anglais
+- Polonais
+- Espagnol
+
+Le formulaire d'édition réutilise également ces textes lorsqu'on ouvre l'une de
+ces quatre langues.
+
+IMPORTANT :
+- aucun default-snapshot.json dans ce ZIP ;
+- aucun fichier de données/contenu remplacé ;
+- aucun changement au menu de traduction v65 ;
+- les autres langues restent pilotées par les données normales du site.

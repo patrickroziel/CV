@@ -1,0 +1,12 @@
+V60 — traduction globale Google, sans reload
+
+- Sélecteur de langue permanent dans le header Work + Notes.
+- Traduction du texte visible + placeholder/title/aria-label/alt.
+- Aucune traduction n'est enregistrée dans le JSON du portfolio.
+- Changement de langue sans rechargement, avec fondu discret.
+- Langue mémorisée pendant la navigation.
+- Cache de session pour éviter de retraduire les mêmes chaînes.
+- Google Cloud API appelée côté serveur (clé non exposée au navigateur).
+- Langues: FR, créole haïtien, EN-GB, EN-US, PL, ES, RU, EL, zh-CN, JA, HA, AR, PT-PT.
+- Haoussa utilisé pour "nigérien".
+- Patch volontaire: default-snapshot.json EXCLU pour préserver le contenu local/publié.

@@ -1,0 +1,15 @@
+V68 — Vercel OIDC + Google Cloud Workload Identity Federation
+
+- Patch de code uniquement.
+- Aucun default-snapshot.json.
+- Aucun contenu Work / Notes / Langues n'est remplacé.
+- En local : conserve Application Default Credentials (ADC) du Mac.
+- Sur Vercel : utilise le jeton OIDC court fourni à la Function via x-vercel-oidc-token.
+- Échange le jeton Vercel via Google Security Token Service puis impersonne le compte :
+  vercel-translate@project-65d3abe6-8784-439b-a77.iam.gserviceaccount.com
+- Pool WIF : vercel
+- Provider WIF : vercel
+- Projet GCP : project-65d3abe6-8784-439b-a77
+- Numéro de projet : 192476117892
+- Cache le jeton Google court pendant sa durée de validité pour éviter un échange STS à chaque lot de traduction.
+- Aucun secret, aucune clé privée et aucun fichier ADC n'est embarqué.

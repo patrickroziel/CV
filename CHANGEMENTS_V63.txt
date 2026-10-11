@@ -1,0 +1,35 @@
+V63 — ordre des langues + créole antillais + variantes arabes
+
+Patch code uniquement. Aucun contenu du portfolio n'est remplacé.
+Ce ZIP NE contient PAS src/lib/default-snapshot.json.
+
+Ordre du menu :
+1. Français
+2. Polski
+3. British English
+4. American English
+5. Español
+Puis les autres langues.
+
+Ajouts :
+- Créole antillais (Guadeloupe / Martinique)
+- Arabe littéraire (arabe standard moderne)
+- Arabe maghrébin
+- Arabe égyptien
+
+Technique :
+- Arabe littéraire reste sur Cloud Translation standard (rapide), qui produit l'arabe standard.
+- Créole antillais, arabe maghrébin et arabe égyptien passent par Google Gemini 3.5 Flash avec sortie JSON structurée, car Cloud Translation ne propose pas ces trois variantes comme cibles directes.
+- Toutes les autres langues gardent l'optimisation v62.
+
+À faire UNE FOIS pour activer les trois variantes dialectales :
+/Users/patrickroziel/google-cloud-sdk/bin/gcloud services enable aiplatform.googleapis.com --project=project-65d3abe6-8784-439b-a77
+
+Installation :
+cd ~/mon-portfolio-v2
+unzip -o ~/Downloads/portfolio-v63-langues-dialectes.zip -d ~/mon-portfolio-v2
+rm -rf .next
+npm run build
+npm run dev
+
+Ne pas publier sur Vercel avant validation locale.

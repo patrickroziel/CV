@@ -82,6 +82,22 @@ import { cn, createId, isXUrl, isYoutubeUrl } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+const HARDCODED_LANGUAGE_DESCRIPTIONS: Record<string, string> = {
+  "français":
+    "Je suis né en France et j’y ai toujours vécu. Le français est ma langue maternelle, celle que j’utilise chaque jour, naturellement, à l’oral comme à l’écrit.",
+  "anglais":
+    "I started learning English at school when I was young. Over the years, travelling and working abroad made it part of my daily life — especially in Australia, where I lived for two years.",
+  "polonais":
+    "Moi rodzice są Polakami, więc od dziecka słyszę język polski. Mieszkam we Francji i mówię po polsku głównie z rodziną. Rozumiem więcej, niż potrafię powiedzieć.",
+  "espagnol":
+    "Entiendo bastante bien el español, sobre todo cuando puedo concentrarme. He trabajado en proyectos en español y puedo escribir o producir contenido. Hablarlo con fluidez todavía me cuesta.",
+};
+
+function hardcodedLanguageDescription(lang: Language): string | null {
+  const frenchName = getL(lang.name, "fr").trim().toLocaleLowerCase("fr-FR");
+  return HARDCODED_LANGUAGE_DESCRIPTIONS[frenchName] ?? null;
+}
+
 const cardGridVariants: Variants = {
   hidden: {},
   visible: {
@@ -146,7 +162,8 @@ function LanguageCard({
     "FR";
 
   const flag = regionFlag(mainRegion.toUpperCase());
-  const level = l(lang.level).trim();
+  const level =
+    hardcodedLanguageDescription(lang) ?? l(lang.level).trim();
 
   return (
     <motion.div variants={cardItemVariants} className="h-full">
@@ -253,7 +270,12 @@ export function LanguagesSection() {
   const openEdit = (lang: Language) => {
     setEditing(lang);
     setName(liftToLocalized(lang.name));
-    setLevel(liftToLocalized(lang.level));
+    const fixedDescription = hardcodedLanguageDescription(lang);
+    setLevel(
+      fixedDescription
+        ? liftToLocalized(fixedDescription)
+        : liftToLocalized(lang.level)
+    );
     setVideoType(lang.videoType ?? "none");
     setVideoUrl(lang.videoUrl ?? null);
     setFallbackImageUrl(lang.fallbackImageUrl ?? null);

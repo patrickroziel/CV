@@ -9,6 +9,7 @@ import { EditGate } from "@/components/shared/EditGate";
 import { WallpaperEditor } from "@/components/background/WallpaperEditor";
 import { UniverseSwitch, useUniverse } from "@/components/layout/UniverseSwitch";
 import { downloadPortfolioSnapshot } from "@/lib/storage";
+import { SiteTranslator } from "@/components/translation/SiteTranslator";
 
 export function Header() {
   const { editMode, setEditMode, editAllowed, data, showToast } = usePortfolio();
@@ -39,6 +40,7 @@ export function Header() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <SiteTranslator />
           <EditGate>
             {!isNotes && (
               <Button variant="ghost" size="sm" onClick={() => setWallpaperOpen(true)} title="Changer le fond de Work">

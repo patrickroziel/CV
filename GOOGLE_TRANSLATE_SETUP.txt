@@ -1,0 +1,57 @@
+V60 — TRADUCTION GOOGLE CLOUD
+==============================
+
+Cette version ajoute un sélecteur de langue permanent dans le header et traduit
+le texte visible sans recharger la page.
+
+IMPORTANT
+---------
+Le vieux widget "Website Translator" de Google n'est plus une base fiable.
+V60 utilise l'API officielle Google Cloud Translation via une route serveur,
+ce qui évite d'exposer la clé dans le navigateur.
+
+Variables à ajouter dans Vercel > Project Settings > Environment Variables :
+
+GOOGLE_TRANSLATE_API_KEY=...
+GOOGLE_TRANSLATE_PROJECT_ID=...
+GOOGLE_TRANSLATE_REGION=us-central1
+
+Puis redéployer le site.
+
+Dans Google Cloud :
+1. Créer/choisir un projet.
+2. Activer Cloud Translation API.
+3. Activer la facturation si Google la demande.
+4. Créer une clé API et la restreindre à Cloud Translation API.
+5. Définir des quotas prudents pour limiter les coûts.
+
+V60 utilise le modèle Google Translation LLM :
+projects/PROJECT_ID/locations/REGION/models/general/translation-llm
+
+LANGUES
+-------
+Français (original)
+Créole haïtien
+Anglais britannique
+Anglais américain
+Polonais
+Espagnol
+Russe
+Grec
+Chinois simplifié
+Japonais
+Haoussa (Niger)
+Arabe
+Portugais (Portugal)
+
+NOTE SUR "NIGÉRIEN"
+--------------------
+"Nigérien" désigne une nationalité, pas une langue unique. Cette version utilise
+le haoussa, langue largement parlée au Niger et prise en charge par Google.
+Si tu voulais une autre langue (par ex. zarma), il faudra remplacer ce choix.
+
+CONTENU
+-------
+Le ZIP V60 est volontairement un PATCH : il ne contient PAS
+src/lib/default-snapshot.json. Il ne peut donc pas écraser le contenu actuel du
+site lors de l'installation.

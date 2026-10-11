@@ -1,0 +1,21 @@
+PORTFOLIO v61 — TRADUCTION GOOGLE VIA ADC
+
+Cette version remplace l'authentification par clé API de v60 par Application Default Credentials (ADC).
+
+Important :
+- aucun default-snapshot.json n'est inclus dans le patch ;
+- aucun contenu Work / Notes / Langues n'est remplacé ;
+- les chapitres et brouillons restent inchangés ;
+- le sélecteur de langues de v60 reste inchangé ;
+- le Project ID utilisé par défaut est project-65d3abe6-8784-439b-a77 ;
+- GOOGLE_TRANSLATE_PROJECT_ID et GOOGLE_TRANSLATE_REGION restent possibles en override.
+
+Dépendance nécessaire :
+  npm install google-auth-library@11.2.0
+
+En local, ADC doit avoir été créé avec :
+  gcloud auth application-default login --project=project-65d3abe6-8784-439b-a77
+
+La présence du fichier ~/.config/gcloud/application_default_credentials.json suffit ensuite au code Node côté serveur.
+
+Vercel : les ADC locales du Mac ne sont pas envoyées sur Vercel. La traduction publique nécessitera une identité Google Cloud configurée côté Vercel (à faire séparément, sans clé API).
