@@ -33,6 +33,9 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     };
   }, [universe, publicComingSoon]);
 
+  // The private sign-in stays available if the public site is paused.
+  if (pathname.startsWith("/behind-the-glass/")) return <>{children}</>;
+
   if (publicComingSoon) {
     return (
       <>
