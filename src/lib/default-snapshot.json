@@ -93,6 +93,22 @@
   },
   "experiences": [
     {
+      "role": {
+        "fr": "Opérateur prompteur"
+      },
+      "company": {
+        "fr": "Solutions Prompteur"
+      },
+      "startDate": "2023-10",
+      "endDate": "2024-02",
+      "description": {
+        "fr": "<div data-rich-lh=\"1.25\" class=\"rich-lh\" style=\"line-height: 1.25\"><p></p><p></p><p><span style=\"font-size: 12px\">Freelance</span></p><ul><li><strong><span style=\"font-size: 12px\">Gestion du matériel</span></strong><span style=\"font-size: 12px\">&nbsp;: réglages techniques du&nbsp;</span><strong><span style=\"font-size: 12px\">prompteur, caméra, éclairage, micro et moniteur</span></strong><span style=\"font-size: 12px\">&nbsp;sur tournages TV, plateaux d’interviews et événements corporate</span></li><li><strong><span style=\"font-size: 12px\">Adaptation du discours</span></strong><span style=\"font-size: 12px\">&nbsp;: ajustement du texte prompteur aux contraintes de&nbsp;</span><strong><span style=\"font-size: 12px\">régie et de plateau</span></strong></li><li><strong><span style=\"font-size: 12px\">Collaboration</span></strong><span style=\"font-size: 12px\">&nbsp;: travail étroit avec&nbsp;</span><strong><span style=\"font-size: 12px\">réalisateurs et chefs de projet</span></strong><span style=\"font-size: 12px\">&nbsp;pour assurer la fluidité des enregistrements</span></li></ul><ul><li><strong><span style=\"font-size: 12px\">Interventions techniques efficaces</span></strong><span style=\"font-size: 12px\">&nbsp;: sur événements en direct, garantissant la continuité des présentations</span></li></ul></div>"
+      },
+      "technologies": [],
+      "media": [],
+      "id": "2e0fb7fe-ca08-4cd1-91c3-848c75fc9b99"
+    },
+    {
       "id": "exp-job-search",
       "company": {
         "fr": "Recherche d’emploi",
@@ -177,8 +193,8 @@
         "pl": "Paryż (75)",
         "es": "París (75)"
       },
-      "startDate": "2023",
-      "endDate": "2024",
+      "startDate": "2023-02",
+      "endDate": "2023-10",
       "description": {
         "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p></p><p></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Missions principales</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Montage vidéo</span></strong><span style=\"font-size: 12px\"> : réalisation de vidéos promotionnelles et tutoriels pour le secteur </span><strong><span style=\"font-size: 12px\">corporate et institutionnel</span></strong></li><li><strong><span style=\"font-size: 12px\">Gestion du matériel</span></strong><span style=\"font-size: 12px\"> : réglages techniques du </span><strong><span style=\"font-size: 12px\">prompteur, caméra, éclairage, micro et moniteur</span></strong><span style=\"font-size: 12px\"> sur tournages TV, plateaux d’interviews et événements corporate</span></li><li><strong><span style=\"font-size: 12px\">Adaptation du discours</span></strong><span style=\"font-size: 12px\"> : ajustement du texte prompteur aux contraintes de </span><strong><span style=\"font-size: 12px\">régie et de plateau</span></strong></li><li><strong><span style=\"font-size: 12px\">Collaboration</span></strong><span style=\"font-size: 12px\"> : travail étroit avec </span><strong><span style=\"font-size: 12px\">réalisateurs et chefs de projet</span></strong><span style=\"font-size: 12px\"> pour assurer la fluidité des enregistrements</span></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Réalisations</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Optimisation de la synchronisation prompteur/plateau</span></strong><span style=\"font-size: 12px\"> : réduisant les erreurs en direct</span></li><li><strong><span style=\"font-size: 12px\">Montage de vidéos institutionnelles et tutoriels</span></strong><span style=\"font-size: 12px\"> : pour plusieurs clients majeurs</span></li><li><strong><span style=\"font-size: 12px\">Interventions techniques efficaces</span></strong><span style=\"font-size: 12px\"> : sur événements en direct, garantissant la continuité des présentations</span></li></ul><br><br></div>",
         "en": "Video editing, graphic creation and teleprompter operation for live and corporate productions.",
@@ -210,8 +226,8 @@
         "pl": "Francja",
         "es": "Francia"
       },
-      "startDate": "2022",
-      "endDate": "2022",
+      "startDate": "2022-09",
+      "endDate": "2022-09",
       "description": {
         "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p></p><p></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Missions principales</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Captation de témoignages clients</span></strong><span style=\"font-size: 12px\"> : et tournages en entreprise (</span><strong><span style=\"font-size: 12px\">GH5, DJI Ronin</span></strong><span style=\"font-size: 12px\">, intérieur/extérieur)</span></li><li><strong><span style=\"font-size: 12px\">Préparation et test du matériel</span></strong><span style=\"font-size: 12px\"> : chargement des batteries, vérification des équipements avant tournage</span></li><li><strong><span style=\"font-size: 12px\">Prise de son et lumière</span></strong><span style=\"font-size: 12px\"> : stabilisation d’image</span></li><li><strong><span style=\"font-size: 12px\">Interaction avec les participants</span></strong><span style=\"font-size: 12px\"> : adaptation selon qu’ils soient déjà connus ou rencontrés pour la première fois</span></li><li><strong><span style=\"font-size: 12px\">Montage vidéo</span></strong><span style=\"font-size: 12px\"> : création de contenus institutionnels destinés aux </span><strong><span style=\"font-size: 12px\">franchisés et réseaux sociaux</span></strong></li><li><strong><span style=\"font-size: 12px\">Habillage graphique et animations</span></strong><span style=\"font-size: 12px\"> : intégration de visuels et motion design</span></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Réalisations</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Optimisation du matériel et des réglages techniques</span></strong><span style=\"font-size: 12px\"> : pour des tournages fluides</span></li><li><strong><span style=\"font-size: 12px\">Captation naturelle des témoignages clients</span></strong><span style=\"font-size: 12px\"> : grâce à une approche relationnelle adaptée</span></li><li><strong><span style=\"font-size: 12px\">Montage de contenus institutionnels attractifs</span></strong><span style=\"font-size: 12px\"> : prêts à la diffusion sur les réseaux</span></li></ul><br><br></div>",
         "en": "Steadicam capture, interviews and editing for nutrition / wellness brand content.",
@@ -243,8 +259,8 @@
         "pl": "Paryż (75)",
         "es": "París (75)"
       },
-      "startDate": "2022",
-      "endDate": "2022",
+      "startDate": "2021-09",
+      "endDate": "2022-03",
       "description": {
         "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p></p><p></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Missions principales</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Montage de vidéos virales</span></strong><span style=\"font-size: 12px\"> : pour créateurs internationaux sur </span><strong><span style=\"font-size: 12px\">Facebook, Instagram et YouTube</span></strong></li><li><strong><span style=\"font-size: 12px\">Application des standards Jellysmack</span></strong><span style=\"font-size: 12px\"> : formats </span><strong><span style=\"font-size: 12px\">1:1</span></strong><span style=\"font-size: 12px\">, AB testing (</span><strong><span style=\"font-size: 12px\">AB1, AB2, AB3</span></strong><span style=\"font-size: 12px\">), optimisations </span><strong><span style=\"font-size: 12px\">SEO visuelles</span></strong></li><li><strong><span style=\"font-size: 12px\">Création de thumbnails et vignettes</span></strong><span style=\"font-size: 12px\"> : transitions dynamiques, effets typographiques, </span><strong><span style=\"font-size: 12px\">habillage graphique</span></strong></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Réalisations</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Optimisation des vidéos courtes</span></strong><span style=\"font-size: 12px\"> : pour maximiser la </span><strong><span style=\"font-size: 12px\">visibilité et l’engagement</span></strong></li><li><strong><span style=\"font-size: 12px\">Respect des délais serrés</span></strong><span style=\"font-size: 12px\"> : tout en maintenant la qualité et la cohérence visuelle</span></li></ul><br><br></div>",
         "en": "Editing for creators and influencers: social pacing, hooks, vertical and horizontal formats (Facebook, Shorts).",
@@ -276,8 +292,8 @@
         "pl": "Paryż (75)",
         "es": "París (75)"
       },
-      "startDate": "2021",
-      "endDate": "2022",
+      "startDate": "2021-07",
+      "endDate": "2022-01",
       "description": {
         "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p></p><p></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Missions principales</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Montage d’émissions d’information</span></strong><span style=\"font-size: 12px\"> : séries web et reportages pour </span><strong><span style=\"font-size: 12px\">YouTube</span></strong></li><li><strong><span style=\"font-size: 12px\">Installation technique complète</span></strong><span style=\"font-size: 12px\"> : caméras, éclairage, </span><strong><span style=\"font-size: 12px\">sonorisation de plateau</span></strong></li><li><strong><span style=\"font-size: 12px\">Création de génériques</span></strong><span style=\"font-size: 12px\"> : </span><strong><span style=\"font-size: 12px\">templates d’habillage (MOGRT)</span></strong><span style=\"font-size: 12px\">, visuels promotionnels</span></li><li><strong><span style=\"font-size: 12px\">Gestion des workflows rapides</span></strong><span style=\"font-size: 12px\"> : pour diffusion quotidienne</span></li><li><strong><span style=\"font-size: 12px\">Travail avec invités controversés</span></strong><span style=\"font-size: 12px\"> : dont candidats présidentiels ou leurs équipes de communication</span></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Réalisations</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Réalisation complète de reportages et interviews</span></strong><span style=\"font-size: 12px\"> : du tournage au montage</span></li><li><strong><span style=\"font-size: 12px\">Production de contenus graphiques et vidéos adaptés</span></strong><span style=\"font-size: 12px\"> : à la diffusion multilingue</span></li><li><strong><span style=\"font-size: 12px\">Habillage et sous-titrage optimisés</span></strong><span style=\"font-size: 12px\"> : pour maintenir l’impact éditorial tout en respectant les délais</span></li></ul><br><br></div>",
         "en": "News and reportage editing, graphic packaging and motion for a news media outlet.",
@@ -309,8 +325,8 @@
         "pl": "Paryż (75)",
         "es": "París (75)"
       },
-      "startDate": "2018",
-      "endDate": "2019",
+      "startDate": "2018-08",
+      "endDate": "2019-04",
       "description": {
         "fr": "<div data-rich-lh=\"1.1\" class=\"rich-lh\" style=\"line-height: 1.1\"><p></p><p></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Missions principales</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Conception et montage de vidéos</span></strong><span style=\"font-size: 12px\"> : </span><strong><span style=\"font-size: 12px\">promotionnelles</span></strong><span style=\"font-size: 12px\">, </span><strong><span style=\"font-size: 12px\">tutoriels et formations internes</span></strong></li><li><strong><span style=\"font-size: 12px\">Maîtrise de la charte graphique</span></strong><span style=\"font-size: 12px\"> : </span><strong><span style=\"font-size: 12px\">storytelling marketing</span></strong></li><li><strong><span style=\"font-size: 12px\">Préparation et gestion du matériel</span></strong><span style=\"font-size: 12px\"> : caméras, lumières, son, stabilisation</span></li><li><strong><span style=\"font-size: 12px\">Coordination</span></strong><span style=\"font-size: 12px\"> : avec équipes internes et franchisés</span></li><li><strong><span style=\"font-size: 12px\">Adaptation des vidéos aux formats</span></strong><span style=\"font-size: 12px\"> : </span><strong><span style=\"font-size: 12px\">Facebook, Instagram, YouTube, IGTV, Story</span></strong></li></ul><p><br></p><p><span style=\"font-size: medium; color: rgb(214, 214, 214)\" data-rich-color=\"#d6d6d6\"><strong><span style=\"font-size: 12px\">Réalisations</span></strong></span></p><ul><li><strong><span style=\"font-size: 12px\">Production de contenus B2C et B2B</span></strong></li><li><strong><span style=\"font-size: 12px\">Vidéos de présentation et témoignages de franchisés</span></strong><span style=\"font-size: 12px\"> : diffusion web et Espagne</span></li><li><strong><span style=\"font-size: 12px\">Plus de 150 vidéos de formation interne</span></strong><span style=\"font-size: 12px\"> : durée </span><strong><span style=\"font-size: 12px\">1–30 min</span></strong></li><li><strong><span style=\"font-size: 12px\">Colorgrading et habillage graphique</span></strong><span style=\"font-size: 12px\"> optimisés</span></li></ul><br><br></div>",
         "en": "Video production and graphic assets for brand communication; internal training videos and social formats.",
@@ -686,10 +702,10 @@
         "es": "Francés"
       },
       "level": {
+        "fr": "Natif",
         "en": "Native",
         "pl": "Ojczysty",
-        "es": "Nativo",
-        "fr": "Je suis né en France et j’y ai toujours vécu. Le français est ma langue maternelle, celle que j’utilise chaque jour, naturellement, à l’oral comme à l’écrit."
+        "es": "Nativo"
       },
       "videoType": "file",
       "videoUrl": "https://res.cloudinary.com/ptp8diwd/video/upload/v1784762544/iukryqcmt5iz8odkujre.mov",
@@ -885,7 +901,7 @@
         "es": "Inglés"
       },
       "level": {
-        "fr": "I started learning English at school when I was young. Over the years, travelling and working abroad made it part of my daily life — especially in Australia, where I lived for two years.",
+        "fr": "Courant",
         "en": "Fluent",
         "pl": "Biegły",
         "es": "Fluido"
@@ -1140,7 +1156,7 @@
         "es": "Polaco"
       },
       "level": {
-        "fr": "Moi rodzice są Polakami, więc od dziecka słyszę język polski. Mieszkam we Francji i mówię po polsku głównie z rodziną. Rozumiem więcej, niż potrafię powiedzieć.",
+        "fr": "Courant",
         "en": "Fluent",
         "pl": "Biegły",
         "es": "Fluido"
@@ -1283,7 +1299,7 @@
         "es": "Español"
       },
       "level": {
-        "fr": "Entiendo bastante bien el español, sobre todo cuando puedo concentrarme. He trabajado en proyectos en español y puedo escribir o producir contenido. Hablarlo con fluidez todavía me cuesta.",
+        "fr": "Je me débrouille… pas vraiment lol",
         "en": "I get by… not really lol",
         "pl": "Radzę sobie… no nie bardzo lol",
         "es": "Me defiendo… la verdad no mucho lol"
@@ -1976,6 +1992,7 @@
   },
   "socialPosts": [
     {
+      "id": "6105218c-288c-47ec-8c18-3ab210d002e2",
       "title": {
         "fr": "Trees for the Woods — Ami Blue"
       },
@@ -1999,8 +2016,7 @@
         "Music"
       ],
       "visible": true,
-      "order": -5,
-      "id": "6105218c-288c-47ec-8c18-3ab210d002e2"
+      "order": -5
     },
     {
       "id": "4d8afaca-a15f-4dd7-b5b8-61f4dcda3447",
