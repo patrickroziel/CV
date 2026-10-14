@@ -205,10 +205,10 @@ export function NotesFeed() {
         <header className="mb-7 flex min-w-0 flex-col gap-4 border-b border-white/[0.07] pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-[0.24em] text-cyan-100/50">
-              Journal
+              Publications
             </p>
             <h2 className="mt-1 break-words text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              {activeTag ? `#${activeTag}` : scope === "Tout" ? "Fil" : scope}
+              {activeTag ? `#${activeTag}` : scope === "Tout" ? "Feed" : scope}
             </h2>
             {activeTag ? (
               <button
