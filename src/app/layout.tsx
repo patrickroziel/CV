@@ -3,6 +3,7 @@ import { Geist_Mono, Manrope } from "next/font/google";
 import { PortfolioProvider } from "@/components/providers/PortfolioProvider";
 import { SkillDetailProvider } from "@/components/skills/SkillDetailProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const workSans = Manrope({
@@ -37,6 +38,7 @@ export default function RootLayout({
             <SiteChrome>{children}</SiteChrome>
           </SkillDetailProvider>
         </PortfolioProvider>
+        <Analytics />
       </body>
     </html>
   );
