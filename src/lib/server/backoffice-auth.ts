@@ -12,16 +12,28 @@ export function privatePath() {
   const slug = process.env.BACKOFFICE_SLUG?.trim();
   return slug ? `/behind-the-glass/${encodeURIComponent(slug)}` : "/";
 }
-export function authConfigured() {
+/**
+ * Report only the names of invalid setup variables, never their values.
+ * Temporary aid for Vercel initial deployment troubleshooting.
+ */
+export function backofficeConfigurationIssues(): string[] {
+  const issues: string[] = [];
   const { BACKOFFICE_SLUG, BACKOFFICE_SESSION_SECRET, BACKOFFICE_BASE_URL, GITHUB_OAUTH_CLIENT_ID, GITHUB_OAUTH_CLIENT_SECRET } = process.env;
-  let validDomain = false;
   try {
-    const url = new URL(BACKOFFICE_BASE_URL ?? "");
-    validDomain = url.protocol === "https:" && !url.username && !url.password && url.pathname === "/" && !url.search && !url.hash;
-  } catch { /* Configuration manquante */ }
-  return Boolean(validDomain && BACKOFFICE_SLUG && /^[A-Za-z0-9_-]{24,}$/.test(BACKOFFICE_SLUG) &&
-    BACKOFFICE_SESSION_SECRET && BACKOFFICE_SESSION_SECRET.length >= 32 &&
-    GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET);
+    const url = new URL(BACKOFFICE_BASE_URL?.trim() ?? "");
+    if (url.protocol !== "https:" || url.username || url.password || url.pathname !== "/" || url.search || url.hash) {
+      issues.push("BACKOFFICE_BASE_URL");
+    }
+  } catch { issues.push("BACKOFFICE_BASE_URL"); }
+
+  if (!BACKOFFICE_SLUG || !/^[A-Za-z0-9_-]{24,}$/.test(BACKOFFICE_SLUG)) issues.push("BACKOFFICE_SLUG");
+  if (!BACKOFFICE_SESSION_SECRET || BACKOFFICE_SESSION_SECRET.length < 32) issues.push("BACKOFFICE_SESSION_SECRET");
+  if (!GITHUB_OAUTH_CLIENT_ID?.trim()) issues.push("GITHUB_OAUTH_CLIENT_ID");
+  if (!GITHUB_OAUTH_CLIENT_SECRET?.trim()) issues.push("GITHUB_OAUTH_CLIENT_SECRET");
+  return issues;
+}
+export function authConfigured() {
+  return backofficeConfigurationIssues().length === 0;
 }
 function signingKey() {
   const key = process.env.BACKOFFICE_SESSION_SECRET;
