@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useRef, useState } from "react";
 
 type PortfolioCloudState = {
@@ -91,8 +90,8 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
           <div className="space-y-5">
             <p className="text-sm text-cyan-100">Session administrateur active. Ton interface Work et Notes reste inchangée.</p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/" className="rounded-xl bg-cyan-200 px-5 py-3 text-sm font-semibold text-slate-950">Modifier Work</Link>
-              <Link href="/notes" className="rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Gérer Notes</Link>
+              <a href="/" className="rounded-xl bg-cyan-200 px-5 py-3 text-sm font-semibold text-slate-950">Modifier Work</a>
+              <a href="/notes" className="rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Gérer Notes</a>
             </div>
             <p className="text-xs text-zinc-400">Dans Work ou Notes, clique sur « Modifier » pour afficher les commandes d'édition.</p>
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
