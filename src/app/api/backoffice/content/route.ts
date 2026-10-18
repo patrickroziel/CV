@@ -39,6 +39,18 @@ export async function PUT(request: Request) {
     data = parsed.data;
     revision = parsed.expectedRevision;
   } catch { return NextResponse.json({ error: "Données ou révision invalides." }, { status: 400, headers }); }
+  // First activation must not silently replace posts already published on the current site.
+  // Existing cloud data can still be edited/deleted intentionally in later revisions.
+  if (revision === 0) {
+    const publishedIds = (DEFAULT_PORTFOLIO.socialPosts ?? [])
+      .filter(post => post.visible !== false)
+      .map(post => post.id);
+    const importedIds = new Set(data.socialPosts.map(post => post.id));
+    const missingIds = publishedIds.filter(id => !importedIds.has(id));
+    if (missingIds.length) return NextResponse.json({
+      error: `Import refusé : ce JSON ne contient pas ${missingIds.length} publication(s) actuellement en ligne. Exporte une version plus récente sur ton iMac.`,
+    }, { status: 409, headers });
+  }
   try {
     const nextRevision = await writePortfolio(data, revision);
     if (nextRevision === null) return NextResponse.json({ error: "Conflit de versions : exporter les modifications avant de recharger." }, { status: 409, headers });
