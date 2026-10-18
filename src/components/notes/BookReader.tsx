@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { RichHtml } from "@/components/shared/RichHtml";
 import { PostActions } from "@/components/medias/PostActions";
+import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
 
 function sortBookPosts(posts: SocialPost[]) {
@@ -111,6 +112,11 @@ export function BookReader({ id }: { id: string }) {
 
           <div className="my-7 h-px bg-white/[0.07] sm:my-9" />
 
+          {(post.featuredEmbed || post.youtubeUrl) && (
+            <div className="mb-7">
+              <FeaturedMedia media={post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null)} title={title} />
+            </div>
+          )}
           <RichHtml
             html={body}
             className="book-reading-text min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-7 [&_*]:max-w-full [&_a]:break-all"
