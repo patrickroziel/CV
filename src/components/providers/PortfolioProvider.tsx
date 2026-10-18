@@ -6,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type {
@@ -54,6 +55,7 @@ type PortfolioContextValue = {
   isHydrated: boolean;
   /** True only on local (or NEXT_PUBLIC_ALLOW_EDIT) — never in production deploys */
   editAllowed: boolean;
+  cloudStatus: "local" | "saved" | "saving" | "error";
   /** Active only when editAllowed */
   editMode: boolean;
   setEditMode: (v: boolean) => void;
@@ -122,6 +124,11 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<PortfolioData>(DEFAULT_PORTFOLIO);
   const [isHydrated, setIsHydrated] = useState(false);
   const [editAllowed, setEditAllowed] = useState(false);
+  const [cloudMode, setCloudMode] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<"local" | "saved" | "saving" | "error">("local");
+  const cloudSync = useRef<{ revision: number; saved: string; blocked: boolean; queue: Promise<void> }>({
+    revision: 0, saved: "", blocked: false, queue: Promise.resolve(),
+  });
   const [editModeRaw, setEditModeRaw] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const locale: Locale = "fr";
@@ -131,27 +138,64 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const editMode = editAllowed && editModeRaw;
 
   useEffect(() => {
-    const allowed = isEditEnvironment();
-    // Public production must always reflect the deployed snapshot.
-    // Browser localStorage is only an editing workspace on localhost (or when
-    // NEXT_PUBLIC_ALLOW_EDIT=true). This prevents an old local draft from
-    // masking freshly published content after a Vercel deployment.
-    const loaded = allowed ? loadPortfolio() : structuredClone(DEFAULT_PORTFOLIO);
-    setData(loaded);
-    setEditAllowed(allowed);
-    if (!allowed) setEditModeRaw(false);
+    let cancelled = false;
+    async function hydrate() {
+      const local = isEditEnvironment();
+      let authenticated = false;
+      try {
+        const response = await fetch("/api/backoffice/session", { cache: "no-store" });
+        if (response.ok) {
+          const result = (await response.json()) as { authenticated?: boolean };
+          authenticated = result.authenticated === true;
+        }
+      } catch { /* Offline local editing keeps working. */ }
 
-    if (typeof document !== "undefined") {
+      if (authenticated) {
+        try {
+          const response = await fetch("/api/backoffice/content", { cache: "no-store" });
+          if (!response.ok) throw new Error("Cloud indisponible");
+          const result = (await response.json()) as { data: PortfolioData; revision: number };
+          if (cancelled) return;
+          cloudSync.current.revision = result.revision;
+          cloudSync.current.saved = JSON.stringify(result.data);
+          cloudSync.current.blocked = false;
+          setData(result.data);
+          setCloudMode(true);
+          setCloudStatus("saved");
+          setEditAllowed(true);
+          document.documentElement.lang = "fr";
+          setIsHydrated(true);
+          return;
+        } catch { if (!cancelled) setCloudStatus("error"); }
+      }
+
+      let initial = local ? loadPortfolio() : structuredClone(DEFAULT_PORTFOLIO);
+      // The anonymous endpoint strips drafts; failures fall back to the deployed snapshot.
+      if (!local) {
+        try {
+          const response = await fetch("/api/portfolio", { cache: "no-store" });
+          if (response.ok) {
+            const result = (await response.json()) as { data?: PortfolioData };
+            if (result.data) initial = result.data;
+          }
+        } catch { /* Snapshot remains available. */ }
+      }
+      if (cancelled) return;
+      setData(initial);
+      setEditAllowed(local);
+      setEditModeRaw(false);
       document.documentElement.lang = "fr";
+      setIsHydrated(true);
     }
-    setIsHydrated(true);
+    void hydrate();
+    return () => { cancelled = true; };
   }, []);
 
   // Safety net: persist the latest provider state again after React settles.
   // Individual mutations already save synchronously; this debounced write
   // prevents a later render/remount from reviving an older value.
   useEffect(() => {
-    if (!isHydrated || !editAllowed) return;
+    if (!isHydrated || !editAllowed || cloudMode) return;
     const timer = window.setTimeout(() => {
       try {
         savePortfolio(data);
@@ -160,7 +204,44 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       }
     }, 250);
     return () => window.clearTimeout(timer);
-  }, [data, isHydrated, editAllowed]);
+  }, [data, isHydrated, editAllowed, cloudMode]);
+
+  // Serialize writes and reject conflicts instead of silently overwriting a second device.
+  useEffect(() => {
+    if (!isHydrated || !cloudMode || cloudSync.current.blocked) return;
+    const serialized = JSON.stringify(data);
+    if (serialized === cloudSync.current.saved) return;
+    const timer = window.setTimeout(() => {
+      cloudSync.current.queue = cloudSync.current.queue.then(async () => {
+        if (cloudSync.current.blocked || serialized === cloudSync.current.saved) return;
+        setCloudStatus("saving");
+        try {
+          const response = await fetch("/api/backoffice/content", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: JSON.parse(serialized), expectedRevision: cloudSync.current.revision }),
+          });
+          if (!response.ok) {
+            if (response.status === 409 || response.status === 401 || response.status === 403) {
+              cloudSync.current.blocked = true;
+            }
+            throw new Error(response.status === 409
+              ? "Conflit cloud entre appareils. Exporte le JSON avant de recharger."
+              : "Sauvegarde cloud impossible. Conserve ton export JSON.");
+          }
+          const result = (await response.json()) as { revision: number };
+          cloudSync.current.revision = result.revision;
+          cloudSync.current.saved = serialized;
+          setCloudStatus("saved");
+        } catch (error) {
+          setCloudStatus("error");
+          setToast(error instanceof Error ? error.message : "Erreur cloud");
+          window.setTimeout(() => setToast(null), 6000);
+        }
+      });
+    }, 650);
+    return () => window.clearTimeout(timer);
+  }, [data, isHydrated, cloudMode]);
 
   const setLocale = useCallback((_next: Locale) => {
     // Site volontairement mono-langue.
@@ -172,12 +253,12 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setEditMode = useCallback((v: boolean) => {
-    if (!isEditEnvironment()) {
+    if (!editAllowed) {
       setEditModeRaw(false);
       return;
     }
     setEditModeRaw(v);
-  }, []);
+  }, [editAllowed]);
 
   const t = useCallback(
     (key: string) => translate(key, "fr"),
@@ -735,6 +816,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       data,
       isHydrated,
       editAllowed,
+      cloudStatus,
       editMode,
       setEditMode,
       locale,
@@ -784,6 +866,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       data,
       isHydrated,
       editAllowed,
+      cloudStatus,
       editMode,
       setEditMode,
       locale,
