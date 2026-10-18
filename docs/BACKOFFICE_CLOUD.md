@@ -67,3 +67,9 @@ Neon Free : aucune souscription payante nécessaire tant que l'utilisation reste
 
 ### Validation obligatoire
 Tester l'affichage iPhone, le lien partagé, les embeds YouTube et X, la photo de couverture, le retour d'un fichier JSON ancien et la persistance des likes entre deux navigateurs après activation de Neon.
+
+## Protection de la première migration (2026-10-18)
+
+La première écriture cloud (révision 0) refuse un export JSON qui ne contient pas **tous les IDs des posts déjà publiés dans le snapshot de production**. Ceci évite d'effacer les nouvelles Notes en important une vieille sauvegarde. Une modification intentionnelle reste possible une fois la base initialisée.
+
+`BACKOFFICE_BASE_URL` (HTTPS, sans chemin, ex. `https://patrickroziel.com`) est désormais obligatoire ; le callback ne peut plus être dérivé d'un Host contrôlé par la requête.
