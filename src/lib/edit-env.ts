@@ -7,6 +7,8 @@
  * Optional override: NEXT_PUBLIC_ALLOW_EDIT=true|false
  */
 export function isEditEnvironment(): boolean {
+  // Public environment variables must never authorize edits on a production server.
+  if (process.env.NODE_ENV === "production") return false;
   const override = process.env.NEXT_PUBLIC_ALLOW_EDIT;
   if (override === "true") return true;
   if (override === "false") return false;
