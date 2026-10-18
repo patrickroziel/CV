@@ -709,6 +709,9 @@ export type NotesCategory =
   | "Images"
   | "Vidéos";
 
+/** A safe external visual displayed at the top of a post; URL only, never raw HTML. */
+export type FeaturedEmbed = { type: "youtube" | "x" | "image"; url: string };
+
 /**
  * One post in the Notes universe (text + optional YouTube + optional file).
  * Distinct from Portfolio projects.
@@ -723,6 +726,8 @@ export type SocialPost = {
   date: string;
   /** Optional YouTube watch / share / Shorts URL */
   youtubeUrl: string | null;
+  /** Optional rich media above the text; legacy youtubeUrl remains compatible. */
+  featuredEmbed?: FeaturedEmbed | null;
   /** Optional PDF or image (Vercel Blob public URL) */
   fileUrl: string | null;
   fileKind: SocialPostFileKind | null;
