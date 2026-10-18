@@ -31,7 +31,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
-    URL.revokeObjectURL(href);
+    window.setTimeout(() => URL.revokeObjectURL(href), 1000);
   }
 
   async function exportCloud() {
@@ -42,6 +42,37 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
       setMessage("Sauvegarde JSON téléchargée. Garde une copie dans iCloud Drive.");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Export impossible."); }
     finally { setBusy(false); }
+  }
+
+  async function initializeFromPublishedContent() {
+    setBusy(true); setMessage("");
+    try {
+      const cloud = await currentCloud();
+      if (cloud.initialized) {
+        setMessage("Le cloud contient déjà des données. Rien n'a été remplacé.");
+        return;
+      }
+      if (!window.confirm(
+        "Initialiser le cloud avec le contenu déjà publié sur le site ? Les brouillons uniquement stockés sur ton iMac ne sont pas inclus. Choisis plutôt Importer un export JSON si tu souhaites conserver ces brouillons."
+      )) {
+        setMessage("Initialisation annulée. Aucune modification.");
+        return;
+      }
+      // Back up the exact source before initialising the database.
+      download(cloud.data, "portfolio-before-cloud-setup");
+      const response = await fetch("/api/backoffice/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: cloud.data, expectedRevision: 0 }),
+      });
+      if (!response.ok) {
+        const details = (await response.json().catch(() => ({}))) as { error?: string };
+        throw new Error(details.error || "Initialisation refusée.");
+      }
+      setMessage("Contenu déjà publié synchronisé ! Ouvre Work ou Notes pour commencer l'édition. Une copie JSON a été téléchargée.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Initialisation impossible.");
+    } finally { setBusy(false); }
   }
 
   async function importSnapshot(file: File) {
@@ -96,7 +127,11 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
             <p className="text-xs text-zinc-400">Dans Work ou Notes, clique sur « Modifier » pour afficher les commandes d'édition.</p>
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <h2 className="font-semibold">Contenu et sauvegardes</h2>
-              <p className="mt-2 text-sm text-zinc-300">Au premier démarrage, importe ton dernier Export JSON de l’iMac. Pour protéger les publications déjà en ligne, les exports trop anciens seront refusés. Conserve la sauvegarde dans iCloud Drive.</p>
+              <p className="mt-2 text-sm text-zinc-300">Pour commencer, importe le dernier export JSON de ton iMac (y compris les brouillons). Si tu n'as pas cet export sous la main, tu peux initialiser le cloud à partir du contenu déjà publié sur le site. Tes brouillons présents uniquement sur l'iMac ne seront pas inclus.</p>
+              <button type="button" disabled={busy} onClick={() => void initializeFromPublishedContent()}
+                className="mt-4 block w-full rounded-xl bg-cyan-200 px-4 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">
+                Initialiser avec le contenu actuellement en ligne
+              </button>
               <button disabled={busy} onClick={() => void exportCloud()}
                 className="mt-4 rounded-xl border border-white/25 px-4 py-2 text-sm disabled:opacity-50">Télécharger une sauvegarde cloud</button>
               <label htmlFor="portfolio-json" className="mt-5 block text-sm font-medium">Importer un export JSON existant</label>
