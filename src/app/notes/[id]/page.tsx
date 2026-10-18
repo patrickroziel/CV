@@ -1,4 +1,4 @@
-import { BookReader } from "@/components/notes/BookReader";
+import { EntryReader } from "@/components/notes/EntryReader";
 
 export default async function BookChapterPage({
   params,
@@ -8,7 +8,7 @@ export default async function BookChapterPage({
   const { id } = await params;
   return (
     <main className="no-print relative z-10 min-h-screen pb-20 pt-24 sm:pt-28">
-      <BookReader id={id} />
+      <EntryReader id={id} />
     </main>
   );
 }

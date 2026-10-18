@@ -59,6 +59,7 @@ import {
   QUOTE_SERVICE_IDS,
 } from "./types";
 import { DEFAULT_PORTFOLIO, DEFAULT_BACKGROUND } from "./defaults";
+import { normalizeFeaturedEmbed } from "./featured-embed";
 import {
   createId,
   inferMediaTypeFromUrl,
@@ -736,6 +737,7 @@ export function normalizeSocialPost(
     description: liftToLocalized(raw.description ?? ""),
     date,
     youtubeUrl,
+    featuredEmbed: normalizeFeaturedEmbed(raw.featuredEmbed),
     fileUrl,
     fileKind: fileUrl ? inferSocialFileKind(fileUrl, raw.fileKind) : null,
     fileName,
