@@ -1,5 +1,6 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
+import { isBackofficeAdmin, validateOrigin } from "@/lib/server/backoffice-auth";
 
 export const runtime = "nodejs";
 
@@ -21,18 +22,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const allow =
-    process.env.NODE_ENV === "development" ||
-    process.env.NEXT_PUBLIC_ALLOW_EDIT === "true" ||
-    process.env.ALLOW_BLOB_UPLOAD === "true";
-
+  // Public environment flags never authorize writes to the media store.
+  const allow = process.env.NODE_ENV === "development" ||
+    ((await isBackofficeAdmin()) && validateOrigin(request));
   if (!allow) {
-    return NextResponse.json(
-      { error: "Upload désactivé (définissez NEXT_PUBLIC_ALLOW_EDIT ou ALLOW_BLOB_UPLOAD)." },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Accès administrateur requis." }, { status: 403 });
   }
-
   let body: HandleUploadBody;
   try {
     body = (await request.json()) as HandleUploadBody;

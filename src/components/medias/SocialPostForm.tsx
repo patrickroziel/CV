@@ -9,7 +9,10 @@ import { Label } from "@/components/ui/label";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
 import { getL, liftToLocalized, type LocalizedString } from "@/lib/i18n-content";
 import { MEDIA_FOLDERS, uploadToBlob } from "@/lib/blob-upload";
-import { cn, isYoutubeUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { featuredEmbedFromInput } from "@/lib/featured-embed";
+import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
+import type { FeaturedEmbed } from "@/lib/types";
 
 export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
 
@@ -146,7 +149,8 @@ export function SocialPostForm({
             ? "Documents"
             : "Réflexions")
   );
-  const [youtubeUrl, setYoutubeUrl] = useState(initial?.youtubeUrl ?? "");
+  const [embedType, setEmbedType] = useState<FeaturedEmbed["type"] | "">(initial?.featuredEmbed?.type ?? (initial?.youtubeUrl ? "youtube" : ""));
+  const [embedInput, setEmbedInput] = useState(initial?.featuredEmbed?.url ?? initial?.youtubeUrl ?? "");
   const [tagsText, setTagsText] = useState((initial?.tags ?? []).join(", "));
   const [fileUrl, setFileUrl] = useState<string | null>(initial?.fileUrl ?? null);
   const [fileKind, setFileKind] = useState<SocialPostFileKind | null>(initial?.fileKind ?? null);
@@ -161,6 +165,7 @@ export function SocialPostForm({
   const abortRef = useRef<AbortController | null>(null);
 
   const isBook = category === "Livre";
+  const featured = embedType && embedInput.trim() ? featuredEmbedFromInput(embedType, embedInput) : null;
 
   const processFile = useCallback(async (file: File, target: Exclude<UploadTarget, null>) => {
     setError(null);
@@ -209,7 +214,8 @@ export function SocialPostForm({
     subtitle: getL(subtitle, "fr").trim() ? subtitle : undefined,
     description,
     date: initial?.date || new Date().toISOString().slice(0, 10),
-    youtubeUrl: youtubeUrl.trim() || null,
+    youtubeUrl: featured?.type === "youtube" ? featured.url : null,
+    featuredEmbed: featured,
     fileUrl,
     fileKind: fileUrl ? fileKind : null,
     fileName: fileUrl ? fileName : null,
@@ -229,8 +235,7 @@ export function SocialPostForm({
     setError(null);
     if (!getL(title, "fr").trim()) return setError("Le titre est obligatoire pour publier.");
     if (isBook && !getL(description, "fr").trim()) return setError("Ajoute le texte du chapitre avant de publier.");
-    const yt = youtubeUrl.trim();
-    if (yt && !isYoutubeUrl(yt)) return setError("Le lien YouTube n’est pas valide.");
+    if (embedType && embedInput.trim() && !featured) return setError("Utilise une URL HTTPS valide (YouTube, X ou image directe). Le code HTML n'est jamais enregistré.");
     onSubmit(buildValues(true));
   };
 
@@ -240,7 +245,7 @@ export function SocialPostForm({
       getL(title, "fr").trim() ||
         getL(subtitle, "fr").trim() ||
         getL(description, "fr").trim() ||
-        youtubeUrl.trim() ||
+        embedInput.trim() ||
         fileUrl ||
         bookCoverUrl ||
         bookPdfUrl
@@ -249,6 +254,7 @@ export function SocialPostForm({
       setError("Ajoute au moins un titre ou un contenu avant d’enregistrer le brouillon.");
       return;
     }
+    if (embedType && embedInput.trim() && !featured) return setError("Lien d'intégration invalide.");
     onSubmit(buildValues(false));
   };
 
@@ -318,65 +324,64 @@ export function SocialPostForm({
         </p>
       </div>
 
-      {isBook ? (
-        <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-          <FilePicker
-            label="Image de couverture (facultatif)"
-            accept="image/*"
-            value={bookCoverUrl}
-            fileName={bookCoverName}
-            uploading={uploadTarget === "cover"}
-            progress={progress}
-            onPick={(file) => void processFile(file, "cover")}
-            onClear={() => {
-              setBookCoverUrl(null);
-              setBookCoverName(null);
-            }}
-            icon={ImageIcon}
-          />
-          <FilePicker
-            label="PDF du chapitre (facultatif)"
-            accept="application/pdf,.pdf"
-            value={bookPdfUrl}
-            fileName={bookPdfName}
-            uploading={uploadTarget === "bookPdf"}
-            progress={progress}
-            onPick={(file) => void processFile(file, "bookPdf")}
-            onClear={() => {
-              setBookPdfUrl(null);
-              setBookPdfName(null);
-            }}
-            icon={FileText}
-          />
-        </div>
-      ) : (
-        <>
-          <div className="grid gap-2">
-            <Label htmlFor="social-yt">Vidéo YouTube (optionnel)</Label>
-            <Input
-              id="social-yt"
-              type="url"
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="https://youtube.com/…"
-            />
-          </div>
+      <div className="grid min-w-0 gap-2 rounded-2xl border border-cyan-200/10 bg-white/[0.025] p-4">
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-cyan-100/75">Média en haut du post</p>
+        <p className="text-xs leading-5 text-zinc-400">Colle une URL YouTube, X ou une image HTTPS. Le code d'iframe YouTube est aussi accepté : nous ne gardons que le lien sûr.</p>
+        <Label htmlFor="featured-media-type">Type d'intégration</Label>
+        <select id="featured-media-type" value={embedType}
+          onChange={(e) => { setEmbedType(e.target.value as FeaturedEmbed["type"] | ""); setEmbedInput(""); }}
+          className="h-10 rounded-xl border border-white/15 bg-black/40 px-3 text-sm text-zinc-100">
+          <option value="">Aucune intégration</option>
+          <option value="youtube">Vidéo YouTube</option>
+          <option value="x">Post X intégré</option>
+          <option value="image">Photo (URL directe HTTPS)</option>
+        </select>
+        {embedType ? <>
+          <Label htmlFor="featured-media-url">URL ou iframe</Label>
+          <Input id="featured-media-url" value={embedInput} onChange={e => setEmbedInput(e.target.value)}
+            placeholder={embedType === "youtube" ? "https://youtu.be/…" : embedType === "x" ? "https://x.com/.../status/…" : "https://.../photo.jpg"} />
+        </> : null}
+        {embedType && embedInput.trim() && featured ? (
+          <div className="mt-2"><FeaturedMedia media={featured} title={getL(title, "fr") || "Aperçu du média"} /></div>
+        ) : embedType && embedInput.trim() ? (
+          <p className="text-xs text-amber-300">Lien non reconnu pour ce type de média.</p>
+        ) : null}
+      </div>
 
-          <FilePicker
-            label="Image ou PDF (optionnel)"
-            accept="application/pdf,.pdf,image/*"
-            value={fileUrl}
-            fileName={fileName}
-            uploading={uploadTarget === "general"}
-            progress={progress}
-            onPick={(file) => void processFile(file, "general")}
-            onClear={() => {
-              setFileUrl(null);
-              setFileKind(null);
-              setFileName(null);
-            }}
-          />
-        </>
+      <FilePicker
+        label={isBook ? "Couverture du chapitre (facultatif)" : "Photo de couverture du post (facultatif)"}
+        accept="image/*"
+        value={bookCoverUrl}
+        fileName={bookCoverName}
+        uploading={uploadTarget === "cover"}
+        progress={progress}
+        onPick={(file) => void processFile(file, "cover")}
+        onClear={() => { setBookCoverUrl(null); setBookCoverName(null); }}
+        icon={ImageIcon}
+      />
+      {isBook ? (
+        <FilePicker
+          label="PDF du chapitre (facultatif)"
+          accept="application/pdf,.pdf"
+          value={bookPdfUrl}
+          fileName={bookPdfName}
+          uploading={uploadTarget === "bookPdf"}
+          progress={progress}
+          onPick={(file) => void processFile(file, "bookPdf")}
+          onClear={() => { setBookPdfUrl(null); setBookPdfName(null); }}
+          icon={FileText}
+        />
+      ) : (
+        <FilePicker
+          label="Image ou PDF supplémentaire (facultatif)"
+          accept="application/pdf,.pdf,image/*"
+          value={fileUrl}
+          fileName={fileName}
+          uploading={uploadTarget === "general"}
+          progress={progress}
+          onPick={(file) => void processFile(file, "general")}
+          onClear={() => { setFileUrl(null); setFileKind(null); setFileName(null); }}
+        />
       )}
 
       {error && <p className="break-words text-xs text-red-400">{error}</p>}
