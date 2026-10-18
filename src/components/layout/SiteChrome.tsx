@@ -19,11 +19,11 @@ import { universeFromPath } from "@/lib/universe";
  * one top bar, no secondary top navigation, no floating bottom dock.
  */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
-  const { data, editMode } = usePortfolio();
+  const { data, editMode, editAllowed } = usePortfolio();
   const pathname = usePathname();
   const universe = universeFromPath(pathname);
   const enabled = (data.comingSoon ?? DEFAULT_COMING_SOON).enabled;
-  const publicComingSoon = !editMode && enabled;
+  const publicComingSoon = !editMode && !editAllowed && enabled;
 
   useEffect(() => {
     const root = document.documentElement;
