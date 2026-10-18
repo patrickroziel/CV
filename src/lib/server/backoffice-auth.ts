@@ -13,8 +13,15 @@ export function privatePath() {
   return slug ? `/behind-the-glass/${encodeURIComponent(slug)}` : "/";
 }
 export function authConfigured() {
-  const { BACKOFFICE_SLUG, BACKOFFICE_SESSION_SECRET, GITHUB_OAUTH_CLIENT_ID, GITHUB_OAUTH_CLIENT_SECRET } = process.env;
-  return Boolean(BACKOFFICE_SLUG && /^[A-Za-z0-9_-]{24,}$/.test(BACKOFFICE_SLUG) && BACKOFFICE_SESSION_SECRET && BACKOFFICE_SESSION_SECRET.length >= 32 && GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET);
+  const { BACKOFFICE_SLUG, BACKOFFICE_SESSION_SECRET, BACKOFFICE_BASE_URL, GITHUB_OAUTH_CLIENT_ID, GITHUB_OAUTH_CLIENT_SECRET } = process.env;
+  let validDomain = false;
+  try {
+    const url = new URL(BACKOFFICE_BASE_URL ?? "");
+    validDomain = url.protocol === "https:" && !url.username && !url.password && url.pathname === "/" && !url.search && !url.hash;
+  } catch { /* Configuration manquante */ }
+  return Boolean(validDomain && BACKOFFICE_SLUG && /^[A-Za-z0-9_-]{24,}$/.test(BACKOFFICE_SLUG) &&
+    BACKOFFICE_SESSION_SECRET && BACKOFFICE_SESSION_SECRET.length >= 32 &&
+    GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET);
 }
 function signingKey() {
   const key = process.env.BACKOFFICE_SESSION_SECRET;
@@ -63,9 +70,8 @@ export function validateOrigin(request: Request) {
   try { return new URL(origin).origin === new URL(request.url).origin; }
   catch { return false; }
 }
-export function oauthCallbackUrl(request: Request) {
+export function oauthCallbackUrl(_request: Request) {
   // Explicitly configured production URL, never trust X-Forwarded-Host from untrusted requests.
-  const base = process.env.BACKOFFICE_BASE_URL;
-  if (!base) return new URL("/api/backoffice/callback", request.url).toString();
-  return new URL("/api/backoffice/callback", base).toString();
+  if (!authConfigured()) throw new Error("Configuration OAuth incomplète");
+  return new URL("/api/backoffice/callback", process.env.BACKOFFICE_BASE_URL).toString();
 }
