@@ -5,6 +5,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { RichHtml } from "@/components/shared/RichHtml";
+import { PostActions } from "@/components/medias/PostActions";
 import type { SocialPost } from "@/lib/types";
 
 function sortBookPosts(posts: SocialPost[]) {
@@ -128,6 +129,9 @@ export function BookReader({ id }: { id: string }) {
               </a>
             </div>
           ) : null}
+          <div className="mt-8">
+            <PostActions postId={post.id} title={title} visible={post.visible !== false} />
+          </div>
         </div>
       </article>
 
