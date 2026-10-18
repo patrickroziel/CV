@@ -161,7 +161,8 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           cloudSync.current.blocked = false;
           setData(result.data);
           setCloudMode(true);
-          setCloudStatus("saved");
+          // An empty cloud database still needs its first write/import.
+          setCloudStatus(result.revision > 0 ? "saved" : "local");
           setEditAllowed(true);
           document.documentElement.lang = "fr";
           setIsHydrated(true);
