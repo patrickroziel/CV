@@ -53,3 +53,17 @@ Ne pas fusionner cette pull request tant que les identifiants OAuth, la base et 
 iCloud+ 2 To : conserver archives et sauvegardes du snapshot. Adobe Creative Cloud : production de médias.
 Ces abonnements ne sont pas des bases de données pour l'application Next.js.
 Neon Free : aucune souscription payante nécessaire tant que l'utilisation reste dans le quota gratuit.
+
+## Publications : couverture, intégrations, likes et partage
+
+- Dans **Notes → Nouveau post**, sélectionne une catégorie, ajoute le texte, puis une **photo de couverture** (disponible aussi pour les posts qui ne sont pas des chapitres Livre).
+- **Média en haut du post** : choisis YouTube, X ou image puis colle une URL HTTPS. Les liens `youtube.com/watch`, `youtu.be`, `youtube.com/shorts`, `x.com/.../status`, ou une URL directe d'image sont acceptés.
+- Copier-coller un `<iframe src="...">` YouTube est possible : l'application **extrait uniquement l'URL reconnue**. Aucun HTML arbitraire n'est sauvegardé ni exécuté. Les scripts d'embed d'autres sites ne sont pas acceptés.
+- Une prévisualisation apparaît dans le formulaire. Sur le site, la **couverture apparaît au-dessus du post**, puis la vidéo/le post X/la photo intégrée apparaît **avant le texte**.
+- Les publications non-Livre possèdent maintenant leur propre URL `/notes/[id]`, comme les chapitres. **Partager** emploie la feuille de partage iOS/Android ou copie le lien.
+- Les boutons cœur affichent le nombre de likes et permettent d'ajouter ou retirer un like depuis un navigateur (un cookie anonyme par navigateur, sans compte visiteur). Les comptes ne sont pas reliés à une identité personnelle.
+- Les likes sont enregistrés **séparément** dans PostgreSQL Neon, table `portfolio_post_likes` : ils ne sont pas dans le snapshot JSON. Les brouillons n'acceptent pas de likes.
+- **Sans DATABASE_URL et BACKOFFICE_SESSION_SECRET configurés**, les compteurs restent désactivés au lieu d'afficher de faux chiffres. Les likes anonymes basés sur un cookie ne garantissent pas l'unicité d'une personne (suppression des cookies, plusieurs navigateurs) : une protection contre les abus sera à évaluer avant ouverture publique.
+
+### Validation obligatoire
+Tester l'affichage iPhone, le lien partagé, les embeds YouTube et X, la photo de couverture, le retour d'un fichier JSON ancien et la persistance des likes entre deux navigateurs après activation de Neon.
