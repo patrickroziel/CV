@@ -160,10 +160,11 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           cloudSync.current.saved = JSON.stringify(result.data);
           cloudSync.current.blocked = false;
           setData(result.data);
-          setCloudMode(true);
-          // An empty cloud database still needs its first write/import.
+          // Don't permit cloud edits until the first explicit JSON import.
+          // Otherwise a newly opened admin page could persist an incomplete snapshot.
+          setCloudMode(result.revision > 0);
           setCloudStatus(result.revision > 0 ? "saved" : "local");
-          setEditAllowed(true);
+          setEditAllowed(result.revision > 0);
           document.documentElement.lang = "fr";
           setIsHydrated(true);
           return;
