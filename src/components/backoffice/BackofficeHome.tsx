@@ -96,7 +96,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
             <p className="text-xs text-zinc-400">Dans Work ou Notes, clique sur « Modifier » pour afficher les commandes d'édition.</p>
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <h2 className="font-semibold">Contenu et sauvegardes</h2>
-              <p className="mt-2 text-sm text-zinc-300">Au premier démarrage, importe le dernier Export JSON de ton iMac. Ne remplace pas ta sauvegarde d'origine.</p>
+              <p className="mt-2 text-sm text-zinc-300">Au premier démarrage, importe ton dernier Export JSON de l’iMac. Pour protéger les publications déjà en ligne, les exports trop anciens seront refusés. Conserve la sauvegarde dans iCloud Drive.</p>
               <button disabled={busy} onClick={() => void exportCloud()}
                 className="mt-4 rounded-xl border border-white/25 px-4 py-2 text-sm disabled:opacity-50">Télécharger une sauvegarde cloud</button>
               <label htmlFor="portfolio-json" className="mt-5 block text-sm font-medium">Importer un export JSON existant</label>
