@@ -1,4 +1,3 @@
-import "server-only";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -15,7 +14,7 @@ export function privatePath() {
 }
 export function authConfigured() {
   const { BACKOFFICE_SLUG, BACKOFFICE_SESSION_SECRET, GITHUB_OAUTH_CLIENT_ID, GITHUB_OAUTH_CLIENT_SECRET } = process.env;
-  return Boolean(BACKOFFICE_SLUG?.trim() && BACKOFFICE_SESSION_SECRET && BACKOFFICE_SESSION_SECRET.length >= 32 && GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET);
+  return Boolean(BACKOFFICE_SLUG && /^[A-Za-z0-9_-]{24,}$/.test(BACKOFFICE_SLUG) && BACKOFFICE_SESSION_SECRET && BACKOFFICE_SESSION_SECRET.length >= 32 && GITHUB_OAUTH_CLIENT_ID && GITHUB_OAUTH_CLIENT_SECRET);
 }
 function signingKey() {
   const key = process.env.BACKOFFICE_SESSION_SECRET;
