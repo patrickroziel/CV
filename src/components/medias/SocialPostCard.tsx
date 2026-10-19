@@ -82,9 +82,9 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
 
           {!isBook && featured && <FeaturedMedia media={featured} title={title} />}
           {!isBook && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
-            post.fileUrl !== featured?.url && <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+            post.fileUrl !== featured?.url && <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/40">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={post.fileUrl} alt={title} loading="lazy" className="max-h-[480px] h-auto w-full object-contain" />
+              <img src={post.fileUrl} alt={title} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
             </div>
           }
 
