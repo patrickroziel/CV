@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
-import { RichHtml } from "@/components/shared/RichHtml";
+import { PostRichBody } from "@/components/medias/PostRichBody";
 import { PostActions } from "@/components/medias/PostActions";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
@@ -117,8 +117,10 @@ export function BookReader({ id }: { id: string }) {
               <FeaturedMedia media={post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null)} title={title} />
             </div>
           )}
-          <RichHtml
+          <PostRichBody
             html={body}
+            inlineMedia={post.inlineMedia}
+            title={title}
             className="book-reading-text min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-7 [&_*]:max-w-full [&_a]:break-all"
           />
 
