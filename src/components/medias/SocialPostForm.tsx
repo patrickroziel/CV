@@ -387,12 +387,27 @@ export function SocialPostForm({
         {inlineMedia.length > 0 && (
           <div className="space-y-3 border-t border-white/10 pt-3">
             <p className="text-xs font-medium text-cyan-100">Médias insérés ({inlineMedia.length})</p>
+            {inlineMedia.some(media => !getL(description, "fr").includes(mediaMarker(media.id))) && (
+              <p className="text-xs text-amber-200">Certains médias n’ont pas encore d’emplacement dans le texte. Ils restent visibles à la fin du post ; clique dans le paragraphe souhaité puis sur « Placer dans le texte ».</p>
+            )}
             {inlineMedia.map((media, index) => (
               <div key={media.id} className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-black/25 px-3 py-2">
                 <span className="min-w-0 truncate text-xs text-zinc-300">{index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "x" ? "X" : "Photo"} — {media.url}</span>
-                <Button type="button" variant="ghost" size="sm" onClick={() => removeInlineMedia(media.id)} title="Retirer le média">
-                  <X className="h-4 w-4" /> Retirer
-                </Button>
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                  {!getL(description, "fr").includes(mediaMarker(media.id)) && (
+                    <Button type="button" variant="secondary" size="sm"
+                      title="Placer ce média après le paragraphe sélectionné"
+                      onClick={() => {
+                        setMediaInsertion({ nonce: crypto.randomUUID(), token: mediaMarker(media.id) });
+                        setError(null);
+                      }}>
+                      Placer dans le texte
+                    </Button>
+                  )}
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeInlineMedia(media.id)} title="Retirer le média">
+                    <X className="h-4 w-4" /> Retirer
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
