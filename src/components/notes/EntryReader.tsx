@@ -48,9 +48,9 @@ export function EntryReader({ id }: { id: string }) {
         </header>
         <FeaturedMedia media={featured} title={title} />
         {post.fileKind === "image" && post.fileUrl && post.fileUrl !== featured?.url && post.fileUrl !== post.bookCoverUrl &&
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+          <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.fileUrl} alt={title} className="max-h-[580px] w-full object-contain" />
+            <img src={post.fileUrl} alt={title} className="absolute inset-0 h-full w-full object-cover object-center" />
           </div>}
         <PostRichBody html={l(post.description)} inlineMedia={post.inlineMedia} title={title} className="min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-zinc-200 [&_*]:max-w-full [&_a]:break-all" />
         {post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"
