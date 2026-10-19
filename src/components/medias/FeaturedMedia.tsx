@@ -95,10 +95,10 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
   if (!featured) return null;
 
   if (featured.type === "image") {
-    return <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+    return <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={featured.url} alt={title || "Image intégrée"} loading="lazy" referrerPolicy="no-referrer"
-        className="max-h-[520px] w-full object-contain" />
+        className="absolute inset-0 h-full w-full object-cover object-center" />
     </div>;
   }
   if (featured.type === "x") {
