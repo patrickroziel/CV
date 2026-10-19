@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { BookOpen, EyeOff, FileDown, Pencil, Trash2 } from "lucide-react";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { Button } from "@/components/ui/button";
-import { RichHtml } from "@/components/shared/RichHtml";
+import { PostRichBody } from "@/components/medias/PostRichBody";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
@@ -18,7 +18,7 @@ function formatDate(iso: string) {
   return Number.isNaN(value.getTime()) ? iso : value.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }
 function excerpt(html: string) {
-  const text = stripHtml(html).replace(/\s+/g, " ").trim();
+  const text = stripHtml(html).replace(/\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]/g, "").replace(/\s+/g, " ").trim();
   return text.length > 260 ? text.slice(0, 260).trimEnd() + "…" : text;
 }
 export function SocialPostCard({ post, index, onEdit, onTagClick }: {
@@ -91,7 +91,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
           {description ? isBook ? (
             <p className="break-words text-sm leading-6 text-zinc-400">{excerpt(description)}</p>
           ) : (
-            <RichHtml html={description} className="min-w-0 max-w-full overflow-hidden text-sm leading-6 text-zinc-300 [&_*]:max-w-full [&_a]:break-all" />
+            <PostRichBody html={description} inlineMedia={post.inlineMedia} title={title} className="min-w-0 max-w-full overflow-hidden text-sm leading-6 text-zinc-300 [&_*]:max-w-full [&_a]:break-all" />
           ) : null}
 
           {post.tags?.length ? <ul className="flex min-w-0 flex-wrap gap-1.5">

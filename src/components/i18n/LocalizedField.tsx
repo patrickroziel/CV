@@ -16,6 +16,8 @@ type LocalizedFieldProps = {
   id?: string;
   className?: string;
   plain?: boolean;
+  /** Request to insert a media marker after the paragraph containing the caret. */
+  insertBlockToken?: { nonce: string; token: string };
 };
 
 /** Éditeur volontairement mono-langue : le site est maintenant édité en français uniquement. */
@@ -29,6 +31,7 @@ export function LocalizedField({
   id,
   className,
   plain = false,
+  insertBlockToken,
 }: LocalizedFieldProps) {
   const fieldId = id || `field-${label.replace(/\s+/g, "-").toLowerCase()}`;
   const current = getL(value, "fr");
@@ -43,6 +46,7 @@ export function LocalizedField({
         placeholder={placeholder}
         id={fieldId}
         className={className}
+        insertBlockToken={insertBlockToken}
       />
     );
   }

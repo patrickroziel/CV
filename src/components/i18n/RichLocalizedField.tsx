@@ -21,6 +21,7 @@ type RichLocalizedFieldProps = {
   className?: string;
   compact?: boolean;
   hint?: string;
+  insertBlockToken?: { nonce: string; token: string };
 };
 
 export function RichLocalizedField({
@@ -33,6 +34,7 @@ export function RichLocalizedField({
   className,
   compact = false,
   hint,
+  insertBlockToken,
 }: RichLocalizedFieldProps) {
   const fieldId = id || `rich-${label.replace(/\s+/g, "-").toLowerCase()}`;
   const editorRef = useRef<HTMLDivElement>(null);
@@ -67,6 +69,38 @@ export function RichLocalizedField({
     skipSyncRef.current = true;
     onChange(setL(value, "fr", html));
   };
+
+  // Keep the media marker as an editable paragraph in the existing rich editor.
+  // Clicking Insert may blur the editor; its previous caret is saved in savedRangeRef.
+  const handledMediaRequest = useRef<string | null>(null);
+  useEffect(() => {
+    const request = insertBlockToken;
+    const el = editorRef.current;
+    if (!request || !el || handledMediaRequest.current === request.nonce) return;
+    if (!/^[[][[]MEDIA:[a-zA-Z0-9_-]{8,80}[]][]]$/.test(request.token)) return;
+    handledMediaRequest.current = request.nonce;
+    const range = savedRangeRef.current;
+    let child: Node | null = range && el.contains(range.startContainer) ? range.startContainer : null;
+    // Move to the top-level block; never inject an invalid DIV into a <p>.
+    while (child?.parentNode && child.parentNode !== el) child = child.parentNode;
+    const markerBlock = document.createElement("p");
+    markerBlock.textContent = request.token;
+    const nextParagraph = document.createElement("p");
+    nextParagraph.appendChild(document.createElement("br"));
+    if (child && child.parentNode === el) child.parentNode.insertBefore(markerBlock, child.nextSibling);
+    else el.appendChild(markerBlock);
+    markerBlock.after(nextParagraph);
+    const selection = window.getSelection();
+    if (selection) {
+      const caret = document.createRange();
+      caret.selectNodeContents(nextParagraph);
+      caret.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(caret);
+      savedRangeRef.current = caret.cloneRange();
+    }
+    commit();
+  }, [insertBlockToken?.nonce]);
 
   const rememberSelection = () => {
     savedRangeRef.current = captureEditorSelection(editorRef.current);

@@ -711,6 +711,7 @@ export type NotesCategory =
 
 /** A safe external visual displayed at the top of a post; URL only, never raw HTML. */
 export type FeaturedEmbed = { type: "youtube" | "x" | "image"; url: string };
+export type InlinePostMedia = FeaturedEmbed & { id: string };
 
 /**
  * One post in the Notes universe (text + optional YouTube + optional file).
@@ -728,6 +729,8 @@ export type SocialPost = {
   youtubeUrl: string | null;
   /** Optional rich media above the text; legacy youtubeUrl remains compatible. */
   featuredEmbed?: FeaturedEmbed | null;
+  /** Images, X posts and YouTube embeds placed between paragraphs. */
+  inlineMedia?: InlinePostMedia[];
   /** Optional PDF or image (Vercel Blob public URL) */
   fileUrl: string | null;
   fileKind: SocialPostFileKind | null;

@@ -60,6 +60,7 @@ import {
 } from "./types";
 import { DEFAULT_PORTFOLIO, DEFAULT_BACKGROUND } from "./defaults";
 import { normalizeFeaturedEmbed } from "./featured-embed";
+import { normalizeInlinePostMedia } from "./post-inline-media";
 import {
   createId,
   inferMediaTypeFromUrl,
@@ -738,6 +739,7 @@ export function normalizeSocialPost(
     date,
     youtubeUrl,
     featuredEmbed: normalizeFeaturedEmbed(raw.featuredEmbed),
+    inlineMedia: normalizeInlinePostMedia(raw.inlineMedia),
     fileUrl,
     fileKind: fileUrl ? inferSocialFileKind(fileUrl, raw.fileKind) : null,
     fileName,
