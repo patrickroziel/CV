@@ -154,7 +154,10 @@ export function SocialPostForm({
     normalizeFeaturedEmbed(initial?.featuredEmbed ?? (initial?.youtubeUrl ? { type: "youtube", url: initial.youtubeUrl } : null))
   );
   const [inlineMedia, setInlineMedia] = useState<InlinePostMedia[]>(normalizeInlinePostMedia(initial?.inlineMedia));
-  const [insertType, setInsertType] = useState<FeaturedEmbed["type"]>("youtube");
+  const [insertType, setInsertType] = useState<FeaturedEmbed["type"] | "text">("youtube");
+  const [textBlockTitle, setTextBlockTitle] = useState("");
+  const [textBlockBody, setTextBlockBody] = useState("");
+  const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [insertInput, setInsertInput] = useState("");
   const [mediaInsertion, setMediaInsertion] = useState<{ nonce: string; token: string }>();
   const [tagsText, setTagsText] = useState((initial?.tags ?? []).join(", "));
@@ -171,7 +174,7 @@ export function SocialPostForm({
   const abortRef = useRef<AbortController | null>(null);
 
   const isBook = category === "Livre";
-  const parsedMedia = insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
+  const parsedMedia = insertType !== "text" && insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
 
   const insertInlineMedia = useCallback((media: FeaturedEmbed) => {
     const valid = normalizeFeaturedEmbed(media);
@@ -182,6 +185,32 @@ export function SocialPostForm({
     setInsertInput("");
     setError(null);
   }, []);
+
+  const insertScrollText = () => {
+    if (!textBlockBody.trim()) {
+      setError("Écris le contenu du bloc de texte avant de l’insérer.");
+      return;
+    }
+    const id = "media_" + crypto.randomUUID().replace(/-/g, "");
+    setInlineMedia(prev => [...prev, {
+      id,
+      type: "text",
+      title: textBlockTitle.trim().slice(0, 160),
+      body: textBlockBody.slice(0, 40000),
+    }]);
+    setMediaInsertion({ nonce: id, token: mediaMarker(id) });
+    setTextBlockTitle("");
+    setTextBlockBody("");
+    setError(null);
+  };
+
+  const updateTextBlock = (id: string, field: "title" | "body", value: string) => {
+    setInlineMedia(prev => prev.map(item =>
+      item.id === id && item.type === "text"
+        ? { ...item, [field]: value }
+        : item
+    ));
+  };
 
   const removeInlineMedia = (id: string) => {
     setInlineMedia(prev => prev.filter(media => media.id !== id));
@@ -264,11 +293,13 @@ export function SocialPostForm({
     setError(null);
     if (!getL(title, "fr").trim()) return setError("Le titre est obligatoire pour publier.");
     if (isBook && !getL(description, "fr").trim()) return setError("Ajoute le texte du chapitre avant de publier.");
+    if (inlineMedia.some(media => media.type === "text" && !media.body.trim())) return setError("Un bloc de texte est vide. Complète-le avant de publier.");
     onSubmit(buildValues(true));
   };
 
   const handleSaveDraft = () => {
     setError(null);
+    if (inlineMedia.some(media => media.type === "text" && !media.body.trim())) return setError("Un bloc de texte est vide. Complète-le avant d’enregistrer.");
     const hasSomething = Boolean(
       getL(title, "fr").trim() ||
         getL(subtitle, "fr").trim() ||
@@ -361,28 +392,50 @@ export function SocialPostForm({
         </p>
         <Label htmlFor="inline-media-type">Type de média</Label>
         <select id="inline-media-type" value={insertType}
-          onChange={(e) => { setInsertType(e.target.value as FeaturedEmbed["type"]); setInsertInput(""); }}
+          onChange={(e) => { setInsertType(e.target.value as FeaturedEmbed["type"] | "text"); setInsertInput(""); }}
           className="h-10 rounded-xl border border-white/15 bg-black/40 px-3 text-sm text-zinc-100">
           <option value="youtube">Vidéo YouTube</option>
           <option value="x">Post X</option>
           <option value="image">Photo (URL ou fichier)</option>
+          <option value="text">Bloc de texte défilant</option>
         </select>
-        <Label htmlFor="inline-media-url">Lien du média (ou iframe YouTube)</Label>
-        <Input id="inline-media-url" value={insertInput} onChange={e => setInsertInput(e.target.value)}
-          placeholder={insertType === "youtube" ? "https://youtu.be/…" : insertType === "x" ? "https://x.com/.../status/…" : "https://.../photo.jpg"} />
-        <Button type="button" variant="secondary" disabled={!parsedMedia || uploadTarget !== null}
-          className="w-fit gap-2" onClick={insertFromLink}>
-          <Plus className="h-4 w-4" /> Insérer ce média dans le texte
-        </Button>
-        {insertInput && !parsedMedia && <p className="text-xs text-amber-300">Lien non reconnu pour ce média.</p>}
-        {insertType === "image" && (
-          <FilePicker
-            label="Ou téléverser une photo dans le texte"
-            accept="image/*" value={null} fileName={null}
-            uploading={uploadTarget === "inline"} progress={progress}
-            onPick={file => void processFile(file, "inline")} onClear={() => {}}
-            icon={ImageIcon}
-          />
+        {insertType === "text" ? (
+          <div className="grid gap-3 rounded-xl border border-cyan-100/10 bg-black/20 p-3">
+            <p className="text-xs leading-5 text-zinc-300">Un encart indépendant du récit, avec sa propre barre de défilement pour lire un extrait ou des paroles.</p>
+            <Label htmlFor="scroll-text-title">Titre du bloc (facultatif)</Label>
+            <Input id="scroll-text-title" value={textBlockTitle} maxLength={160}
+              onChange={(e) => setTextBlockTitle(e.target.value)}
+              placeholder="Paroles de la chanson, Extrait, Citation…" />
+            <Label htmlFor="scroll-text-body">Texte du bloc</Label>
+            <textarea id="scroll-text-body" rows={9} maxLength={40000}
+              value={textBlockBody} onChange={(e) => setTextBlockBody(e.target.value)}
+              placeholder="Colle ici les paroles ou l'extrait… Les retours à la ligne seront conservés."
+              className="w-full min-w-0 resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2 text-sm leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-cyan-200/45" />
+            <Button type="button" variant="secondary" disabled={!textBlockBody.trim() || uploadTarget !== null}
+              className="w-fit gap-2" onClick={insertScrollText}>
+              <Plus className="h-4 w-4" /> Insérer ce bloc dans le texte
+            </Button>
+          </div>
+        ) : (
+          <>
+            <Label htmlFor="inline-media-url">Lien du média (ou iframe YouTube)</Label>
+            <Input id="inline-media-url" value={insertInput} onChange={e => setInsertInput(e.target.value)}
+              placeholder={insertType === "youtube" ? "https://youtu.be/…" : insertType === "x" ? "https://x.com/.../status/…" : "https://.../photo.jpg"} />
+            <Button type="button" variant="secondary" disabled={!parsedMedia || uploadTarget !== null}
+              className="w-fit gap-2" onClick={insertFromLink}>
+              <Plus className="h-4 w-4" /> Insérer ce média dans le texte
+            </Button>
+            {insertInput && !parsedMedia && <p className="text-xs text-amber-300">Lien non reconnu pour ce média.</p>}
+            {insertType === "image" && (
+              <FilePicker
+                label="Ou téléverser une photo dans le texte"
+                accept="image/*" value={null} fileName={null}
+                uploading={uploadTarget === "inline"} progress={progress}
+                onPick={file => void processFile(file, "inline")} onClear={() => {}}
+                icon={ImageIcon}
+              />
+            )}
+          </>
         )}
         {inlineMedia.length > 0 && (
           <div className="space-y-3 border-t border-white/10 pt-3">
@@ -391,23 +444,46 @@ export function SocialPostForm({
               <p className="text-xs text-amber-200">Certains médias n’ont pas encore d’emplacement dans le texte. Ils restent visibles à la fin du post ; clique dans le paragraphe souhaité puis sur « Placer dans le texte ».</p>
             )}
             {inlineMedia.map((media, index) => (
-              <div key={media.id} className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-black/25 px-3 py-2">
-                <span className="min-w-0 truncate text-xs text-zinc-300">{index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "x" ? "X" : "Photo"} — {media.url}</span>
-                <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
-                  {!getL(description, "fr").includes(mediaMarker(media.id)) && (
-                    <Button type="button" variant="secondary" size="sm"
-                      title="Placer ce média après le paragraphe sélectionné"
-                      onClick={() => {
-                        setMediaInsertion({ nonce: crypto.randomUUID(), token: mediaMarker(media.id) });
-                        setError(null);
-                      }}>
-                      Placer dans le texte
+              <div key={media.id} className="grid min-w-0 gap-2 rounded-lg bg-black/25 px-3 py-2">
+                <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+                  <span className="min-w-0 flex-1 break-words text-xs text-zinc-300">
+                    {index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "x" ? "X" : media.type === "text" ? "Bloc de texte" : "Photo"}
+                    {" — "}{media.type === "text" ? (media.title || "Extrait à lire") : media.url}
+                  </span>
+                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                    {media.type === "text" && (
+                      <Button type="button" variant="secondary" size="sm"
+                        onClick={() => setEditingTextId(current => current === media.id ? null : media.id)}>
+                        {editingTextId === media.id ? "Terminer" : "Modifier le bloc"}
+                      </Button>
+                    )}
+                    {!getL(description, "fr").includes(mediaMarker(media.id)) && (
+                      <Button type="button" variant="secondary" size="sm"
+                        title="Placer ce média après le paragraphe sélectionné"
+                        onClick={() => {
+                          setMediaInsertion({ nonce: crypto.randomUUID(), token: mediaMarker(media.id) });
+                          setError(null);
+                        }}>
+                        Placer dans le texte
+                      </Button>
+                    )}
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeInlineMedia(media.id)} title="Retirer le média">
+                      <X className="h-4 w-4" /> Retirer
                     </Button>
-                  )}
-                  <Button type="button" variant="ghost" size="sm" onClick={() => removeInlineMedia(media.id)} title="Retirer le média">
-                    <X className="h-4 w-4" /> Retirer
-                  </Button>
+                  </div>
                 </div>
+                {media.type === "text" && editingTextId === media.id && (
+                  <div className="grid gap-2 border-t border-white/10 pt-3">
+                    <Label htmlFor={`text-title-${media.id}`}>Titre</Label>
+                    <Input id={`text-title-${media.id}`} value={media.title} maxLength={160}
+                      onChange={e => updateTextBlock(media.id, "title", e.target.value)} />
+                    <Label htmlFor={`text-body-${media.id}`}>Contenu du bloc</Label>
+                    <textarea id={`text-body-${media.id}`} rows={8} maxLength={40000}
+                      value={media.body} onChange={e => updateTextBlock(media.id, "body", e.target.value)}
+                      className="min-w-0 resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2 text-sm leading-6 text-zinc-100 focus:border-cyan-200/45" />
+                    <p className="text-xs text-zinc-400">Ces modifications seront enregistrées avec le post.</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
