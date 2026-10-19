@@ -1,18 +1,18 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { BookOpen, FileText, FileUp, ImageIcon, Loader2, Save, X } from "lucide-react";
-import type { NotesCategory, SocialPost, SocialPostFileKind } from "@/lib/types";
+import { BookOpen, FileText, FileUp, ImageIcon, Loader2, Plus, Save, X } from "lucide-react";
+import type { NotesCategory, SocialPost, SocialPostFileKind, InlinePostMedia, FeaturedEmbed } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
-import { getL, liftToLocalized, type LocalizedString } from "@/lib/i18n-content";
+import { getL, liftToLocalized, setL, type LocalizedString } from "@/lib/i18n-content";
 import { MEDIA_FOLDERS, uploadToBlob } from "@/lib/blob-upload";
 import { cn } from "@/lib/utils";
-import { featuredEmbedFromInput } from "@/lib/featured-embed";
+import { featuredEmbedFromInput, normalizeFeaturedEmbed } from "@/lib/featured-embed";
+import { mediaMarker, removeInlineMediaMarker, normalizeInlinePostMedia } from "@/lib/post-inline-media";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
-import type { FeaturedEmbed } from "@/lib/types";
 
 export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
 
@@ -26,7 +26,7 @@ type SocialPostFormProps = {
 const MAX_BYTES = 20 * 1024 * 1024;
 const NOTES_CATEGORIES: NotesCategory[] = ["Livre", "Réflexions", "Documents", "Images", "Vidéos"];
 
-type UploadTarget = "general" | "cover" | "bookPdf" | null;
+type UploadTarget = "general" | "cover" | "bookPdf" | "inline" | null;
 
 function detectFileKind(file: File): SocialPostFileKind | null {
   const name = file.name.toLowerCase();
@@ -149,8 +149,14 @@ export function SocialPostForm({
             ? "Documents"
             : "Réflexions")
   );
-  const [embedType, setEmbedType] = useState<FeaturedEmbed["type"] | "">(initial?.featuredEmbed?.type ?? (initial?.youtubeUrl ? "youtube" : ""));
-  const [embedInput, setEmbedInput] = useState(initial?.featuredEmbed?.url ?? initial?.youtubeUrl ?? "");
+  // Legacy featured embeds stay where they are until intentionally moved.
+  const [legacyFeatured, setLegacyFeatured] = useState<FeaturedEmbed | null>(
+    normalizeFeaturedEmbed(initial?.featuredEmbed ?? (initial?.youtubeUrl ? { type: "youtube", url: initial.youtubeUrl } : null))
+  );
+  const [inlineMedia, setInlineMedia] = useState<InlinePostMedia[]>(normalizeInlinePostMedia(initial?.inlineMedia));
+  const [insertType, setInsertType] = useState<FeaturedEmbed["type"]>("youtube");
+  const [insertInput, setInsertInput] = useState("");
+  const [mediaInsertion, setMediaInsertion] = useState<{ nonce: string; token: string }>();
   const [tagsText, setTagsText] = useState((initial?.tags ?? []).join(", "));
   const [fileUrl, setFileUrl] = useState<string | null>(initial?.fileUrl ?? null);
   const [fileKind, setFileKind] = useState<SocialPostFileKind | null>(initial?.fileKind ?? null);
@@ -165,13 +171,33 @@ export function SocialPostForm({
   const abortRef = useRef<AbortController | null>(null);
 
   const isBook = category === "Livre";
-  const featured = embedType && embedInput.trim() ? featuredEmbedFromInput(embedType, embedInput) : null;
+  const parsedMedia = insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
+
+  const insertInlineMedia = useCallback((media: FeaturedEmbed) => {
+    const valid = normalizeFeaturedEmbed(media);
+    if (!valid) { setError("Média non reconnu."); return; }
+    const id = "media_" + crypto.randomUUID().replace(/-/g, "");
+    setInlineMedia(prev => [...prev, { id, ...valid }]);
+    setMediaInsertion({ nonce: id, token: mediaMarker(id) });
+    setInsertInput("");
+    setError(null);
+  }, []);
+
+  const removeInlineMedia = (id: string) => {
+    setInlineMedia(prev => prev.filter(media => media.id !== id));
+    setDescription(prev => setL(prev, "fr", removeInlineMediaMarker(getL(prev, "fr"), id)));
+  };
+
+  const insertFromLink = () => {
+    if (!parsedMedia) { setError("Colle un lien YouTube, X ou une URL d'image HTTPS valide."); return; }
+    insertInlineMedia(parsedMedia);
+  };
 
   const processFile = useCallback(async (file: File, target: Exclude<UploadTarget, null>) => {
     setError(null);
     const kind = detectFileKind(file);
     if (!kind) return setError("Ajoute une image ou un PDF.");
-    if (target === "cover" && kind !== "image") return setError("La couverture doit être une image.");
+    if ((target === "cover" || target === "inline") && kind !== "image") return setError("La couverture doit être une image.");
     if (target === "bookPdf" && kind !== "pdf") return setError("Ajoute un fichier PDF pour le chapitre.");
     if (file.size > MAX_BYTES) return setError("Fichier trop lourd (max 20 Mo).");
 
@@ -188,7 +214,9 @@ export function SocialPostForm({
         onProgress: setProgress,
         signal: controller.signal,
       });
-      if (target === "cover") {
+      if (target === "inline") {
+        insertInlineMedia({ type: "image", url: result.url });
+      } else if (target === "cover") {
         setBookCoverUrl(result.url);
         setBookCoverName(file.name);
       } else if (target === "bookPdf") {
@@ -207,15 +235,16 @@ export function SocialPostForm({
       setProgress(0);
       abortRef.current = null;
     }
-  }, []);
+  }, [insertInlineMedia]);
 
   const buildValues = (nextVisible: boolean): SocialPostFormValues => ({
     title,
     subtitle: getL(subtitle, "fr").trim() ? subtitle : undefined,
     description,
     date: initial?.date || new Date().toISOString().slice(0, 10),
-    youtubeUrl: featured?.type === "youtube" ? featured.url : null,
-    featuredEmbed: featured,
+    youtubeUrl: legacyFeatured?.type === "youtube" ? legacyFeatured.url : null,
+    featuredEmbed: legacyFeatured,
+    inlineMedia,
     fileUrl,
     fileKind: fileUrl ? fileKind : null,
     fileName: fileUrl ? fileName : null,
@@ -235,7 +264,6 @@ export function SocialPostForm({
     setError(null);
     if (!getL(title, "fr").trim()) return setError("Le titre est obligatoire pour publier.");
     if (isBook && !getL(description, "fr").trim()) return setError("Ajoute le texte du chapitre avant de publier.");
-    if (embedType && embedInput.trim() && !featured) return setError("Utilise une URL HTTPS valide (YouTube, X ou image directe). Le code HTML n'est jamais enregistré.");
     onSubmit(buildValues(true));
   };
 
@@ -245,7 +273,8 @@ export function SocialPostForm({
       getL(title, "fr").trim() ||
         getL(subtitle, "fr").trim() ||
         getL(description, "fr").trim() ||
-        embedInput.trim() ||
+        inlineMedia.length > 0 ||
+        Boolean(legacyFeatured) ||
         fileUrl ||
         bookCoverUrl ||
         bookPdfUrl
@@ -254,7 +283,6 @@ export function SocialPostForm({
       setError("Ajoute au moins un titre ou un contenu avant d’enregistrer le brouillon.");
       return;
     }
-    if (embedType && embedInput.trim() && !featured) return setError("Lien d'intégration invalide.");
     onSubmit(buildValues(false));
   };
 
@@ -309,6 +337,7 @@ export function SocialPostForm({
         multiline
         rows={isBook ? 14 : 7}
         placeholder={isBook ? "Colle ou écris le texte du chapitre ici…" : "Écris ton post…"}
+        insertBlockToken={mediaInsertion}
       />
 
       <div className="grid gap-2">
@@ -324,28 +353,60 @@ export function SocialPostForm({
         </p>
       </div>
 
-      <div className="grid min-w-0 gap-2 rounded-2xl border border-cyan-200/10 bg-white/[0.025] p-4">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-cyan-100/75">Média en haut du post</p>
-        <p className="text-xs leading-5 text-zinc-400">Colle une URL YouTube, X ou une image HTTPS. Le code d'iframe YouTube est aussi accepté : nous ne gardons que le lien sûr.</p>
-        <Label htmlFor="featured-media-type">Type d'intégration</Label>
-        <select id="featured-media-type" value={embedType}
-          onChange={(e) => { setEmbedType(e.target.value as FeaturedEmbed["type"] | ""); setEmbedInput(""); }}
+      <div className="grid min-w-0 gap-3 rounded-2xl border border-cyan-200/15 bg-white/[0.025] p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-cyan-100/75">Insérer des médias dans le texte</p>
+        <p className="text-xs leading-5 text-zinc-300">
+          Clique dans le paragraphe souhaité, puis ajoute un média : il apparaîtra <strong>après ce paragraphe</strong>.
+          Tu peux en insérer plusieurs. La photo de couverture reste toujours en haut.
+        </p>
+        <Label htmlFor="inline-media-type">Type de média</Label>
+        <select id="inline-media-type" value={insertType}
+          onChange={(e) => { setInsertType(e.target.value as FeaturedEmbed["type"]); setInsertInput(""); }}
           className="h-10 rounded-xl border border-white/15 bg-black/40 px-3 text-sm text-zinc-100">
-          <option value="">Aucune intégration</option>
           <option value="youtube">Vidéo YouTube</option>
-          <option value="x">Post X intégré</option>
-          <option value="image">Photo (URL directe HTTPS)</option>
+          <option value="x">Post X</option>
+          <option value="image">Photo (URL ou fichier)</option>
         </select>
-        {embedType ? <>
-          <Label htmlFor="featured-media-url">URL ou iframe</Label>
-          <Input id="featured-media-url" value={embedInput} onChange={e => setEmbedInput(e.target.value)}
-            placeholder={embedType === "youtube" ? "https://youtu.be/…" : embedType === "x" ? "https://x.com/.../status/…" : "https://.../photo.jpg"} />
-        </> : null}
-        {embedType && embedInput.trim() && featured ? (
-          <div className="mt-2"><FeaturedMedia media={featured} title={getL(title, "fr") || "Aperçu du média"} /></div>
-        ) : embedType && embedInput.trim() ? (
-          <p className="text-xs text-amber-300">Lien non reconnu pour ce type de média.</p>
-        ) : null}
+        <Label htmlFor="inline-media-url">Lien du média (ou iframe YouTube)</Label>
+        <Input id="inline-media-url" value={insertInput} onChange={e => setInsertInput(e.target.value)}
+          placeholder={insertType === "youtube" ? "https://youtu.be/…" : insertType === "x" ? "https://x.com/.../status/…" : "https://.../photo.jpg"} />
+        <Button type="button" variant="secondary" disabled={!parsedMedia || uploadTarget !== null}
+          className="w-fit gap-2" onClick={insertFromLink}>
+          <Plus className="h-4 w-4" /> Insérer ce média dans le texte
+        </Button>
+        {insertInput && !parsedMedia && <p className="text-xs text-amber-300">Lien non reconnu pour ce média.</p>}
+        {insertType === "image" && (
+          <FilePicker
+            label="Ou téléverser une photo dans le texte"
+            accept="image/*" value={null} fileName={null}
+            uploading={uploadTarget === "inline"} progress={progress}
+            onPick={file => void processFile(file, "inline")} onClear={() => {}}
+            icon={ImageIcon}
+          />
+        )}
+        {inlineMedia.length > 0 && (
+          <div className="space-y-3 border-t border-white/10 pt-3">
+            <p className="text-xs font-medium text-cyan-100">Médias insérés ({inlineMedia.length})</p>
+            {inlineMedia.map((media, index) => (
+              <div key={media.id} className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-black/25 px-3 py-2">
+                <span className="min-w-0 truncate text-xs text-zinc-300">{index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "x" ? "X" : "Photo"} — {media.url}</span>
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeInlineMedia(media.id)} title="Retirer le média">
+                  <X className="h-4 w-4" /> Retirer
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+        {legacyFeatured && (
+          <div className="space-y-2 border-t border-white/10 pt-3">
+            <p className="text-xs text-zinc-400">Ancien média de cette publication, actuellement placé avant le texte :</p>
+            <FeaturedMedia media={legacyFeatured} title="Média existant" />
+            <Button type="button" variant="secondary" onClick={() => {
+              insertInlineMedia(legacyFeatured);
+              setLegacyFeatured(null);
+            }}>Déplacer ce média après le paragraphe sélectionné</Button>
+          </div>
+        )}
       </div>
 
       <FilePicker
