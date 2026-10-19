@@ -13,6 +13,17 @@ export function normalizeInlinePostMedia(value: unknown): InlinePostMedia[] {
     const item = raw as Record<string, unknown>;
     const id = item.id;
     if (typeof id !== "string" || !INLINE_MEDIA_ID.test(id) || seen.has(id)) continue;
+    if (item.type === "text") {
+      // Store text, not HTML: React renders it escaped and preserves line breaks.
+      const title = typeof item.title === "string" ? item.title.trim().slice(0, 160) : "";
+      const body = typeof item.body === "string"
+        ? item.body.replace(/\r\n?/g, "\n").slice(0, 40000)
+        : "";
+      if (!body.trim()) continue;
+      result.push({ id, type: "text", title, body });
+      seen.add(id);
+      continue;
+    }
     const media = normalizeFeaturedEmbed(item);
     if (!media) continue;
     result.push({ id, ...media });
