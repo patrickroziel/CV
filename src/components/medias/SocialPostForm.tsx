@@ -507,7 +507,7 @@ export function SocialPostForm({
                       onChange={next => updateTextBlock(media.id, "body", getL(next, "fr"))}
                       placeholder="Modifie le texte, utilise la barre de mise en forme ou ⌘B / Ctrl+B."
                     />
-                    {media.body.length > MAX_TEXT_BLOCK_LENGTH && <p className="text-xs text-red-400">Bloc trop long : limite 40 000 caractères.</p>
+                    {media.body.length > MAX_TEXT_BLOCK_LENGTH && <p className="text-xs text-red-400">Bloc trop long : limite 40 000 caractères.</p>}
                     <p className="text-xs text-zinc-400">Ces modifications seront enregistrées avec le post.</p>
                   </div>
                 )}
