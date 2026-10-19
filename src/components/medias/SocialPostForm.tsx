@@ -234,7 +234,7 @@ export function SocialPostForm({
     (!item.items.length || item.items.length > MAX_CAROUSEL_ITEMS ||
       normalizeInlineCarouselItems(item.items).length !== item.items.length);
 
-  const insertScrollText = () {
+  const insertScrollText = () => {
     if (!stripHtml(textBlockBody).trim()) {
       setError("Écris le contenu du bloc de texte avant de l’insérer.");
       return;
