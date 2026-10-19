@@ -6,9 +6,9 @@ import { normalizeFeaturedEmbed } from "@/lib/featured-embed";
 import { XEmbed } from "@/components/projects/XEmbed";
 
 /**
- * Autoplay is muted and only starts while most of the video is on-screen.
- * Unmounting the iframe stops playback (and audio) when scrolling away or
- * switching browser tabs. A thumbnail remains available for manual playback.
+ * Start muted autoplay when the video first becomes visible.
+ * After starting, keep the same iframe mounted even if the visitor scrolls
+ * away. The player (not the viewport observer) controls stopping and pausing.
  */
 function ViewportYouTube({ id, title, autoplay }: {
   id: string;
@@ -17,9 +17,8 @@ function ViewportYouTube({ id, title, autoplay }: {
 }) {
   const host = useRef<HTMLDivElement>(null);
   const [visibleRatio, setVisibleRatio] = useState(0);
-  const [tabVisible, setTabVisible] = useState(true);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [manualPlay, setManualPlay] = useState(false);
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     const element = host.current;
@@ -37,13 +36,6 @@ function ViewportYouTube({ id, title, autoplay }: {
   }, []);
 
   useEffect(() => {
-    const updateVisibility = () => setTabVisible(!document.hidden);
-    document.addEventListener("visibilitychange", updateVisibility);
-    updateVisibility();
-    return () => document.removeEventListener("visibilitychange", updateVisibility);
-  }, []);
-
-  useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updateMotion = () => setReduceMotion(motion.matches);
     updateMotion();
@@ -51,17 +43,15 @@ function ViewportYouTube({ id, title, autoplay }: {
     return () => motion.removeEventListener("change", updateMotion);
   }, []);
 
-  // Autoplay may be blocked by iOS or YouTube itself; iframe controls remain accessible.
-  // For manual playback a partial intersection suffices, but an off-screen iframe
-  // is always removed so it cannot continue playing in the background.
-  const play = tabVisible && (
-    (autoplay && !reduceMotion && visibleRatio >= 0.6) ||
-    (manualPlay && visibleRatio > 0)
-  );
+  // Visibility is only the trigger, never an instruction to stop.
+  // YouTube / the browser may still independently restrict playback.
+  useEffect(() => {
+    if (autoplay && !reduceMotion && visibleRatio >= 0.6) setStarted(true);
+  }, [autoplay, reduceMotion, visibleRatio]);
 
   return (
     <div ref={host} className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
-      {play ? (
+      {started ? (
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1&autoplay=1&mute=1&controls=1`}
           title={title || "Vidéo YouTube"}
@@ -74,7 +64,7 @@ function ViewportYouTube({ id, title, autoplay }: {
       ) : (
         <button
           type="button"
-          onClick={() => setManualPlay(true)}
+          onClick={() => setStarted(true)}
           aria-label="Lire la vidéo YouTube sans le son"
           className="group absolute inset-0 flex h-full w-full items-center justify-center overflow-hidden bg-black text-white"
         >
@@ -119,5 +109,5 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
     </div>;
   }
   const id = new URL(featured.url).searchParams.get("v");
-  return id ? <ViewportYouTube id={id} title={title} autoplay={autoplay} /> : null;
+  return id ? <ViewportYouTube key={id} id={id} title={title} autoplay={autoplay} /> : null;
 }
