@@ -1,12 +1,13 @@
 "use client";
 
 import { AlignLeft, ArrowDown } from "lucide-react";
+import { RichHtml } from "@/components/shared/RichHtml";
 
 /**
  * An independent, keyboard-scrollable media card, not part of the article prose.
- * The body remains plain text (no HTML or scripts) and preserves line breaks.
+ * Legacy blocks remain plain text; opt-in rich blocks render sanitized HTML.
  */
-export function ScrollableTextMedia({ title, body }: { title: string; body: string }) {
+export function ScrollableTextMedia({ title, body, format }: { title: string; body: string; format?: "rich" }) {
   return (
     <figure className="min-w-0 overflow-hidden rounded-2xl border border-cyan-200/25 bg-[rgba(5,25,33,0.95)] shadow-[0_12px_32px_rgba(0,0,0,0.16)]">
       <figcaption className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-100/15 bg-cyan-100/[0.055] px-4 py-3 sm:px-5">
@@ -30,7 +31,11 @@ export function ScrollableTextMedia({ title, body }: { title: string; body: stri
         className="max-h-80 min-w-0 overflow-y-auto overscroll-contain px-4 py-5 text-[14px] leading-7 text-zinc-100 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-200/70 sm:px-6 sm:text-[15px] [scrollbar-width:thin] [scrollbar-color:rgba(165,243,252,0.5)_transparent]"
         style={{ scrollbarGutter: "stable" }}
       >
-        <div className="whitespace-pre-wrap break-words">{body}</div>
+        {format === "rich" ? (
+          <RichHtml html={body} className="min-w-0 break-words text-inherit [&_p]:whitespace-pre-wrap" />
+        ) : (
+          <div className="whitespace-pre-wrap break-words">{body}</div>
+        )}
       </div>
     </figure>
   );
