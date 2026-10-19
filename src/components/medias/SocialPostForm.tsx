@@ -189,7 +189,7 @@ export function SocialPostForm({
   const abortRef = useRef<AbortController | null>(null);
 
   const isBook = category === "Livre";
-  const parsedMedia = insertType !== "text" && insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
+  const parsedMedia = insertType !== "text" && insertType !== "carousel" && insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
 
   const insertInlineMedia = useCallback((media: FeaturedEmbed) => {
     const valid = normalizeFeaturedEmbed(media);
