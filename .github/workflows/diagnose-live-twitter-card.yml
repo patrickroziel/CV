@@ -45,4 +45,28 @@ jobs:
                   print('HEAD END',content.find('</head>'),'CARD TAG POS',content.find('twitter:card'))
               stat,url,h,b=req('/api/notes/'+urllib.parse.quote(id,safe='')+'/share-image')
               print('GENERATED IMAGE',stat,h.get('Content-Type'),'SIZE',len(b),'URL',url)
+
+          from html.parser import HTMLParser
+          class Tags(HTMLParser):
+              def __init__(self): super().__init__();self.tags={}
+              def handle_starttag(self,tag,attrs):
+                  if tag!='meta':return
+                  d=dict(attrs);name=d.get('name') or d.get('property')
+                  if name:self.tags[name]=d.get('content','')
+          print('--- VERIFIED SOCIAL TAGS ---')
+          for post in candidates[:2]:
+              id=post['id'];_,_,_,markup=req('/notes/'+urllib.parse.quote(id,safe=''),bot='Twitterbot')
+              parser=Tags();parser.feed(markup.decode('utf-8','replace'))
+              for key in ('twitter:card','twitter:title','twitter:description','twitter:image','og:title','og:description','og:image'):
+                  val=parser.tags.get(key,'')
+                  print(key,'PRESENT',bool(val),'LENGTH',len(val),'VALUE',val[:140] if key.endswith('card') else '(hidden)')
+              url=parser.tags.get('twitter:image','')
+              if url.startswith('https://'):
+                  print('SHARE_IMAGE_HOST',urllib.parse.urlsplit(url).hostname)
+                  try:
+                      q=urllib.request.Request(url,headers={'User-Agent':'Twitterbot','Range':'bytes=0-4095'})
+                      with urllib.request.urlopen(q,timeout=20) as response:
+                          bs=response.read(10240)
+                          print('SHARE_IMAGE_REQUEST',response.status,'TYPE',response.headers.get('Content-Type'),'SIZE_HEADER',response.headers.get('Content-Length'),'CONTENT_RANGE',response.headers.get('Content-Range'),'FIRST_BYTES',bs[:12].hex())
+                  except Exception as exc: print('SHARE_IMAGE_ERROR',str(exc))
           PY
