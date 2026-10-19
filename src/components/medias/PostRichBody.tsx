@@ -2,11 +2,18 @@
 import type { InlinePostMedia } from "@/lib/types";
 import { normalizeInlinePostMedia } from "@/lib/post-inline-media";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
+import { ScrollableTextMedia } from "@/components/medias/ScrollableTextMedia";
 import { RichHtml } from "@/components/shared/RichHtml";
 import { DEFAULT_LINE_HEIGHT, extractRichSpacing, wrapWithRichSpacing } from "@/lib/rich-spacing";
 import { looksLikeHtml } from "@/lib/sanitize-html";
 
 type Segment = { html: string } | { mediaId: string };
+function EmbeddedItem({ item, title }: { item: InlinePostMedia; title: string }) {
+  return item.type === "text"
+    ? <ScrollableTextMedia title={item.title} body={item.body} />
+    : <FeaturedMedia media={item} title={title} />;
+}
+
 const MEDIA_BLOCK = /<p>\s*\[\[MEDIA:([a-zA-Z0-9_-]{8,80})\]\]\s*<\/p>|\[\[MEDIA:([a-zA-Z0-9_-]{8,80})\]\]/g;
 
 export function PostRichBody({ html, inlineMedia, title, className }: {
@@ -37,7 +44,7 @@ export function PostRichBody({ html, inlineMedia, title, className }: {
     return <div className="min-w-0 space-y-5">
       <RichHtml html={html} className={className} />
       {unplaced.map(media => <div key={media.id} className="min-w-0">
-        <FeaturedMedia media={media} title={title} />
+        <EmbeddedItem item={media} title={title} />
       </div>)}
     </div>;
   }
@@ -45,14 +52,14 @@ export function PostRichBody({ html, inlineMedia, title, className }: {
     {segments.map((segment, i) => {
       if ("mediaId" in segment) {
         const item = embeds.find(media => media.id === segment.mediaId);
-        return item ? <div key={i} className="min-w-0"><FeaturedMedia media={item} title={title} /></div> : null;
+        return item ? <div key={i} className="min-w-0"><EmbeddedItem item={item} title={title} /></div> : null;
       }
       if (!segment.html.trim()) return null;
       const part = isMarkup ? wrapWithRichSpacing(segment.html, lineHeight) : segment.html;
       return <RichHtml key={i} html={part} className={className} />;
     })}
     {unplaced.map(media => <div key={media.id} className="min-w-0">
-      <FeaturedMedia media={media} title={title} />
+      <EmbeddedItem item={media} title={title} />
     </div>)}
   </div>;
 }
