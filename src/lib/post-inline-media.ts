@@ -20,7 +20,7 @@ export function normalizeInlinePostMedia(value: unknown): InlinePostMedia[] {
         ? item.body.replace(/\r\n?/g, "\n").slice(0, 40000)
         : "";
       if (!body.trim()) continue;
-      result.push({ id, type: "text", title, body });
+      result.push({ id, type: "text", title, body, ...(item.format === "rich" ? { format: "rich" as const } : {}) });
       seen.add(id);
       continue;
     }
