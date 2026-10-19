@@ -11,9 +11,12 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type NoteParams = { params: Promise<{ id: string }> };
+type NoteParams = {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ share?: string | string[] }>;
+};
 
-export async function generateMetadata({ params }: NoteParams): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: NoteParams): Promise<Metadata> {
   const { id } = await params;
   const post = await getPublicNote(id);
 
@@ -28,6 +31,13 @@ export async function generateMetadata({ params }: NoteParams): Promise<Metadata
 
   const { title, description } = getNoteShareText(post);
   const url = `${NOTES_ORIGIN}/notes/${encodeURIComponent(id)}`;
+  // Give X a distinct URL for each voluntary share so it can re-fetch stale
+  // preview data. Keep the page's SEO canonical on the clean, stable URL.
+  const query = await searchParams;
+  const share = typeof query?.share === "string" && /^[a-z0-9]{8,24}$/.test(query.share)
+    ? query.share
+    : null;
+  const shareUrl = share ? `${url}?share=${share}` : url;
   const image = getNoteSharePhoto(post) ??
     `${NOTES_ORIGIN}/api/notes/${encodeURIComponent(id)}/share-image`;
 
@@ -40,7 +50,7 @@ export async function generateMetadata({ params }: NoteParams): Promise<Metadata
       type: "article",
       locale: "fr_FR",
       siteName: "Patrick Roziel — Notes",
-      url,
+      url: shareUrl,
       title,
       description,
       images: [{ url: image, alt: `Aperçu de ${title}` }],
