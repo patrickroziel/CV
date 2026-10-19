@@ -3,7 +3,7 @@ import type { InlinePostMedia } from "@/lib/types";
 import { normalizeInlinePostMedia } from "@/lib/post-inline-media";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { RichHtml } from "@/components/shared/RichHtml";
-import { extractRichSpacing, wrapWithRichSpacing } from "@/lib/rich-spacing";
+import { DEFAULT_LINE_HEIGHT, extractRichSpacing, wrapWithRichSpacing } from "@/lib/rich-spacing";
 import { looksLikeHtml } from "@/lib/sanitize-html";
 
 type Segment = { html: string } | { mediaId: string };
@@ -18,7 +18,7 @@ export function PostRichBody({ html, inlineMedia, title, className }: {
     return <RichHtml html={html} className={className} />;
   }
   const isMarkup = looksLikeHtml(html);
-  const { body, lineHeight } = isMarkup ? extractRichSpacing(html) : { body: html, lineHeight: 1.6 };
+  const { body, lineHeight } = isMarkup ? extractRichSpacing(html) : { body: html, lineHeight: DEFAULT_LINE_HEIGHT };
   const segments: Segment[] = [];
   let end = 0;
   for (const match of body.matchAll(MEDIA_BLOCK)) {
