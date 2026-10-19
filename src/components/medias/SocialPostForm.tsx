@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
+import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
+import { stripHtml } from "@/lib/sanitize-html";
 import { getL, liftToLocalized, setL, type LocalizedString } from "@/lib/i18n-content";
 import { MEDIA_FOLDERS, uploadToBlob } from "@/lib/blob-upload";
 import { cn } from "@/lib/utils";
@@ -27,6 +29,14 @@ const MAX_BYTES = 20 * 1024 * 1024;
 const NOTES_CATEGORIES: NotesCategory[] = ["Livre", "Réflexions", "Documents", "Images", "Vidéos"];
 
 type UploadTarget = "general" | "cover" | "bookPdf" | "inline" | null;
+
+/** Existing plain-text blocks become editable HTML only when the user edits them. */
+function legacyBlockToEditableHtml(text: string) {
+  const safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return "<p>" + safe.replace(/\r\n?/g, "\n").replace(/\n/g, "<br>") + "</p>";
+}
+
+const MAX_TEXT_BLOCK_LENGTH = 40000;
 
 function detectFileKind(file: File): SocialPostFileKind | null {
   const name = file.name.toLowerCase();
@@ -187,8 +197,12 @@ export function SocialPostForm({
   }, []);
 
   const insertScrollText = () => {
-    if (!textBlockBody.trim()) {
+    if (!stripHtml(textBlockBody).trim()) {
       setError("Écris le contenu du bloc de texte avant de l’insérer.");
+      return;
+    }
+    if (textBlockBody.length > MAX_TEXT_BLOCK_LENGTH) {
+      setError("Le bloc de texte dépasse 40 000 caractères, mise en forme comprise.");
       return;
     }
     const id = "media_" + crypto.randomUUID().replace(/-/g, "");
@@ -196,7 +210,8 @@ export function SocialPostForm({
       id,
       type: "text",
       title: textBlockTitle.trim().slice(0, 160),
-      body: textBlockBody.slice(0, 40000),
+      body: textBlockBody,
+      format: "rich",
     }]);
     setMediaInsertion({ nonce: id, token: mediaMarker(id) });
     setTextBlockTitle("");
@@ -207,7 +222,9 @@ export function SocialPostForm({
   const updateTextBlock = (id: string, field: "title" | "body", value: string) => {
     setInlineMedia(prev => prev.map(item =>
       item.id === id && item.type === "text"
-        ? { ...item, [field]: value }
+        ? (field === "body"
+          ? { ...item, body: value, format: "rich" as const }
+          : { ...item, title: value })
         : item
     ));
   };
@@ -293,13 +310,15 @@ export function SocialPostForm({
     setError(null);
     if (!getL(title, "fr").trim()) return setError("Le titre est obligatoire pour publier.");
     if (isBook && !getL(description, "fr").trim()) return setError("Ajoute le texte du chapitre avant de publier.");
-    if (inlineMedia.some(media => media.type === "text" && !media.body.trim())) return setError("Un bloc de texte est vide. Complète-le avant de publier.");
+    if (inlineMedia.some(media => media.type === "text" && !stripHtml(media.body).trim())) return setError("Un bloc de texte est vide. Complète-le avant de publier.");
+    if (inlineMedia.some(media => media.type === "text" && media.body.length > MAX_TEXT_BLOCK_LENGTH)) return setError("Un bloc de texte dépasse 40 000 caractères.");
     onSubmit(buildValues(true));
   };
 
   const handleSaveDraft = () => {
     setError(null);
-    if (inlineMedia.some(media => media.type === "text" && !media.body.trim())) return setError("Un bloc de texte est vide. Complète-le avant d’enregistrer.");
+    if (inlineMedia.some(media => media.type === "text" && !stripHtml(media.body).trim())) return setError("Un bloc de texte est vide. Complète-le avant d’enregistrer.");
+    if (inlineMedia.some(media => media.type === "text" && media.body.length > MAX_TEXT_BLOCK_LENGTH)) return setError("Un bloc de texte dépasse 40 000 caractères.");
     const hasSomething = Boolean(
       getL(title, "fr").trim() ||
         getL(subtitle, "fr").trim() ||
@@ -407,11 +426,13 @@ export function SocialPostForm({
               onChange={(e) => setTextBlockTitle(e.target.value)}
               placeholder="Paroles de la chanson, Extrait, Citation…" />
             <Label htmlFor="scroll-text-body">Texte du bloc</Label>
-            <textarea id="scroll-text-body" rows={9} maxLength={40000}
-              value={textBlockBody} onChange={(e) => setTextBlockBody(e.target.value)}
-              placeholder="Colle ici les paroles ou l'extrait… Les retours à la ligne seront conservés."
-              className="w-full min-w-0 resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2 text-sm leading-6 text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-cyan-200/45" />
-            <Button type="button" variant="secondary" disabled={!textBlockBody.trim() || uploadTarget !== null}
+            <RichLocalizedField id="scroll-text-body" label="Texte enrichi" rows={9}
+              value={textBlockBody}
+              onChange={next => setTextBlockBody(getL(next, "fr"))}
+              placeholder="Colle ici ton texte avec sa mise en forme, ou sélectionne du texte pour utiliser le gras, l’italique…" />
+            <p className="text-xs text-zinc-400">Le collage conserve le gras et l’italique. ⌘B / Ctrl+B fonctionne dans cet éditeur.</p>
+            {textBlockBody.length > MAX_TEXT_BLOCK_LENGTH && <p className="text-xs text-red-400">Texte trop long (40 000 caractères, mise en forme comprise).</p>}
+            <Button type="button" variant="secondary" disabled={!stripHtml(textBlockBody).trim() || textBlockBody.length > MAX_TEXT_BLOCK_LENGTH || uploadTarget !== null}
               className="w-fit gap-2" onClick={insertScrollText}>
               <Plus className="h-4 w-4" /> Insérer ce bloc dans le texte
             </Button>
@@ -478,9 +499,15 @@ export function SocialPostForm({
                     <Input id={`text-title-${media.id}`} value={media.title} maxLength={160}
                       onChange={e => updateTextBlock(media.id, "title", e.target.value)} />
                     <Label htmlFor={`text-body-${media.id}`}>Contenu du bloc</Label>
-                    <textarea id={`text-body-${media.id}`} rows={8} maxLength={40000}
-                      value={media.body} onChange={e => updateTextBlock(media.id, "body", e.target.value)}
-                      className="min-w-0 resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2 text-sm leading-6 text-zinc-100 focus:border-cyan-200/45" />
+                    <RichLocalizedField
+                      id={`text-body-${media.id}`}
+                      label="Texte enrichi"
+                      rows={8}
+                      value={media.format === "rich" ? media.body : legacyBlockToEditableHtml(media.body)}
+                      onChange={next => updateTextBlock(media.id, "body", getL(next, "fr"))}
+                      placeholder="Modifie le texte, utilise la barre de mise en forme ou ⌘B / Ctrl+B."
+                    />
+                    {media.body.length > MAX_TEXT_BLOCK_LENGTH && <p className="text-xs text-red-400">Bloc trop long : limite 40 000 caractères.</p>}
                     <p className="text-xs text-zinc-400">Ces modifications seront enregistrées avec le post.</p>
                   </div>
                 )}

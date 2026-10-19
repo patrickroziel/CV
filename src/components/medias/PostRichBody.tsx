@@ -10,7 +10,7 @@ import { looksLikeHtml } from "@/lib/sanitize-html";
 type Segment = { html: string } | { mediaId: string };
 function EmbeddedItem({ item, title }: { item: InlinePostMedia; title: string }) {
   return item.type === "text"
-    ? <ScrollableTextMedia title={item.title} body={item.body} />
+    ? <ScrollableTextMedia title={item.title} body={item.body} format={item.format} />
     : <FeaturedMedia media={item} title={title} />;
 }
 

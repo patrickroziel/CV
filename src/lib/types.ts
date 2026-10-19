@@ -714,7 +714,7 @@ export type FeaturedEmbed = { type: "youtube" | "x" | "image"; url: string };
 /** External media or a self-contained, independently scrollable text excerpt. */
 export type InlinePostMedia =
   | (FeaturedEmbed & { id: string })
-  | { id: string; type: "text"; title: string; body: string };
+  | { id: string; type: "text"; title: string; body: string; format?: "rich" };
 
 /**
  * One post in the Notes universe (text + optional YouTube + optional file).
