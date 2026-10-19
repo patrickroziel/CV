@@ -47,7 +47,11 @@ export function PostActions({ postId, title, visible = true }: { postId: string;
     finally { setBusy(false); }
   }
   async function share() {
-    const url = new URL(`/notes/${encodeURIComponent(postId)}`, location.origin).toString();
+    // A fresh share URL avoids reusing X's potentially stale cached card.
+    // The site still publishes the clean canonical /notes/[id] URL.
+    const shared = new URL(`/notes/${encodeURIComponent(postId)}`, "https://patrickroziel.com");
+    shared.searchParams.set("share", Date.now().toString(36));
+    const url = shared.toString();
     setMessage("");
     try {
       if (typeof navigator.share === "function") {
