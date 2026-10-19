@@ -2,18 +2,19 @@
 
 import { useCallback, useRef, useState } from "react";
 import { BookOpen, FileText, FileUp, ImageIcon, Loader2, Plus, Save, X } from "lucide-react";
-import type { NotesCategory, SocialPost, SocialPostFileKind, InlinePostMedia, FeaturedEmbed } from "@/lib/types";
+import type { NotesCategory, SocialPost, SocialPostFileKind, InlinePostMedia, FeaturedEmbed, MediaItem } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
 import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
+import { MediaCarouselEditor } from "@/components/shared/MediaCarouselEditor";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getL, liftToLocalized, setL, type LocalizedString } from "@/lib/i18n-content";
 import { MEDIA_FOLDERS, uploadToBlob } from "@/lib/blob-upload";
 import { cn } from "@/lib/utils";
 import { featuredEmbedFromInput, normalizeFeaturedEmbed } from "@/lib/featured-embed";
-import { mediaMarker, removeInlineMediaMarker, normalizeInlinePostMedia } from "@/lib/post-inline-media";
+import { mediaMarker, removeInlineMediaMarker, normalizeInlinePostMedia, normalizeInlineCarouselItems } from "@/lib/post-inline-media";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 
 export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
@@ -37,6 +38,7 @@ function legacyBlockToEditableHtml(text: string) {
 }
 
 const MAX_TEXT_BLOCK_LENGTH = 40000;
+const MAX_CAROUSEL_ITEMS = 24;
 
 function detectFileKind(file: File): SocialPostFileKind | null {
   const name = file.name.toLowerCase();
@@ -164,7 +166,10 @@ export function SocialPostForm({
     normalizeFeaturedEmbed(initial?.featuredEmbed ?? (initial?.youtubeUrl ? { type: "youtube", url: initial.youtubeUrl } : null))
   );
   const [inlineMedia, setInlineMedia] = useState<InlinePostMedia[]>(normalizeInlinePostMedia(initial?.inlineMedia));
-  const [insertType, setInsertType] = useState<FeaturedEmbed["type"] | "text">("youtube");
+  const [insertType, setInsertType] = useState<FeaturedEmbed["type"] | "text" | "carousel">("youtube");
+  const [carouselTitle, setCarouselTitle] = useState("");
+  const [carouselItems, setCarouselItems] = useState<MediaItem[]>([]);
+  const [editingCarouselId, setEditingCarouselId] = useState<string | null>(null);
   const [textBlockTitle, setTextBlockTitle] = useState("");
   const [textBlockBody, setTextBlockBody] = useState("");
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
@@ -184,7 +189,7 @@ export function SocialPostForm({
   const abortRef = useRef<AbortController | null>(null);
 
   const isBook = category === "Livre";
-  const parsedMedia = insertType !== "text" && insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
+  const parsedMedia = insertType !== "text" && insertType !== "carousel" && insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
 
   const insertInlineMedia = useCallback((media: FeaturedEmbed) => {
     const valid = normalizeFeaturedEmbed(media);
@@ -195,6 +200,39 @@ export function SocialPostForm({
     setInsertInput("");
     setError(null);
   }, []);
+
+  const insertCarousel = () => {
+    const valid = normalizeInlineCarouselItems(carouselItems);
+    if (!valid.length || valid.length !== carouselItems.length) {
+      setError("Ajoute au moins une photo ou une vidéo valide pour créer le carrousel.");
+      return;
+    }
+    const id = "media_" + crypto.randomUUID().replace(/-/g, "");
+    setInlineMedia(prev => [...prev, {
+      id,
+      type: "carousel",
+      title: carouselTitle.trim().slice(0, 160),
+      items: valid,
+    }]);
+    setMediaInsertion({ nonce: id, token: mediaMarker(id) });
+    setCarouselItems([]);
+    setCarouselTitle("");
+    setError(null);
+  };
+
+  const updateCarousel = (id: string, field: "title" | "items", value: string | MediaItem[]) => {
+    setInlineMedia(prev => prev.map(item => {
+      if (item.id !== id || item.type !== "carousel") return item;
+      return field === "items"
+        ? { ...item, items: value as MediaItem[] }
+        : { ...item, title: String(value).slice(0, 160) };
+    }));
+  };
+
+  const invalidCarousel = (item: InlinePostMedia) =>
+    item.type === "carousel" &&
+    (!item.items.length || item.items.length > MAX_CAROUSEL_ITEMS ||
+      normalizeInlineCarouselItems(item.items).length !== item.items.length);
 
   const insertScrollText = () => {
     if (!stripHtml(textBlockBody).trim()) {
@@ -310,6 +348,7 @@ export function SocialPostForm({
     setError(null);
     if (!getL(title, "fr").trim()) return setError("Le titre est obligatoire pour publier.");
     if (isBook && !getL(description, "fr").trim()) return setError("Ajoute le texte du chapitre avant de publier.");
+    if (inlineMedia.some(invalidCarousel)) return setError("Un carrousel contient des médias invalides ou trop nombreux (maximum 24).");
     if (inlineMedia.some(media => media.type === "text" && !stripHtml(media.body).trim())) return setError("Un bloc de texte est vide. Complète-le avant de publier.");
     if (inlineMedia.some(media => media.type === "text" && media.body.length > MAX_TEXT_BLOCK_LENGTH)) return setError("Un bloc de texte dépasse 40 000 caractères.");
     onSubmit(buildValues(true));
@@ -317,6 +356,7 @@ export function SocialPostForm({
 
   const handleSaveDraft = () => {
     setError(null);
+    if (inlineMedia.some(invalidCarousel)) return setError("Un carrousel contient des médias invalides ou trop nombreux (maximum 24).");
     if (inlineMedia.some(media => media.type === "text" && !stripHtml(media.body).trim())) return setError("Un bloc de texte est vide. Complète-le avant d’enregistrer.");
     if (inlineMedia.some(media => media.type === "text" && media.body.length > MAX_TEXT_BLOCK_LENGTH)) return setError("Un bloc de texte dépasse 40 000 caractères.");
     const hasSomething = Boolean(
@@ -411,14 +451,37 @@ export function SocialPostForm({
         </p>
         <Label htmlFor="inline-media-type">Type de média</Label>
         <select id="inline-media-type" value={insertType}
-          onChange={(e) => { setInsertType(e.target.value as FeaturedEmbed["type"] | "text"); setInsertInput(""); }}
+          onChange={(e) => { setInsertType(e.target.value as FeaturedEmbed["type"] | "text" | "carousel"); setInsertInput(""); }}
           className="h-10 rounded-xl border border-white/15 bg-black/40 px-3 text-sm text-zinc-100">
           <option value="youtube">Vidéo YouTube</option>
           <option value="x">Post X</option>
           <option value="image">Photo (URL ou fichier)</option>
           <option value="text">Bloc de texte défilant</option>
+          <option value="carousel">Carrousel photos / vidéos</option>
         </select>
-        {insertType === "text" ? (
+        {insertType === "carousel" ? (
+          <div className="grid min-w-0 gap-3 rounded-xl border border-cyan-100/10 bg-black/20 p-3">
+            <p className="text-xs leading-5 text-zinc-300">
+              Le même carrousel que dans Work : ajoute plusieurs photos, vidéos ou liens YouTube,
+              puis organise les cartes par glisser-déposer. Il apparaîtra après le paragraphe sélectionné.
+            </p>
+            <Label htmlFor="notes-carousel-title">Titre du carrousel (facultatif)</Label>
+            <Input id="notes-carousel-title" value={carouselTitle} maxLength={160}
+              placeholder="Photos et vidéos de l'expérience…"
+              onChange={e => setCarouselTitle(e.target.value)} />
+            <MediaCarouselEditor
+              items={carouselItems}
+              onChange={setCarouselItems}
+              folder={MEDIA_FOLDERS.social}
+              maxItems={MAX_CAROUSEL_ITEMS}
+            />
+            <Button type="button" variant="secondary"
+              disabled={!carouselItems.length || carouselItems.length > MAX_CAROUSEL_ITEMS || uploadTarget !== null}
+              className="w-fit gap-2" onClick={insertCarousel}>
+              <Plus className="h-4 w-4" /> Insérer ce carrousel dans le texte
+            </Button>
+          </div>
+        ) : insertType === "text" ? (
           <div className="grid gap-3 rounded-xl border border-cyan-100/10 bg-black/20 p-3">
             <p className="text-xs leading-5 text-zinc-300">Un encart indépendant du récit, avec sa propre barre de défilement pour lire un extrait ou des paroles.</p>
             <Label htmlFor="scroll-text-title">Titre du bloc (facultatif)</Label>
@@ -468,14 +531,20 @@ export function SocialPostForm({
               <div key={media.id} className="grid min-w-0 gap-2 rounded-lg bg-black/25 px-3 py-2">
                 <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
                   <span className="min-w-0 flex-1 break-words text-xs text-zinc-300">
-                    {index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "x" ? "X" : media.type === "text" ? "Bloc de texte" : "Photo"}
-                    {" — "}{media.type === "text" ? (media.title || "Extrait à lire") : media.url}
+                    {index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "x" ? "X" : media.type === "text" ? "Bloc de texte" : media.type === "carousel" ? "Carrousel" : "Photo"}
+                    {" — "}{media.type === "text" ? (media.title || "Extrait à lire") : media.type === "carousel" ? `${media.title || "Photos et vidéos"} (${media.items.length})` : media.url}
                   </span>
                   <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
                     {media.type === "text" && (
                       <Button type="button" variant="secondary" size="sm"
                         onClick={() => setEditingTextId(current => current === media.id ? null : media.id)}>
                         {editingTextId === media.id ? "Terminer" : "Modifier le bloc"}
+                      </Button>
+                    )}
+                    {media.type === "carousel" && (
+                      <Button type="button" variant="secondary" size="sm"
+                        onClick={() => setEditingCarouselId(current => current === media.id ? null : media.id)}>
+                        {editingCarouselId === media.id ? "Terminer" : "Modifier le carrousel"}
                       </Button>
                     )}
                     {!getL(description, "fr").includes(mediaMarker(media.id)) && (
@@ -493,6 +562,20 @@ export function SocialPostForm({
                     </Button>
                   </div>
                 </div>
+                {media.type === "carousel" && editingCarouselId === media.id && (
+                  <div className="grid min-w-0 gap-3 border-t border-white/10 pt-3">
+                    <Label htmlFor={`carousel-title-${media.id}`}>Titre du carrousel</Label>
+                    <Input id={`carousel-title-${media.id}`} value={media.title} maxLength={160}
+                      onChange={e => updateCarousel(media.id, "title", e.target.value)} />
+                    <MediaCarouselEditor
+                      items={media.items}
+                      onChange={items => updateCarousel(media.id, "items", items)}
+                      folder={MEDIA_FOLDERS.social}
+                      maxItems={MAX_CAROUSEL_ITEMS}
+                    />
+                    <p className="text-xs text-zinc-400">Les changements seront enregistrés avec la publication.</p>
+                  </div>
+                )}
                 {media.type === "text" && editingTextId === media.id && (
                   <div className="grid gap-2 border-t border-white/10 pt-3">
                     <Label htmlFor={`text-title-${media.id}`}>Titre</Label>

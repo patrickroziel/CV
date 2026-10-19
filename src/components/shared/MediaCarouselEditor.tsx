@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { VideoUpload } from "@/components/shared/VideoUpload";
-import { MEDIA_FOLDERS } from "@/lib/blob-upload";
+import { MEDIA_FOLDERS, type MediaFolder } from "@/lib/blob-upload";
 import {
   createId,
   isXUrl,
@@ -27,6 +27,9 @@ import {
 type MediaCarouselEditorProps = {
   items: MediaItem[];
   onChange: (items: MediaItem[]) => void;
+  folder?: MediaFolder | string;
+  /** Notes can limit a block without changing existing Work galleries. */
+  maxItems?: number;
 };
 
 type AddMode = "image" | "file" | "youtube";
@@ -50,6 +53,8 @@ function thumbFor(item: MediaItem): string | null {
 export function MediaCarouselEditor({
   items,
   onChange,
+  folder = MEDIA_FOLDERS.projects,
+  maxItems = Infinity,
 }: MediaCarouselEditorProps) {
   const [mode, setMode] = useState<AddMode>("image");
   const [link, setLink] = useState("");
@@ -59,16 +64,17 @@ export function MediaCarouselEditor({
   const dragIdRef = useRef<string | null>(null);
 
   const addImage = (url: string | null) => {
-    if (!url) return;
+    if (!url || items.length >= maxItems) return;
     onChange([...items, { id: createId(), type: "image", url }]);
   };
 
   const addFile = (url: string | null) => {
-    if (!url) return;
+    if (!url || items.length >= maxItems) return;
     onChange([...items, { id: createId(), type: "file", url }]);
   };
 
   const addYoutube = () => {
+    if (items.length >= maxItems) return;
     setError(null);
     const url = link.trim();
     if (!url) {
@@ -84,6 +90,7 @@ export function MediaCarouselEditor({
   };
 
   const addX = () => {
+    if (items.length >= maxItems) return;
     setError(null);
     const url = link.trim();
     if (!url) {
@@ -225,6 +232,7 @@ export function MediaCarouselEditor({
           <button
             key={m}
             type="button"
+            disabled={items.length >= maxItems}
             onClick={() => {
               setMode(m);
               setError(null);
@@ -243,7 +251,10 @@ export function MediaCarouselEditor({
         ))}
       </div>
 
-      {/* Add zone */}
+      {/* Add zone — Work has no limit; Notes blocks cap the count. */}
+      {items.length >= maxItems ? (
+        <p className="text-xs text-zinc-400">Maximum de {maxItems} médias. Retire une carte pour en ajouter une autre.</p>
+      ) : (
       <div className="rounded-2xl border border-white/10 bg-black/25 p-3 backdrop-blur-md">
         {mode === "image" && (
           <ImageUpload
@@ -251,7 +262,7 @@ export function MediaCarouselEditor({
             onChange={addImage}
             aspectClassName="aspect-square max-h-36"
             label="Ajouter une photo (carré conseillé)"
-            folder={MEDIA_FOLDERS.projects}
+            folder={folder}
           />
         )}
         {mode === "file" && (
@@ -259,7 +270,7 @@ export function MediaCarouselEditor({
             value={null}
             onChange={addFile}
             label="Ajouter une vidéo (autoplay muet + loop)"
-            folder={MEDIA_FOLDERS.projects}
+            folder={folder}
           />
         )}
         {mode === "youtube" && (
@@ -294,6 +305,7 @@ export function MediaCarouselEditor({
         )}
         {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       </div>
+      )}
     </div>
   );
 }
