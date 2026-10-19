@@ -77,7 +77,7 @@ export function RichLocalizedField({
     const request = insertBlockToken;
     const el = editorRef.current;
     if (!request || !el || handledMediaRequest.current === request.nonce) return;
-    if (!/^[[][[]MEDIA:[a-zA-Z0-9_-]{8,80}[]][]]$/.test(request.token)) return;
+    if (!/^\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]$/.test(request.token)) return;
     handledMediaRequest.current = request.nonce;
     const range = savedRangeRef.current;
     let child: Node | null = range && el.contains(range.startContainer) ? range.startContainer : null;
