@@ -415,7 +415,7 @@ export function SocialPostForm({
         {legacyFeatured && (
           <div className="space-y-2 border-t border-white/10 pt-3">
             <p className="text-xs text-zinc-400">Ancien média de cette publication, actuellement placé avant le texte :</p>
-            <FeaturedMedia media={legacyFeatured} title="Média existant" />
+            <FeaturedMedia media={legacyFeatured} title="Média existant" autoplay={false} />
             <Button type="button" variant="secondary" onClick={() => {
               insertInlineMedia(legacyFeatured);
               setLegacyFeatured(null);

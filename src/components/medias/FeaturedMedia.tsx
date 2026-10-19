@@ -1,11 +1,109 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
+import { Play } from "lucide-react";
 import type { FeaturedEmbed } from "@/lib/types";
 import { normalizeFeaturedEmbed } from "@/lib/featured-embed";
 import { XEmbed } from "@/components/projects/XEmbed";
 
-export function FeaturedMedia({ media, title }: { media: FeaturedEmbed | null | undefined; title: string }) {
+/**
+ * Autoplay is muted and only starts while most of the video is on-screen.
+ * Unmounting the iframe stops playback (and audio) when scrolling away or
+ * switching browser tabs. A thumbnail remains available for manual playback.
+ */
+function ViewportYouTube({ id, title, autoplay }: {
+  id: string;
+  title: string;
+  autoplay: boolean;
+}) {
+  const host = useRef<HTMLDivElement>(null);
+  const [visibleRatio, setVisibleRatio] = useState(0);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [manualPlay, setManualPlay] = useState(false);
+
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    if (!("IntersectionObserver" in window)) {
+      setVisibleRatio(1);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      entries => setVisibleRatio(entries[0]?.intersectionRatio ?? 0),
+      { threshold: [0, 0.01, 0.6, 1] },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const updateVisibility = () => setTabVisible(!document.hidden);
+    document.addEventListener("visibilitychange", updateVisibility);
+    updateVisibility();
+    return () => document.removeEventListener("visibilitychange", updateVisibility);
+  }, []);
+
+  useEffect(() => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotion = () => setReduceMotion(motion.matches);
+    updateMotion();
+    motion.addEventListener("change", updateMotion);
+    return () => motion.removeEventListener("change", updateMotion);
+  }, []);
+
+  // Autoplay may be blocked by iOS or YouTube itself; iframe controls remain accessible.
+  // For manual playback a partial intersection suffices, but an off-screen iframe
+  // is always removed so it cannot continue playing in the background.
+  const play = tabVisible && (
+    (autoplay && !reduceMotion && visibleRatio >= 0.6) ||
+    (manualPlay && visibleRatio > 0)
+  );
+
+  return (
+    <div ref={host} className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
+      {play ? (
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1&autoplay=1&mute=1&controls=1`}
+          title={title || "Vidéo YouTube"}
+          className="absolute inset-0 h-full w-full border-0"
+          loading="eager"
+          allow="autoplay; accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setManualPlay(true)}
+          aria-label="Lire la vidéo YouTube sans le son"
+          className="group absolute inset-0 flex h-full w-full items-center justify-center overflow-hidden bg-black text-white"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover opacity-70"
+          />
+          <span className="relative flex h-14 w-20 items-center justify-center rounded-2xl bg-red-600 shadow-xl transition-transform group-hover:scale-105">
+            <Play className="h-7 w-7 fill-white" aria-hidden="true" />
+          </span>
+          <span className="sr-only">Vidéo silencieuse au démarrage, son activable dans le lecteur</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function FeaturedMedia({ media, title, autoplay = true }: {
+  media: FeaturedEmbed | null | undefined;
+  title: string;
+  /** Disable automatic playback in the post editor preview. */
+  autoplay?: boolean;
+}) {
   const featured = normalizeFeaturedEmbed(media);
   if (!featured) return null;
+
   if (featured.type === "image") {
     return <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -14,16 +112,12 @@ export function FeaturedMedia({ media, title }: { media: FeaturedEmbed | null | 
     </div>;
   }
   if (featured.type === "x") {
+    // X runs its own embedded player and does not expose a reliable muted
+    // autoplay API. Do not claim that its videos have their sound disabled.
     return <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/50">
       <XEmbed url={featured.url} interactive title={title || "Post X intégré"} />
     </div>;
   }
   const id = new URL(featured.url).searchParams.get("v");
-  if (!id) return null;
-  return <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
-    <iframe src={`https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`}
-      className="absolute inset-0 h-full w-full border-0" title={title || "Vidéo YouTube intégrée"}
-      loading="lazy" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
-  </div>;
+  return id ? <ViewportYouTube id={id} title={title} autoplay={autoplay} /> : null;
 }
