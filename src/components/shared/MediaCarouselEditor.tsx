@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { VideoUpload } from "@/components/shared/VideoUpload";
-import { MEDIA_FOLDERS } from "@/lib/blob-upload";
+import { MEDIA_FOLDERS, type MediaFolder } from "@/lib/blob-upload";
 import {
   createId,
   isXUrl,
@@ -27,6 +27,7 @@ import {
 type MediaCarouselEditorProps = {
   items: MediaItem[];
   onChange: (items: MediaItem[]) => void;
+  folder?: MediaFolder | string;
 };
 
 type AddMode = "image" | "file" | "youtube";
@@ -50,6 +51,7 @@ function thumbFor(item: MediaItem): string | null {
 export function MediaCarouselEditor({
   items,
   onChange,
+  folder = MEDIA_FOLDERS.projects,
 }: MediaCarouselEditorProps) {
   const [mode, setMode] = useState<AddMode>("image");
   const [link, setLink] = useState("");
@@ -251,7 +253,7 @@ export function MediaCarouselEditor({
             onChange={addImage}
             aspectClassName="aspect-square max-h-36"
             label="Ajouter une photo (carré conseillé)"
-            folder={MEDIA_FOLDERS.projects}
+            folder={folder}
           />
         )}
         {mode === "file" && (
@@ -259,7 +261,7 @@ export function MediaCarouselEditor({
             value={null}
             onChange={addFile}
             label="Ajouter une vidéo (autoplay muet + loop)"
-            folder={MEDIA_FOLDERS.projects}
+            folder={folder}
           />
         )}
         {mode === "youtube" && (
