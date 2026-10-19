@@ -3,15 +3,24 @@ import type { InlinePostMedia } from "@/lib/types";
 import { normalizeInlinePostMedia } from "@/lib/post-inline-media";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { ScrollableTextMedia } from "@/components/medias/ScrollableTextMedia";
+import { MediaCarousel } from "@/components/shared/MediaCarousel";
 import { RichHtml } from "@/components/shared/RichHtml";
 import { DEFAULT_LINE_HEIGHT, extractRichSpacing, wrapWithRichSpacing } from "@/lib/rich-spacing";
 import { looksLikeHtml } from "@/lib/sanitize-html";
 
 type Segment = { html: string } | { mediaId: string };
 function EmbeddedItem({ item, title }: { item: InlinePostMedia; title: string }) {
-  return item.type === "text"
-    ? <ScrollableTextMedia title={item.title} body={item.body} format={item.format} />
-    : <FeaturedMedia media={item} title={title} />;
+  if (item.type === "text") {
+    return <ScrollableTextMedia title={item.title} body={item.body} format={item.format} />;
+  }
+  if (item.type === "carousel") {
+    return <section aria-label={item.title || "Carrousel de photos et vidéos"}
+      className="min-w-0 rounded-2xl border border-cyan-200/15 bg-white/[0.025] px-3 py-4 sm:px-4">
+      {item.title && <h3 className="mb-3 break-words text-sm font-semibold text-cyan-50">{item.title}</h3>}
+      <MediaCarousel items={item.items} />
+    </section>;
+  }
+  return <FeaturedMedia media={item} title={title} />;
 }
 
 const MEDIA_BLOCK = /<p>\s*\[\[MEDIA:([a-zA-Z0-9_-]{8,80})\]\]\s*<\/p>|\[\[MEDIA:([a-zA-Z0-9_-]{8,80})\]\]/g;
