@@ -1,0 +1,48 @@
+name: Diagnose public Notes preview
+on:
+  push:
+    branches: [diagnose/x-card-live-20261019]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Probe live site's public metadata as Twitterbot
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error,json,re,html,urllib.parse
+          root='https://patrickroziel.com'
+          def req(path,bot='Twitterbot',method='GET',range_header=None):
+              h={'User-Agent':bot,'Accept':'text/html,application/json;q=0.9,*/*;q=0.8'}
+              if range_header: h['Range']=range_header
+              request=urllib.request.Request(root+path,headers=h,method=method)
+              try:
+                  with urllib.request.urlopen(request,timeout=25) as resp:
+                      body=resp.read(1200000)
+                      return resp.status,resp.url,dict(resp.headers),body
+              except Exception as exc:return 0,str(exc),{},b''
+          for path in ('/','/robots.txt','/notes','/api/portfolio'):
+              status,url,h,body=req(path)
+              print('ROUTE',path,status,'URL',url,'TYPE',h.get('Content-Type'),'SIZE',len(body),'BODY',body[:90] if status!=200 else '')
+          status,_,_,body=req('/api/portfolio')
+          if status!=200:raise SystemExit('No public API; cannot pick a real Note')
+          try: obj=json.loads(body); posts=obj.get('data',{}).get('socialPosts',[])
+          except Exception as exc: raise SystemExit('Bad API JSON '+str(exc))
+          print('VISIBLE POSTS',len(posts))
+          candidates=[p for p in posts if str(p.get('id','')).startswith('74d207ec')]
+          if not candidates:candidates=posts[:2]
+          for post in candidates[:2]:
+              id=post['id'];path='/notes/'+urllib.parse.quote(id,safe='')
+              print('NOTE_ID',id,'VISIBLE',post.get('visible',True),'HAS_COVER',bool(post.get('bookCoverUrl')))
+              for bot in ('Twitterbot','Mozilla/5.0'):
+                  status,url,h,body=req(path,bot=bot)
+                  content=body.decode('utf-8','replace')
+                  print('NOTE',bot,'STATUS',status,'URL',url,'BYTES',len(body),'TYPE',h.get('Content-Type'))
+                  for tag in ('twitter:card','twitter:title','twitter:description','twitter:image','og:image','og:title'):
+                      snippets=[x[:450] for x in re.findall(r'<meta\\b[^>]*>',content,re.I) if tag in x]
+                      print('META',tag, 'COUNT',len(snippets),snippets[:1])
+                  print('HEAD END',content.find('</head>'),'CARD TAG POS',content.find('twitter:card'))
+              stat,url,h,b=req('/api/notes/'+urllib.parse.quote(id,safe='')+'/share-image')
+              print('GENERATED IMAGE',stat,h.get('Content-Type'),'SIZE',len(b),'URL',url)
+          PY
