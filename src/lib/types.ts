@@ -714,7 +714,8 @@ export type FeaturedEmbed = { type: "youtube" | "x" | "image"; url: string };
 /** External media or a self-contained, independently scrollable text excerpt. */
 export type InlinePostMedia =
   | (FeaturedEmbed & { id: string })
-  | { id: string; type: "text"; title: string; body: string; format?: "rich" };
+  | { id: string; type: "text"; title: string; body: string; format?: "rich" }
+  | { id: string; type: "carousel"; title: string; items: MediaItem[] };
 
 /**
  * One post in the Notes universe (text + optional YouTube + optional file).
@@ -732,7 +733,7 @@ export type SocialPost = {
   youtubeUrl: string | null;
   /** Optional rich media above the text; legacy youtubeUrl remains compatible. */
   featuredEmbed?: FeaturedEmbed | null;
-  /** Images, YouTube, X and scrollable text blocks placed between paragraphs. */
+  /** Images, videos, carousels and scrollable text blocks between paragraphs. */
   inlineMedia?: InlinePostMedia[];
   /** Optional PDF or image (Vercel Blob public URL) */
   fileUrl: string | null;
