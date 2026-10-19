@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { ArrowLeft, FileDown } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
-import { RichHtml } from "@/components/shared/RichHtml";
+import { PostRichBody } from "@/components/medias/PostRichBody";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
@@ -52,7 +52,7 @@ export function EntryReader({ id }: { id: string }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={post.fileUrl} alt={title} className="max-h-[580px] w-full object-contain" />
           </div>}
-        <RichHtml html={l(post.description)} className="min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-zinc-200 [&_*]:max-w-full [&_a]:break-all" />
+        <PostRichBody html={l(post.description)} inlineMedia={post.inlineMedia} title={title} className="min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-zinc-200 [&_*]:max-w-full [&_a]:break-all" />
         {post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100">
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}
