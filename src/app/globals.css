@@ -963,3 +963,16 @@ html.site-translating footer {
     transition: none !important;
   }
 }
+
+/* AIR — luminous sky and drifting, softly sculpted cumulus clouds. */
+.air-cloud { position: absolute; pointer-events:none; opacity:.83; filter:blur(8px); border-radius:55% 55% 35% 40%; background:
+ radial-gradient(ellipse at 25% 68%, rgba(255,255,255,.96) 0 27%, transparent 28%),
+ radial-gradient(ellipse at 45% 42%, #fff 0 30%, transparent 31%),
+ radial-gradient(ellipse at 69% 56%, rgba(255,255,255,.93) 0 26%, transparent 27%),
+ radial-gradient(ellipse at 83% 72%, #eaf6fb 0 22%, transparent 23%);
+ animation:air-drift 26s ease-in-out infinite alternate; }
+.air-cloud-one { width:660px; height:360px; right:-140px; top:10px; }
+.air-cloud-two { width:580px; height:320px; left:-170px; bottom:-40px; opacity:.63; animation-duration:33s; animation-delay:-9s; }
+.air-cloud-three { width:430px; height:260px; right:-100px; bottom:70px; opacity:.55; animation-duration:38s; animation-delay:-15s; }
+@keyframes air-drift { 0% { transform:translate3d(-22px,4px,0) scale(1); } 100% { transform:translate3d(30px,-12px,0) scale(1.05); } }
+@media (prefers-reduced-motion: reduce) { .air-cloud { animation:none !important; } }

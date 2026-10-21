@@ -739,6 +739,7 @@ export function normalizeSocialPost(
     date,
     youtubeUrl,
     featuredEmbed: normalizeFeaturedEmbed(raw.featuredEmbed),
+    universe: raw.universe === "air" ? "air" : "notes",
     inlineMedia: normalizeInlinePostMedia(raw.inlineMedia),
     fileUrl,
     fileKind: fileUrl ? inferSocialFileKind(fileUrl, raw.fileKind) : null,

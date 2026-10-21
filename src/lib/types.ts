@@ -723,6 +723,8 @@ export type InlinePostMedia =
  */
 export type SocialPost = {
   id: string;
+  /** Content universe. Missing = legacy Notes. */
+  universe?: "notes" | "air";
   title: Translatable;
   /** Optional subtitle, mainly used by Livre entries. */
   subtitle?: Translatable;

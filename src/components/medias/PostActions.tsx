@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Heart, Share2 } from "lucide-react";
 
 type ResponseState = { available?: boolean; count?: number; liked?: boolean };
-export function PostActions({ postId, title, visible = true }: { postId: string; title: string; visible?: boolean }) {
+export function PostActions({ postId, title, visible = true, sharePath = "/notes" }: { postId: string; title: string; visible?: boolean; sharePath?: "/notes" | "/air" }) {
   const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -49,7 +49,7 @@ export function PostActions({ postId, title, visible = true }: { postId: string;
   async function share() {
     // A fresh share URL avoids reusing X's potentially stale cached card.
     // The site still publishes the clean canonical /notes/[id] URL.
-    const shared = new URL(`/notes/${encodeURIComponent(postId)}`, "https://patrickroziel.com");
+    const shared = new URL(`${sharePath}/${encodeURIComponent(postId)}`, "https://patrickroziel.com");
     shared.searchParams.set("share", Date.now().toString(36));
     const url = shared.toString();
     setMessage("");

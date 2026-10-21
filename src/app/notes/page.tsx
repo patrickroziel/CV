@@ -1,9 +1,6 @@
-import { NotesFeed } from "@/components/notes/NotesFeed";
+import { redirect } from "next/navigation";
 
-export default function NotesPage() {
-  return (
-    <main className="no-print relative z-10 min-h-screen pb-20 pt-24 sm:pt-28">
-      <NotesFeed />
-    </main>
-  );
+/** The Notes feed lives at the domain root; individual /notes/[id] URLs stay intact. */
+export default function NotesLegacyIndex() {
+  redirect("/");
 }

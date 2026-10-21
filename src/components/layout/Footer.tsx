@@ -21,9 +21,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p className="text-xs text-zinc-500">
           © {year} {name}
-          {universe === "medias"
-            ? " · Notes"
-            : " · Work"}
+          {universe === "medias" ? " · Notes" : universe === "air" ? " · Air" : " · Work"}
         </p>
         {editMode && (
           <button

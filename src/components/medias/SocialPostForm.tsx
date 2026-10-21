@@ -21,6 +21,7 @@ export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
 
 type SocialPostFormProps = {
   initial?: Partial<SocialPost>;
+  universe?: "notes" | "air";
   onSubmit: (values: SocialPostFormValues) => void;
   onCancel: () => void;
   submitLabel?: string;
@@ -144,6 +145,7 @@ function FilePicker({
 
 export function SocialPostForm({
   initial,
+  universe = "notes",
   onSubmit,
   onCancel,
   submitLabel = "Enregistrer",
@@ -322,6 +324,7 @@ export function SocialPostForm({
   }, [insertInlineMedia]);
 
   const buildValues = (nextVisible: boolean): SocialPostFormValues => ({
+    universe: initial?.universe ?? universe,
     title,
     subtitle: getL(subtitle, "fr").trim() ? subtitle : undefined,
     description,
