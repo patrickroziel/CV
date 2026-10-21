@@ -31,7 +31,7 @@ export function AirFeed() {
     {posts.length ? <div className="grid gap-5 md:grid-cols-2">
       {posts.map(post => { const photo=getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
         const excerpt=stripHtml(l(post.description)).replace(/\\[\\[MEDIA:[^\\]]+\\]\\]/g,"").replace(/\\s+/g," ").slice(0,170);
-        return <article key={post.id} className="overflow-hidden rounded-2xl border border-white/65 bg-white/78 shadow-[0_12px_38px_-18px_rgba(8,44,85,0.35)] transition-colors hover:bg-white/88 backdrop-blur-2xl">
+        return <article key={post.id} className="overflow-hidden rounded-2xl border border-white/45 bg-white/42 shadow-[0_12px_38px_-18px_rgba(8,44,85,0.35)] transition-colors hover:bg-white/52 backdrop-blur-2xl">
           <Link href={`/air/${post.id}`} className="group block">
             <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-100/70 to-sky-400/30">
               {photo ? <img src={photo} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center text-7xl font-light text-sky-800/25">Air.</span>}
@@ -46,7 +46,7 @@ export function AirFeed() {
           </div>}
         </article>;
       })}
-    </div> : <div className="rounded-2xl border border-white/65 bg-white/75 p-10 text-center backdrop-blur-xl">
+    </div> : <div className="rounded-2xl border border-white/45 bg-white/40 p-10 text-center backdrop-blur-xl">
       <p className="text-[10px] uppercase tracking-[.2em] text-sky-800/75">À suivre</p>
       <h3 className="mt-3 text-xl text-slate-950">Les premiers articles prennent forme.</h3>
       <p className="mt-3 text-sm text-slate-800">Ici paraîtront mes décryptages, expériences et observations.</p>
