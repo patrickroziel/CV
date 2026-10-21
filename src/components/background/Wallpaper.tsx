@@ -86,7 +86,7 @@ export function Wallpaper() {
       } else if (isAir) {
         next = {
           id: "bg-air-sky-photograph",
-          url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=2000&q=90",
+          url: "/air-sky-selected.png",
           opacity: 1,
           alphaVideoUrl: null,
           alphaVideoEnabled: false,
@@ -194,8 +194,8 @@ export function Wallpaper() {
           withAlpha: false,
         })}
       {isAir ? (
-        <div className="absolute inset-0 z-[1] air-sky-background" aria-hidden="true">
-          <div className="air-sky-clouds absolute inset-0" />
+        <div className="absolute inset-0 z-[1]" aria-hidden="true">
+          <img src="/air-sky-selected.png" alt="" className="air-wallpaper-breathe absolute inset-0 h-full w-full object-cover object-center" draggable={false} />
         </div>
       ) : renderLayer(active, {
         visible: fadeIn,
