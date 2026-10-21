@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AirFeed } from "@/components/air/AirFeed";
 import Link from "next/link";
 import { ArrowUpRight, Cloud, Compass, BookOpenText } from "lucide-react";
 
@@ -44,5 +45,6 @@ export default function AirPage() {
         </div>
       </div>
     </section>
+    <AirFeed />
   </main>;
 }
