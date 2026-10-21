@@ -50,6 +50,7 @@ export function sanitizeBioHtml(
     "UL",
     "OL",
     "LI",
+    "BLOCKQUOTE",
   ]);
   // Never font-family. Color/size only for manual editor commits.
   // line-height only when not paste (wrapper + editor) — Word line-heights stripped on paste.

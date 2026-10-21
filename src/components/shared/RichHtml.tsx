@@ -68,6 +68,7 @@ export function RichHtml({
         "[&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pl-5",
         "[&_p]:m-0 [&_p+p]:mt-1.5",
         "[&_li]:my-0",
+        "[&_blockquote]:my-4 [&_blockquote]:border-l-[3px] [&_blockquote]:border-current/50 [&_blockquote]:pl-4 [&_blockquote]:italic",
         className
       )}
       style={lhStyle}
