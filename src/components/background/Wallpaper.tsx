@@ -38,7 +38,9 @@ const FADE_MS = 900;
  */
 export function Wallpaper() {
   const { data, isHydrated } = usePortfolio();
-  const isNotes = universeFromPath(usePathname()) === "medias";
+  const universe = universeFromPath(usePathname());
+  const isNotes = universe === "medias";
+  const isAir = universe === "air";
   const overlayOpacity = isHydrated ? data.ui.overlayOpacity : 0.52;
   const didPickRef = useRef(false);
 
@@ -176,7 +178,7 @@ export function Wallpaper() {
 
   return (
     <div className="no-print pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      {prev &&
+      {!isAir && prev &&
         renderLayer(prev, {
           visible: !fadeIn,
           z: 0,
@@ -190,9 +192,11 @@ export function Wallpaper() {
 
       <div
         className="absolute inset-0 z-[2]"
-        style={{ backgroundColor: `rgba(0,0,0,${overlayOpacity})` }}
+        style={{ backgroundColor: isAir ? "rgba(5,45,78,0.06)" : `rgba(0,0,0,${overlayOpacity})` }}
       />
-      {isNotes ? (
+      {isAir ? (
+        <div className="absolute inset-0 z-[2] bg-gradient-to-b from-sky-500/10 via-transparent to-sky-950/25" />
+      ) : isNotes ? (
         <>
           <div className="absolute inset-0 z-[2] bg-gradient-to-b from-[#02131a]/30 via-transparent to-[#01070a]/68" />
           <div
@@ -206,13 +210,10 @@ export function Wallpaper() {
       ) : (
         <div className="absolute inset-0 z-[2] bg-gradient-to-b from-black/30 via-transparent to-black/75" />
       )}
-      <div
+      {!isAir && <div
         className="absolute inset-0 z-[2]"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%)",
-        }}
-      />
+        style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%)" }}
+      />}
     </div>
   );
 }
