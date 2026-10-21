@@ -187,16 +187,20 @@ export function Wallpaper() {
 
   return (
     <div className="no-print pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      {prev &&
+      {!isAir && prev &&
         renderLayer(prev, {
           visible: !fadeIn,
           z: 0,
           withAlpha: false,
         })}
-      {renderLayer(active, {
+      {isAir ? (
+        <div className="absolute inset-0 z-[1] air-sky-background" aria-hidden="true">
+          <div className="air-sky-clouds absolute inset-0" />
+        </div>
+      ) : renderLayer(active, {
         visible: fadeIn,
         z: 1,
-        withAlpha: !isAir && showAlpha,
+        withAlpha: showAlpha,
       })}
 
       <div
