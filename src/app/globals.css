@@ -1005,3 +1005,14 @@ html.site-translating footer {
 }
 @keyframes air-cloud-drift { from { transform: translate3d(-1.5%,0,0) scale(1.04); } to { transform: translate3d(1.5%,-.8%,0) scale(1.04); } }
 @media (prefers-reduced-motion: reduce) { .air-sky-clouds { animation: none; } }
+
+/* AIR editorial surfaces: bright translucent glass, dark ink for readability. */
+.air-article-body,
+.air-article-body p,
+.air-article-body li,
+.air-article-body h2,
+.air-article-body h3,
+.air-article-body h4,
+.air-article-body strong { color: #10253e; }
+.air-article-body a { color: #0757a3; text-decoration-color: rgba(7,87,163,.5); }
+.air-article-body blockquote { color: #233c58; border-color: rgba(13,79,143,.3); }
