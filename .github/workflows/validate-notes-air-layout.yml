@@ -1,0 +1,21 @@
+name: Validate Notes and Air layout
+on:
+  push:
+    branches:
+      - fix/air-photo-notes-compact-panel-20261021
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm install --no-save --package-lock=false
+      - run: npm run build
+      - name: Verify public sky wallpaper photo URL
+        run: |
+          curl -fSL --max-time 20 -o /tmp/air-sky.jpg -w 'Air background HTTP %{http_code} · %{size_download} bytes\n' 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=2000&q=85'
+          file /tmp/air-sky.jpg
