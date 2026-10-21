@@ -33,7 +33,7 @@ export function WorkSidebar() {
       const cfg = nav[meta.id] ?? DEFAULT_NAV[meta.id];
       return {
         id: meta.id,
-        href: meta.href,
+        href: meta.href.startsWith("/") ? meta.href : meta.href.startsWith("#") ? `/work${meta.href}` : meta.href,
         label: l(cfg.label).trim() || t(meta.i18nKey),
       };
     });
