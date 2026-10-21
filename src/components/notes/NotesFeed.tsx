@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { BookOpen, FileText, Images, Plus, Video } from "lucide-react";
+import { NotesIntroduction } from "@/components/notes/NotesIntroduction";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostCard } from "@/components/medias/SocialPostCard";
 import {
@@ -198,6 +199,7 @@ export function NotesFeed() {
               );
             })}
           </nav>
+          <NotesIntroduction />
         </div>
       </aside>
 
