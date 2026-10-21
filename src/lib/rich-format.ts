@@ -134,6 +134,7 @@ export function applyRichFormat(
 
   // Block / list commands — execCommand is reliable enough
   if (
+    command === "formatBlock" ||
     command === "insertUnorderedList" ||
     command === "insertOrderedList" ||
     command === "justifyLeft" ||
