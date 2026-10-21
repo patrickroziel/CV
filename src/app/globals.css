@@ -976,3 +976,18 @@ html.site-translating footer {
 .air-cloud-three { width:430px; height:260px; right:-100px; bottom:70px; opacity:.55; animation-duration:38s; animation-delay:-15s; }
 @keyframes air-drift { 0% { transform:translate3d(-22px,4px,0) scale(1); } 100% { transform:translate3d(30px,-12px,0) scale(1.05); } }
 @media (prefers-reduced-motion: reduce) { .air-cloud { animation:none !important; } }
+
+/* AIR — a restrained breeze across the photographic sky, not cartoon clouds.
+   Preserve the blue sky / white cloud / green foliage contrast. */
+@keyframes air-breathe {
+  0%, 100% { transform: scale(1.025) translate3d(0, 0, 0); }
+  50% { transform: scale(1.045) translate3d(-0.55%, 0.4%, 0); }
+}
+.air-wallpaper-breathe {
+  animation: air-breathe 28s ease-in-out infinite;
+  transform-origin: 65% 20%;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .air-wallpaper-breathe { animation: none; transform: none; will-change: auto; }
+}
