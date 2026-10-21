@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Clapperboard, Eye, FileDown, ImageIcon, Pencil, Radio } from "lucide-react";
+import { Clapperboard, Cloud, Eye, FileDown, ImageIcon, Pencil, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
@@ -15,6 +15,7 @@ export function Header() {
   const { editMode, setEditMode, editAllowed, cloudStatus, data, showToast } = usePortfolio();
   const universe = useUniverse();
   const isNotes = universe === "medias";
+  const isAir = universe === "air";
   const [wallpaperOpen, setWallpaperOpen] = useState(false);
 
   return (
@@ -28,11 +29,11 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between gap-3 px-5 sm:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Link
-            href={isNotes ? "/notes" : "/"}
+            href="/"
             className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight text-zinc-50"
           >
             <span className="glass-chip flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-cyan-200 shadow-lg">
-              {isNotes ? <Radio className="h-4 w-4" /> : <Clapperboard className="h-4 w-4" />}
+              {isNotes ? <Radio className="h-4 w-4" /> : isAir ? <Cloud className="h-4 w-4" /> : <Clapperboard className="h-4 w-4" />}
             </span>
             <span className="hidden truncate sm:inline">Patrick Roziel</span>
           </Link>
