@@ -155,6 +155,7 @@ export function RichLocalizedField({
           "rich-bio-editor w-full rounded-xl border border-white/12 bg-black/35 px-3 py-2 text-sm text-zinc-100 outline-none",
           "focus:border-teal-300/40 focus:ring-1 focus:ring-teal-300/30",
           "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5",
+          "[&_blockquote]:my-3 [&_blockquote]:border-l-[3px] [&_blockquote]:border-cyan-300/80 [&_blockquote]:pl-4 [&_blockquote]:italic",
           "[&_b]:font-bold [&_strong]:font-bold [&_i]:italic [&_em]:italic rich-lh"
         )}
         style={{ minHeight: `${minHeight}rem`, lineHeight }}
