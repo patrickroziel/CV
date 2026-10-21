@@ -154,8 +154,8 @@ export function Wallpaper() {
         <img
           src={img.url}
           alt=""
-          className="wallpaper-kenburns absolute inset-0 h-full w-full object-cover"
-          style={{ opacity: op }}
+          className={`${isAir ? "air-wallpaper-breathe" : "wallpaper-kenburns"} absolute inset-0 h-full w-full object-cover`}
+          style={{ opacity: op, objectPosition: isAir ? "center 30%" : undefined }}
           draggable={false}
         />
         {alphaOn && (
