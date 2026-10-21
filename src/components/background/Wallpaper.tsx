@@ -83,6 +83,15 @@ export function Wallpaper() {
           alphaVideoEnabled: false,
           alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
         };
+      } else if (isAir) {
+        next = {
+          id: "bg-air-sky-photograph",
+          url: "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=2000&q=85",
+          opacity: 1,
+          alphaVideoUrl: null,
+          alphaVideoEnabled: false,
+          alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
+        };
       } else if (!didPickRef.current) {
         didPickRef.current = true;
         next = pickRandomBackground(list, data.backgroundUrl);
@@ -102,7 +111,7 @@ export function Wallpaper() {
       return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHydrated, poolKey, isNotes]);
+  }, [isHydrated, poolKey, isNotes, isAir]);
 
   useEffect(() => {
     setAlphaFailed(false);
@@ -178,26 +187,24 @@ export function Wallpaper() {
 
   return (
     <div className="no-print pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      {!isAir && prev &&
+      {prev &&
         renderLayer(prev, {
           visible: !fadeIn,
           z: 0,
           withAlpha: false,
         })}
-      {isAir ? (
-        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#338bc4] via-[#a1daee] to-[#ecfaff]" />
-      ) : renderLayer(active, {
+      {renderLayer(active, {
         visible: fadeIn,
         z: 1,
-        withAlpha: showAlpha,
+        withAlpha: !isAir && showAlpha,
       })}
 
       <div
         className="absolute inset-0 z-[2]"
-        style={{ backgroundColor: isAir ? "rgba(5,45,78,0.06)" : `rgba(0,0,0,${overlayOpacity})` }}
+        style={{ backgroundColor: isAir ? "rgba(3,18,38,0.32)" : `rgba(0,0,0,${overlayOpacity})` }}
       />
       {isAir ? (
-        <div className="absolute inset-0 z-[2] bg-gradient-to-b from-sky-500/10 via-transparent to-sky-950/25" />
+        <div className="absolute inset-0 z-[2] bg-gradient-to-b from-sky-950/25 via-[#081d32]/10 to-[#03101e]/65" />
       ) : isNotes ? (
         <>
           <div className="absolute inset-0 z-[2] bg-gradient-to-b from-[#02131a]/30 via-transparent to-[#01070a]/68" />
