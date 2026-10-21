@@ -184,7 +184,9 @@ export function Wallpaper() {
           z: 0,
           withAlpha: false,
         })}
-      {renderLayer(active, {
+      {isAir ? (
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#338bc4] via-[#a1daee] to-[#ecfaff]" />
+      ) : renderLayer(active, {
         visible: fadeIn,
         z: 1,
         withAlpha: showAlpha,
