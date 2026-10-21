@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bold, Eraser, Italic, List, Minus, Plus } from "lucide-react";
+import { Bold, Eraser, Italic, List, Quote, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type RichTextToolbarProps = {
@@ -37,6 +37,7 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
     >
       <button type="button" title="Gras" className={btn} onClick={() => onCommand("bold")}><Bold className="h-3.5 w-3.5" /></button>
       <button type="button" title="Italique" className={btn} onClick={() => onCommand("italic")}><Italic className="h-3.5 w-3.5" /></button>
+      {!compact && <button type="button" title="Citation — barre verticale" className={btn} onClick={() => onCommand("formatBlock", "blockquote")}><Quote className="h-3.5 w-3.5" /></button>}
       {!compact && <button type="button" title="Liste à puces" className={btn} onClick={() => onCommand("insertUnorderedList")}><List className="h-3.5 w-3.5" /></button>}
 
       <span className="mx-0.5 h-5 w-px bg-white/10" aria-hidden />
