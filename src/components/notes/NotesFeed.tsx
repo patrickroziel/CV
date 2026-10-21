@@ -53,7 +53,7 @@ export function NotesFeed() {
   const [bookMenuOpen, setBookMenuOpen] = useState(false);
 
   const posts = useMemo(() => {
-    const list = [...(data.socialPosts ?? [])].sort((a, b) => {
+    const list = [...(data.socialPosts ?? [])].filter(post => post.universe !== "air").sort((a, b) => {
       if (a.order !== b.order) return a.order - b.order;
       return (b.date || "").localeCompare(a.date || "");
     });
