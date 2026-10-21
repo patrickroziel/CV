@@ -20,7 +20,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
   const { id } = await params;
   const post = await getPublicNote(id);
 
-  if (!post) {
+  if (!post || post.universe === "air") {
     // Never reveal titles, descriptions or draft images in public previews.
     return {
       title: "Publication indisponible — Patrick Roziel",
