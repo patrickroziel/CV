@@ -991,3 +991,17 @@ html.site-translating footer {
 @media (prefers-reduced-motion: reduce) {
   .air-wallpaper-breathe { animation: none; transform: none; will-change: auto; }
 }
+
+/* Air is SKY first: blue and white, never a landscape or tree wallpaper. */
+.air-sky-background {
+  background: linear-gradient(165deg, #1454af 0%, #2170c7 38%, #398fda 73%, #73b7ed 100%);
+}
+.air-sky-clouds {
+  background:
+    radial-gradient(ellipse 31% 12% at 12% 23%, rgba(255,255,255,.85) 0%, rgba(255,255,255,.45) 46%, transparent 100%),
+    radial-gradient(ellipse 37% 14% at 79% 43%, rgba(255,255,255,.89) 0%, rgba(255,255,255,.48) 43%, transparent 100%),
+    radial-gradient(ellipse 28% 9% at 30% 77%, rgba(255,255,255,.65) 0%, rgba(255,255,255,.27) 48%, transparent 100%);
+  animation: air-cloud-drift 42s ease-in-out infinite alternate;
+}
+@keyframes air-cloud-drift { from { transform: translate3d(-1.5%,0,0) scale(1.04); } to { transform: translate3d(1.5%,-.8%,0) scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .air-sky-clouds { animation: none; } }
