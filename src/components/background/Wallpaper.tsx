@@ -86,7 +86,7 @@ export function Wallpaper() {
       } else if (isAir) {
         next = {
           id: "bg-air-sky-photograph",
-          url: "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=2000&q=85",
+          url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=2000&q=90",
           opacity: 1,
           alphaVideoUrl: null,
           alphaVideoEnabled: false,
@@ -201,10 +201,10 @@ export function Wallpaper() {
 
       <div
         className="absolute inset-0 z-[2]"
-        style={{ backgroundColor: isAir ? "rgba(3,18,38,0.32)" : `rgba(0,0,0,${overlayOpacity})` }}
+        style={{ backgroundColor: isAir ? "rgba(3,18,38,0.08)" : `rgba(0,0,0,${overlayOpacity})` }}
       />
       {isAir ? (
-        <div className="absolute inset-0 z-[2] bg-gradient-to-b from-sky-950/25 via-[#081d32]/10 to-[#03101e]/65" />
+        <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-transparent to-[#03101e]/35" />
       ) : isNotes ? (
         <>
           <div className="absolute inset-0 z-[2] bg-gradient-to-b from-[#02131a]/30 via-transparent to-[#01070a]/68" />
