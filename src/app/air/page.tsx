@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { AirFeed } from "@/components/air/AirFeed";
-import Link from "next/link";
-import { ArrowUpRight, Cloud, Compass, BookOpenText } from "lucide-react";
+import { Cloud, Compass, BookOpenText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Air — Décryptages, expériences, observations | Patrick Roziel",
@@ -34,15 +33,6 @@ export default function AirPage() {
           <h2 className="mt-4 text-xl font-semibold tracking-tight">{title}</h2>
           <p className="mt-3 text-sm leading-6 text-zinc-300">{copy}</p>
         </div>)}
-      </div>
-      <div className="mt-10 rounded-2xl border border-white/10 bg-black/30 p-7 text-center backdrop-blur-xl sm:p-10">
-        <p className="text-[10px] uppercase tracking-[.22em] text-cyan-200/70">Premiers articles à venir</p>
-        <h2 className="mt-3 text-2xl font-light text-white">Un espace en préparation.</h2>
-        <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">Air prendra forme au fil des décryptages, expériences et observations publiés ici. Aucun article fictif n’a été ajouté.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-cyan-200/25 px-4 py-2 text-sm text-cyan-100 hover:bg-cyan-100/10">Lire Notes <ArrowUpRight className="h-4 w-4" /></Link>
-          <Link href="/work" className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/10">Explorer Work <ArrowUpRight className="h-4 w-4" /></Link>
-        </div>
       </div>
     </section>
     <AirFeed />
