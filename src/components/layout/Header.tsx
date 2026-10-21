@@ -43,7 +43,7 @@ export function Header() {
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <SiteTranslator />
           <EditGate>
-            {!isNotes && (
+            {!isNotes && !isAir && (
               <Button variant="ghost" size="sm" onClick={() => setWallpaperOpen(true)} title="Changer le fond de Work">
                 <ImageIcon className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Fond</span>

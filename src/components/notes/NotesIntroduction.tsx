@@ -1,59 +1,114 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowDownRight, ArrowUpRight, Cloud, BriefcaseBusiness, Waves } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, BriefcaseBusiness, Cloud, Waves } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 
+/**
+ * An editorial note below the left-hand Notes menu, not a hero or a video.
+ * Existing ocean wallpaper remains visible behind the glass.
+ */
 export function NotesIntroduction() {
   const { data, l } = usePortfolio();
   const reduceMotion = useReducedMotion();
-  const posts = (data.socialPosts ?? [])
-    .filter(post => post.visible !== false)
-    .sort((a, b) => a.order - b.order)
-    .slice(0, 12);
-  const featured = posts.find(post => getNoteSharePhoto(post)) ?? posts[0];
+  const [index, setIndex] = useState(0);
+
+  const featured = useMemo(() => {
+    const posts = (data.socialPosts ?? [])
+      .filter(post => post.visible !== false && post.universe !== "air")
+      .sort((a, b) => a.order - b.order);
+    return posts.find(post => getNoteSharePhoto(post)) ?? posts[0] ?? null;
+  }, [data.socialPosts]);
+
   const image = featured ? getNoteSharePhoto(featured) : null;
-  const excerpt = featured ? stripHtml(l(featured.description))
-    .replace(/\\[\\[MEDIA:[A-Za-z0-9_-]{8,80}\\]\\]/g, "")
-    .replace(/\\s+/g, " ").trim().slice(0, 160) : "";
-  return <section aria-label="Bienvenue dans Notes" className="mx-auto mb-12 max-w-[1180px] px-3 sm:px-6 lg:px-8">
-    <div className="relative isolate overflow-hidden rounded-[1.8rem] border border-cyan-100/15 bg-[#031923]/65 p-6 shadow-[0_24px_100px_-32px_rgba(2,24,32,.75)] backdrop-blur-2xl sm:p-9 lg:p-12">
-      <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-cyan-200/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 left-[16%] h-72 w-72 rounded-full bg-blue-300/10 blur-3xl" />
-      <div className="relative grid items-center gap-8 md:grid-cols-[1.16fr_.84fr] md:gap-12">
-        <motion.div initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }} transition={{ duration: .8 }}>
-          <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.29em] text-cyan-100/70"><Waves className="h-4 w-4" /> Un espace à part</span>
-          <h1 className="mt-5 text-5xl font-light tracking-[-.065em] text-white sm:text-6xl lg:text-7xl">Notes<span className="text-cyan-200">.</span></h1>
-          <p className="mt-5 max-w-xl text-base leading-7 text-zinc-200 sm:text-lg">Des réflexions, des souvenirs, des musiques et des images. Un lieu pour raconter, observer et partager ce qui me traverse.</p>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-400">Vous êtes dans mon univers éditorial. Deux autres espaces permettent de découvrir ce que j’analyse et ce que je réalise.</p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/air" className="inline-flex items-center gap-2 rounded-full border border-sky-200/25 bg-sky-100/10 px-4 py-2.5 text-xs font-medium text-sky-100 transition hover:bg-sky-100/20"><Cloud className="h-4 w-4" /> Explorer Air <ArrowUpRight className="h-3.5 w-3.5" /></Link>
-            <Link href="/work" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-white/10"><BriefcaseBusiness className="h-4 w-4" /> Découvrir Work <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+  const quote = featured
+    ? stripHtml(l(featured.description))
+        .replace(/\[\[MEDIA:[A-Za-z0-9_-]{8,80}\]\]/g, "")
+        .replace(/\s+/g, " ")
+        .trim().slice(0, 105)
+    : "";
+
+  const slides = [
+    { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/" },
+    { label: "Air", content: "Décryptages · Expériences · Observations", href: "/air" },
+    { label: "Work", content: "Portfolio · CV · Compétences", href: "/work" },
+  ];
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const timer = window.setInterval(() => setIndex(current => (current + 1) % slides.length), 5500);
+    return () => window.clearInterval(timer);
+  }, [reduceMotion, slides.length]);
+
+  return (
+    <section aria-label="Découvrir les trois univers" className="mt-5 min-w-0">
+      <div className="relative overflow-hidden rounded-2xl border border-cyan-100/15 bg-[#031c25]/65 p-3.5 shadow-[0_16px_40px_-24px_rgba(0,0,0,.8)] backdrop-blur-xl">
+        <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-cyan-200/10 blur-2xl" />
+        <div className="relative flex items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[.18em] text-cyan-100/70">
+            <Waves className="h-3.5 w-3.5" /> Trois univers
+          </span>
+          <div className="flex gap-1" aria-label="Étape de présentation">
+            {slides.map((slide, step) => (
+              <button
+                key={slide.label}
+                type="button"
+                onClick={() => setIndex(step)}
+                aria-label={`Afficher ${slide.label}`}
+                aria-pressed={step === index}
+                className={`h-1.5 rounded-full transition-all duration-300 ${step === index ? "w-4 bg-cyan-200" : "w-1.5 bg-white/20 hover:bg-white/40"}`}
+              />
+            ))}
           </div>
-        </motion.div>
-        {featured && <motion.div initial={reduceMotion ? false : { opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .9, delay: .16 }}>
-          <Link href={`/notes/${featured.id}`} aria-label={`Lire : ${l(featured.title)}`} className="group block overflow-hidden rounded-2xl border border-cyan-100/15 bg-black/35">
-            <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-cyan-900/45 via-slate-950 to-indigo-950/55">
-              {image ? <img src={image} alt="" className="h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-[1.04]" loading="lazy" /> :
-                <div className="flex h-full items-center justify-center text-7xl font-light tracking-tight text-cyan-100/30">N.</div>}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#03131a]/80 via-transparent to-transparent" />
-              <span className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-black/35 px-3 py-1 text-[10px] uppercase tracking-[.16em] text-white/90 backdrop-blur-md">À découvrir</span>
-            </div>
-            <div className="flex items-start justify-between gap-3 p-5">
-              <div className="min-w-0"><p className="line-clamp-2 text-sm font-medium text-white">{l(featured.title)}</p>
-                {excerpt && <p className="mt-2 line-clamp-2 text-xs leading-5 text-zinc-400">{excerpt}</p>}</div>
-              <ArrowUpRight className="h-4 w-4 shrink-0 text-cyan-200" />
-            </div>
+        </div>
+        <div className="relative mt-3 min-h-[88px]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={index}
+              initial={reduceMotion ? false : { opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -5 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-1.5"
+            >
+              <p className="text-sm font-semibold tracking-tight text-white">{slides[index].label}</p>
+              <p className="text-[11px] leading-[1.55] text-zinc-300">{slides[index].content}</p>
+              {index > 0 && (
+                <Link href={slides[index].href} className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-100 hover:underline">
+                  Découvrir {slides[index].label} <ArrowUpRight className="h-3 w-3" />
+                </Link>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        {featured && (
+          <Link href={`/notes/${featured.id}`} className="group relative mt-2 flex min-w-0 items-center gap-2.5 border-t border-white/10 pt-3" title="Lire une publication">
+            {image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={image} alt="" loading="lazy" className="h-12 w-14 shrink-0 rounded-lg object-cover" />
+            ) : null}
+            <span className="min-w-0 flex-1">
+              <span className="block text-[9px] uppercase tracking-[.14em] text-cyan-100/50">À lire dans Notes</span>
+              <span className="mt-1 line-clamp-2 text-[11px] font-medium leading-snug text-zinc-200 group-hover:text-cyan-100">
+                {quote || l(featured.title)}
+              </span>
+            </span>
+            <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-cyan-100/60" aria-hidden />
           </Link>
-        </motion.div>}
+        )}
+        <div className="relative mt-3 flex flex-wrap gap-1.5">
+          <Link href="/air" className="inline-flex items-center gap-1 rounded-full border border-sky-100/20 bg-sky-100/[.07] px-2.5 py-1.5 text-[10px] text-sky-100 transition-colors hover:bg-sky-100/15">
+            <Cloud className="h-3 w-3" /> Air
+          </Link>
+          <Link href="/work" className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[.05] px-2.5 py-1.5 text-[10px] text-zinc-100 transition-colors hover:bg-white/10">
+            <BriefcaseBusiness className="h-3 w-3" /> Work
+          </Link>
+        </div>
       </div>
-      <div className="relative mt-8 flex items-center gap-3 border-t border-cyan-100/10 pt-5 text-[11px] uppercase tracking-[.22em] text-cyan-100/50">
-        <ArrowDownRight className="h-4 w-4" /> Explorer les publications
-      </div>
-    </div>
-  </section>;
+    </section>
+  );
 }
