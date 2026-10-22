@@ -22,22 +22,33 @@ export function AirFeed() {
     else addSocialPost({...values,universe:"air",order:0});
     setCreateOpen(false); setEditing(null);
   };
-  return <section aria-label="Articles AIR" className="mx-auto mt-10 max-w-[1180px] px-3 sm:px-6 lg:px-8">
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+  return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+    <aside><div className="lg:sticky lg:top-28">
+      <p className="text-xs text-sky-950/75">Patrick Roziel</p>
+      <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">Air</h1>
+      <p className="mt-2 max-w-[18rem] text-xs leading-5 text-sky-950/80">Décryptages, expériences et observations.</p>
+      <div className="mt-8 rounded-2xl border border-white/40 bg-white/25 p-4 backdrop-blur-xl">
+        <p className="text-[10px] uppercase tracking-[.24em] text-sky-950/75">À propos d’Air</p>
+        <p className="mt-3 text-sm leading-6 text-slate-900">Regarder les choses en face. Les comprendre. Les formuler.</p>
+        <p className="mt-3 text-xs leading-5 text-slate-900">Un espace de réflexion et de transmission autour de la communication, des institutions et des expériences qui poussent à questionner ce qui semble aller de soi.</p>
+      </div>
+    </div></aside>
+    <section aria-label="Articles AIR" className="min-w-0">
+    <div className="mb-7 flex min-w-0 flex-wrap items-end justify-between gap-4 border-b border-white/40 pb-6">
       <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-sky-100/90">Journal / Air</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">Articles & décryptages</h2></div>
       {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-cyan-100/25 bg-cyan-100/10 px-4 py-2 text-sm text-cyan-50"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
     </div>
-    {posts.length ? <div className="grid gap-5 md:grid-cols-2">
+    {posts.length ? <div className="space-y-5">
       {posts.map(post => { const photo=getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
-        const excerpt=stripHtml(l(post.description)).replace(/\\[\\[MEDIA:[^\\]]+\\]\\]/g,"").replace(/\\s+/g," ").slice(0,170);
-        return <article key={post.id} className="overflow-hidden rounded-2xl border border-white/45 bg-white/42 shadow-[0_12px_38px_-18px_rgba(8,44,85,0.35)] transition-colors hover:bg-white/52 backdrop-blur-2xl">
+        const excerpt=stripHtml(l(post.description)).replace(/\\[\\[MEDIA:[^\\]]+\\]\\]/g,"").replace(/\\s+/g," ").slice(0,260);
+        return <article key={post.id} className="overflow-hidden rounded-[1.35rem] border border-white/45 bg-white/35 shadow-[0_12px_38px_-18px_rgba(8,44,85,0.35)] transition-colors hover:bg-white/42 backdrop-blur-2xl">
           <Link href={`/air/${post.id}`} className="group block">
-            <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-100/70 to-sky-400/30">
+            <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-100/30 to-sky-400/20 sm:aspect-[16/7]">
               {photo ? <img src={photo} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center text-7xl font-light text-sky-800/25">Air.</span>}
             </div>
-            <div className="p-6"><p className="text-[10px] uppercase tracking-[.2em] text-sky-800/75">{post.date}</p><h3 className="mt-2 text-xl font-semibold text-slate-950">{title}</h3>
-              <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-800">{excerpt}</p>
+            <div className="p-4 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-sky-800/75">{post.date}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">{title}</h3>
+              <p className="mt-3 line-clamp-4 text-sm leading-6 text-slate-800">{excerpt}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-800">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
           </Link>
           {editMode && <div className="flex gap-2 border-t border-sky-900/10 px-5 py-3">
@@ -57,5 +68,6 @@ export function AirFeed() {
         onSubmit={publish} onCancel={()=>{setCreateOpen(false);setEditing(null)}} submitLabel={editing?"Enregistrer":"Publier"} />
       </DialogContent>
     </Dialog>
-  </section>;
+    </section>
+  </div>;
 }
