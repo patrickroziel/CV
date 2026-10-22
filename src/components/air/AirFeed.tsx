@@ -35,9 +35,9 @@ export function AirFeed() {
     </div></aside>
     <section aria-label="Articles AIR" className="min-w-0">
     <div className="mb-7 flex min-w-0 flex-wrap items-end justify-between gap-4 border-b border-white/40 pb-6">
-      <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-sky-100/90">Journal / Air</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">Articles & décryptages</h2></div>
-      {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-cyan-100/25 bg-cyan-100/10 px-4 py-2 text-sm text-cyan-50"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
+      <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-sky-950/75">Journal / Air</p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Articles & décryptages</h2></div>
+      {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/45 bg-white/30 px-4 py-2 text-sm text-sky-950"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
     </div>
     {posts.length ? <div className="space-y-5">
       {posts.map(post => { const photo=getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
