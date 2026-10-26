@@ -9,14 +9,16 @@ import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import type { SocialPost } from "@/lib/types";
 
-export function AirFeed() {
-  const { data, editMode, l, addSocialPost, updateSocialPost, removeSocialPost } = usePortfolio();
+export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
+  const { data, editMode, l, addSocialPost, updateSocialPost, removeSocialPost, isHydrated } = usePortfolio();
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<SocialPost | null>(null);
-  const posts = useMemo(() => (data.socialPosts ?? [])
-    .filter(p => p.universe === "air" && (editMode || p.visible !== false))
-    .sort((a,b) => a.order - b.order || b.date.localeCompare(a.date)),
-    [data.socialPosts,editMode]);
+  const posts = useMemo(() => {
+    const source = !isHydrated && seedPosts.length ? seedPosts : (data.socialPosts ?? []);
+    return source
+      .filter(p => p.universe === "air" && (editMode || p.visible !== false))
+      .sort((a,b) => a.order - b.order || b.date.localeCompare(a.date));
+  }, [data.socialPosts, editMode, isHydrated, seedPosts]);
   const publish = (values: SocialPostFormValues) => {
     if (editing) updateSocialPost(editing.id,{...values,universe:"air"});
     else addSocialPost({...values,universe:"air",order:0});
@@ -45,7 +47,7 @@ export function AirFeed() {
         return <article key={post.id} className="overflow-hidden rounded-[1.35rem] border border-white/12 bg-white/8 shadow-[0_16px_48px_-20px_rgba(0,0,0,0.45)] transition-all hover:bg-white/12 hover:border-white/20 backdrop-blur-2xl">
           <Link href={`/air/${post.id}`} className="group block">
             <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-900/20 to-sky-700/10 sm:aspect-[16/7]">
-              {photo ? <img src={photo} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
+              {photo ? <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>
             <div className="p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
               <p className="mt-3 line-clamp-4 text-sm leading-6 text-white/75">{excerpt}</p>

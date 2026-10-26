@@ -38,13 +38,14 @@ function categoryOf(post: SocialPost): NotesCategory {
   return "Réflexions";
 }
 
-export function NotesFeed() {
+export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   const {
     data,
     editMode,
     l,
     addSocialPost,
     updateSocialPost,
+    isHydrated,
   } = usePortfolio();
 
   const [scope, setScope] = useState<Scope>("Tout");
@@ -54,12 +55,13 @@ export function NotesFeed() {
   const [bookMenuOpen, setBookMenuOpen] = useState(false);
 
   const posts = useMemo(() => {
-    const list = [...(data.socialPosts ?? [])].filter(post => post.universe !== "air").sort((a, b) => {
+    const source = !isHydrated && seedPosts.length ? seedPosts : (data.socialPosts ?? []);
+    const list = [...source].filter(post => post.universe !== "air").sort((a, b) => {
       if (a.order !== b.order) return a.order - b.order;
       return (b.date || "").localeCompare(a.date || "");
     });
     return editMode ? list : list.filter((post) => post.visible !== false);
-  }, [data.socialPosts, editMode]);
+  }, [data.socialPosts, editMode, isHydrated, seedPosts]);
 
   const visiblePosts = useMemo(() => {
     const scoped =

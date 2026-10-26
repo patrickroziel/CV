@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
 import { getL } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
@@ -14,18 +15,21 @@ const isPostId = (id: string) => /^[a-zA-Z0-9_-]{1,128}$/.test(id);
  * Social crawlers do not run our client-side PortfolioProvider.
  * Read the current cloud snapshot on the server, without ever disclosing drafts.
  */
-export async function getPublicNote(id: string): Promise<SocialPost | null> {
-  if (!isPostId(id)) return null;
-
+export const listPublicPosts = cache(async function listPublicPosts(): Promise<SocialPost[]> {
   let posts = DEFAULT_PORTFOLIO.socialPosts ?? [];
   try {
     const saved = await readPortfolio();
-    if (saved.data) posts = saved.data.socialPosts ?? [];
+    if (saved.data?.socialPosts) posts = saved.data.socialPosts;
   } catch {
     // The baked-in public snapshot remains a fallback if Neon is unavailable.
   }
+  return posts.filter((post) => post.visible !== false);
+});
 
-  return posts.find((post) => post.id === id && post.visible !== false) ?? null;
+export async function getPublicNote(id: string): Promise<SocialPost | null> {
+  if (!isPostId(id)) return null;
+  const posts = await listPublicPosts();
+  return posts.find((post) => post.id === id) ?? null;
 }
 
 function validPublicImage(url: unknown): string | null {
@@ -56,6 +60,10 @@ export function getNoteSharePhoto(post: SocialPost): string | null {
     if (image) return image;
   }
   return null;
+}
+
+export function titleForSearch(title: string) {
+  return title.replace(/^(?:\p{Extended_Pictographic}\uFE0F?\s*)+/u, "").trim() || title;
 }
 
 export function getNoteShareText(post: SocialPost) {

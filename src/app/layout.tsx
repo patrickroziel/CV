@@ -3,6 +3,8 @@ import { Geist_Mono, Manrope } from "next/font/google";
 import { PortfolioProvider } from "@/components/providers/PortfolioProvider";
 import { SkillDetailProvider } from "@/components/skills/SkillDetailProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { SiteJsonLd } from "@/components/seo/JsonLd";
+import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -18,9 +20,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Patrick Roziel — Work & Notes",
+  metadataBase: new URL(NOTES_ORIGIN),
+  title: {
+    default: "Patrick Roziel — Monteur vidéo, Notes et Air",
+    template: "%s",
+  },
   description:
-    "Work et Notes de Patrick Roziel : portfolio professionnel, expériences, compétences, réflexions, documents, images et vidéos.",
+    "Patrick Roziel, monteur vidéo et créateur de contenus à La Courneuve. Notes, décryptages Air, et portfolio Work : motion design, expériences et showreel.",
+  applicationName: "Patrick Roziel",
+  authors: [{ name: "Patrick Roziel", url: NOTES_ORIGIN }],
+  creator: "Patrick Roziel",
+  category: "portfolio",
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Patrick Roziel",
+    url: NOTES_ORIGIN,
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: "@patwithnoE",
+  },
 };
 
 export default function RootLayout({
@@ -33,6 +54,7 @@ export default function RootLayout({
       <body
         className={`${workSans.variable} ${geistMono.variable} min-h-screen bg-zinc-950 text-zinc-50 antialiased`}
       >
+        <SiteJsonLd />
         <PortfolioProvider>
           <SkillDetailProvider>
             <SiteChrome>{children}</SiteChrome>

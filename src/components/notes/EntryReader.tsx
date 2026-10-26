@@ -6,7 +6,7 @@ import { PostRichBody } from "@/components/medias/PostRichBody";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
-import type { FeaturedEmbed } from "@/lib/types";
+import type { FeaturedEmbed, SocialPost } from "@/lib/types";
 
 function formatDate(iso: string) {
   const date = new Date(iso.length === 10 ? iso + "T12:00:00" : iso);
@@ -15,17 +15,17 @@ function formatDate(iso: string) {
   });
 }
 
-/** One shareable permalink for every Notes post, not only book chapters. */
-export function EntryReader({ id }: { id: string }) {
+export function EntryReader({ id, initialPost = null }: { id: string; initialPost?: SocialPost | null }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
-  const post = (data.socialPosts ?? []).find(item => item.id === id && (editMode || item.visible !== false));
+  const fromStore = (data.socialPosts ?? []).find(item => item.id === id && (editMode || item.visible !== false) && item.universe !== "air");
+  const post = isHydrated ? (fromStore ?? null) : (initialPost ?? fromStore ?? null);
 
-  if (!isHydrated) return <div className="mx-auto h-40 max-w-3xl animate-pulse rounded-3xl border border-white/5 bg-white/[0.025]" />;
+  if (!post && !isHydrated && initialPost === undefined) return <div className="mx-auto h-40 max-w-3xl animate-pulse rounded-3xl border border-white/5 bg-white/[0.025]" />;
   if (!post) return <div className="mx-auto max-w-3xl px-3 sm:px-6">
     <Link href="/notes" className="text-sm text-cyan-100">← Retour à Notes</Link>
     <p className="mt-6 text-sm text-zinc-400">Cette publication n’est pas disponible.</p>
   </div>;
-  if (post.category === "Livre") return <BookReader id={id} />;
+  if (post.category === "Livre") return <BookReader id={id} initialPost={post} />;
 
   const title = l(post.title).trim() || (editMode ? "Brouillon" : "");
   const featured: FeaturedEmbed | null = post.featuredEmbed ??
@@ -38,7 +38,7 @@ export function EntryReader({ id }: { id: string }) {
     <article className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
       {post.bookCoverUrl && <div className="relative aspect-[16/8] w-full overflow-hidden border-b border-white/10 bg-black/30 sm:aspect-[16/7]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={post.bookCoverUrl} className="h-full w-full object-cover" alt="" />
+        <img src={post.bookCoverUrl} className="h-full w-full object-cover" alt={title} />
       </div>}
       <div className="min-w-0 space-y-6 p-4 sm:p-8 md:p-10">
         <header>
