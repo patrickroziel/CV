@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { MessageCircle, Send } from "lucide-react";
 
 type Comment = { id: string; author_name: string; body: string; created_at: string };
@@ -9,6 +10,7 @@ export function PostComments({ postId }: { postId: string }) {
   const [available, setAvailable] = useState(true);
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
+  const [website, setWebsite] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -29,7 +31,7 @@ export function PostComments({ postId }: { postId: string }) {
     try {
       const response = await fetch(`/api/notes/${encodeURIComponent(postId)}/comments`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, comment, website: "" }),
+        body: JSON.stringify({ name, comment, website }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Envoi impossible.");
@@ -65,7 +67,7 @@ export function PostComments({ postId }: { postId: string }) {
             className="mt-1.5 w-full resize-y rounded-xl border border-white/15 bg-black/20 px-3 py-2.5 text-sm leading-6 text-white outline-none focus:border-cyan-200/50" />
         </label>
         <div aria-hidden="true" className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden">
-          <label>Site web <input tabIndex={-1} autoComplete="off" /></label>
+          <label>Site web <input tabIndex={-1} autoComplete="off" value={website} onChange={e => setWebsite(e.target.value)} /></label>
         </div>
         <button type="submit" disabled={busy || !available} className="inline-flex items-center gap-2 rounded-full bg-cyan-200 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100 disabled:opacity-50">
           <Send className="h-3.5 w-3.5" /> {busy ? "Envoi…" : "Envoyer le commentaire"}
