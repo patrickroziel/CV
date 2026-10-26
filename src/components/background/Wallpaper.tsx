@@ -86,7 +86,7 @@ export function Wallpaper() {
       } else if (isAir) {
         next = {
           id: "bg-air-sky-photograph",
-          url: "/air-sky-vibrations.jpg",
+          url: "/IMG_6076.jpeg",
           opacity: 1,
           alphaVideoUrl: null,
           alphaVideoEnabled: false,
@@ -195,7 +195,7 @@ export function Wallpaper() {
         })}
       {isAir ? (
         <div className="absolute inset-0 z-[1]" aria-hidden="true">
-          <img src="/air-sky-vibrations.jpg" alt="" className="air-wallpaper-breathe absolute inset-0 h-full w-full object-cover object-center" draggable={false} />
+          <img src="/IMG_6076.jpeg" alt="" className="air-wallpaper-breathe absolute inset-0 h-full w-full object-cover object-center" draggable={false} />
         </div>
       ) : renderLayer(active, {
         visible: fadeIn,
