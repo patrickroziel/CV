@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostComments } from "@/components/notes/PostComments";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
 
@@ -139,6 +140,7 @@ export function BookReader({ id }: { id: string }) {
           ) : null}
           <div className="mt-8">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} />
+            {post.visible !== false && post.universe !== "air" && <PostComments postId={post.id} />}
           </div>
         </div>
       </article>
