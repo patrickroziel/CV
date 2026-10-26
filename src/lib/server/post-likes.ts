@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
-import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
+import { getPublicNote } from "@/lib/server/notes-sharing";
 
 export const likeCookie = "pr_post_reaction";
 const VALID_ID = /^[a-zA-Z0-9_-]{1,120}$/;
@@ -27,9 +27,13 @@ async function readyDatabase() {
   await schemaReady;
   return sql;
 }
-export function isPublishedPost(id: string) {
-  return VALID_ID.test(id) &&
-    (DEFAULT_PORTFOLIO.socialPosts ?? []).some(post => post.id === id && post.visible !== false);
+export async function isPublishedPost(id: string) {
+  if (!VALID_ID.test(id)) return false;
+  try {
+    return (await getPublicNote(id)) !== null;
+  } catch {
+    return false;
+  }
 }
 export function tokenLooksValid(token: string | undefined) {
   return typeof token === "string" && TOKEN_PATTERN.test(token);
