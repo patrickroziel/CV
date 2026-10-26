@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { ArticleJsonLd } from "@/components/seo/JsonLd";
 import { EntryReader } from "@/components/notes/EntryReader";
 import {
   getNoteSharePhoto,
   getNoteShareText,
   getPublicNote,
   NOTES_ORIGIN,
+  titleForSearch,
 } from "@/lib/server/notes-sharing";
 
 // Published content lives in Neon and can change without a code deployment.
@@ -43,9 +45,12 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
 
   return {
     metadataBase: new URL(NOTES_ORIGIN),
-    title: `${title} — Patrick Roziel`,
+    title: `${titleForSearch(title)} — Patrick Roziel`,
     description,
     alternates: { canonical: url },
+    robots: share
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
     openGraph: {
       type: "article",
       locale: "fr_FR",
@@ -66,9 +71,12 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
 
 export default async function BookChapterPage({ params }: NoteParams) {
   const { id } = await params;
+  const post = await getPublicNote(id);
+  const article = post && post.universe !== "air" ? post : null;
   return (
     <main className="no-print relative z-10 min-h-screen pb-20 pt-24 sm:pt-28">
-      <EntryReader id={id} />
+      {article ? <ArticleJsonLd post={article} path={`/notes/${id}`} section="Notes" /> : null}
+      <EntryReader id={id} initialPost={article} />
     </main>
   );
 }

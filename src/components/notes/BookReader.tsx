@@ -29,7 +29,7 @@ function formatDate(iso: string) {
   });
 }
 
-export function BookReader({ id }: { id: string }) {
+export function BookReader({ id, initialPost = null }: { id: string; initialPost?: SocialPost | null }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
 
   const books = useMemo(
@@ -37,11 +37,12 @@ export function BookReader({ id }: { id: string }) {
     [data.socialPosts, editMode]
   );
   const index = books.findIndex((post) => post.id === id);
-  const post = index >= 0 ? books[index] : null;
+  const stored = index >= 0 ? books[index] : null;
+  const post = isHydrated ? stored : (initialPost?.category === "Livre" ? initialPost : stored);
   const previous = index > 0 ? books[index - 1] : null;
   const next = index >= 0 && index < books.length - 1 ? books[index + 1] : null;
 
-  if (!isHydrated) {
+  if (!post && !isHydrated && !initialPost) {
     return <div className="mx-auto h-40 max-w-3xl animate-pulse rounded-3xl border border-white/5 bg-white/[0.025]" />;
   }
 
