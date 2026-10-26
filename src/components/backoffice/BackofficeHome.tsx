@@ -123,6 +123,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
             <div className="flex flex-wrap gap-3">
               <a href="/" className="rounded-xl bg-cyan-200 px-5 py-3 text-sm font-semibold text-slate-950">Modifier Work</a>
               <a href="/notes" className="rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Gérer Notes</a>
+              <a href={`${privatePath}/comments`} className="rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Modérer les commentaires</a>
             </div>
             <p className="text-xs text-zinc-400">Dans Work ou Notes, clique sur « Modifier » pour afficher les commandes d'édition.</p>
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4">

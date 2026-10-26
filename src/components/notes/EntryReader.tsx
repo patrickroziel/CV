@@ -6,6 +6,7 @@ import { PostRichBody } from "@/components/medias/PostRichBody";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostComments } from "@/components/notes/PostComments";
 import type { FeaturedEmbed } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -58,6 +59,7 @@ export function EntryReader({ id }: { id: string }) {
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}
         </a>}
         <PostActions postId={post.id} title={title} visible={post.visible !== false} />
+        {post.visible !== false && post.universe !== "air" && <PostComments postId={post.id} />}
       </div>
     </article>
   </div>;
