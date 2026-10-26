@@ -16,7 +16,7 @@ function correctOrigin(request: NextRequest) {
 
 export async function GET(request: NextRequest, { params }: Context) {
   const { id } = await params;
-  if (!isPublishedPost(id)) return NextResponse.json({ error: "Publication introuvable" }, { status: 404, headers: noCache });
+  if (!(await isPublishedPost(id))) return NextResponse.json({ error: "Publication introuvable" }, { status: 404, headers: noCache });
   if (!process.env.DATABASE_URL) return NextResponse.json({ available: false, liked: false, count: 0 }, { headers: noCache });
   try {
     const cookie = request.cookies.get(likeCookie)?.value;
