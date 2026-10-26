@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Patrick Roziel", url: NOTES_ORIGIN }],
   creator: "Patrick Roziel",
   category: "portfolio",
+  verification: {
+    google: "NLj8M7f3PPPdLcBNph-KpFeT-0d1wKJY93jyC7BTHoM",
+  },
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
