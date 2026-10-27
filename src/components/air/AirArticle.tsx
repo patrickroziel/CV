@@ -24,7 +24,7 @@ export function AirArticle({ id, initialPost = null }: { id: string; initialPost
         {post.subtitle&&<p className="text-lg text-slate-700">{l(post.subtitle)}</p>}
         <FeaturedMedia media={post.featuredEmbed} title={title}/>
         <PostRichBody html={l(post.description)} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-slate-900 [&_*]:max-w-full"/>
-        <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air"/>
+        <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" tone="light"/>
       </div>
     </article>
   </div>;

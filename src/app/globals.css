@@ -125,6 +125,22 @@ select {
 .rich-bio-editor em {
   font-style: italic;
 }
+.rich-bio-editor u,
+.rich-html u,
+.book-reading-text u {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+.rich-html a,
+.rich-bio-editor a,
+.book-reading-text a {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+.rich-html:not(.air-article-body) a,
+.book-reading-text a {
+  color: #a5f3fc;
+}
 
 /* List style base in editor */
 .rich-bio-editor ul {
@@ -1016,3 +1032,63 @@ html.site-translating footer {
 .air-article-body strong { color: #10253e; }
 .air-article-body a { color: #0757a3; text-decoration-color: rgba(7,87,163,.5); }
 .air-article-body blockquote { color: #233c58; border-color: rgba(13,79,143,.3); }
+
+.rich-bio-editor blockquote.rich-link-card,
+.rich-html blockquote.rich-link-card,
+.book-reading-text blockquote.rich-link-card {
+  margin: 0.9rem 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 1rem !important;
+  padding: 0 !important;
+  background: rgba(2, 12, 18, 0.55);
+  font-style: normal !important;
+  text-decoration: none;
+}
+.rich-link-card,
+.rich-link-card * {
+  font-style: normal !important;
+  word-break: normal !important;
+}
+.rich-link-card a {
+  display: flex;
+  flex-direction: column;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+.rich-link-card-img {
+  display: block;
+  width: 100%;
+  height: 11rem;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.06);
+}
+.rich-link-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 1rem 1rem;
+}
+.rich-link-card-host {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+.rich-link-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.rich-link-card-desc {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  opacity: 0.78;
+}
+.air-article-body blockquote.rich-link-card {
+  border: 1px solid rgba(16, 37, 62, 0.16) !important;
+  background: rgba(255, 255, 255, 0.88);
+  color: #10253e;
+}
+.air-article-body .rich-link-card a { color: #10253e !important; }

@@ -5,6 +5,7 @@
  */
 
 import { restoreSelection, saveSelection } from "@/lib/rich-editor";
+import { hostLabel, safeHref, safeImageSrc } from "@/lib/safe-href";
 
 const BLOCK_TAGS = new Set([
   "P",
@@ -150,15 +151,82 @@ export function applyRichFormat(
     }
   }
 
-  if (command === "bold" || command === "italic") {
-    // Let the browser TOGGLE the formatting. The former custom wrapper only
-    // ever added <strong>/<em>, so clicking Bold twice could never remove it.
+  if (command === "bold" || command === "italic" || command === "underline") {
+    // Let the browser TOGGLE the formatting. styleWithCSS off keeps <u>,
+    // which the sanitizer preserves (text-decoration on a span would not).
     try {
       document.execCommand("styleWithCSS", false, "false");
       return document.execCommand(command, false);
     } catch {
       return false;
     }
+  }
+
+  if (command === "createLink" && arg) {
+    const href = safeHref(arg);
+    if (!href) return false;
+    const anchor = anchorFromRange(live);
+    if (anchor && editor.contains(anchor)) {
+      decorateAnchor(anchor, href);
+      return true;
+    }
+    if (live.collapsed) {
+      const created = document.createElement("a");
+      decorateAnchor(created, href);
+      created.textContent = hostLabel(href);
+      live.insertNode(created);
+      selectNodeContents(created);
+      return true;
+    }
+    wrapRangeWith(live, () => {
+      const created = document.createElement("a");
+      decorateAnchor(created, href);
+      return created;
+    });
+    return true;
+  }
+
+  if (command === "insertLinkCard" && arg) {
+    let data: { url?: string; title?: string; description?: string; image?: string; host?: string };
+    try {
+      data = JSON.parse(arg) as typeof data;
+    } catch {
+      return false;
+    }
+    const href = safeHref(data.url || "");
+    if (!href || !/^https?:\/\//i.test(href)) return false;
+    const card = document.createElement("blockquote");
+    card.className = "rich-link-card";
+    card.setAttribute("contenteditable", "false");
+    const created = document.createElement("a");
+    decorateAnchor(created, href);
+    const image = data.image ? safeImageSrc(data.image) : null;
+    if (image) {
+      const img = document.createElement("img");
+      img.src = image;
+      img.alt = "";
+      img.className = "rich-link-card-img";
+      created.appendChild(img);
+    }
+    const copy = document.createElement("span");
+    copy.className = "rich-link-card-copy";
+    const host = document.createElement("span");
+    host.className = "rich-link-card-host";
+    host.textContent = (data.host || hostLabel(href)).slice(0, 80);
+    const title = document.createElement("span");
+    title.className = "rich-link-card-title";
+    title.textContent = (data.title || hostLabel(href)).slice(0, 180);
+    copy.append(host, title);
+    if (data.description?.trim()) {
+      const desc = document.createElement("span");
+      desc.className = "rich-link-card-desc";
+      desc.textContent = data.description.trim().slice(0, 240);
+      copy.appendChild(desc);
+    }
+    created.appendChild(copy);
+    card.appendChild(created);
+    insertBlockAfterCaret(editor, card, live);
+    return true;
   }
 
   if (command === "foreColor" && arg) {
@@ -242,6 +310,41 @@ export function applyRichFormat(
   } catch {
     return false;
   }
+}
+
+function decorateAnchor(anchor: HTMLAnchorElement, href: string) {
+  anchor.setAttribute("href", href);
+  if (/^https?:\/\//i.test(href)) {
+    anchor.target = "_blank";
+    anchor.rel = "noopener noreferrer";
+  } else {
+    anchor.removeAttribute("target");
+    anchor.removeAttribute("rel");
+  }
+}
+
+function anchorFromRange(range: Range): HTMLAnchorElement | null {
+  const node = range.startContainer;
+  const element = node instanceof Element ? node : node.parentElement;
+  const anchor = element?.closest("a");
+  return anchor instanceof HTMLAnchorElement ? anchor : null;
+}
+
+function insertBlockAfterCaret(editor: HTMLElement, block: HTMLElement, range: Range) {
+  let child: Node | null = range.startContainer;
+  while (child?.parentNode && child.parentNode !== editor) child = child.parentNode;
+  if (child && child.parentNode === editor) child.parentNode.insertBefore(block, child.nextSibling);
+  else editor.appendChild(block);
+  const next = document.createElement("p");
+  next.appendChild(document.createElement("br"));
+  block.after(next);
+  const selection = window.getSelection();
+  if (!selection) return;
+  const caret = document.createRange();
+  caret.selectNodeContents(next);
+  caret.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(caret);
 }
 
 function unwrapElement(el: HTMLElement): void {

@@ -3,6 +3,7 @@ import {
   isRichSpacingClass,
 } from "@/lib/rich-spacing";
 import { normalizeRichBody, restoreColorMarkers } from "@/lib/rich-format";
+import { safeHref, safeImageSrc } from "@/lib/safe-href";
 
 export type SanitizeHtmlOptions = {
   /**
@@ -15,8 +16,8 @@ export type SanitizeHtmlOptions = {
 
 /**
  * Allow a small HTML subset for rich text fields:
- * b, strong, i, em, u, br, p, div, span, ul, ol, li
- * style: font-weight, font-style, text-align
+ * b, strong, i, em, u, a, br, p, div, span, ul, ol, li, blockquote
+ * style: font-weight, font-style, text-align, text-decoration
  *        + color / font-size only when NOT from paste (manual edit)
  * Never keeps font-family — site default font always wins.
  */
@@ -51,6 +52,16 @@ export function sanitizeBioHtml(
     "OL",
     "LI",
     "BLOCKQUOTE",
+    "A",
+    "IMG",
+  ]);
+  const linkCardClass = new Set([
+    "rich-link-card",
+    "rich-link-card-img",
+    "rich-link-card-copy",
+    "rich-link-card-host",
+    "rich-link-card-title",
+    "rich-link-card-desc",
   ]);
   // Never font-family. Color/size only for manual editor commits.
   // line-height only when not paste (wrapper + editor) — Word line-heights stripped on paste.
@@ -58,6 +69,7 @@ export function sanitizeBioHtml(
     "font-weight",
     "font-style",
     "text-align",
+    "text-decoration",
     ...(fromPaste ? [] : ["color", "font-size", "line-height"]),
   ]);
 
@@ -118,6 +130,7 @@ export function sanitizeBioHtml(
             const key = rawKey.trim().toLowerCase();
             const val = rest.join(":").trim();
             if (!styleProps.has(key) || !val) continue;
+            if (key === "text-decoration" && val.toLowerCase() !== "underline") continue;
             if (/url\s*\(|expression\s*\(|javascript:/i.test(val)) continue;
             cleaned.push(`${key}: ${val}`);
           }
@@ -129,7 +142,7 @@ export function sanitizeBioHtml(
             .split(/\s+/)
             .filter(
               (t) =>
-                isRichSpacingClass(t) || t === "rich-lh"
+                isRichSpacingClass(t) || t === "rich-lh" || linkCardClass.has(t)
             );
           if (kept.length) el.setAttribute("class", kept.join(" "));
           else el.removeAttribute("class");
@@ -154,10 +167,43 @@ export function sanitizeBioHtml(
         } else if (name === "color" && !fromPaste && el.tagName === "FONT") {
           // handled above when converting FONT
           el.removeAttribute(attr.name);
+        } else if (name === "href" && el.tagName === "A") {
+          const href = safeHref(attr.value);
+          if (href) el.setAttribute("href", href);
+          else el.removeAttribute(attr.name);
+        } else if (name === "src" && el.tagName === "IMG") {
+          const src = safeImageSrc(attr.value);
+          if (src && el.classList.contains("rich-link-card-img")) el.setAttribute("src", src);
+          else el.removeAttribute(attr.name);
+        } else if (name === "alt" && el.tagName === "IMG") {
+          el.setAttribute("alt", attr.value.replace(/[<>]/g, "").slice(0, 180));
         } else {
           // Drop face, color, size attrs, other data-*, etc.
           el.removeAttribute(attr.name);
         }
+      }
+      if (el.tagName === "A") {
+        const href = el.getAttribute("href");
+        if (!href) {
+          const holder = document.createElement("span");
+          while (el.firstChild) holder.appendChild(el.firstChild);
+          el.replaceWith(holder);
+          walk(holder);
+          while (holder.firstChild) holder.parentNode?.insertBefore(holder.firstChild, holder);
+          holder.remove();
+          continue;
+        }
+        if (/^https?:\/\//i.test(href)) {
+          el.setAttribute("target", "_blank");
+          el.setAttribute("rel", "noopener noreferrer");
+        }
+      }
+      if (el.tagName === "IMG" && !el.getAttribute("src")) {
+        el.remove();
+        continue;
+      }
+      if (el.classList.contains("rich-link-card")) {
+        el.setAttribute("contenteditable", "false");
       }
       // If we kept data-rich-color, ensure style.color exists after style cleanup
       const marker = el.getAttribute("data-rich-color");

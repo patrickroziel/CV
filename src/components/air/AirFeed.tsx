@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ArrowUpRight, FilePlus2, Pencil, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostForm, type SocialPostFormValues } from "@/components/medias/SocialPostForm";
+import { PostActions } from "@/components/medias/PostActions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
@@ -53,6 +54,9 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               <p className="mt-3 line-clamp-4 text-sm leading-6 text-white/75">{excerpt}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
           </Link>
+          <div className="border-t border-white/15 px-5 py-4">
+            <PostActions postId={post.id} title={title} visible={post.visible !== false} sharePath="/air" />
+          </div>
           {editMode && <div className="flex gap-2 border-t border-white/10 px-5 py-3">
             <button className="inline-flex items-center gap-1 text-xs text-white/70" onClick={()=>setEditing(post)}><Pencil className="h-3.5 w-3.5"/> Modifier</button>
             <button className="inline-flex items-center gap-1 text-xs text-red-300" onClick={()=>{if(window.confirm("Supprimer cet article AIR ?"))removeSocialPost(post.id)}}><Trash2 className="h-3.5 w-3.5"/> Supprimer</button>
