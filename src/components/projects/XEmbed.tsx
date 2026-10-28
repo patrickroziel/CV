@@ -97,13 +97,14 @@ export function XEmbed({
 
   if (interactive) {
     return (
-      <div className={cn("relative h-full min-h-[320px] w-full bg-black", className)}>
+      <div className={cn("relative w-full overflow-visible bg-black", className)}>
         <iframe
           ref={iframeRef}
           key={embedSrc}
           src={embedSrc}
           title={title}
-          className="absolute inset-0 h-full w-full border-0"
+          className="block w-full border-0"
+          style={{ minHeight: "480px", height: "540px" }}
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           allowFullScreen
           loading="lazy"

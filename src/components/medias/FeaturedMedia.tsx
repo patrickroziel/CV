@@ -104,9 +104,11 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
   if (featured.type === "x") {
     // X runs its own embedded player and does not expose a reliable muted
     // autoplay API. Do not claim that its videos have their sound disabled.
-    return <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/50">
-      <XEmbed url={featured.url} interactive title={title || "Post X intégré"} />
-    </div>;
+    return (
+      <div className="w-full overflow-visible rounded-2xl border border-white/10 bg-black/50">
+        <XEmbed url={featured.url} interactive title={title || "Post X intégré"} />
+      </div>
+    );
   }
   const id = new URL(featured.url).searchParams.get("v");
   return id ? <ViewportYouTube key={id} id={id} title={title} autoplay={autoplay} /> : null;
