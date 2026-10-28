@@ -39,13 +39,13 @@ export function XEmbed({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "group block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-900/90 to-black/80 transition-all hover:border-white/20 hover:bg-zinc-900",
+        "group block w-full overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 transition-all hover:border-white/20",
         className
       )}
     >
       <div className="flex items-center gap-3 border-b border-white/5 px-4 py-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-white">
-          <span className="text-lg font-bold">𝕏</span>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-white">
+          <span className="text-base font-bold">𝕏</span>
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-zinc-100">{title}</p>
@@ -55,19 +55,19 @@ export function XEmbed({
       </div>
 
       {poster ? (
-        <div className="relative aspect-video bg-black">
+        <div className="relative bg-black">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={poster} alt="" className="h-full w-full object-cover" />
+          <img src={poster} alt="" className="w-full object-cover" />
         </div>
       ) : (
-        <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-zinc-900 to-black px-6 text-center">
+        <div className="flex min-h-[180px] items-center justify-center bg-zinc-900 px-6 py-10 text-center">
           <p className="text-sm leading-relaxed text-zinc-400">
             Voir le post complet sur X
           </p>
         </div>
       )}
 
-      <div className="px-4 py-3 text-xs text-zinc-500">
+      <div className="px-4 py-3 text-xs text-zinc-500 group-hover:text-zinc-400">
         Ouvrir sur x.com →
       </div>
     </a>

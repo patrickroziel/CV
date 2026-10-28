@@ -5,11 +5,6 @@ import type { FeaturedEmbed } from "@/lib/types";
 import { normalizeFeaturedEmbed } from "@/lib/featured-embed";
 import { XEmbed } from "@/components/projects/XEmbed";
 
-/**
- * Start muted autoplay when the video first becomes visible.
- * After starting, keep the same iframe mounted even if the visitor scrolls
- * away. The player (not the viewport observer) controls stopping and pausing.
- */
 function ViewportYouTube({ id, title, autoplay }: {
   id: string;
   title: string;
@@ -43,8 +38,6 @@ function ViewportYouTube({ id, title, autoplay }: {
     return () => motion.removeEventListener("change", updateMotion);
   }, []);
 
-  // Visibility is only the trigger, never an instruction to stop.
-  // YouTube / the browser may still independently restrict playback.
   useEffect(() => {
     if (autoplay && !reduceMotion && visibleRatio >= 0.6) setStarted(true);
   }, [autoplay, reduceMotion, visibleRatio]);
@@ -68,7 +61,6 @@ function ViewportYouTube({ id, title, autoplay }: {
           aria-label="Lire la vidéo YouTube sans le son"
           className="group absolute inset-0 flex h-full w-full items-center justify-center overflow-hidden bg-black text-white"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
             alt=""
@@ -88,7 +80,6 @@ function ViewportYouTube({ id, title, autoplay }: {
 export function FeaturedMedia({ media, title, autoplay = true }: {
   media: FeaturedEmbed | null | undefined;
   title: string;
-  /** Disable automatic playback in the post editor preview. */
   autoplay?: boolean;
 }) {
   const featured = normalizeFeaturedEmbed(media);
@@ -96,17 +87,14 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
 
   if (featured.type === "image") {
     return <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={featured.url} alt={title || "Image intégrée"} loading="lazy" referrerPolicy="no-referrer"
         className="absolute inset-0 h-full w-full object-cover object-center" />
     </div>;
   }
   if (featured.type === "x") {
-    // X runs its own embedded player and does not expose a reliable muted
-    // autoplay API. Do not claim that its videos have their sound disabled.
     return (
-      <div className="w-full overflow-visible rounded-2xl border border-white/10 bg-black/50">
-        <XEmbed url={featured.url} interactive title={title || "Post X intégré"} />
+      <div className="w-full">
+        <XEmbed url={featured.url} title={title || "Post X"} />
       </div>
     );
   }
