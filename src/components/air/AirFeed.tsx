@@ -13,6 +13,17 @@ import { PostTagList } from "@/components/medias/PostTagList";
 import { AIR_CATEGORIES, coercePostCategory, collectPostTags, type AirCategory } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
+function previewText(html: string) {
+  const text = stripHtml(html)
+    .replace(/\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length <= 700) return text;
+  const window = text.slice(0, 700);
+  const space = window.lastIndexOf(" ");
+  return (space > 400 ? window.slice(0, space) : window).trimEnd();
+}
+
 export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   const { data, editMode, l, addSocialPost, updateSocialPost, removeSocialPost, isHydrated } = usePortfolio();
   const [createOpen, setCreateOpen] = useState(false);
@@ -89,7 +100,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     </div>
     {visiblePosts.length ? <div className="space-y-6">
       {visiblePosts.map((post, index) => { const photo=getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
-        const excerpt=stripHtml(l(post.description)).replace(/\\[\\[MEDIA:[^\\]]+\\]\\]/g,"").replace(/\\s+/g," ").slice(0,260);
+        const excerpt = previewText(l(post.description));
         return <Fragment key={post.id}>
         <article className="overflow-hidden rounded-[1.35rem] border border-white/12 bg-white/8 shadow-[0_16px_48px_-20px_rgba(0,0,0,0.45)] transition-all hover:bg-white/12 hover:border-white/20 backdrop-blur-2xl">
           <Link href={`/air/${post.id}`} className="group block">
@@ -98,7 +109,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             </div>
             <div className="p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-white/50">{coercePostCategory(post)} · {post.date}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
               {post.subtitle ? <p className="mt-1 text-sm leading-6 text-white/70">{l(post.subtitle)}</p> : null}
-              <p className="mt-3 line-clamp-4 text-sm leading-6 text-white/75">{excerpt}</p>
+              <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
           </Link>
           <div className="border-t border-white/15 px-5 py-4">
