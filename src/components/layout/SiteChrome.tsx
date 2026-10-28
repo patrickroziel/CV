@@ -7,6 +7,7 @@ import { Wallpaper } from "@/components/background/Wallpaper";
 import { AmbientOrbs } from "@/components/background/AmbientOrbs";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SupportBar } from "@/components/layout/SupportBar";
 import { ScrollProgress } from "@/components/shared/ScrollProgress";
 import { CvPrintView } from "@/components/print/CvPrintView";
 import { ComingSoonView } from "@/components/coming-soon/ComingSoonView";
@@ -53,6 +54,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <Header />
       <div className="relative z-10">{children}</div>
       <Footer />
+      <SupportBar />
       <CvPrintView />
     </>
   );

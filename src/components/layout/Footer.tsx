@@ -15,7 +15,9 @@ export function Footer() {
     <footer
       className={cn(
         "no-print relative z-10 border-t border-white/12 bg-gradient-to-t from-black/40 to-transparent pt-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]",
-        universe === "medias" ? "pb-10" : "pb-28 lg:pb-24"
+        universe === "medias"
+          ? "pb-[calc(5.75rem+env(safe-area-inset-bottom,0px))]"
+          : "pb-[calc(9.75rem+env(safe-area-inset-bottom,0px))] lg:pb-[calc(8.75rem+env(safe-area-inset-bottom,0px))]"
       )}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
