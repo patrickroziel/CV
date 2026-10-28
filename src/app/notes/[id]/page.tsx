@@ -5,6 +5,7 @@ import {
   getNoteSharePhoto,
   getNoteShareText,
   getPublicNote,
+  listPublicPosts,
   NOTES_ORIGIN,
   titleForSearch,
 } from "@/lib/server/notes-sharing";
@@ -71,12 +72,14 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
 
 export default async function BookChapterPage({ params }: NoteParams) {
   const { id } = await params;
-  const post = await getPublicNote(id);
+  const posts = await listPublicPosts();
+  const post = posts.find((item) => item.id === id) ?? null;
   const article = post && post.universe !== "air" ? post : null;
+  const notes = posts.filter((item) => item.universe !== "air");
   return (
     <main className="no-print relative z-10 min-h-screen pb-20 pt-24 sm:pt-28">
       {article ? <ArticleJsonLd post={article} path={`/notes/${id}`} section="Notes" /> : null}
-      <EntryReader id={id} initialPost={article} />
+      <EntryReader id={id} initialPost={article} seedPosts={notes} />
     </main>
   );
 }

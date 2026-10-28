@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getPublicNote, getNoteShareText, getNoteSharePhoto, NOTES_ORIGIN, titleForSearch } from "@/lib/server/notes-sharing";
+import { getPublicNote, getNoteShareText, getNoteSharePhoto, listPublicPosts, NOTES_ORIGIN, titleForSearch } from "@/lib/server/notes-sharing";
 import { AirArticle } from "@/components/air/AirArticle";
 import { ArticleJsonLd } from "@/components/seo/JsonLd";
 
@@ -31,12 +31,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 export default async function AirArticlePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const post = await getPublicNote(id);
+  const posts = await listPublicPosts();
+  const post = posts.find((item) => item.id === id) ?? null;
   const article = post && post.universe === "air" ? post : null;
+  const air = posts.filter((item) => item.universe === "air");
   return (
     <main className="relative z-10 min-h-screen pb-24 pt-24 sm:pt-28">
       {article ? <ArticleJsonLd post={article} path={`/air/${id}`} section="Air" /> : null}
-      <AirArticle id={id} initialPost={article} />
+      <AirArticle id={id} initialPost={article} seedPosts={air} />
     </main>
   );
 }

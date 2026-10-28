@@ -5,9 +5,10 @@ import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostPager } from "@/components/notes/PostPager";
 import type { SocialPost } from "@/lib/types";
 
-export function AirArticle({ id, initialPost = null }: { id: string; initialPost?: SocialPost | null }) {
+export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: string; initialPost?: SocialPost | null; seedPosts?: SocialPost[] }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
   const fromStore = (data.socialPosts ?? []).find(p => p.id === id && p.universe === "air" && (p.visible !== false || editMode));
   const post = isHydrated ? (fromStore ?? null) : (initialPost ?? fromStore ?? null);
@@ -27,5 +28,6 @@ export function AirArticle({ id, initialPost = null }: { id: string; initialPost
         <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" tone="light"/>
       </div>
     </article>
+    <PostPager postId={post.id} universe="air" seedPosts={seedPosts} tone="light" />
   </div>;
 }

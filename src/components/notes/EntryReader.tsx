@@ -6,6 +6,7 @@ import { PostRichBody } from "@/components/medias/PostRichBody";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostPager } from "@/components/notes/PostPager";
 import type { FeaturedEmbed, SocialPost } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -15,7 +16,7 @@ function formatDate(iso: string) {
   });
 }
 
-export function EntryReader({ id, initialPost = null }: { id: string; initialPost?: SocialPost | null }) {
+export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: string; initialPost?: SocialPost | null; seedPosts?: SocialPost[] }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
   const fromStore = (data.socialPosts ?? []).find(item => item.id === id && (editMode || item.visible !== false) && item.universe !== "air");
   const post = isHydrated ? (fromStore ?? null) : (initialPost ?? fromStore ?? null);
@@ -25,7 +26,7 @@ export function EntryReader({ id, initialPost = null }: { id: string; initialPos
     <Link href="/notes" className="text-sm text-cyan-100">← Retour à Notes</Link>
     <p className="mt-6 text-sm text-zinc-400">Cette publication n’est pas disponible.</p>
   </div>;
-  if (post.category === "Livre") return <BookReader id={id} initialPost={post} />;
+  if (post.category === "Livre") return <BookReader id={id} initialPost={post} seedPosts={seedPosts} />;
 
   const title = l(post.title).trim() || (editMode ? "Brouillon" : "");
   const featured: FeaturedEmbed | null = post.featuredEmbed ??
@@ -60,5 +61,6 @@ export function EntryReader({ id, initialPost = null }: { id: string; initialPos
         <PostActions postId={post.id} title={title} visible={post.visible !== false} />
       </div>
     </article>
+    <PostPager postId={post.id} universe="notes" seedPosts={seedPosts} />
   </div>;
 }

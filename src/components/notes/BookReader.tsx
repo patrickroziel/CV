@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
+import { ArrowLeft, FileDown } from "lucide-react";
 import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostPager } from "@/components/notes/PostPager";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
 
@@ -29,7 +30,7 @@ function formatDate(iso: string) {
   });
 }
 
-export function BookReader({ id, initialPost = null }: { id: string; initialPost?: SocialPost | null }) {
+export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: string; initialPost?: SocialPost | null; seedPosts?: SocialPost[] }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
 
   const books = useMemo(
@@ -39,8 +40,6 @@ export function BookReader({ id, initialPost = null }: { id: string; initialPost
   const index = books.findIndex((post) => post.id === id);
   const stored = index >= 0 ? books[index] : null;
   const post = isHydrated ? stored : (initialPost?.category === "Livre" ? initialPost : stored);
-  const previous = index > 0 ? books[index - 1] : null;
-  const next = index >= 0 && index < books.length - 1 ? books[index + 1] : null;
 
   if (!post && !isHydrated && !initialPost) {
     return <div className="mx-auto h-40 max-w-3xl animate-pulse rounded-3xl border border-white/5 bg-white/[0.025]" />;
@@ -144,30 +143,7 @@ export function BookReader({ id, initialPost = null }: { id: string; initialPost
         </div>
       </article>
 
-      <nav className="mt-6 grid min-w-0 gap-3 sm:grid-cols-2" aria-label="Navigation entre les chapitres">
-        <div>
-          {previous ? (
-            <Link
-              href={`/notes/${previous.id}`}
-              className="flex min-w-0 items-center gap-2 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-zinc-300 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              <ChevronLeft className="h-4 w-4 shrink-0" />
-              <span className="min-w-0 break-words">{l(previous.title).trim() || "Brouillon sans titre"}</span>
-            </Link>
-          ) : null}
-        </div>
-        <div>
-          {next ? (
-            <Link
-              href={`/notes/${next.id}`}
-              className="flex min-w-0 items-center justify-end gap-2 rounded-2xl border border-white/10 bg-black/20 p-4 text-right text-sm text-zinc-300 transition hover:bg-white/[0.04] hover:text-white"
-            >
-              <span className="min-w-0 break-words">{l(next.title).trim() || "Brouillon sans titre"}</span>
-              <ChevronRight className="h-4 w-4 shrink-0" />
-            </Link>
-          ) : null}
-        </div>
-      </nav>
+      <PostPager postId={post.id} universe="notes" seedPosts={seedPosts} />
     </div>
   );
 }
