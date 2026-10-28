@@ -5,7 +5,9 @@ import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
+import { coercePostCategory } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
 export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: string; initialPost?: SocialPost | null; seedPosts?: SocialPost[] }) {
@@ -16,11 +18,14 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Air</Link><p className="mt-8">Article indisponible.</p></div>;
   const title=l(post.title),cover=post.bookCoverUrl;
   return <div className="mx-auto max-w-3xl px-3 sm:px-6">
-    <Link href="/air" className="inline-flex items-center gap-2 text-sm text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
+    <div className="flex items-center justify-between gap-3">
+      <Link href="/air" className="inline-flex items-center gap-2 text-sm text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
+      <PostEditButton post={post} universe="air" tone="light" />
+    </div>
     <article className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/45 bg-white/48 shadow-[0_18px_50px_-22px_rgba(8,44,85,0.4)] backdrop-blur-2xl">
       {cover&&<div className="aspect-[16/8] overflow-hidden"><img src={cover} alt={title} className="h-full w-full object-cover"/></div>}
       <div className="space-y-6 p-5 sm:p-10">
-        <p className="text-[11px] font-semibold uppercase tracking-[.2em] text-sky-800/80">AIR / {post.date}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[.2em] text-sky-800/80">{coercePostCategory(post)} · {post.date}</p>
         <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{title}</h1>
         {post.subtitle&&<p className="text-lg text-slate-700">{l(post.subtitle)}</p>}
         <FeaturedMedia media={post.featuredEmbed} title={title}/>

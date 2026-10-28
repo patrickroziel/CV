@@ -2,7 +2,8 @@
 
 import { useCallback, useRef, useState } from "react";
 import { BookOpen, FileText, FileUp, ImageIcon, Loader2, Plus, Save, X } from "lucide-react";
-import type { NotesCategory, SocialPost, SocialPostFileKind, InlinePostMedia, FeaturedEmbed, MediaItem } from "@/lib/types";
+import type { SocialPost, SocialPostFileKind, InlinePostMedia, FeaturedEmbed, MediaItem } from "@/lib/types";
+import { AIR_CATEGORIES, NOTES_CATEGORIES, coercePostCategory, type PostCategory } from "@/lib/post-taxonomy";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,6 @@ type SocialPostFormProps = {
 };
 
 const MAX_BYTES = 20 * 1024 * 1024;
-const NOTES_CATEGORIES: NotesCategory[] = ["Livre", "Réflexions", "Documents", "Images", "Vidéos"];
 
 type UploadTarget = "general" | "cover" | "bookPdf" | "inline" | null;
 
@@ -153,15 +153,9 @@ export function SocialPostForm({
   const [title, setTitle] = useState<LocalizedString>(liftToLocalized(initial?.title));
   const [subtitle, setSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.subtitle));
   const [description, setDescription] = useState<LocalizedString>(liftToLocalized(initial?.description));
-  const [category, setCategory] = useState<NotesCategory>(
-    initial?.category ??
-      (initial?.youtubeUrl
-        ? "Vidéos"
-        : initial?.fileKind === "image"
-          ? "Images"
-          : initial?.fileKind === "pdf"
-            ? "Documents"
-            : "Réflexions")
+  const categories = universe === "air" ? AIR_CATEGORIES : NOTES_CATEGORIES;
+  const [category, setCategory] = useState<PostCategory>(
+    coercePostCategory({ ...initial, universe: initial?.universe ?? universe })
   );
   // Legacy featured embeds stay where they are until intentionally moved.
   const [legacyFeatured, setLegacyFeatured] = useState<FeaturedEmbed | null>(
@@ -386,10 +380,10 @@ export function SocialPostForm({
         <select
           id="notes-category"
           value={category}
-          onChange={(e) => setCategory(e.target.value as NotesCategory)}
+          onChange={(e) => setCategory(e.target.value as PostCategory)}
           className="h-10 w-full min-w-0 rounded-xl border border-white/12 bg-black/35 px-3 text-sm text-zinc-100 outline-none focus:ring-1 focus:ring-cyan-300/40"
         >
-          {NOTES_CATEGORIES.map((item) => (
+          {categories.map((item) => (
             <option key={item} value={item}>{item}</option>
           ))}
         </select>

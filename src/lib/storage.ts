@@ -34,7 +34,6 @@ import type {
   SocialConfig,
   SocialPost,
   SocialPostFileKind,
-  NotesCategory,
   Translatable,
 } from "./types";
 import {
@@ -61,6 +60,7 @@ import {
 import { DEFAULT_PORTFOLIO, DEFAULT_BACKGROUND } from "./defaults";
 import { normalizeFeaturedEmbed } from "./featured-embed";
 import { normalizeInlinePostMedia } from "./post-inline-media";
+import { coercePostCategory } from "./post-taxonomy";
 import {
   createId,
   inferMediaTypeFromUrl,
@@ -708,25 +708,12 @@ export function normalizeSocialPost(
     typeof raw.bookPdfName === "string" && raw.bookPdfName.trim()
       ? raw.bookPdfName.trim()
       : null;
-  const allowedCategories: NotesCategory[] = [
-    "Livre",
-    "Réflexions",
-    "Documents",
-    "Images",
-    "Vidéos",
-  ];
-  const rawCategory =
-    typeof raw.category === "string" ? raw.category.trim() : "";
-  const inferredCategory: NotesCategory = youtubeUrl
-    ? "Vidéos"
-    : fileUrl && inferSocialFileKind(fileUrl, raw.fileKind) === "image"
-      ? "Images"
-      : fileUrl
-        ? "Documents"
-        : "Réflexions";
-  const category = allowedCategories.includes(rawCategory as NotesCategory)
-    ? (rawCategory as NotesCategory)
-    : inferredCategory;
+  const rawCategory = typeof raw.category === "string" ? raw.category.trim() : "";
+  const category = coercePostCategory({
+    id: typeof raw.id === "string" ? raw.id : "",
+    universe: raw.universe === "air" ? "air" : "notes",
+    category: rawCategory,
+  });
   return {
     id:
       typeof raw.id === "string" && raw.id

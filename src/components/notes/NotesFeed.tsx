@@ -2,9 +2,10 @@
 
 import { useMemo, useState, Fragment } from "react";
 import Link from "next/link";
-import { BookOpen, FileText, Images, Plus, Video } from "lucide-react";
+import { BookOpen, Music, PenLine, Plus } from "lucide-react";
 import { NotesIntroduction } from "@/components/notes/NotesIntroduction";
 import { KofiCard } from "@/components/support/KofiCard";
+import { PostTagList } from "@/components/medias/PostTagList";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostCard } from "@/components/medias/SocialPostCard";
 import {
@@ -17,7 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { NotesCategory, SocialPost } from "@/lib/types";
+import type { SocialPost } from "@/lib/types";
+import { NOTES_CATEGORIES, coercePostCategory, collectPostTags, type NotesCategory } from "@/lib/post-taxonomy";
 
 type Scope = "Tout" | NotesCategory;
 
@@ -25,18 +27,13 @@ type Scope = "Tout" | NotesCategory;
 const FILTERS: Array<{ id: Scope; icon?: typeof BookOpen }> = [
   { id: "Tout" },
   { id: "Livre", icon: BookOpen },
-  { id: "Réflexions", icon: FileText },
-  { id: "Documents", icon: FileText },
-  { id: "Images", icon: Images },
-  { id: "Vidéos", icon: Video },
+  { id: "Musique", icon: Music },
+  { id: "Essais", icon: PenLine },
 ];
 
 function categoryOf(post: SocialPost): NotesCategory {
-  if (post.category) return post.category;
-  if (post.youtubeUrl) return "Vidéos";
-  if (post.fileKind === "image") return "Images";
-  if (post.fileKind === "pdf") return "Documents";
-  return "Réflexions";
+  const category = coercePostCategory(post);
+  return NOTES_CATEGORIES.includes(category as NotesCategory) ? category as NotesCategory : "Essais";
 }
 
 export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
@@ -64,16 +61,17 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     return editMode ? list : list.filter((post) => post.visible !== false);
   }, [data.socialPosts, editMode, isHydrated, seedPosts]);
 
+  const scopedPosts = useMemo(
+    () => (scope === "Tout" ? posts : posts.filter((post) => categoryOf(post) === scope)),
+    [posts, scope]
+  );
+  const tags = useMemo(() => collectPostTags(scopedPosts), [scopedPosts]);
   const visiblePosts = useMemo(() => {
-    const scoped =
-      scope === "Tout"
-        ? posts
-        : posts.filter((post) => categoryOf(post) === scope);
-    if (!activeTag) return scoped;
-    return scoped.filter((post) =>
+    if (!activeTag) return scopedPosts;
+    return scopedPosts.filter((post) =>
       (post.tags ?? []).some((tag) => tag.toLowerCase() === activeTag.toLowerCase())
     );
-  }, [posts, scope, activeTag]);
+  }, [scopedPosts, activeTag]);
 
   const bookChapters = useMemo(
     () => posts.filter((post) => categoryOf(post) === "Livre"),
@@ -106,7 +104,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             Notes
           </h1>
           <p className="mt-2 max-w-[18rem] text-xs leading-5 text-zinc-500 lg:max-w-none">
-            Livre, réflexions, documents, images et vidéos.
+            Livre, musique et essais.
           </p>
 
           <p className="mb-3 mt-8 text-[10px] uppercase tracking-[0.28em] text-zinc-600">
@@ -205,6 +203,15 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           <NotesIntroduction />
           <KofiCard className="mt-3" />
         </div>
+        <PostTagList
+          tags={tags}
+          activeTag={activeTag}
+          onClear={() => setActiveTag(null)}
+          onToggle={(tag) => {
+            setActiveTag((current) => current?.toLocaleLowerCase("fr") === tag.toLocaleLowerCase("fr") ? null : tag);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
       </aside>
 
       <section className="min-w-0">

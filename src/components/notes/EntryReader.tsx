@@ -6,7 +6,9 @@ import { PostRichBody } from "@/components/medias/PostRichBody";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
+import { coercePostCategory } from "@/lib/post-taxonomy";
 import type { FeaturedEmbed, SocialPost } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -26,16 +28,20 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
     <Link href="/notes" className="text-sm text-cyan-100">← Retour à Notes</Link>
     <p className="mt-6 text-sm text-zinc-400">Cette publication n’est pas disponible.</p>
   </div>;
-  if (post.category === "Livre") return <BookReader id={id} initialPost={post} seedPosts={seedPosts} />;
+  if (post.category === "Livre" || coercePostCategory(post) === "Livre") return <BookReader id={id} initialPost={post} seedPosts={seedPosts} />;
 
   const title = l(post.title).trim() || (editMode ? "Brouillon" : "");
+  const category = coercePostCategory(post);
   const featured: FeaturedEmbed | null = post.featuredEmbed ??
     (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null);
 
   return <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
-    <Link href="/notes" className="inline-flex items-center gap-2 text-sm text-cyan-100/65 hover:text-cyan-50">
-      <ArrowLeft className="h-4 w-4" /> Retour à Notes
-    </Link>
+    <div className="flex items-center justify-between gap-3">
+      <Link href="/notes" className="inline-flex items-center gap-2 text-sm text-cyan-100/65 hover:text-cyan-50">
+        <ArrowLeft className="h-4 w-4" /> Retour à Notes
+      </Link>
+      <PostEditButton post={post} universe="notes" />
+    </div>
     <article className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
       {post.bookCoverUrl && <div className="relative aspect-[16/8] w-full overflow-hidden border-b border-white/10 bg-black/30 sm:aspect-[16/7]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -43,7 +49,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
       </div>}
       <div className="min-w-0 space-y-6 p-4 sm:p-8 md:p-10">
         <header>
-          <p className="text-xs uppercase tracking-[0.15em] text-cyan-100/55">{post.category ?? "Réflexions"} · {formatDate(post.date)}</p>
+          <p className="text-xs uppercase tracking-[0.15em] text-cyan-100/55">{category} · {formatDate(post.date)}</p>
           <h1 className="mt-3 break-words text-2xl font-semibold text-white sm:text-3xl">{title}</h1>
           {post.subtitle && <p className="mt-3 text-sm text-zinc-400">{l(post.subtitle)}</p>}
         </header>

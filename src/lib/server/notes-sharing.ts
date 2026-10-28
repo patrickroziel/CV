@@ -6,6 +6,7 @@ import { getL } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
 import { readPortfolio } from "@/lib/server/portfolio-db";
 import type { SocialPost } from "@/lib/types";
+import { coercePostCategory } from "@/lib/post-taxonomy";
 
 export const NOTES_ORIGIN = "https://patrickroziel.com";
 
@@ -23,7 +24,12 @@ export const listPublicPosts = cache(async function listPublicPosts(): Promise<S
   } catch {
     // The baked-in public snapshot remains a fallback if Neon is unavailable.
   }
-  return posts.filter((post) => post.visible !== false);
+  return posts
+    .filter((post) => post.visible !== false)
+    .map((post) => {
+      const category = coercePostCategory(post);
+      return category === post.category ? post : { ...post, category };
+    });
 });
 
 export async function getPublicNote(id: string): Promise<SocialPost | null> {

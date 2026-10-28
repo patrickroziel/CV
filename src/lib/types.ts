@@ -1,7 +1,9 @@
 import type { Locale } from "@/i18n/locales";
 import { L, type LocalizedString } from "@/lib/i18n-content";
+import type { PostCategory } from "@/lib/post-taxonomy";
 
 export type { Locale, LocalizedString };
+export type { AirCategory, NotesCategory, PostCategory } from "@/lib/post-taxonomy";
 
 /**
  * Content field that may be a legacy flat string or a per-locale map.
@@ -702,12 +704,6 @@ export type HeroGlassConfig = {
 
 /** Attachment on a Médias / Social post (Vercel Blob) */
 export type SocialPostFileKind = "pdf" | "image";
-export type NotesCategory =
-  | "Livre"
-  | "Réflexions"
-  | "Documents"
-  | "Images"
-  | "Vidéos";
 
 /** A safe external visual displayed at the top of a post; URL only, never raw HTML. */
 export type FeaturedEmbed = { type: "youtube" | "x" | "image"; url: string };
@@ -748,8 +744,8 @@ export type SocialPost = {
   /** Optional downloadable PDF version of a Livre entry. */
   bookPdfUrl?: string | null;
   bookPdfName?: string | null;
-  /** Primary Notes category. */
-  category?: NotesCategory;
+  /** Primary category. Notes and Air each have their own set. */
+  category?: PostCategory;
   /** Free-form tags — shared across locales, used by search. */
   tags: string[];
   /** When false: hidden from the public, visible in Mode Édition */

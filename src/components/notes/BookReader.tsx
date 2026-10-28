@@ -6,13 +6,15 @@ import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
+import { coercePostCategory } from "@/lib/post-taxonomy";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
 
 function sortBookPosts(posts: SocialPost[]) {
   return [...posts]
-    .filter((post) => post.category === "Livre")
+    .filter((post) => coercePostCategory(post) === "Livre")
     .sort((a, b) => {
       if (a.order !== b.order) return a.order - b.order;
       return (b.date || "").localeCompare(a.date || "");
@@ -39,7 +41,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
   );
   const index = books.findIndex((post) => post.id === id);
   const stored = index >= 0 ? books[index] : null;
-  const post = isHydrated ? stored : (initialPost?.category === "Livre" ? initialPost : stored);
+  const post = isHydrated ? stored : (initialPost && coercePostCategory(initialPost) === "Livre" ? initialPost : stored);
 
   if (!post && !isHydrated && !initialPost) {
     return <div className="mx-auto h-40 max-w-3xl animate-pulse rounded-3xl border border-white/5 bg-white/[0.025]" />;
@@ -64,12 +66,15 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
 
   return (
     <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
-      <Link
-        href="/notes"
-        className="inline-flex items-center gap-2 text-sm text-cyan-100/65 transition hover:text-cyan-50"
-      >
-        <ArrowLeft className="h-4 w-4" /> Retour à Notes
-      </Link>
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          href="/notes"
+          className="inline-flex items-center gap-2 text-sm text-cyan-100/65 transition hover:text-cyan-50"
+        >
+          <ArrowLeft className="h-4 w-4" /> Retour à Notes
+        </Link>
+        <PostEditButton post={post} universe="notes" />
+      </div>
 
       <article className="mt-6 min-w-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]">
         {post.bookCoverUrl ? (

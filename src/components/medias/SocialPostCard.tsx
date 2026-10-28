@@ -9,7 +9,8 @@ import { PostRichBody } from "@/components/medias/PostRichBody";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
-import type { NotesCategory, SocialPost, FeaturedEmbed } from "@/lib/types";
+import type { SocialPost, FeaturedEmbed } from "@/lib/types";
+import { coercePostCategory } from "@/lib/post-taxonomy";
 import { stripHtml } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 
@@ -30,8 +31,8 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
   const { l, editMode, removeSocialPost } = usePortfolio();
   const title = l(post.title).trim() || (editMode && !post.visible ? "Brouillon sans titre" : "");
   const description = l(post.description);
-  const isBook = post.category === "Livre";
-  const category: NotesCategory = post.category ?? (post.youtubeUrl ? "Vidéos" : post.fileKind === "image" ? "Images" : post.fileKind === "pdf" ? "Documents" : "Réflexions");
+  const category = coercePostCategory(post);
+  const isBook = category === "Livre";
   const featured: FeaturedEmbed | null = post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null);
 
   return (
