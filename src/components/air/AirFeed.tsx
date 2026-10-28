@@ -97,6 +97,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               {photo ? <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>
             <div className="p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-white/50">{coercePostCategory(post)} · {post.date}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
+              {post.subtitle ? <p className="mt-1 text-sm leading-6 text-white/70">{l(post.subtitle)}</p> : null}
               <p className="mt-3 line-clamp-4 text-sm leading-6 text-white/75">{excerpt}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
           </Link>

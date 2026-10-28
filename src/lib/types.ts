@@ -722,7 +722,7 @@ export type SocialPost = {
   /** Content universe. Missing = legacy Notes. */
   universe?: "notes" | "air";
   title: Translatable;
-  /** Optional subtitle, mainly used by Livre entries. */
+  /** Optional subtitle, shown under the title. */
   subtitle?: Translatable;
   description: Translatable;
   /** ISO date YYYY-MM-DD */

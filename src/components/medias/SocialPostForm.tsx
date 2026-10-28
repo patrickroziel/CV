@@ -408,14 +408,12 @@ export function SocialPostForm({
         placeholder={isBook ? "Ex. Chapitre 1 — Le départ" : "Titre du post"}
       />
 
-      {isBook && (
-        <LocalizedField
-          label="Sous-titre (facultatif)"
-          value={subtitle}
-          onChange={setSubtitle}
-          placeholder="Une phrase courte pour introduire le chapitre"
-        />
-      )}
+      <LocalizedField
+        label="Sous-titre (facultatif)"
+        value={subtitle}
+        onChange={setSubtitle}
+        placeholder={isBook ? "Une phrase courte pour introduire le chapitre" : "Une phrase courte sous le titre"}
+      />
 
       <LocalizedField
         label={isBook ? "Texte du chapitre *" : "Texte"}
