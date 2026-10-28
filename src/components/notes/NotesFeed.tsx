@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Fragment } from "react";
 import Link from "next/link";
 import { BookOpen, FileText, Images, Plus, Video } from "lucide-react";
 import { NotesIntroduction } from "@/components/notes/NotesIntroduction";
+import { KofiCard } from "@/components/support/KofiCard";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostCard } from "@/components/medias/SocialPostCard";
 import {
@@ -202,6 +203,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             })}
           </nav>
           <NotesIntroduction />
+          <KofiCard className="mt-3" />
         </div>
       </aside>
 
@@ -240,16 +242,18 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
         {visiblePosts.length > 0 ? (
           <div className="space-y-5">
             {visiblePosts.map((post, index) => (
-              <SocialPostCard
-                key={post.id}
-                post={post}
-                index={index}
-                onEdit={setEditing}
-                onTagClick={(tag) => {
-                  setActiveTag(tag);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-              />
+              <Fragment key={post.id}>
+                <SocialPostCard
+                  post={post}
+                  index={index}
+                  onEdit={setEditing}
+                  onTagClick={(tag) => {
+                    setActiveTag(tag);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
+                {index === 0 ? <KofiCard /> : null}
+              </Fragment>
             ))}
           </div>
         ) : (
