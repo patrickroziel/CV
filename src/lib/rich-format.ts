@@ -106,6 +106,15 @@ function wrapTextLeaves(
   }
 }
 
+function rangeInEditor(editor: HTMLElement, range: Range | null | undefined): Range | null {
+  if (!range) return null;
+  try {
+    return editor.contains(range.commonAncestorContainer) ? range : null;
+  } catch {
+    return null;
+  }
+}
+
 function selectNodeContents(node: Node) {
   const sel = window.getSelection();
   if (!sel) return;
@@ -124,14 +133,21 @@ export function applyRichFormat(
   arg?: string,
   savedRange?: Range | null
 ): boolean {
-  const range = savedRange ?? saveSelection(editor);
-  editor.focus();
-  if (range) restoreSelection(editor, range);
+  const saved = rangeInEditor(editor, savedRange);
+  editor.focus({ preventScroll: true });
+  if (saved) restoreSelection(editor, saved);
 
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return false;
-  const live = sel.getRangeAt(0);
-  if (!editor.contains(live.commonAncestorContainer)) return false;
+  const live = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
+  const liveIn = rangeInEditor(editor, live);
+  // A toolbar tap (especially on a phone) collapses the caret. Keep the
+  // selection that was saved before that tap.
+  const active =
+    (saved && !saved.collapsed ? saved : null) ??
+    (liveIn && !liveIn.collapsed ? liveIn : null) ??
+    saved ??
+    liveIn;
+  if (!active) return false;
 
   // Block / list commands — execCommand is reliable enough
   if (
@@ -165,13 +181,13 @@ export function applyRichFormat(
   if (command === "createLink" && arg) {
     const href = safeHref(arg);
     if (!href) return false;
-    const anchor = anchorFromRange(live);
+    const anchor = anchorFromRange(active);
     if (anchor && editor.contains(anchor)) {
       decorateAnchor(anchor, href);
       return true;
     }
-    if (live.collapsed) return false;
-    wrapRangeWith(live, () => {
+    if (active.collapsed) return false;
+    wrapRangeWith(active, () => {
       const created = document.createElement("a");
       decorateAnchor(created, href);
       return created;
@@ -218,14 +234,14 @@ export function applyRichFormat(
     }
     created.appendChild(copy);
     card.appendChild(created);
-    insertBlockAfterCaret(editor, card, live);
+    insertBlockAfterCaret(editor, card, active);
     return true;
   }
 
   if (command === "foreColor" && arg) {
     const color = arg;
-    if (!live.collapsed) {
-      wrapRangeWith(live, () => {
+    if (!active.collapsed) {
+      wrapRangeWith(active, () => {
         const span = document.createElement("span");
         span.style.color = color;
         // Durable marker — survives sanitizer even if style is rewritten
@@ -249,8 +265,8 @@ export function applyRichFormat(
     const px = Math.min(96, Math.max(6, parsed));
     const size = `${Math.round(px * 10) / 10}px`;
 
-    if (!live.collapsed) {
-      wrapRangeWith(live, () => {
+    if (!active.collapsed) {
+      wrapRangeWith(active, () => {
         const span = document.createElement("span");
         span.style.fontSize = size;
         return span;
@@ -280,8 +296,8 @@ export function applyRichFormat(
       "7": "2rem",
     };
     const size = map[arg] || "1rem";
-    if (!live.collapsed) {
-      wrapRangeWith(live, () => {
+    if (!active.collapsed) {
+      wrapRangeWith(active, () => {
         const span = document.createElement("span");
         span.style.fontSize = size;
         return span;

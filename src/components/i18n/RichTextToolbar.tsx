@@ -79,6 +79,11 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
         if (target.closest("input, button")) return;
         e.preventDefault();
       }}
+      onPointerDown={(e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest("input, textarea")) return;
+        if (target.closest("button")) e.preventDefault();
+      }}
     >
       <button type="button" title="Gras" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("bold")}><Bold className="h-3.5 w-3.5" /></button>
       <button type="button" title="Italique" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("italic")}><Italic className="h-3.5 w-3.5" /></button>
@@ -89,14 +94,18 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
 
       <span className="mx-0.5 h-5 w-px bg-white/10" aria-hidden />
       <div className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 p-0.5" title="Taille du texte sélectionné">
-        <button type="button" title="Réduire" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 14) - 1))}><Minus className="h-3.5 w-3.5" /></button>
+        <button type="button" data-fontsize-step title="Réduire" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 14) - 1))}><Minus className="h-3.5 w-3.5" /></button>
         <input
           type="text"
           inputMode="decimal"
           aria-label="Taille de police en pixels"
           value={fontSizeDraft}
           onChange={(e) => setFontSizeDraft(e.target.value)}
-          onBlur={() => commitFontSize()}
+          onBlur={(e) => {
+            const next = e.relatedTarget as HTMLElement | null;
+            if (next?.closest("[data-fontsize-step]")) return;
+            commitFontSize();
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -108,7 +117,7 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
           className="h-7 w-11 rounded-md border border-white/10 bg-black/40 px-1 text-center text-[11px] font-semibold tabular-nums text-zinc-100 outline-none focus:border-teal-300/40"
         />
         <span className="pr-0.5 text-[9px] text-zinc-500">px</span>
-        <button type="button" title="Augmenter" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 14) + 1))}><Plus className="h-3.5 w-3.5" /></button>
+        <button type="button" data-fontsize-step title="Augmenter" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 14) + 1))}><Plus className="h-3.5 w-3.5" /></button>
       </div>
 
       <span className="mx-0.5 h-5 w-px bg-white/10" aria-hidden />
