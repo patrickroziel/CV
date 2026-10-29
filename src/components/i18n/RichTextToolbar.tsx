@@ -96,6 +96,7 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
+              e.stopPropagation();
               commitFontSize();
               (e.target as HTMLInputElement).blur();
             }
@@ -112,7 +113,11 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
       {linkOpen && (
         <form
           className="mt-1 flex w-full min-w-0 basis-full flex-col gap-2 rounded-lg border border-white/10 bg-black/40 p-2"
-          onSubmit={(e) => { e.preventDefault(); applyTextLink(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            applyTextLink();
+          }}
         >
           <label className="grid gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
             Adresse
@@ -122,11 +127,17 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
               placeholder="https://…"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                e.stopPropagation();
+                applyTextLink();
+              }}
               className="h-9 rounded-lg border border-white/15 bg-black/50 px-2 text-sm font-normal normal-case tracking-normal text-zinc-100 outline-none focus:border-cyan-200/50"
             />
           </label>
           <div className="flex flex-wrap gap-2">
-            <button type="submit" onMouseDown={(e) => e.preventDefault()} className="inline-flex h-9 items-center rounded-full bg-cyan-300 px-3 text-xs font-semibold text-slate-950">Lien sur le texte</button>
+            <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={applyTextLink} className="inline-flex h-9 items-center rounded-full bg-cyan-300 px-3 text-xs font-semibold text-slate-950">Lien sur le texte</button>
             {!compact && (
               <button type="button" disabled={linkBusy} onMouseDown={(e) => e.preventDefault()} onClick={() => void applyLinkCard()} className="inline-flex h-9 items-center rounded-full border border-white/20 px-3 text-xs font-semibold text-white disabled:opacity-60">
                 {linkBusy ? "Aperçu…" : "Bloc aperçu"}
