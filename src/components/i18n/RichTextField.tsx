@@ -76,16 +76,19 @@ export function RichTextField({
   };
 
   const rememberSelection = () => {
-    savedRangeRef.current = captureEditorSelection(editorRef.current);
+    const range = captureEditorSelection(editorRef.current);
+    if (range) savedRangeRef.current = range;
   };
 
   const run = (command: string, arg?: string) => {
     const el = editorRef.current;
-    if (!el) return;
+    if (!el) return false;
     const range = savedRangeRef.current ?? captureEditorSelection(el);
-    applyRichFormat(el, command, arg, range);
-    savedRangeRef.current = captureEditorSelection(el);
-    requestAnimationFrame(() => commit());
+    const applied = applyRichFormat(el, command, arg, range);
+    const next = captureEditorSelection(el);
+    if (next) savedRangeRef.current = next;
+    if (applied) requestAnimationFrame(() => commit());
+    return applied;
   };
 
   const handleLineHeight = (raw: number) => {

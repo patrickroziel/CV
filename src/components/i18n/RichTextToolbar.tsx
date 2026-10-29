@@ -6,7 +6,7 @@ import { safeHref } from "@/lib/safe-href";
 import { cn } from "@/lib/utils";
 
 type RichTextToolbarProps = {
-  onCommand: (command: string, arg?: string) => void;
+  onCommand: (command: string, arg?: string) => void | boolean;
   className?: string;
   compact?: boolean;
   lineHeight?: number;
@@ -37,7 +37,11 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
       setLinkError("Adresse invalide.");
       return;
     }
-    onCommand("createLink", href);
+    const applied = onCommand("createLink", href);
+    if (applied === false) {
+      setLinkError("Sélectionne d’abord les mots à lier.");
+      return;
+    }
     setLinkError("");
     setLinkOpen(false);
     setLinkUrl("");

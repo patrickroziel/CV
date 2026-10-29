@@ -170,14 +170,7 @@ export function applyRichFormat(
       decorateAnchor(anchor, href);
       return true;
     }
-    if (live.collapsed) {
-      const created = document.createElement("a");
-      decorateAnchor(created, href);
-      created.textContent = hostLabel(href);
-      live.insertNode(created);
-      selectNodeContents(created);
-      return true;
-    }
+    if (live.collapsed) return false;
     wrapRangeWith(live, () => {
       const created = document.createElement("a");
       decorateAnchor(created, href);
