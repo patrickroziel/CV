@@ -11,8 +11,13 @@ import type { SocialPost } from "@/lib/types";
 
 type Current = "notes" | "air";
 
-function pickFeatured(posts: SocialPost[]) {
-  return posts.find(post => getNoteSharePhoto(post)) ?? posts[0] ?? null;
+function shuffle<T>(array: T[]): T[] {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
 export function UniversesWidget({ current = "notes" }: { current?: Current }) {
@@ -20,22 +25,31 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   const reduceMotion = useReducedMotion();
   const [slideIndex, setSlideIndex] = useState(0);
   const [articleIndex, setArticleIndex] = useState(0);
+  const [shuffled, setShuffled] = useState<SocialPost[]>([]);
 
   const candidates = useMemo(() => {
     const all = (data.socialPosts ?? [])
-      .filter(post => post.visible !== false)
-      .sort((a, b) => a.order - b.order);
+      .filter(post => post.visible !== false);
 
     const notes = all.filter(p => p.universe !== "air");
     const air = all.filter(p => p.universe === "air");
 
-    // Prefer posts with images, mix Notes + Air
     const withImage = [...notes, ...air].filter(p => getNoteSharePhoto(p));
     const pool = withImage.length ? withImage : [...notes, ...air];
-    return pool.slice(0, 8);
+    return pool;
   }, [data.socialPosts]);
 
-  const featured = candidates[articleIndex % Math.max(candidates.length, 1)] ?? null;
+  // Shuffle once on mount / when candidates change
+  useEffect(() => {
+    if (candidates.length) {
+      setShuffled(shuffle(candidates).slice(0, 10));
+      setArticleIndex(0);
+    } else {
+      setShuffled([]);
+    }
+  }, [candidates]);
+
+  const featured = shuffled[articleIndex % Math.max(shuffled.length, 1)] ?? null;
 
   const slides = current === "air"
     ? [
@@ -58,12 +72,12 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   }, [reduceMotion, slides.length]);
 
   useEffect(() => {
-    if (reduceMotion || candidates.length <= 1) return;
+    if (reduceMotion || shuffled.length <= 1) return;
     const timer = window.setInterval(() => {
-      setArticleIndex(current => (current + 1) % candidates.length);
-    }, 8000);
+      setArticleIndex(current => (current + 1) % shuffled.length);
+    }, 7000);
     return () => window.clearInterval(timer);
-  }, [reduceMotion, candidates.length]);
+  }, [reduceMotion, shuffled.length]);
 
   const image = featured ? getNoteSharePhoto(featured) : null;
   const quote = featured
@@ -106,7 +120,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
               initial={reduceMotion ? false : { opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? undefined : { opacity: 0, y: -5 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="space-y-1.5"
             >
               <p className="text-sm font-semibold tracking-tight text-white">{slides[slideIndex].label}</p>
@@ -121,23 +135,40 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
         </div>
 
         {featured && articleHref && (
-          <Link
-            href={articleHref}
-            className="group relative mt-2 flex min-w-0 items-center gap-2.5 border-t border-white/10 pt-3"
-            title="Lire une publication"
-          >
-            {image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} alt="" loading="lazy" className="h-12 w-14 shrink-0 rounded-lg object-cover" />
-            ) : null}
-            <span className="min-w-0 flex-1">
-              <span className="block text-[9px] uppercase tracking-[.14em] text-cyan-100/50">{articleLabel}</span>
-              <span className="mt-1 line-clamp-2 text-[11px] font-medium leading-snug text-zinc-200 group-hover:text-cyan-100">
-                {quote || l(featured.title)}
-              </span>
-            </span>
-            <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-cyan-100/60" aria-hidden />
-          </Link>
+          <div className="relative mt-2 border-t border-white/10 pt-3">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={featured.id}
+                initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.985 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Link
+                  href={articleHref}
+                  className="group flex min-w-0 items-center gap-2.5"
+                  title="Lire une publication"
+                >
+                  {image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={image}
+                      alt=""
+                      loading="lazy"
+                      className="h-12 w-14 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : null}
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[9px] uppercase tracking-[.14em] text-cyan-100/50">{articleLabel}</span>
+                    <span className="mt-1 line-clamp-2 text-[11px] font-medium leading-snug text-zinc-200 group-hover:text-cyan-100">
+                      {quote || l(featured.title)}
+                    </span>
+                  </span>
+                  <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-cyan-100/60" aria-hidden />
+                </Link>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         )}
 
         <div className="relative mt-3 flex flex-wrap gap-1.5">
