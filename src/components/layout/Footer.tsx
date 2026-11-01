@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { useUniverse } from "@/components/layout/UniverseSwitch";
+import { ContactButton } from "@/components/layout/ContactButton";
 import { cn } from "@/lib/utils";
 
 export function Footer() {
@@ -28,7 +29,7 @@ export function Footer() {
           : "pb-[calc(9.75rem+env(safe-area-inset-bottom,0px))] lg:pb-[calc(8.75rem+env(safe-area-inset-bottom,0px))]"
       )}
     >
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 sm:px-6">
         <nav aria-label="Liens principaux" className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-zinc-400">
           {links.map((link) => (
             <Link
@@ -43,29 +44,32 @@ export function Footer() {
             Plan du site
           </Link>
         </nav>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <ContactButton />
           <p className="text-xs text-zinc-500">
             © {year} {name}
             {universe === "medias" ? " · Notes" : universe === "air" ? " · Air" : " · Work"}
           </p>
-          {editMode && (
-            <button
-              type="button"
-              onClick={() => {
-                if (
-                  confirm(
-                    "Réinitialiser toutes les données avec le profil ATS par défaut ?"
-                  )
-                ) {
-                  resetToDefaults();
-                }
-              }}
-              className="text-left text-xs text-zinc-600 transition-colors hover:text-zinc-400 sm:text-right"
-            >
-              Réinitialiser les données
-            </button>
-          )}
         </div>
+
+        {editMode && (
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                confirm(
+                  "Réinitialiser toutes les données avec le profil ATS par défaut ?"
+                )
+              ) {
+                resetToDefaults();
+              }
+            }}
+            className="text-left text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+          >
+            Réinitialiser les données
+          </button>
+        )}
       </div>
     </footer>
   );

@@ -8,6 +8,7 @@ import { SiteTranslator } from "@/components/translation/SiteTranslator";
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { isGhostSlug, slugifyGhost } from "@/lib/ghost-pages";
+import { ContactButton } from "@/components/layout/ContactButton";
 
 export function GhostPageView({ slug }: { slug: string }) {
   const { data, isHydrated, editMode, l, updateGhostPage, removeGhostPage, showToast } = usePortfolio();
@@ -138,6 +139,9 @@ export function GhostPageView({ slug }: { slug: string }) {
             {page.title.trim() || "Sans titre"}
           </h1>
           <RichHtml html={l(page.body)} className="ghost-reading mt-8 text-lg leading-8 text-zinc-100" />
+          <div className="mt-14">
+            <ContactButton />
+          </div>
         </article>
       )}
     </GhostShell>
