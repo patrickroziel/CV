@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 
 export default function ProjetsPage() {
   const { data, addProject, updateProject, editMode, l } = usePortfolio();
-  const { shouldRender, showHiddenBadge, publicVisible } =
+  const { showHiddenBadge, publicVisible } =
     useSectionVisible("gallery");
   const [tag, setTag] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -41,22 +41,6 @@ export default function ProjetsPage() {
     if (!tag) return data.projects;
     return data.projects.filter((p) => p.tags.includes(tag));
   }, [data.projects, tag]);
-
-  if (!shouldRender) {
-    return (
-      <main className="no-print relative z-10 pb-16 pt-28 sm:pt-32">
-        <div className="mx-auto max-w-lg px-4 text-center">
-          <p className="text-zinc-400">Cette page n’est pas disponible.</p>
-          <Link
-            href="/"
-            className="mt-4 inline-flex text-sm text-teal-300 hover:underline"
-          >
-            Retour à l’accueil
-          </Link>
-        </div>
-      </main>
-    );
-  }
 
   const galleryLabel =
     l(data.nav?.gallery?.label).trim() || "Galerie";
@@ -124,7 +108,7 @@ export default function ProjetsPage() {
 
         {filtered.length === 0 ? (
           <p className="py-16 text-center text-zinc-400">
-            Aucun projet pour ce filtre.
+            Aucun projet pour le moment.
           </p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
