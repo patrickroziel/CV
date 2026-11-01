@@ -14,21 +14,21 @@ const items = [
     label: "Notes",
     hint: "Écrits, musiques et fragments",
     icon: Radio,
-    accent: "text-cyan-200",
+    accent: "text-cyan-200/90",
   },
   {
     href: "/air",
     label: "Air",
     hint: "Décryptages et observations",
     icon: Cloud,
-    accent: "text-teal-200",
+    accent: "text-teal-200/90",
   },
   {
     href: "/work",
     label: "Work",
     hint: "Portfolio & compétences",
     icon: Clapperboard,
-    accent: "text-amber-200",
+    accent: "text-amber-200/90",
   },
 ];
 
@@ -58,78 +58,65 @@ export function UniversesBanner() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="no-print pointer-events-none fixed inset-x-0 top-16 z-30 flex justify-center px-3 pt-2 sm:px-4"
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="no-print pointer-events-none fixed inset-x-0 top-16 z-30 flex justify-center px-3 pt-2.5 sm:px-5"
         >
           <div
             className={cn(
-              "pointer-events-auto relative flex max-w-3xl items-center gap-3 overflow-hidden rounded-2xl px-3.5 py-2 shadow-2xl",
-              "border border-white/12",
-              "bg-[#031014]/55 backdrop-blur-2xl supports-[backdrop-filter]:bg-[#031014]/40",
-              "sm:gap-4 sm:px-4 sm:py-2.5"
+              "pointer-events-auto relative flex max-w-2xl items-center overflow-hidden rounded-full",
+              "border border-white/[0.08] bg-[#020c10]/50 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.6)]",
+              "backdrop-blur-2xl supports-[backdrop-filter]:bg-[#020c10]/40",
+              "px-1.5 py-1 sm:px-2 sm:py-1.5"
             )}
           >
-            {/* Filet doré discret — esprit pages fantômes */}
+            {/* Filet doré ultra-fin */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-6 top-0 h-px"
+              className="pointer-events-none absolute inset-x-8 top-0 h-px"
               style={{
                 background:
-                  "linear-gradient(90deg, transparent 0%, rgba(214,186,140,0.15) 15%, rgba(231,211,174,0.75) 50%, rgba(214,186,140,0.15) 85%, transparent 100%)",
-                boxShadow: "0 0 8px rgba(214,186,140,0.25)",
-              }}
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-10 bottom-0 h-px opacity-60"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent 0%, rgba(214,186,140,0.2) 30%, rgba(231,211,174,0.45) 50%, rgba(214,186,140,0.2) 70%, transparent 100%)",
+                  "linear-gradient(90deg, transparent 0%, rgba(214,186,140,0.1) 20%, rgba(231,211,174,0.55) 50%, rgba(214,186,140,0.1) 80%, transparent 100%)",
               }}
             />
 
-            {/* Subtle animated sheen */}
+            {/* Sheen très discret */}
             <motion.div
               aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-30"
+              className="pointer-events-none absolute inset-0 opacity-20"
               style={{
                 background:
-                  "linear-gradient(105deg, transparent 30%, rgba(255,248,236,0.06) 48%, rgba(214,186,140,0.1) 52%, transparent 70%)",
+                  "linear-gradient(100deg, transparent 35%, rgba(255,248,236,0.05) 50%, transparent 65%)",
               }}
-              animate={{ x: ["-120%", "120%"] }}
+              animate={{ x: ["-100%", "100%"] }}
               transition={{
-                duration: 8,
+                duration: 9,
                 repeat: Infinity,
                 ease: "linear",
-                repeatDelay: 5,
+                repeatDelay: 6,
               }}
             />
 
-            <p className="relative hidden text-[11px] font-medium tracking-wide text-zinc-400 sm:block">
-              Trois univers
-            </p>
-
-            <div className="relative flex min-w-0 flex-1 items-center justify-center gap-1 sm:gap-2">
+            <div className="relative flex min-w-0 flex-1 items-center justify-center gap-0.5 sm:gap-1">
               {items.map((item, i) => {
                 const Icon = item.icon;
                 return (
-                  <span key={item.href} className="flex items-center gap-1 sm:gap-2">
+                  <span key={item.href} className="flex items-center">
                     {i > 0 && (
-                      <span className="text-zinc-600 text-[10px] sm:text-xs">·</span>
+                      <span className="mx-1 h-3 w-px bg-white/10 sm:mx-1.5" aria-hidden />
                     )}
                     <Link
                       href={item.href}
                       title={item.hint}
-                      className="group flex items-center gap-1.5 rounded-full px-2 py-1 transition hover:bg-white/8"
+                      className="group flex items-center gap-2 rounded-full px-2.5 py-1.5 transition-all duration-200 hover:bg-white/[0.06] sm:px-3"
                     >
-                      <Icon className={cn("h-3.5 w-3.5 shrink-0", item.accent)} />
-                      <span className="text-xs font-medium text-zinc-100 sm:text-[13px]">
+                      <Icon className={cn("h-3.5 w-3.5 shrink-0 opacity-80", item.accent)} />
+                      <span className="text-[12px] font-medium tracking-tight text-zinc-100 sm:text-[13px]">
                         {item.label}
                       </span>
-                      <span className="hidden text-[11px] text-zinc-500 group-hover:text-zinc-300 lg:inline">
+                      <span className="hidden max-w-[140px] truncate text-[11px] font-normal tracking-tight text-zinc-500/90 transition group-hover:text-zinc-300 xl:inline">
                         {item.hint}
                       </span>
                     </Link>
@@ -142,9 +129,9 @@ export function UniversesBanner() {
               type="button"
               onClick={dismiss}
               aria-label="Fermer la bannière"
-              className="relative ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-zinc-500 transition hover:bg-white/10 hover:text-zinc-200"
+              className="relative ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-zinc-500/80 transition hover:bg-white/8 hover:text-zinc-300"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-3 w-3" />
             </button>
           </div>
         </motion.div>
