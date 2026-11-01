@@ -13,6 +13,7 @@ import {
   DEFAULT_SOCIAL_POSTS,
 } from "./types";
 import snapshot from "./default-snapshot.json";
+import { normalizeGhostPages } from "./ghost-pages";
 
 /**
  * Production defaults = full portfolio snapshot (Cloudinary media, languages,
@@ -104,6 +105,7 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
   socialPosts: Array.isArray((snap as { socialPosts?: unknown }).socialPosts)
     ? structuredClone((snap as { socialPosts: typeof DEFAULT_SOCIAL_POSTS }).socialPosts)
     : DEFAULT_SOCIAL_POSTS.map((p) => ({ ...p })),
+  ghostPages: normalizeGhostPages((snap as { ghostPages?: unknown }).ghostPages),
   contact: {
     ...DEFAULT_CONTACT,
     ...snap.contact,

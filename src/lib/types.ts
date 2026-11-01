@@ -784,6 +784,16 @@ export const DEFAULT_SOCIAL: SocialConfig = {
 
 export const DEFAULT_SOCIAL_POSTS: SocialPost[] = [];
 
+/** Standalone page, absent from the site menu. Shared by its own link. */
+export type GhostPage = {
+  id: string;
+  slug: string;
+  title: string;
+  body: Translatable;
+  visible: boolean;
+  updatedAt: string;
+};
+
 export const DEFAULT_HERO_GLASS: HeroGlassConfig = {
   backVideos: [],
   front: {
@@ -847,6 +857,8 @@ export type PortfolioData = {
    */
   social: SocialConfig;
   socialPosts: SocialPost[];
+  /** Pages hors menu, destinées à être liées depuis les articles. */
+  ghostPages: GhostPage[];
   version: number;
 };
 

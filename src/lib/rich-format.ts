@@ -6,6 +6,7 @@
 
 import { restoreSelection, saveSelection } from "@/lib/rich-editor";
 import { hostLabel, safeHref, safeImageSrc } from "@/lib/safe-href";
+import { ghostSlugFromHref } from "@/lib/ghost-href";
 
 const BLOCK_TAGS = new Set([
   "P",
@@ -205,7 +206,7 @@ export function applyRichFormat(
     const href = safeHref(data.url || "");
     if (!href || !/^https?:\/\//i.test(href)) return false;
     const card = document.createElement("blockquote");
-    card.className = "rich-link-card";
+    card.className = ghostSlugFromHref(href) ? "rich-link-card ghost-link-card" : "rich-link-card";
     card.setAttribute("contenteditable", "false");
     const created = document.createElement("a");
     decorateAnchor(created, href);

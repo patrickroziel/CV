@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { normalizeGhostPages } from "@/lib/ghost-pages";
 import type { PortfolioData } from "@/lib/types";
 
 type Snapshot = { data: PortfolioData | null; revision: number };
@@ -46,5 +47,9 @@ export async function writePortfolio(data: PortfolioData, expectedRevision: numb
   return rows.length ? Number(rows[0].revision) : null;
 }
 export function publicPortfolio(data: PortfolioData): PortfolioData {
-  return { ...data, socialPosts: (data.socialPosts ?? []).filter((post) => post.visible !== false) };
+  return {
+    ...data,
+    socialPosts: (data.socialPosts ?? []).filter((post) => post.visible !== false),
+    ghostPages: normalizeGhostPages(data.ghostPages).filter((page) => page.visible),
+  };
 }

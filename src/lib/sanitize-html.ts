@@ -62,6 +62,7 @@ export function sanitizeBioHtml(
     "rich-link-card-host",
     "rich-link-card-title",
     "rich-link-card-desc",
+    "ghost-link-card",
   ]);
   // Never font-family. Color/size only for manual editor commits.
   // line-height only when not paste (wrapper + editor) — Word line-heights stripped on paste.

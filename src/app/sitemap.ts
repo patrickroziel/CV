@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { listPublicPosts, NOTES_ORIGIN } from "@/lib/server/notes-sharing";
+import { listPublicGhosts } from "@/lib/server/ghost-pages";
 
 export const runtime = "nodejs";
 export const revalidate = 300;
@@ -12,6 +13,7 @@ function lastModified(date: string | undefined) {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await listPublicPosts();
+  const ghosts = await listPublicGhosts();
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${NOTES_ORIGIN}/`, changeFrequency: "daily", priority: 1 },
     { url: `${NOTES_ORIGIN}/air`, changeFrequency: "daily", priority: 0.9 },
@@ -29,5 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  return [...staticPages, ...articles];
+  const ghostPages: MetadataRoute.Sitemap = ghosts.map((page) => ({
+    url: `${NOTES_ORIGIN}/g/${page.slug}`,
+    lastModified: lastModified(page.updatedAt),
+    changeFrequency: "weekly",
+    priority: 0.4,
+  }));
+
+  return [...staticPages, ...articles, ...ghostPages];
 }

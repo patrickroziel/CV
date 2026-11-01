@@ -22,20 +22,32 @@ import { universeFromPath } from "@/lib/universe";
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const { data, editMode, editAllowed } = usePortfolio();
   const pathname = usePathname();
+  const isGhost = Boolean(pathname?.startsWith("/g/"));
   const universe = universeFromPath(pathname);
   const enabled = (data.comingSoon ?? DEFAULT_COMING_SOON).enabled;
-  const publicComingSoon = !editMode && !editAllowed && enabled;
+  const publicComingSoon = !editMode && !editAllowed && enabled && !isGhost;
 
   useEffect(() => {
     const root = document.documentElement;
-    root.dataset.universe = publicComingSoon ? "coming-soon" : universe;
+    root.dataset.universe = publicComingSoon ? "coming-soon" : isGhost ? "ghost" : universe;
     return () => {
       delete root.dataset.universe;
     };
-  }, [universe, publicComingSoon]);
+  }, [universe, publicComingSoon, isGhost]);
 
   // The private sign-in stays available if the public site is paused.
   if (pathname.startsWith("/behind-the-glass/")) return <>{children}</>;
+
+  if (isGhost) {
+    return editMode ? (
+      <>
+        <Header />
+        <div className="relative z-10">{children}</div>
+      </>
+    ) : (
+      <div className="relative z-10">{children}</div>
+    );
+  }
 
   if (publicComingSoon) {
     return (

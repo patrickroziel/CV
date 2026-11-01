@@ -36,6 +36,7 @@ import type {
   SocialPostFileKind,
   Translatable,
 } from "./types";
+import { normalizeGhostPages } from "./ghost-pages";
 import {
   DATA_VERSION,
   DEFAULT_ALPHA_VIDEO_OPACITY,
@@ -1334,6 +1335,9 @@ export function loadPortfolio(): PortfolioData {
       ),
       socialPosts: normalizeSocialPosts(
         (parsed as { socialPosts?: unknown }).socialPosts
+      ),
+      ghostPages: normalizeGhostPages(
+        (parsed as { ghostPages?: unknown }).ghostPages
       ),
     };
 

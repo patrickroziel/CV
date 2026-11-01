@@ -1,6 +1,9 @@
 import { lookup } from "node:dns/promises";
 import { NextRequest, NextResponse } from "next/server";
 import { hostLabel, safeHref, safeImageSrc } from "@/lib/safe-href";
+import { ghostSlugFromHref } from "@/lib/ghost-href";
+import { getPublicGhost, ghostShareText } from "@/lib/server/ghost-pages";
+import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -108,6 +111,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Adresse invalide" }, { status: 400 });
   }
   try {
+    const ghostSlug = ghostSlugFromHref(href);
+    if (ghostSlug) {
+      const page = await getPublicGhost(ghostSlug);
+      if (!page) return NextResponse.json({ error: "Page non publiée" }, { status: 422 });
+      const share = ghostShareText(page);
+      return NextResponse.json({
+        url: `${NOTES_ORIGIN}/g/${page.slug}`,
+        host: "Patrick Roziel",
+        title: share.title.slice(0, 180),
+        description: share.description.slice(0, 240),
+        image: "",
+      }, {
+        headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600" },
+      });
+    }
     const page = await fetchHtml(new URL(href));
     if (!page) return NextResponse.json({ error: "Page inaccessible" }, { status: 422 });
     const title = metaContent(page.html, "og:title")

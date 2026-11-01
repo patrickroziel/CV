@@ -10,6 +10,7 @@ import { WallpaperEditor } from "@/components/background/WallpaperEditor";
 import { UniverseSwitch, useUniverse } from "@/components/layout/UniverseSwitch";
 import { downloadPortfolioSnapshot } from "@/lib/storage";
 import { SiteTranslator } from "@/components/translation/SiteTranslator";
+import { GhostPagesButton } from "@/components/ghost/GhostPagesButton";
 
 export function Header() {
   const { editMode, setEditMode, editAllowed, cloudStatus, data, showToast } = usePortfolio();
@@ -61,6 +62,7 @@ export function Header() {
               <FileDown className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Exporter</span>
             </Button>
+            <GhostPagesButton />
           </EditGate>
 
           {editAllowed && (

@@ -16,6 +16,7 @@ import type {
   Education,
   Experience,
   FeatureVideo,
+  GhostPage,
   HeroGlassConfig,
   Language,
   Locale,
@@ -41,6 +42,7 @@ import {
   savePortfolio,
 } from "@/lib/storage";
 import { createId } from "@/lib/utils";
+import { normalizeGhostPages } from "@/lib/ghost-pages";
 import { isEditEnvironment } from "@/lib/edit-env";
 
 import { t as translate } from "@/i18n";
@@ -115,6 +117,9 @@ type PortfolioContextValue = {
   updateSocialPost: (id: string, partial: Partial<SocialPost>) => void;
   removeSocialPost: (id: string) => void;
   reorderSocialPosts: (orderedIds: string[]) => void;
+  addGhostPage: (page: GhostPage) => void;
+  updateGhostPage: (id: string, partial: Partial<GhostPage>, toastMsg?: string) => void;
+  removeGhostPage: (id: string) => void;
   resetToDefaults: () => void;
 };
 
@@ -159,7 +164,10 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           cloudSync.current.revision = result.revision;
           cloudSync.current.saved = JSON.stringify(result.data);
           cloudSync.current.blocked = false;
-          setData(result.data);
+          setData({
+            ...result.data,
+            ghostPages: normalizeGhostPages(result.data.ghostPages),
+          });
           // Don't permit cloud edits until the first explicit JSON import.
           // Otherwise a newly opened admin page could persist an incomplete snapshot.
           setCloudMode(result.revision > 0);
@@ -183,7 +191,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
         } catch { /* Snapshot remains available. */ }
       }
       if (cancelled) return;
-      setData(initial);
+      setData({ ...initial, ghostPages: normalizeGhostPages(initial.ghostPages) });
       setEditAllowed(local);
       setEditModeRaw(false);
       document.documentElement.lang = "fr";
@@ -787,6 +795,38 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     [persist]
   );
 
+  const addGhostPage = useCallback(
+    (page: GhostPage) => {
+      persist((prev) => ({
+        ...prev,
+        ghostPages: [page, ...(prev.ghostPages ?? []).filter((item) => item.id !== page.id && item.slug !== page.slug)],
+      }), "Page fantôme créée");
+    },
+    [persist]
+  );
+
+  const updateGhostPage = useCallback(
+    (id: string, partial: Partial<GhostPage>, toastMsg?: string) => {
+      persist((prev) => ({
+        ...prev,
+        ghostPages: (prev.ghostPages ?? []).map((page) =>
+          page.id === id ? { ...page, ...partial, updatedAt: new Date().toISOString() } : page
+        ),
+      }), toastMsg);
+    },
+    [persist]
+  );
+
+  const removeGhostPage = useCallback(
+    (id: string) => {
+      persist((prev) => ({
+        ...prev,
+        ghostPages: (prev.ghostPages ?? []).filter((page) => page.id !== id),
+      }), "Page fantôme supprimée");
+    },
+    [persist]
+  );
+
   const reorderSocialPosts = useCallback(
     (orderedIds: string[]) => {
       persist((prev) => {
@@ -862,6 +902,9 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       updateSocialPost,
       removeSocialPost,
       reorderSocialPosts,
+      addGhostPage,
+      updateGhostPage,
+      removeGhostPage,
       resetToDefaults,
     }),
     [
@@ -911,6 +954,9 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       updateSocialPost,
       removeSocialPost,
       reorderSocialPosts,
+      addGhostPage,
+      updateGhostPage,
+      removeGhostPage,
       resetToDefaults,
     ]
   );
