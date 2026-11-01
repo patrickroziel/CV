@@ -17,7 +17,6 @@ export function Footer() {
     { href: "/air", label: "Air" },
     { href: "/notes", label: "Notes" },
     { href: "/work", label: "Work" },
-    { href: "/projets", label: "Projets" },
   ];
 
   return (
@@ -40,9 +39,6 @@ export function Footer() {
               {link.label}
             </Link>
           ))}
-          <Link href="/plan-du-site" className="transition hover:text-teal-300">
-            Plan du site
-          </Link>
         </nav>
 
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
