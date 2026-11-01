@@ -21,7 +21,7 @@ export function SiteJsonLd() {
         url: NOTES_ORIGIN,
         name: "Patrick Roziel",
         description:
-          "Notes, Air et Work de Patrick Roziel : écrits, décryptages et portfolio de montage vidéo.",
+          "Notes, Air et Work de Patrick Roziel : écrits, décryptages et portfolio de montage vidéo et motion design.",
         inLanguage: "fr-FR",
         publisher: { "@id": `${NOTES_ORIGIN}/#person` },
       },
@@ -30,9 +30,9 @@ export function SiteJsonLd() {
         "@id": `${NOTES_ORIGIN}/#person`,
         name: "Patrick Roziel",
         url: NOTES_ORIGIN,
-        jobTitle: "Monteur vidéo, motion designer et créateur de contenus",
+        jobTitle: "Monteur vidéo, motion designer et créateur de contenus digitaux",
         description:
-          "Je crée et monte des contenus pour le web, les réseaux sociaux et la communication.",
+          "Je crée et monte des contenus pour le web, les réseaux sociaux et la communication. Basé à La Courneuve (93).",
         image: "https://res.cloudinary.com/ptp8diwd/image/upload/v1784742778/ih9243zrqradcoauy6vi.png",
         email: "patrickroziel@gmail.com",
         address: {
@@ -42,11 +42,20 @@ export function SiteJsonLd() {
           addressCountry: "FR",
         },
         knowsLanguage: ["fr", "en", "pl", "es"],
+        knowsAbout: [
+          "Montage vidéo",
+          "Motion design",
+          "Contenus digitaux",
+          "Premiere Pro",
+          "After Effects",
+          "Communication visuelle",
+        ],
         sameAs: [
           "https://x.com/patwithnoE",
           "https://www.tiktok.com/@patwithnoe",
           "https://github.com/patrickroziel",
           "https://www.youtube.com/watch?v=iPLN2ODs0jE",
+          "https://ko-fi.com/patrickroziel",
         ],
       },
     ],

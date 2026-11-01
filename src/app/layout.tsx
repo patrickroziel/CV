@@ -22,11 +22,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(NOTES_ORIGIN),
   title: {
-    default: "Patrick Roziel — Monteur vidéo, Notes et Air",
-    template: "%s",
+    default: "Patrick Roziel — Monteur vidéo, Motion Design & Notes",
+    template: "%s | Patrick Roziel",
   },
   description:
-    "Patrick Roziel, monteur vidéo et créateur de contenus à La Courneuve. Notes, décryptages Air, et portfolio Work : motion design, expériences et showreel.",
+    "Patrick Roziel, monteur vidéo et motion designer à La Courneuve (93). Notes, décryptages Air, portfolio Work et projets : montage, motion design, showreel.",
+  keywords: ["monteur vidéo", "motion design", "montage vidéo", "Patrick Roziel", "La Courneuve", "portfolio", "contenus digitaux"],
   applicationName: "Patrick Roziel",
   authors: [{ name: "Patrick Roziel", url: NOTES_ORIGIN }],
   creator: "Patrick Roziel",
@@ -40,10 +41,19 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     siteName: "Patrick Roziel",
     url: NOTES_ORIGIN,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Patrick Roziel — Notes, Air et Work",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     creator: "@patwithnoE",
+    images: ["/twitter-image"],
   },
 };
 
