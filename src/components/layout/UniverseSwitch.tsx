@@ -17,7 +17,7 @@ export function UniverseSwitch({ className }: { className?: string }) {
     className,
   )}>
     {([
-      { href: "/", label: "Notes", key: "medias" as const, icon: Radio, hint: "Écrits, images et musiques" },
+      { href: "/notes", label: "Notes", key: "medias" as const, icon: Radio, hint: "Écrits, images et musiques" },
       { href: "/air", label: "Air", key: "air" as const, icon: Cloud, hint: "Décryptages, expériences et observations" },
       { href: "/work", label: "Work", key: "portfolio" as const, icon: Clapperboard, hint: "Portfolio, CV et compétences" },
     ]).map(({ href, label, key, icon: Icon, hint }) =>

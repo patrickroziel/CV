@@ -4,7 +4,7 @@ import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
 const title = "Plan du site — Patrick Roziel";
 const description =
-  "Plan du site de Patrick Roziel : Notes, Air, Work, Projets et pages principales.";
+  "Plan du site de Patrick Roziel : Air, Notes, Work, Projets et pages principales.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -17,8 +17,8 @@ const sections = [
   {
     title: "Principales sections",
     links: [
-      { href: "/", label: "Accueil — Notes" },
-      { href: "/air", label: "Air — Décryptages et observations" },
+      { href: "/air", label: "Air — Décryptages et observations (page d’accueil)" },
+      { href: "/notes", label: "Notes — Réflexions et créations" },
       { href: "/work", label: "Work — Portfolio monteur vidéo" },
       { href: "/projets", label: "Projets — Galerie de réalisations" },
     ],

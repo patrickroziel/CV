@@ -13,8 +13,8 @@ export function Footer() {
     data.profile.name.replace(/<[^>]+>/g, "").trim() || data.profile.name;
 
   const links = [
-    { href: "/", label: "Notes" },
     { href: "/air", label: "Air" },
+    { href: "/notes", label: "Notes" },
     { href: "/work", label: "Work" },
     { href: "/projets", label: "Projets" },
   ];
