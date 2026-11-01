@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(NOTES_ORIGIN),
   title: {
     default: "Patrick Roziel — Monteur vidéo, Motion Design & Notes",
-    template: "%s | Patrick Roziel",
+    template: "%s",
   },
   description:
     "Patrick Roziel, monteur vidéo et motion designer à La Courneuve (93). Notes, décryptages Air, portfolio Work et projets : montage, motion design, showreel.",
