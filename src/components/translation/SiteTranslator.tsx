@@ -242,7 +242,7 @@ async function translateBatches({
   return firstError;
 }
 
-export function SiteTranslator({ className }: { className?: string }) {
+export function SiteTranslator({ className, tone = "site" }: { className?: string; tone?: "site" | "ghost" }) {
   const pathname = usePathname();
   const [languageCode, setLanguageCode] = useState(DEFAULT_SITE_LANGUAGE);
   const [busy, setBusy] = useState(false);
@@ -404,13 +404,24 @@ export function SiteTranslator({ className }: { className?: string }) {
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="translation-trigger glass-chip inline-flex h-9 max-w-[10.5rem] items-center gap-2 rounded-2xl px-2.5 text-xs font-medium text-zinc-100 transition-colors hover:bg-white/[0.09] sm:max-w-none sm:px-3"
-            aria-label={`Langue du site : ${language.label}`}
-            title="Traduire le site"
+            className={cn(
+              "translation-trigger inline-flex items-center gap-2 text-zinc-100 transition-colors",
+              tone === "ghost"
+                ? "ghost-tone h-10 rounded-full px-3.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f6efe4]"
+                : "glass-chip h-9 max-w-[10.5rem] rounded-2xl px-2.5 text-xs font-medium hover:bg-white/[0.09] sm:max-w-none sm:px-3"
+            )}
+            aria-label={`Langue : ${language.label}. Traduction automatique Google`}
+            title="Traduction automatique Google"
           >
-            {busy ? <LoaderCircle className="h-3.5 w-3.5 animate-spin text-cyan-200" /> : <Languages className="h-3.5 w-3.5 text-cyan-200" />}
+            {busy ? (
+              <LoaderCircle className={cn("h-3.5 w-3.5 animate-spin", tone === "ghost" ? "text-[#e7d3ae]" : "text-cyan-200")} />
+            ) : (
+              <Languages className={cn("h-3.5 w-3.5", tone === "ghost" ? "text-[#e7d3ae]" : "text-cyan-200")} />
+            )}
             <span aria-hidden className="text-sm leading-none">{language.flag}</span>
-            <span className="hidden max-w-[8rem] truncate sm:inline">{language.nativeLabel}</span>
+            <span className={cn("max-w-[8rem] truncate", tone === "ghost" ? "inline" : "hidden sm:inline")}>
+              {tone === "ghost" ? (languageCode === "fr" ? "Traduire" : language.nativeLabel) : language.nativeLabel}
+            </span>
           </button>
         </DropdownMenuTrigger>
 
@@ -419,10 +430,17 @@ export function SiteTranslator({ className }: { className?: string }) {
           sideOffset={9}
           data-no-translate="true"
           translate="no"
-          className="translation-menu max-h-[72vh] w-[min(92vw,20rem)] overflow-y-auto border-cyan-100/15 bg-[#031014]/94 p-1.5 shadow-2xl"
+          className={cn(
+            "translation-menu max-h-[72vh] w-[min(92vw,20rem)] overflow-y-auto p-1.5 shadow-2xl",
+            tone === "ghost"
+              ? "ghost-tone border-[#d6ba8c]/30 bg-[#07080e]/95"
+              : "border-cyan-100/15 bg-[#031014]/94"
+          )}
         >
           <div className="px-2.5 pb-2 pt-1.5">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-100/45">Traduire le site</div>
+            <div className={cn("text-[10px] font-semibold uppercase tracking-[0.2em]", tone === "ghost" ? "text-[#e7d3ae]/70" : "text-cyan-100/45")}>
+              {tone === "ghost" ? "Traduire cette page" : "Traduire le site"}
+            </div>
             <div className="mt-1 text-[11px] text-zinc-400">Traduction automatique · Google</div>
           </div>
           {SITE_LANGUAGES.map((item) => {
@@ -432,8 +450,9 @@ export function SiteTranslator({ className }: { className?: string }) {
                 key={item.code}
                 onSelect={() => chooseLanguage(item.code)}
                 className={cn(
-                  "min-h-10 cursor-pointer justify-between px-2.5 py-2 focus:bg-cyan-100/[0.08]",
-                  active && "bg-cyan-100/[0.09] text-cyan-50"
+                  "min-h-10 cursor-pointer justify-between px-2.5 py-2",
+                  tone === "ghost" ? "focus:bg-[#e7d3ae]/10" : "focus:bg-cyan-100/[0.08]",
+                  active && (tone === "ghost" ? "bg-[#e7d3ae]/12 text-[#f6efe4]" : "bg-cyan-100/[0.09] text-cyan-50")
                 )}
               >
                 <span className="flex min-w-0 items-center gap-2.5">
@@ -445,7 +464,7 @@ export function SiteTranslator({ className }: { className?: string }) {
                     )}
                   </span>
                 </span>
-                {active && <Check className="h-3.5 w-3.5 shrink-0 text-cyan-200" />}
+                {active && <Check className={cn("h-3.5 w-3.5 shrink-0", tone === "ghost" ? "text-[#e7d3ae]" : "text-cyan-200")} />}
               </DropdownMenuItem>
             );
           })}

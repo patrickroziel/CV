@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
 import { RichHtml } from "@/components/shared/RichHtml";
+import { SiteTranslator } from "@/components/translation/SiteTranslator";
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { isGhostSlug, slugifyGhost } from "@/lib/ghost-pages";
@@ -129,6 +130,9 @@ export function GhostPageView({ slug }: { slug: string }) {
         </div>
       ) : (
         <article>
+          <div className="ghost-translate">
+            <SiteTranslator tone="ghost" />
+          </div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100/75">Patrick Roziel</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-6xl">
             {page.title.trim() || "Sans titre"}
