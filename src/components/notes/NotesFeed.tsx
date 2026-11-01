@@ -3,7 +3,7 @@
 import { useMemo, useState, Fragment } from "react";
 import Link from "next/link";
 import { BookOpen, Music, PenLine, Plus } from "lucide-react";
-import { NotesIntroduction } from "@/components/notes/NotesIntroduction";
+import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { KofiCard } from "@/components/support/KofiCard";
 import { PostTagList } from "@/components/medias/PostTagList";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
@@ -22,7 +22,6 @@ import type { SocialPost } from "@/lib/types";
 import { NOTES_CATEGORIES, coercePostCategory, collectPostTags, type NotesCategory } from "@/lib/post-taxonomy";
 
 type Scope = "Tout" | NotesCategory;
-
 
 const FILTERS: Array<{ id: Scope; icon?: typeof BookOpen }> = [
   { id: "Tout" },
@@ -200,7 +199,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               );
             })}
           </nav>
-          <NotesIntroduction />
+          <UniversesWidget current="notes" />
           <KofiCard className="mt-3" />
         </div>
         <PostTagList

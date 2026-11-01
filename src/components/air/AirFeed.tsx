@@ -10,6 +10,7 @@ import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import { KofiCard } from "@/components/support/KofiCard";
 import { PostTagList } from "@/components/medias/PostTagList";
+import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { AIR_CATEGORIES, coercePostCategory, collectPostTags, type AirCategory } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
@@ -82,6 +83,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
         <p className="mt-3 text-sm leading-6 text-white/90">Regarder les choses en face. Les comprendre. Les formuler.</p>
         <p className="mt-3 text-xs leading-5 text-white/75">Un espace de réflexion et de transmission autour de la communication, des institutions et des expériences qui poussent à questionner ce qui semble aller de soi.</p>
       </div>
+      <UniversesWidget current="air" />
       <KofiCard className="mt-3" />
     </div>
     <PostTagList
