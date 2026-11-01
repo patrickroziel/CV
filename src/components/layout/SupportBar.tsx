@@ -1,5 +1,7 @@
 "use client";
 
+import { track } from "@vercel/analytics";
+
 const KOFI_URL = "https://ko-fi.com/patrickroziel";
 
 export function SupportBar() {
@@ -8,6 +10,7 @@ export function SupportBar() {
       href={KOFI_URL}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => track("kofi_click")}
       className="support-bar no-print group"
       aria-label="Soutenir mon travail sur Ko-fi"
     >

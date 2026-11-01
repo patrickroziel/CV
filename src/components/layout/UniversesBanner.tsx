@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cloud, Clapperboard, Radio, X } from "lucide-react";
+import { track } from "@vercel/analytics";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "universes-banner-dismissed";
@@ -12,21 +13,21 @@ const items = [
   {
     href: "/notes",
     label: "Notes",
-    hint: "Écrits, musiques et fragments",
+    hint: "écrits",
     icon: Radio,
     accent: "text-cyan-200/90",
   },
   {
     href: "/air",
     label: "Air",
-    hint: "Décryptages et observations",
+    hint: "décryptages",
     icon: Cloud,
     accent: "text-teal-200/90",
   },
   {
     href: "/work",
     label: "Work",
-    hint: "Portfolio & compétences",
+    hint: "portfolio",
     icon: Clapperboard,
     accent: "text-amber-200/90",
   },
@@ -52,6 +53,10 @@ export function UniversesBanner() {
     } catch {
       /* ignore */
     }
+  }
+
+  function trackClick(label: string) {
+    track("banner_universe_click", { universe: label });
   }
 
   return (
@@ -110,13 +115,14 @@ export function UniversesBanner() {
                     <Link
                       href={item.href}
                       title={item.hint}
+                      onClick={() => trackClick(item.label)}
                       className="group flex items-center gap-2 rounded-full px-2.5 py-1.5 transition-all duration-200 hover:bg-white/[0.06] sm:px-3"
                     >
                       <Icon className={cn("h-3.5 w-3.5 shrink-0 opacity-80", item.accent)} />
                       <span className="text-[12px] font-medium tracking-tight text-zinc-100 sm:text-[13px]">
                         {item.label}
                       </span>
-                      <span className="hidden max-w-[140px] truncate text-[11px] font-normal tracking-tight text-zinc-500/90 transition group-hover:text-zinc-300 xl:inline">
+                      <span className="hidden text-[11px] font-normal tracking-tight text-zinc-500/90 transition group-hover:text-zinc-300 xl:inline">
                         {item.hint}
                       </span>
                     </Link>
