@@ -9,6 +9,7 @@ import {
   NOTES_ORIGIN,
   titleForSearch,
 } from "@/lib/server/notes-sharing";
+import { openGraphLocale, requestedShareLanguage, shareImageUrl, translateShareText } from "@/lib/server/share-locale";
 
 // Published content lives in Neon and can change without a code deployment.
 export const runtime = "nodejs";
@@ -16,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 type NoteParams = {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ share?: string | string[] }>;
+  searchParams?: Promise<{ share?: string | string[]; lang?: string | string[] }>;
 };
 
 export async function generateMetadata({ params, searchParams }: NoteParams): Promise<Metadata> {
@@ -32,34 +33,45 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
     };
   }
 
-  const { title, description } = getNoteShareText(post);
+  const french = getNoteShareText(post);
   const url = `${NOTES_ORIGIN}/notes/${encodeURIComponent(id)}`;
-  // Give X a distinct URL for each voluntary share so it can re-fetch stale
-  // preview data. Keep the page's SEO canonical on the clean, stable URL.
+  // Give X and Facebook a distinct URL for each voluntary share so they can
+  // re-fetch stale preview data. Keep the page's SEO canonical on the clean URL.
   const query = await searchParams;
   const share = typeof query?.share === "string" && /^[a-z0-9]{8,24}$/.test(query.share)
     ? query.share
     : null;
-  const shareUrl = share ? `${url}?share=${share}` : url;
-  const image = getNoteSharePhoto(post) ??
-    `${NOTES_ORIGIN}/api/notes/${encodeURIComponent(id)}/share-image`;
+  const lang = requestedShareLanguage(query?.lang);
+  const { title, description } = await translateShareText(french.title, french.description, lang);
+  const preview = new URL(url);
+  if (share) preview.searchParams.set("share", share);
+  if (lang) preview.searchParams.set("lang", lang);
+  const image = shareImageUrl(id, lang);
+  const imageType = getNoteSharePhoto(post) ? "image/jpeg" : "image/png";
 
   return {
     metadataBase: new URL(NOTES_ORIGIN),
     title: `${titleForSearch(title)} — Patrick Roziel`,
     description,
     alternates: { canonical: url },
-    robots: share
+    robots: share || lang
       ? { index: false, follow: true }
       : { index: true, follow: true },
     openGraph: {
       type: "article",
-      locale: "fr_FR",
+      locale: openGraphLocale(lang),
       siteName: "Patrick Roziel — Notes",
-      url: shareUrl,
+      url: preview.toString(),
       title,
       description,
-      images: [{ url: image, alt: `Aperçu de ${title}` }],
+      images: [{
+        url: image,
+        secureUrl: image,
+        width: 1200,
+        height: 630,
+        type: imageType,
+        alt: title,
+      }],
     },
     twitter: {
       card: "summary_large_image",

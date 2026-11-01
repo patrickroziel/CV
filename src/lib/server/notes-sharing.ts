@@ -7,6 +7,7 @@ import { stripHtml } from "@/lib/sanitize-html";
 import { readPortfolio } from "@/lib/server/portfolio-db";
 import type { SocialPost } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
+import { youtubeVideoId } from "@/lib/utils";
 
 export const NOTES_ORIGIN = "https://patrickroziel.com";
 
@@ -50,7 +51,13 @@ function validPublicImage(url: unknown): string | null {
   }
 }
 
-/** Prefer the actual cover, then the first photo supplied by the author. */
+function pushYoutubeThumb(options: unknown[], url: unknown) {
+  if (typeof url !== "string") return;
+  const id = youtubeVideoId(url);
+  if (id) options.push(`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`);
+}
+
+/** Prefer the actual cover, then the first photo, then a YouTube thumbnail. */
 export function getNoteSharePhoto(post: SocialPost): string | null {
   const options: unknown[] = [post.bookCoverUrl];
   if (post.featuredEmbed?.type === "image") options.push(post.featuredEmbed.url);
@@ -60,6 +67,11 @@ export function getNoteSharePhoto(post: SocialPost): string | null {
     if (item.type === "carousel") {
       options.push(...item.items.filter((media) => media.type === "image").map((media) => media.url));
     }
+  }
+  if (post.featuredEmbed?.type === "youtube") pushYoutubeThumb(options, post.featuredEmbed.url);
+  pushYoutubeThumb(options, post.youtubeUrl);
+  for (const item of post.inlineMedia ?? []) {
+    if (item.type === "youtube") pushYoutubeThumb(options, item.url);
   }
   for (const option of options) {
     const image = validPublicImage(option);

@@ -341,8 +341,11 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
   }, [translateTargets]);
 
   useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("lang");
     const saved = localStorage.getItem(SITE_LANGUAGE_STORAGE_KEY) || DEFAULT_SITE_LANGUAGE;
-    const initial = SITE_LANGUAGES.some((item) => item.code === saved) ? saved : DEFAULT_SITE_LANGUAGE;
+    const preferred = fromUrl && SITE_LANGUAGES.some((item) => item.code === fromUrl) ? fromUrl : saved;
+    const initial = SITE_LANGUAGES.some((item) => item.code === preferred) ? preferred : DEFAULT_SITE_LANGUAGE;
+    if (fromUrl && initial === fromUrl) localStorage.setItem(SITE_LANGUAGE_STORAGE_KEY, initial);
     languageRef.current = initial;
     setLanguageCode(initial);
     window.setTimeout(() => void translateCurrentPage(initial), 100);
