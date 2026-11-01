@@ -7,7 +7,7 @@ const description =
   "Plan du site de Patrick Roziel : Notes, Air, Work, Projets et pages principales.";
 
 export const metadata: Metadata = {
-  title,
+  title: { absolute: title },
   description,
   alternates: { canonical: `${NOTES_ORIGIN}/plan-du-site` },
   robots: { index: true, follow: true },
