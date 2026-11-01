@@ -30,7 +30,7 @@ export async function generateMetadata({
   return {
     title: `${titleForSearch(title)} — Air · Patrick Roziel`,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: lang ? preview.toString() : url },
     robots: share || lang ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       type: "article",

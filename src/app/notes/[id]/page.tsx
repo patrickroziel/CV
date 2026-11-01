@@ -53,7 +53,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
     metadataBase: new URL(NOTES_ORIGIN),
     title: `${titleForSearch(title)} — Patrick Roziel`,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: lang ? preview.toString() : url },
     robots: share || lang
       ? { index: false, follow: true }
       : { index: true, follow: true },
