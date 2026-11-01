@@ -66,25 +66,45 @@ export function UniversesBanner() {
         >
           <div
             className={cn(
-              "pointer-events-auto relative flex max-w-3xl items-center gap-3 overflow-hidden rounded-2xl border border-white/12 px-3.5 py-2 shadow-2xl",
+              "pointer-events-auto relative flex max-w-3xl items-center gap-3 overflow-hidden rounded-2xl px-3.5 py-2 shadow-2xl",
+              "border border-white/12",
               "bg-[#031014]/55 backdrop-blur-2xl supports-[backdrop-filter]:bg-[#031014]/40",
               "sm:gap-4 sm:px-4 sm:py-2.5"
             )}
           >
+            {/* Filet doré discret — esprit pages fantômes */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-6 top-0 h-px"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, rgba(214,186,140,0.15) 15%, rgba(231,211,174,0.75) 50%, rgba(214,186,140,0.15) 85%, transparent 100%)",
+                boxShadow: "0 0 8px rgba(214,186,140,0.25)",
+              }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-10 bottom-0 h-px opacity-60"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, rgba(214,186,140,0.2) 30%, rgba(231,211,174,0.45) 50%, rgba(214,186,140,0.2) 70%, transparent 100%)",
+              }}
+            />
+
             {/* Subtle animated sheen */}
             <motion.div
               aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-40"
+              className="pointer-events-none absolute inset-0 opacity-30"
               style={{
                 background:
-                  "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.08) 48%, rgba(142,240,234,0.12) 52%, transparent 70%)",
+                  "linear-gradient(105deg, transparent 30%, rgba(255,248,236,0.06) 48%, rgba(214,186,140,0.1) 52%, transparent 70%)",
               }}
               animate={{ x: ["-120%", "120%"] }}
               transition={{
-                duration: 7,
+                duration: 8,
                 repeat: Infinity,
                 ease: "linear",
-                repeatDelay: 4,
+                repeatDelay: 5,
               }}
             />
 
