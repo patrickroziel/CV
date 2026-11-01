@@ -6,6 +6,13 @@ const title = "Air — Décryptages & observations | Patrick Roziel";
 const description =
   "Air, le journal de Patrick Roziel : décryptages, expériences professionnelles et observations sur la communication, les institutions et le monde du travail en France.";
 
+const ogImage = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: "Patrick Roziel — Air",
+};
+
 export const metadata: Metadata = {
   title,
   description,
@@ -18,8 +25,14 @@ export const metadata: Metadata = {
     description,
     locale: "fr_FR",
     siteName: "Patrick Roziel",
+    images: [ogImage],
   },
-  twitter: { card: "summary_large_image", title, description },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/twitter-image"],
+  },
 };
 
 export const revalidate = 300;
