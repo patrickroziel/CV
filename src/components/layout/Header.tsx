@@ -62,8 +62,9 @@ export function Header() {
               <FileDown className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Exporter</span>
             </Button>
-            <GhostPagesButton />
           </EditGate>
+
+          {editAllowed && <GhostPagesButton />}
 
           {editAllowed && (
             <Button
