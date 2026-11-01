@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { AirFeed } from "@/components/air/AirFeed";
 import { listPublicPosts, NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
-const title = "Air — Décryptages et observations | Patrick Roziel";
+const title = "Air — Décryptages & observations | Patrick Roziel";
 const description =
-  "Air, le journal de Patrick Roziel : décryptages, expériences et observations sur la communication, les institutions et ce qui semble aller de soi.";
+  "Air, le journal de Patrick Roziel : décryptages, expériences professionnelles et observations sur la communication, les institutions et le monde du travail en France.";
 
 export const metadata: Metadata = {
   title,
   description,
+  keywords: ["décryptages", "observations", "Patrick Roziel", "communication", "institutions", "France"],
   alternates: { canonical: `${NOTES_ORIGIN}/air` },
   openGraph: {
     type: "website",

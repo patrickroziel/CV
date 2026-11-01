@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
-const title = "Patrick Roziel — Monteur vidéo, motion design et portfolio";
+const title = "Portfolio Monteur Vidéo & Motion Design — Patrick Roziel";
 const description =
-  "Portfolio de Patrick Roziel : montage vidéo, motion design et contenus digitaux. Expériences, compétences et showreel. La Courneuve (93).";
+  "Portfolio professionnel de Patrick Roziel : monteur vidéo, motion designer et créateur de contenus digitaux. Expériences, compétences, showreel. Basé à La Courneuve (93), Île-de-France.";
 
 export const metadata: Metadata = {
   title,
   description,
+  keywords: ["monteur vidéo", "motion design", "portfolio", "showreel", "montage vidéo", "Patrick Roziel", "La Courneuve"],
   alternates: { canonical: `${NOTES_ORIGIN}/work` },
   openGraph: {
     type: "profile",

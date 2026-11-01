@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { NotesFeed } from "@/components/notes/NotesFeed";
 import { listPublicPosts, NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
-const title = "Patrick Roziel — Notes, réflexions et créations";
+const title = "Patrick Roziel — Monteur vidéo, Notes & Créations";
 const description =
-  "Notes de Patrick Roziel : livre, réflexions, musiques et fragments de vie. Monteur vidéo et créateur de contenus à La Courneuve.";
+  "Patrick Roziel, monteur vidéo et motion designer à La Courneuve (93). Notes, réflexions, musiques et portfolio : montage, motion design et contenus digitaux.";
 
 export const metadata: Metadata = {
   title,
   description,
+  keywords: ["monteur vidéo", "motion design", "montage vidéo", "Patrick Roziel", "La Courneuve", "portfolio", "contenus digitaux"],
   alternates: { canonical: `${NOTES_ORIGIN}/` },
   openGraph: {
     type: "website",

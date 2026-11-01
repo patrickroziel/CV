@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
-const title = "Projets — Patrick Roziel";
+const title = "Projets de montage & motion design — Patrick Roziel";
 const description =
-  "Projets de Patrick Roziel : montage, motion design et contenus pour le web et la communication.";
+  "Galerie de projets de Patrick Roziel : montage vidéo, motion design, showreel, social media et réalisations pour le web et la communication. La Courneuve (93).";
 
 export const metadata: Metadata = {
   title,
   description,
+  keywords: ["projets", "montage vidéo", "motion design", "showreel", "portfolio", "Patrick Roziel"],
   alternates: { canonical: `${NOTES_ORIGIN}/projets` },
   openGraph: {
     type: "website",
