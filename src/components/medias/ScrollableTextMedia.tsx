@@ -28,7 +28,7 @@ export function ScrollableTextMedia({ title, body, format }: { title: string; bo
         role="region"
         tabIndex={0}
         aria-label={title ? `Lire le bloc de texte : ${title}` : "Lire le bloc de texte"}
-        className="max-h-80 min-w-0 overflow-y-auto overscroll-contain px-4 py-5 text-[14px] leading-7 text-zinc-100 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-200/70 sm:px-6 sm:text-[15px] [scrollbar-width:thin] [scrollbar-color:rgba(165,243,252,0.5)_transparent]"
+        className="scrollable-text-media__body max-h-80 min-w-0 overflow-y-auto overscroll-contain px-4 py-5 text-[14px] leading-7 text-zinc-100 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-200/70 sm:px-6 sm:text-[15px] [scrollbar-width:thin] [scrollbar-color:rgba(165,243,252,0.5)_transparent]"
         style={{ scrollbarGutter: "stable" }}
       >
         {format === "rich" ? (

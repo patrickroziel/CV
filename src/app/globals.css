@@ -1531,3 +1531,10 @@ blockquote.rich-link-card.ghost-link-card {
 }
 
 
+
+
+/* Embedded text blocks: keep their content white, including rich HTML inside Air articles. */
+.scrollable-text-media__body,
+.scrollable-text-media__body * {
+  color: #fff !important;
+}
