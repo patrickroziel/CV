@@ -2,6 +2,7 @@
  * Smart clipboard paste for portfolio edit fields.
  * Preserves structure (paragraphs, lists, bold/italic), accepts emojis,
  * and maps common broken / shortcode forms to usable Unicode emojis.
+ * Pasted text is forced to black while keeping its structure.
  */
 
 import type { ClipboardEvent as ReactClipboardEvent } from "react";
@@ -221,10 +222,10 @@ export function normalizeEmojis(input: string): string {
 
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
+    .replace(/"/g, """);
 }
 
 /** Lightweight markdown inline → HTML (after escape) */
@@ -312,6 +313,32 @@ export function plainTextToHtml(raw: string): string {
 }
 
 /**
+ * Force black color on pasted content while preserving structure.
+ * Applies to text-bearing elements without flattening the tree.
+ */
+function forceBlackColor(html: string): string {
+  if (!html || typeof document === "undefined") return html;
+  const template = document.createElement("template");
+  template.innerHTML = html;
+  const BLACK = "#111111";
+
+  const walk = (node: Node) => {
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const el = node as HTMLElement;
+    // Skip non-text containers like images or pure structural wrappers with no text
+    const hasText = Boolean((el.textContent || "").trim());
+    if (hasText && el.tagName !== "IMG") {
+      el.style.color = BLACK;
+      el.setAttribute("data-rich-color", BLACK);
+    }
+    Array.from(el.childNodes).forEach(walk);
+  };
+
+  Array.from(template.content.childNodes).forEach(walk);
+  return template.innerHTML;
+}
+
+/**
  * Clean Word / Google Docs / browser HTML into our allowed subset,
  * fixing list-ish markup and emojis in text nodes.
  */
@@ -386,7 +413,9 @@ export function cleanPastedHtml(rawHtml: string): string {
   coalesceBulletParagraphs(template.content);
 
   // fromPaste: drop external fonts/colors — site theme + manual color only
-  return sanitizeBioHtml(template.innerHTML, { fromPaste: true });
+  const sanitized = sanitizeBioHtml(template.innerHTML, { fromPaste: true });
+  // Force black on the result while preserving structure
+  return forceBlackColor(sanitized);
 }
 
 function coalesceBulletParagraphs(root: DocumentFragment | HTMLElement) {
@@ -521,8 +550,9 @@ export function clipboardToRichHtml(
   }
 
   if (text && text.trim()) {
-    // Plain path: structure + emojis only — no colors/fonts from source
-    return sanitizeBioHtml(plainTextToHtml(text), { fromPaste: true });
+    // Plain path: structure + emojis only — force black
+    const structured = sanitizeBioHtml(plainTextToHtml(text), { fromPaste: true });
+    return forceBlackColor(structured);
   }
 
   if (html && html.trim()) {
