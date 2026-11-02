@@ -2,7 +2,6 @@
  * Smart clipboard paste for portfolio edit fields.
  * Preserves structure (paragraphs, lists, bold/italic), accepts emojis,
  * and maps common broken / shortcode forms to usable Unicode emojis.
- * Pasted text is forced to black while keeping its structure.
  */
 
 import type { ClipboardEvent as ReactClipboardEvent } from "react";
@@ -222,10 +221,10 @@ export function normalizeEmojis(input: string): string {
 
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, "&")
-    .replace(/</g, "<")
-    .replace(/>/g, ">")
-    .replace(/"/g, """);
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 /** Lightweight markdown inline → HTML (after escape) */
@@ -312,6 +311,7 @@ export function plainTextToHtml(raw: string): string {
   return parts.join("") || `<p>${inlineMarkdownToHtml(escapeHtml(text))}</p>`;
 }
 
+
 /**
  * Force black color on pasted content while preserving structure.
  * Applies to text-bearing elements without flattening the tree.
@@ -325,9 +325,8 @@ function forceBlackColor(html: string): string {
   const walk = (node: Node) => {
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     const el = node as HTMLElement;
-    // Skip non-text containers like images or pure structural wrappers with no text
     const hasText = Boolean((el.textContent || "").trim());
-    if (hasText && el.tagName !== "IMG") {
+    if (hasText && el.tagName !== "IMG" && el.tagName !== "A") {
       el.style.color = BLACK;
       el.setAttribute("data-rich-color", BLACK);
     }
