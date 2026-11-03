@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, FileDown } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
+import { ArticleAudioPlayer } from "@/components/audio/ArticleAudioPlayer";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
@@ -52,6 +53,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
           <p className="text-xs uppercase tracking-[0.15em] text-cyan-100/55">{category} · {formatDate(post.date)}</p>
           <h1 className="mt-3 break-words text-2xl font-semibold text-white sm:text-3xl">{title}</h1>
           {post.subtitle && <p className="mt-3 text-sm text-zinc-400">{l(post.subtitle)}</p>}
+          <ArticleAudioPlayer articleId={post.id} />
         </header>
         <FeaturedMedia media={featured} title={title} />
         {post.fileKind === "image" && post.fileUrl && post.fileUrl !== featured?.url && post.fileUrl !== post.bookCoverUrl &&
