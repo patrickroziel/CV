@@ -16,8 +16,8 @@ type SupportedLocale = "fr" | "en" | "es" | "pl";
 const GOOGLE_VOICES: Record<SupportedLocale, { languageCode: string; male: string; female: string }> = {
   fr: { languageCode: "fr-FR", male: "fr-FR-Neural2-G", female: "fr-FR-Neural2-F" },
   en: { languageCode: "en-US", male: "en-US-Neural2-D", female: "en-US-Neural2-F" },
-  es: { languageCode: "es-ES", male: "es-ES-Neural2-B", female: "es-ES-Neural2-C" },
-  pl: { languageCode: "pl-PL", male: "pl-PL-Neural2-B", female: "pl-PL-Neural2-A" },
+  es: { languageCode: "es-ES", male: "es-ES-Neural2-F", female: "es-ES-Neural2-A" },
+  pl: { languageCode: "pl-PL", male: "pl-PL-Chirp3-HD-Orus", female: "pl-PL-Chirp3-HD-Kore" },
 };
 
 function localized(value: SocialPost["description"]): { text: string; locale: SupportedLocale } {
