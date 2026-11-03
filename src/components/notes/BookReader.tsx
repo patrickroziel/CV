@@ -5,6 +5,7 @@ import { ArrowLeft, FileDown } from "lucide-react";
 import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
+import { ArticleAudioPlayer } from "@/components/audio/ArticleAudioPlayer";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
@@ -100,6 +101,8 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
               {subtitle}
             </p>
           ) : null}
+
+          <ArticleAudioPlayer articleId={post.id} />
 
           {post.tags?.length ? (
             <div className="mt-5 flex min-w-0 flex-wrap gap-1.5">
