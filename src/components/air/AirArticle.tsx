@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
+import { ArticleAudioPlayer } from "@/components/audio/ArticleAudioPlayer";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
