@@ -1022,96 +1022,111 @@ html.site-translating footer {
 @keyframes air-cloud-drift { from { transform: translate3d(-1.5%,0,0) scale(1.04); } to { transform: translate3d(1.5%,-.8%,0) scale(1.04); } }
 @media (prefers-reduced-motion: reduce) { .air-sky-clouds { animation: none; } }
 
-/* AIR editorial surfaces: bright translucent glass, dark ink for readability. */
-.air-article-body,
+/* AIR editorial surfaces: preserve the original blue article typography.
+   Rich-text HTML may contain inline colors; override those only in the published article. */
+.air-article-body {
+  color: #10253e;
+}
 .air-article-body p,
+.air-article-body p *,
 .air-article-body li,
+.air-article-body li *,
 .air-article-body h2,
+.air-article-body h2 *,
 .air-article-body h3,
+.air-article-body h3 *,
 .air-article-body h4,
-.air-article-body strong { color: #10253e; }
-.air-article-body a { color: #0757a3; text-decoration-color: rgba(7,87,163,.5); }
-.air-article-body blockquote { color: #233c58; border-color: rgba(13,79,143,.3); }
+.air-article-body h4 *,
+.air-article-body > span,
+.air-article-body > strong {
+  color: #10253e !important;
+}
+.air-article-body a {
+  color: #0757a3 !important;
+  text-decoration-color: rgba(7,87,163,.5);
+}
+.air-article-body blockquote:not(.rich-link-card) {
+  color: #233c58 !important;
+  border-color: rgba(13,79,143,.3);
+}
 
-.rich-bio-editor blockquote.rich-link-card,
-.rich-html blockquote.rich-link-card,
-.book-reading-text blockquote.rich-link-card {
-  margin: 0.9rem 0 !important;
+/* Standard link previews: dark glass, light type, restrained proportions. */
+.air-article-body blockquote.rich-link-card {
+  margin: 1rem 0 !important;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(214,186,140,.28) !important;
   border-radius: 1rem !important;
   padding: 0 !important;
-  background: rgba(2, 12, 18, 0.55);
+  background: linear-gradient(165deg, rgba(22,18,14,.78), rgba(6,7,12,.68)) !important;
+  color: #f5f0ea !important;
+  box-shadow: inset 0 1px 0 rgba(231,211,174,.14), 0 12px 32px -16px rgba(0,0,0,.45);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
   font-style: normal !important;
-  text-decoration: none;
 }
-.rich-link-card,
-.rich-link-card * {
-  font-style: normal !important;
-  word-break: normal !important;
-}
-.rich-link-card a {
-  display: flex;
-  flex-direction: column;
-  color: inherit !important;
+.air-article-body .rich-link-card a,
+.air-article-body .rich-link-card a *,
+.air-article-body .rich-link-card .rich-link-card-copy,
+.air-article-body .rich-link-card .rich-link-card-copy * {
+  color: #f5f0ea !important;
   text-decoration: none !important;
+  font-style: normal !important;
 }
-.rich-link-card-img {
+.air-article-body .rich-link-card .rich-link-card-host {
+  color: #e7d3ae !important;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.air-article-body .rich-link-card .rich-link-card-title {
+  color: #f8f4ef !important;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.air-article-body .rich-link-card .rich-link-card-desc {
+  color: rgba(245,240,234,.82) !important;
+  font-size: .88rem;
+  line-height: 1.5;
+}
+.air-article-body .rich-link-card-img {
   display: block;
   width: 100%;
   height: 11rem;
   object-fit: cover;
-  background: rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(214,186,140,.18);
 }
-.rich-link-card-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.9rem 1rem 1rem;
-}
-.rich-link-card-host {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.62;
-}
-.rich-link-card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-.rich-link-card-desc {
-  font-size: 0.82rem;
-  line-height: 1.45;
-  opacity: 0.78;
-}
-.air-article-body blockquote.rich-link-card {
-  border: 1px solid rgba(214, 186, 140, 0.28) !important;
+
+/* Ghost link previews keep their more distinctive, cinematic dark-glass treatment. */
+.air-article-body blockquote.rich-link-card.ghost-link-card {
+  border-color: rgba(214,186,140,.38) !important;
+  border-radius: 1.15rem !important;
   background:
-    linear-gradient(165deg, rgba(22, 18, 14, 0.72), rgba(6, 7, 12, 0.55));
-  color: #f5f0ea;
-  box-shadow:
-    inset 0 1px 0 rgba(231, 211, 174, 0.18),
-    0 12px 32px -16px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+    linear-gradient(145deg, rgba(8,14,24,.96), rgba(7,10,16,.94)),
+    radial-gradient(120% 90% at 100% 0%, rgba(130,190,220,.18), transparent 46%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.28);
 }
-.air-article-body .rich-link-card a { color: #f5f0ea !important; }
-.air-article-body .rich-link-card-host {
-  color: rgba(231, 211, 174, 0.72);
-  letter-spacing: 0.14em;
+.air-article-body .ghost-link-card .rich-link-card-copy {
+  gap: .45rem;
+  padding: 1.05rem 1.15rem 1.15rem;
 }
-.air-article-body .rich-link-card-title {
-  color: #f8f4ef;
-  font-weight: 650;
+.air-article-body .ghost-link-card .rich-link-card-host {
+  color: #e7d3ae !important;
+  letter-spacing: .16em;
 }
-.air-article-body .rich-link-card-desc {
-  color: rgba(245, 240, 234, 0.78);
+.air-article-body .ghost-link-card .rich-link-card-title {
+  color: #f8f4ef !important;
+  font-size: 1.18rem;
+  letter-spacing: -.02em;
+  line-height: 1.25;
 }
-.air-article-body .rich-link-card-img {
-  border-bottom: 1px solid rgba(214, 186, 140, 0.18);
+.air-article-body .ghost-link-card .rich-link-card-desc {
+  color: rgba(245,240,234,.88) !important;
+  font-size: .95rem;
+  line-height: 1.55;
 }
+
 
 .ghost-page-sky {
   position: fixed;
