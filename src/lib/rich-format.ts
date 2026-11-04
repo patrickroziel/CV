@@ -239,6 +239,26 @@ export function applyRichFormat(
     return true;
   }
 
+  if (command === "insertEmoji" && arg) {
+    const emoji = arg.slice(0, 8);
+    try {
+      const range = active.cloneRange();
+      range.deleteContents();
+      const node = document.createTextNode(emoji);
+      range.insertNode(node);
+      range.setStartAfter(node);
+      range.collapse(true);
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   if (command === "foreColor" && arg) {
     const color = arg;
     if (!active.collapsed) {
