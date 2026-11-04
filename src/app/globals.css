@@ -1551,3 +1551,17 @@ blockquote.rich-link-card.ghost-link-card {
 .rich-bio-editor [style*="color: black"] {
   color: #f4f4f5 !important;
 }
+
+/* Ensure legacy black inline formatting stays readable on dark rich-text surfaces. */
+.rich-html [style*="color: rgb(0, 0, 0)"],
+.rich-html [style*="color:rgb(0, 0, 0)"],
+.rich-html [style*="color: #000"],
+.rich-html [style*="color:#000"],
+.rich-html [style*="color: black"],
+.rich-bio-editor [style*="color: rgb(0, 0, 0)"],
+.rich-bio-editor [style*="color:rgb(0, 0, 0)"],
+.rich-bio-editor [style*="color: #000"],
+.rich-bio-editor [style*="color:#000"],
+.rich-bio-editor [style*="color: black"] {
+  color: #f4f4f5 !important;
+}
