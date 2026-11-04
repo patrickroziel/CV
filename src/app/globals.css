@@ -1072,6 +1072,25 @@ html.site-translating footer {
   text-decoration: none !important;
   font-style: normal !important;
 }
+.air-article-body .rich-link-card .rich-link-card-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start;
+  gap: .38rem !important;
+  padding: 1rem 1.15rem 1.15rem !important;
+  min-width: 0;
+}
+.air-article-body .rich-link-card .rich-link-card-copy > span {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+}
+.air-article-body .rich-link-card .rich-link-card-host,
+.air-article-body .rich-link-card .rich-link-card-title,
+.air-article-body .rich-link-card .rich-link-card-desc {
+  display: block !important;
+  width: 100%;
+}
 .air-article-body .rich-link-card .rich-link-card-host {
   color: #e7d3ae !important;
   font-size: .68rem;
