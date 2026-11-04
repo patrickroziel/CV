@@ -161,7 +161,7 @@ export function RichLocalizedField({
           "[&_blockquote]:my-3 [&_blockquote]:border-l-[3px] [&_blockquote]:border-cyan-300/80 [&_blockquote]:pl-4 [&_blockquote]:italic",
           "[&_b]:font-bold [&_strong]:font-bold [&_i]:italic [&_em]:italic rich-lh"
         )}
-        style={{ minHeight: `${minHeight}rem`, lineHeight }}
+        style={{ fontSize: "12px", color: "#f4f4f5", minHeight: `${minHeight}rem`, lineHeight }}
       />
       {hint ? <p className="text-[10px] text-zinc-500">{hint}</p> : null}
     </div>
