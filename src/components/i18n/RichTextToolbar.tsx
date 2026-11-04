@@ -16,7 +16,7 @@ type RichTextToolbarProps = {
 /** Gras, italique, souligné, lien, taille, liste et remise à zéro. */
 export function RichTextToolbar({ onCommand, className, compact = false }: RichTextToolbarProps) {
   const btn = "inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-200 transition hover:bg-white/10 hover:text-white";
-  const [fontSizeDraft, setFontSizeDraft] = useState("14");
+  const [fontSizeDraft, setFontSizeDraft] = useState("12");
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkBusy, setLinkBusy] = useState(false);
@@ -94,7 +94,7 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
 
       <span className="mx-0.5 h-5 w-px bg-white/10" aria-hidden />
       <div className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 p-0.5" title="Taille du texte sélectionné">
-        <button type="button" data-fontsize-step title="Réduire" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 14) - 1))}><Minus className="h-3.5 w-3.5" /></button>
+        <button type="button" data-fontsize-step title="Réduire" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 12) - 1))}><Minus className="h-3.5 w-3.5" /></button>
         <input
           type="text"
           inputMode="decimal"
@@ -117,7 +117,7 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
           className="h-7 w-11 rounded-md border border-white/10 bg-black/40 px-1 text-center text-[11px] font-semibold tabular-nums text-zinc-100 outline-none focus:border-teal-300/40"
         />
         <span className="pr-0.5 text-[9px] text-zinc-500">px</span>
-        <button type="button" data-fontsize-step title="Augmenter" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 14) + 1))}><Plus className="h-3.5 w-3.5" /></button>
+        <button type="button" data-fontsize-step title="Augmenter" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => commitFontSize(String((Number(fontSizeDraft) || 12) + 1))}><Plus className="h-3.5 w-3.5" /></button>
       </div>
 
       <span className="mx-0.5 h-5 w-px bg-white/10" aria-hidden />
