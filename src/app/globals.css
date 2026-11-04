@@ -1538,3 +1538,16 @@ blockquote.rich-link-card.ghost-link-card {
 .scrollable-text-media__body * {
   color: #fff !important;
 }
+
+
+/* Back-office rich-text editors: readable defaults, independent of stored inline article colours. */
+.rich-bio-editor {
+  font-size: 12px !important;
+  color: #f4f4f5;
+}
+.rich-bio-editor [style*="color: rgb(0, 0, 0)"],
+.rich-bio-editor [style*="color: #000"],
+.rich-bio-editor [style*="color:#000"],
+.rich-bio-editor [style*="color: black"] {
+  color: #f4f4f5 !important;
+}
