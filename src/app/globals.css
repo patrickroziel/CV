@@ -1565,3 +1565,10 @@ blockquote.rich-link-card.ghost-link-card {
 .rich-bio-editor [style*="color: black"] {
   color: #f4f4f5 !important;
 }
+
+/* In edit mode, legacy inline text colours must not become unreadable on the dark surface. */
+.rich-bio-editor [style*="color"],
+.rich-bio-editor font[color],
+.rich-bio-editor [color] {
+  color: #f4f4f5 !important;
+}
