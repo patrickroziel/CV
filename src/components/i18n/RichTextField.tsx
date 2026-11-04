@@ -152,6 +152,8 @@ export function RichTextField({
           compact && "py-2"
         )}
         style={{
+          fontSize: "12px",
+          color: "#f4f4f5",
           minHeight: `${minHeight}rem`,
           lineHeight: formatLineHeight(lineHeight),
         }}
