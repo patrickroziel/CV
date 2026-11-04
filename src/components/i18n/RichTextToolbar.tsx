@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bold, Eraser, Italic, Link2, List, Quote, Minus, Plus, Underline } from "lucide-react";
+import { Bold, Eraser, Italic, Link2, List, Quote, Minus, Plus, Underline, Palette, Smile } from "lucide-react";
 import { safeHref } from "@/lib/safe-href";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,8 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
   const [linkUrl, setLinkUrl] = useState("");
   const [linkBusy, setLinkBusy] = useState(false);
   const [linkError, setLinkError] = useState("");
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const emojis = ["😀","😂","😍","😉","😊","🤔","😎","🥳","❤️","🧡","💛","💚","💙","💜","✨","🔥","⭐","🎬","🎥","📷","🎨","🚀","👏","🙏"];
 
   const commitFontSize = (raw = fontSizeDraft) => {
     const parsed = Number(String(raw).replace(",", "."));
@@ -89,6 +91,31 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
       <button type="button" title="Italique" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("italic")}><Italic className="h-3.5 w-3.5" /></button>
       <button type="button" title="Souligner" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("underline")}><Underline className="h-3.5 w-3.5" /></button>
       <button type="button" title="Lien" aria-expanded={linkOpen} className={cn(btn, linkOpen && "bg-white/15 text-white")} onMouseDown={(e) => e.preventDefault()} onClick={() => { setLinkOpen((open) => !open); setLinkError(""); }}><Link2 className="h-3.5 w-3.5" /></button>
+      <label title="Couleur du texte" className={cn(btn, "relative cursor-pointer")}>
+        <Palette className="h-3.5 w-3.5" />
+        <input
+          type="color"
+          aria-label="Choisir la couleur du texte"
+          defaultValue="#f4f4f5"
+          onChange={(e) => onCommand("foreColor", e.target.value)}
+          onMouseDown={(e) => e.preventDefault()}
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+      </label>
+      <div className="relative">
+        <button type="button" title="Insérer un emoji" aria-expanded={emojiOpen} className={cn(btn, emojiOpen && "bg-white/15 text-white")} onMouseDown={(e) => e.preventDefault()} onClick={() => setEmojiOpen((v) => !v)}>
+          <Smile className="h-3.5 w-3.5" />
+        </button>
+        {emojiOpen && (
+          <div className="absolute left-0 top-full z-50 mt-2 grid w-52 grid-cols-6 gap-1 rounded-xl border border-white/15 bg-slate-950 p-2 shadow-2xl">
+            {emojis.map((emoji) => (
+              <button key={emoji} type="button" title={emoji} className="flex h-8 w-8 items-center justify-center rounded-md text-lg hover:bg-white/10" onMouseDown={(e) => e.preventDefault()} onClick={() => { onCommand("insertEmoji", emoji); setEmojiOpen(false); }}>
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       {!compact && <button type="button" title="Citation — barre verticale" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("formatBlock", "blockquote")}><Quote className="h-3.5 w-3.5" /></button>}
       {!compact && <button type="button" title="Liste à puces" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("insertUnorderedList")}><List className="h-3.5 w-3.5" /></button>}
 
