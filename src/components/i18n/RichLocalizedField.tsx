@@ -121,7 +121,7 @@ export function RichLocalizedField({
   return (
     <div ref={rootRef} className={cn("grid gap-2", className)}>
       <Label htmlFor={fieldId}>{label}</Label>
-      <div onMouseDownCapture={rememberSelection} onPointerDownCapture={rememberSelection}>
+      <div className="sticky top-2 z-30 rounded-xl bg-slate-950/90 p-1 shadow-xl backdrop-blur-md" onMouseDownCapture={rememberSelection} onPointerDownCapture={rememberSelection}>
         <RichTextToolbar onCommand={run} compact={compact} />
       </div>
       <div
