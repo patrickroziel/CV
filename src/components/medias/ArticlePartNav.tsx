@@ -3,46 +3,51 @@
 import { useEffect, useState } from "react";
 
 export function ArticlePartNav({ targetId }: { targetId: string }) {
-  const [parts, setParts] = useState<{ id: string; label: string }[]>([]);
-  const [active, setActive] = useState("");
+  const [label, setLabel] = useState("");
+  const [href, setHref] = useState("");
 
   useEffect(() => {
     const root = document.getElementById(targetId);
     if (!root) return;
-    const heads = Array.from(root.querySelectorAll("h2.air-part-title"));
-    const items = heads.map((el, index) => {
+    const heads = Array.from(root.querySelectorAll<HTMLElement>("h2.air-part-title"));
+    heads.forEach((el, index) => {
       if (!el.id) el.id = `part-${index}-${targetId}`;
-      return { id: el.id, label: (el.textContent || "").replace(/\s+/g, " ").trim() || `Partie ${index + 1}` };
     });
-    setParts(items);
     if (!heads.length) return;
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-      if (visible?.target.id) setActive(visible.target.id);
-    }, { rootMargin: "-20% 0px -60% 0px", threshold: [0.15, 0.6] });
-    heads.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+
+    const pick = () => {
+      const line = 150;
+      let current: HTMLElement | null = null;
+      for (const head of heads) {
+        if (head.getBoundingClientRect().top <= line) current = head;
+      }
+      if (!current || current.getBoundingClientRect().bottom > line - 8) {
+        setLabel("");
+        setHref("");
+        return;
+      }
+      setLabel((current.textContent || "").replace(/\s+/g, " ").trim());
+      setHref(`#${current.id}`);
+    };
+
+    pick();
+    window.addEventListener("scroll", pick, { passive: true });
+    return () => window.removeEventListener("scroll", pick);
   }, [targetId]);
 
-  if (!parts.length) return null;
+  if (!label) return null;
 
   return (
-    <nav className="article-part-nav mt-4 flex gap-2 overflow-x-auto pb-1" aria-label="Parties de l’article">
-      {parts.map((part) => (
-        <a
-          key={part.id}
-          href={`#${part.id}`}
-          aria-current={part.id === active ? "true" : undefined}
-          onClick={(event) => {
-            event.preventDefault();
-            document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-        >
-          {part.label}
-        </a>
-      ))}
-    </nav>
+    <a
+      href={href}
+      className="air-part-float"
+      onClick={(event) => {
+        event.preventDefault();
+        const id = href.slice(1);
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }}
+    >
+      {label}
+    </a>
   );
 }

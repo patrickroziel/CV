@@ -8,6 +8,7 @@ import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
+import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { getNoteSharePhotos } from "@/lib/notes-preview-image";
 import type { SocialPost } from "@/lib/types";
@@ -86,6 +87,7 @@ function AirReadHead({
           <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
           <h1>{title}</h1>
         </a>
+        <ArticlePartNav targetId={bodyId} />
       </div>
     </>
   );
