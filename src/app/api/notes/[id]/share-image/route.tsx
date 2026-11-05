@@ -4,7 +4,7 @@ import { getNoteSharePhoto, getNoteShareText, getPublicNote } from "@/lib/server
 import { requestedShareLanguage, translateShareText } from "@/lib/server/share-locale";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function loadPhoto(url: string) {
   const candidates = [url];

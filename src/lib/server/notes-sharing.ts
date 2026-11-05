@@ -4,7 +4,7 @@ import { cache } from "react";
 import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
 import { getL } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
-import { readPortfolio } from "@/lib/server/portfolio-db";
+import { readPublicPortfolio } from "@/lib/server/portfolio-db";
 import type { SocialPost } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { youtubeVideoId } from "@/lib/utils";
@@ -20,7 +20,7 @@ const isPostId = (id: string) => /^[a-zA-Z0-9_-]{1,128}$/.test(id);
 export const listPublicPosts = cache(async function listPublicPosts(): Promise<SocialPost[]> {
   let posts = DEFAULT_PORTFOLIO.socialPosts ?? [];
   try {
-    const saved = await readPortfolio();
+    const saved = await readPublicPortfolio();
     if (saved.data?.socialPosts) posts = saved.data.socialPosts;
   } catch {
     // The baked-in public snapshot remains a fallback if Neon is unavailable.

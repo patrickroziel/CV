@@ -6,7 +6,7 @@ import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 import { getPublicGhost, ghostShareText } from "@/lib/server/ghost-pages";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type GhostParams = { params: Promise<{ slug: string }> };
 

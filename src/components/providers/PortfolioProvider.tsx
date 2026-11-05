@@ -183,7 +183,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       // The anonymous endpoint strips drafts; failures fall back to the deployed snapshot.
       if (!local) {
         try {
-          const response = await fetch("/api/portfolio", { cache: "no-store" });
+          const response = await fetch("/api/portfolio");
           if (response.ok) {
             const result = (await response.json()) as { data?: PortfolioData };
             if (result.data) initial = result.data;

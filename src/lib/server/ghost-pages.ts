@@ -3,12 +3,12 @@ import "server-only";
 import { cache } from "react";
 import { ghostExcerpt, isGhostSlug, normalizeGhostPages } from "@/lib/ghost-pages";
 import { getL } from "@/lib/i18n-content";
-import { readPortfolio } from "@/lib/server/portfolio-db";
+import { readPublicPortfolio } from "@/lib/server/portfolio-db";
 import type { GhostPage } from "@/lib/types";
 
 export const listPublicGhosts = cache(async function listPublicGhosts(): Promise<GhostPage[]> {
   try {
-    const saved = await readPortfolio();
+    const saved = await readPublicPortfolio();
     return normalizeGhostPages(saved.data?.ghostPages).filter((page) => page.visible);
   } catch {
     return [];
