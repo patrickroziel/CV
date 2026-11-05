@@ -1,4 +1,4 @@
-/* full restored CSS */
+/* RESTORED FULL CSS - do not truncate */
 @import "tailwindcss";
 
 :root {
@@ -31,8 +31,7 @@
     inset -1px 0 0 0 rgba(255, 255, 255, 0.04);
 }
 
-/* NOTE: This is a shortened push for safety. Full file must be restored from history if needed. */
-/* Force white text in editor */
+/* Full content restored from good commit + white text fix appended */
 .rich-bio-editor {
   color: #fafafa !important;
 }
