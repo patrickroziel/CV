@@ -1149,13 +1149,19 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
 .air-frame-sheen--late {
   animation-delay: -3.6s;
 }
+.air-part-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
 .air-part-float {
   position: relative;
   z-index: 1;
   display: flex;
   width: fit-content;
   max-width: 100%;
-  margin-top: 0.4rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(48, 78, 128, 0.96);
