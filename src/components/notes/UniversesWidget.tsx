@@ -7,6 +7,8 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
+import { isHeldMediaUrl } from "@/lib/blob-upload";
+import { WorkInProgress } from "@/components/media/WorkInProgress";
 import type { SocialPost } from "@/lib/types";
 
 type Current = "notes" | "air" | "work";
@@ -157,13 +159,16 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
                   title="Lire une publication"
                 >
                   {image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
+                    isHeldMediaUrl(image) ? (
+                      <WorkInProgress className="h-12 w-14 shrink-0 rounded-lg" />
+                    ) : (
                     <img
                       src={image}
                       alt=""
                       loading="lazy"
                       className="h-12 w-14 shrink-0 rounded-lg object-cover"
                     />
+                    )
                   ) : null}
                   <span className="min-w-0 flex-1">
                     <span className="block text-[9px] uppercase tracking-[.14em] text-cyan-100/50">{articleLabel}</span>

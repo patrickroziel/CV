@@ -156,14 +156,20 @@ export async function uploadToCloudinary(
 export function isVercelBlobUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   try {
-    const host = new URL(url).hostname;
+    const host = new URL(url, "https://patrickroziel.com").hostname;
     return (
       host.endsWith(".public.blob.vercel-storage.com") ||
+      host.endsWith(".blob.vercel-storage.com") ||
       host === "blob.vercel-storage.com"
     );
   } catch {
     return false;
   }
+}
+
+export function isHeldMediaUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  return isVercelBlobUrl(url) || url.includes("/api/media/blob") || url.includes("blob.vercel-storage.com");
 }
 
 /** True if URL is a legacy Cloudinary delivery URL (still displayable) */

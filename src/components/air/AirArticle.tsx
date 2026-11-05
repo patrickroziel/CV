@@ -11,6 +11,8 @@ import { PostPager } from "@/components/notes/PostPager";
 import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { getNoteSharePhotos } from "@/lib/notes-preview-image";
+import { isHeldMediaUrl } from "@/lib/blob-upload";
+import { WorkInProgress } from "@/components/media/WorkInProgress";
 import type { SocialPost } from "@/lib/types";
 
 function proxyBlobImages(html: string) {
@@ -22,15 +24,20 @@ const FORCE_WHITE_ARTICLE = "adbaf437-0909-4347-a846-7910e702b954";
 function ArticleCover({ sources }: { sources: string[] }) {
   const [index, setIndex] = useState(0);
   if (index >= sources.length) return null;
+  const src = sources[index];
   return (
     <div className="overflow-hidden rounded-t-[1.35rem]">
-      <div className="aspect-[16/8] sm:aspect-[16/7]">
-        <img
-          src={sources[index]}
-          alt=""
-          className="block h-full w-full object-cover object-center"
-          onError={() => setIndex((current) => current + 1)}
-        />
+      <div className="relative aspect-[16/8] sm:aspect-[16/7]">
+        {isHeldMediaUrl(src) ? (
+          <WorkInProgress className="absolute inset-0" />
+        ) : (
+          <img
+            src={src}
+            alt=""
+            className="block h-full w-full object-cover object-center"
+            onError={() => setIndex((current) => current + 1)}
+          />
+        )}
       </div>
     </div>
   );

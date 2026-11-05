@@ -8,6 +8,8 @@ import { PostActions } from "@/components/medias/PostActions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
+import { isHeldMediaUrl } from "@/lib/blob-upload";
+import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
@@ -100,7 +102,9 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
         <article className="air-surface overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl transition-colors">
           <Link href={`/air/${post.id}`} className="group block">
             <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-900/20 to-sky-700/10 sm:aspect-[16/7]">
-              {photo ? <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
+              {photo ? (
+                isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>
             <div className="p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-white/50">{coercePostCategory(post)} · {post.date}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
               {post.subtitle ? <p className="mt-1 text-sm leading-6 text-white/70">{l(post.subtitle)}</p> : null}
