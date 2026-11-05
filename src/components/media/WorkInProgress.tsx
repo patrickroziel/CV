@@ -9,7 +9,6 @@ export function WorkInProgress({ className }: { className?: string }) {
           <path d="M10 16.5h28M24 6 18 16.5 24 42 30 16.5 24 6Z" />
         </svg>
       </span>
-      <span className="blob-wip__kicker">Work in progress</span>
     </div>
   );
 }

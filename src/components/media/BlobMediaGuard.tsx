@@ -27,10 +27,12 @@ function paint(node: Element) {
   frame.setAttribute("role", "img");
   frame.setAttribute("aria-label", "Work in progress");
   frame.innerHTML =
-    '<span class="blob-wip__mark" aria-hidden="true"><svg viewBox="0 0 48 48" class="blob-wip__gem"><path d="M24 6 38 16.5 24 42 10 16.5 24 6Z"/><path d="M10 16.5h28M24 6 18 16.5 24 42 30 16.5 24 6Z"/></svg></span><span class="blob-wip__kicker">Work in progress</span>';
+    '<span class="blob-wip__mark" aria-hidden="true"><svg viewBox="0 0 48 48" class="blob-wip__gem"><path d="M24 6 38 16.5 24 42 10 16.5 24 6Z"/><path d="M10 16.5h28M24 6 18 16.5 24 42 30 16.5 24 6Z"/></svg></span>';
 
+  const parent = node.parentElement;
   const positioned = getComputedStyle(node).position === "absolute";
-  if (positioned) frame.classList.add("blob-wip--fill");
+  const parentPositioned = parent ? getComputedStyle(parent).position === "relative" : false;
+  if (positioned || parentPositioned) frame.classList.add("blob-wip--fill");
   node.replaceWith(frame);
 }
 
