@@ -1033,6 +1033,24 @@ html.site-translating footer {
 .air-article-body a { color: #0757a3; text-decoration-color: rgba(7,87,163,.5); }
 .air-article-body blockquote { color: #233c58; border-color: rgba(13,79,143,.3); }
 
+html[data-universe="air"] .air-surface .air-article-body,
+html[data-universe="air"] .air-surface .air-article-body p,
+html[data-universe="air"] .air-surface .air-article-body li,
+html[data-universe="air"] .air-surface .air-article-body h2,
+html[data-universe="air"] .air-surface .air-article-body h3,
+html[data-universe="air"] .air-surface .air-article-body h4,
+html[data-universe="air"] .air-surface .air-article-body strong {
+  color: rgba(255, 255, 255, 0.88);
+}
+html[data-universe="air"] .air-surface .air-article-body a {
+  color: #dbeafe;
+  text-decoration-color: rgba(219, 234, 254, 0.45);
+}
+html[data-universe="air"] .air-surface .air-article-body blockquote {
+  color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
 .rich-bio-editor blockquote.rich-link-card,
 .rich-html blockquote.rich-link-card,
 .book-reading-text blockquote.rich-link-card {

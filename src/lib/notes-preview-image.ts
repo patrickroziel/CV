@@ -1,5 +1,18 @@
 import type { SocialPost } from "@/lib/types";
 
+function readableMediaUrl(raw: string): string | null {
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "https:") return null;
+    const host = url.hostname;
+    const onBlob = host === "blob.vercel-storage.com" || host.endsWith(".blob.vercel-storage.com");
+    if (onBlob) return `/api/media/blob?url=${encodeURIComponent(url.toString())}`;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 /** Public visual source, matching the Notes share-card preference. */
 export function getNoteSharePhoto(post: SocialPost): string | null {
   const urls: unknown[] = [post.bookCoverUrl];
@@ -11,7 +24,8 @@ export function getNoteSharePhoto(post: SocialPost): string | null {
   }
   for (const raw of urls) {
     if (typeof raw !== "string") continue;
-    try { const url = new URL(raw); if (url.protocol === "https:") return url.toString(); } catch {}
+    const readable = readableMediaUrl(raw);
+    if (readable) return readable;
   }
   return null;
 }
