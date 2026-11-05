@@ -6,6 +6,7 @@ import { PostRichBody } from "@/components/medias/PostRichBody";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
+import { PostComments } from "@/components/notes/PostComments";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { coercePostCategory } from "@/lib/post-taxonomy";
@@ -65,6 +66,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}
         </a>}
         <PostActions postId={post.id} title={title} visible={post.visible !== false} />
+        <PostComments postId={post.id} />
       </div>
     </article>
     <PostPager postId={post.id} universe="notes" seedPosts={seedPosts} />
