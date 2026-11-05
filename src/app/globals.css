@@ -1890,7 +1890,8 @@ html[data-universe="portfolio"] .work-rail .glass-card,
 html[data-universe="portfolio"] .work-rail .rounded-\[1\.35rem\],
 html[data-universe="portfolio"] .work-rail [aria-label="Découvrir les trois univers"] > div,
 html[data-universe="portfolio"] .work-notes-main .glass-card,
-html[data-universe="portfolio"] .work-notes-main .glass-nested {
+html[data-universe="portfolio"] .work-notes-main .glass-nested,
+html[data-universe="portfolio"] .air-tag-ticker {
   background: rgba(10, 24, 16, 0.52) !important;
   border-color: rgba(255, 255, 255, 0.14) !important;
   backdrop-filter: blur(16px) saturate(120%) !important;

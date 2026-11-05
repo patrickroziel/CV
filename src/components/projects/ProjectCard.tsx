@@ -51,6 +51,7 @@ export function ProjectCard({ project, index = 0, onEdit }: ProjectCardProps) {
       <GlassCard
         glow
         className="group relative flex h-full flex-col overflow-hidden"
+        data-work-tags={project.tags.map((tag) => tag.trim().toLocaleLowerCase("fr")).filter(Boolean).join("|")}
       >
         <Link href={`/projets/${project.id}`} className="block">
           <div className="relative aspect-video overflow-hidden">
