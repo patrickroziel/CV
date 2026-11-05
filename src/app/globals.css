@@ -1150,8 +1150,8 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.35rem;
-  margin-top: 0.4rem;
+  gap: 0.16rem;
+  margin-top: 0.28rem;
 }
 .air-part-float {
   position: relative;
@@ -1160,13 +1160,13 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   width: fit-content;
   max-width: 100%;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   background: #305080;
-  padding: 0.32rem 0.8rem;
+  padding: 0.08rem 0.62rem;
   color: #fff;
-  font-size: 0.78rem;
-  font-weight: 600;
-  line-height: 1.3;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.25;
 }
 .air-article h2.air-part-title {
   position: relative;
