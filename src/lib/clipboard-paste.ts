@@ -634,6 +634,22 @@ export function handleRichPaste(
   if (!dt) return false;
 
   e.preventDefault();
+  const selection = window.getSelection();
+  const anchor = selection?.anchorNode;
+  const host = anchor instanceof Element ? anchor : anchor?.parentElement;
+  const part = host?.closest("h2.air-part-title");
+  if (part) {
+    const title = (dt.getData("text/plain") || "").replace(/\s+/g, " ").trim();
+    if (title) part.textContent = title;
+    if (selection) {
+      const range = document.createRange();
+      range.selectNodeContents(part);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    return true;
+  }
   const html = dt.getData("text/html");
   const text = dt.getData("text/plain");
   const rich = clipboardToRichHtml(html || null, text || null);
