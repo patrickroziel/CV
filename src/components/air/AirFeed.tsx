@@ -78,7 +78,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           );
         })}
       </nav>
-      <div className="mt-8 rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl shadow-[0_8px_32px_-12px_rgba(0,0,0,0.4)]">
+      <div className="air-surface mt-8 rounded-2xl border p-5 backdrop-blur-xl">
         <p className="text-[10px] uppercase tracking-[.24em] text-white/60">À propos d’Air</p>
         <p className="mt-3 text-sm leading-6 text-white/90">Regarder les choses en face. Les comprendre. Les formuler.</p>
         <p className="mt-3 text-xs leading-5 text-white/75">Un espace de réflexion et de transmission autour de la communication, des institutions et des expériences qui poussent à questionner ce qui semble aller de soi.</p>
@@ -97,7 +97,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       {visiblePosts.map((post, index) => { const photo=getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
         const excerpt = previewText(l(post.description));
         return <Fragment key={post.id}>
-        <article className="overflow-hidden rounded-[1.35rem] border border-white/12 bg-white/8 shadow-[0_16px_48px_-20px_rgba(0,0,0,0.45)] transition-all hover:bg-white/12 hover:border-white/20 backdrop-blur-2xl">
+        <article className="air-surface overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl transition-colors">
           <Link href={`/air/${post.id}`} className="group block">
             <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-900/20 to-sky-700/10 sm:aspect-[16/7]">
               {photo ? <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
@@ -118,7 +118,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
         {index === 0 ? <KofiCard /> : null}
         </Fragment>;
       })}
-    </div> : <div className="rounded-2xl border border-white/12 bg-white/8 p-10 text-center backdrop-blur-xl">
+    </div> : <div className="air-surface rounded-2xl border p-10 text-center backdrop-blur-xl">
       <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{activeTag || scope !== "Tout" ? "Sélection" : "À suivre"}</p>
       <h3 className="mt-3 text-xl text-white">{activeTag || scope !== "Tout" ? "Aucun article dans cette sélection." : "Les premiers articles prennent forme."}</h3>
       {!activeTag && scope === "Tout" ? <p className="mt-3 text-sm text-white/70">Ici paraîtront mes décryptages, expériences et observations.</p> : null}

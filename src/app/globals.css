@@ -1608,3 +1608,41 @@ blockquote.rich-link-card.ghost-link-card {
     animation: none;
   }
 }
+
+/* Each universe keeps one surface, matched to its own background. */
+html[data-universe="air"] .air-surface,
+html[data-universe="air"] .kofi-card,
+html[data-universe="air"] [aria-label="Découvrir les trois univers"] > div,
+html[data-universe="air"] .air-tag-ticker {
+  background: rgba(18, 52, 108, 0.46) !important;
+  border-color: rgba(214, 230, 255, 0.32) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 18px 40px -28px rgba(6, 24, 58, 0.55) !important;
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+
+html[data-universe="medias"] .air-tag-ticker,
+html[data-universe="medias"] .kofi-card,
+html[data-universe="medias"] [aria-label="Découvrir les trois univers"] > div {
+  background: rgba(4, 20, 32, 0.72) !important;
+  border-color: rgba(125, 211, 232, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(186, 230, 253, 0.12) !important;
+}
+
+html[data-universe="portfolio"] .work-rail .glass-card,
+html[data-universe="portfolio"] .work-rail .rounded-\[1\.35rem\],
+html[data-universe="portfolio"] .work-rail [aria-label="Découvrir les trois univers"] > div,
+html[data-universe="portfolio"] .work-notes-main .glass-card,
+html[data-universe="portfolio"] .work-notes-main .glass-nested {
+  background: rgba(10, 24, 16, 0.52) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-universe="portfolio"] .work-hero-card::before,
+html[data-universe="portfolio"] .work-notes-main .glass-card::before,
+html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
+  opacity: 0.16 !important;
+}
