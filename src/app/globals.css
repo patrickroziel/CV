@@ -1,14 +1,1 @@
-/* ... existing content ... */
-
-/* Rich text editor — force white text (override any accent/blue inheritance) */
-.rich-bio-editor {
-  color: #fafafa !important;
-}
-.rich-bio-editor * {
-  color: inherit;
-}
-.rich-bio-editor a {
-  color: #a5f3fc; /* keep links cyan for visibility */
-}
-
-/* ... rest of existing file ... */
+PLACEHOLDER_WILL_BE_REPLACED
