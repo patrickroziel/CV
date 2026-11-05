@@ -1571,3 +1571,20 @@ blockquote.rich-link-card.ghost-link-card {
 .experience-card.glass-nested::before {
   opacity: 0.2;
 }
+
+/* Work column: one light glass for every card */
+.work-notes-main .glass-card,
+.work-notes-main .glass-nested {
+  background: rgba(8, 10, 14, 0.2);
+  border-color: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+.work-notes-main .glass-card::before,
+.work-notes-main .glass-nested::before {
+  opacity: 0.22;
+}
+.work-notes-main .glass-card::after {
+  opacity: 0.35;
+}

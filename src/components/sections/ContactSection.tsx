@@ -118,7 +118,7 @@ export function ContactSection() {
                   <div className="mt-8 flex flex-wrap gap-3">
                     {c.showEmail && (
                       <MagneticButton>
-                        <Button size="lg" asChild>
+                        <Button size="lg" variant="outline" asChild>
                           <a href={`mailto:${email}`}>
                             <Mail className="h-4 w-4" />
                             {l(c.emailLabel)}
@@ -188,7 +188,7 @@ export function ContactSection() {
                       placeholder={t("contact.messagePlaceholder")}
                     />
                   </div>
-                  <Button type="submit" className="w-full sm:w-auto">
+                  <Button type="submit" variant="outline" className="w-full sm:w-auto">
                     <Mail className="h-4 w-4" />
                     {l(c.formSubmitLabel)}
                   </Button>
