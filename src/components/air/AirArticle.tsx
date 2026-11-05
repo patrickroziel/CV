@@ -75,11 +75,15 @@ function AirReadHead({
       <div ref={ref} className="air-read-head">
         {seriesLabel ? (
           <p className="air-series-line">
-            <Layers className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span className="air-frame-sheen" aria-hidden />
+            <span className="air-series-mark" aria-hidden>
+              <Layers className="h-3.5 w-3.5" />
+            </span>
             <span>{seriesLabel}</span>
           </p>
         ) : null}
         <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
+          <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
           <h1>{title}</h1>
         </a>
       </div>
