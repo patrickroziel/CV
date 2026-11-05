@@ -8,7 +8,6 @@ import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
-import { WorkInProgress } from "@/components/media/WorkInProgress";
 import type { SocialPost } from "@/lib/types";
 
 type Current = "notes" | "air" | "work";
@@ -36,7 +35,10 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
     const notes = all.filter(p => p.universe !== "air");
     const air = all.filter(p => p.universe === "air");
 
-    const withImage = [...notes, ...air].filter(p => getNoteSharePhoto(p));
+    const withImage = [...notes, ...air].filter(p => {
+      const photo = getNoteSharePhoto(p);
+      return Boolean(photo && !isHeldMediaUrl(photo));
+    });
     const pool = withImage.length ? withImage : [...notes, ...air];
     return pool;
   }, [data.socialPosts]);
@@ -158,17 +160,13 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
                   className="group flex min-w-0 items-center gap-2.5"
                   title="Lire une publication"
                 >
-                  {image ? (
-                    isHeldMediaUrl(image) ? (
-                      <WorkInProgress className="h-12 w-14 shrink-0 rounded-lg" />
-                    ) : (
+                  {image && !isHeldMediaUrl(image) ? (
                     <img
                       src={image}
                       alt=""
                       loading="lazy"
                       className="h-12 w-14 shrink-0 rounded-lg object-cover"
                     />
-                    )
                   ) : null}
                   <span className="min-w-0 flex-1">
                     <span className="block text-[9px] uppercase tracking-[.14em] text-cyan-100/50">{articleLabel}</span>
