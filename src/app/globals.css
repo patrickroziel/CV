@@ -1588,3 +1588,23 @@ blockquote.rich-link-card.ghost-link-card {
 .work-notes-main .glass-card::after {
   opacity: 0.35;
 }
+
+@keyframes air-tag-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.air-tag-track {
+  animation: air-tag-marquee 48s linear infinite;
+}
+
+.air-tag-ticker:hover .air-tag-track,
+.air-tag-ticker:focus-within .air-tag-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .air-tag-track {
+    animation: none;
+  }
+}

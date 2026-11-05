@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import { KofiCard } from "@/components/support/KofiCard";
-import { PostTagList } from "@/components/medias/PostTagList";
+import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { AIR_CATEGORIES, coercePostCategory, collectPostTags, type AirCategory } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
@@ -52,7 +52,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     else addSocialPost({...values,universe:"air",order:0});
     setCreateOpen(false); setEditing(null);
   };
-  return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+  return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
     <aside><div className="lg:sticky lg:top-28">
       <p className="text-xs text-white/70">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white drop-shadow-sm">Air</h1>
@@ -86,13 +86,6 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       <UniversesWidget current="air" />
       <KofiCard className="mt-3" />
     </div>
-    <PostTagList
-      tags={tags}
-      activeTag={activeTag}
-      tone="light"
-      onClear={() => setActiveTag(null)}
-      onToggle={(tag) => setActiveTag((current) => current?.toLocaleLowerCase("fr") === tag.toLocaleLowerCase("fr") ? null : tag)}
-    />
     </aside>
     <section aria-label="Articles AIR" className="min-w-0">
     <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-4 pb-2">
@@ -137,5 +130,11 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       </DialogContent>
     </Dialog>
     </section>
+    <AirTagTicker
+      tags={tags}
+      activeTag={activeTag}
+      onClear={() => setActiveTag(null)}
+      onToggle={(tag) => setActiveTag((current) => current?.toLocaleLowerCase("fr") === tag.toLocaleLowerCase("fr") ? null : tag)}
+    />
   </div>;
 }
