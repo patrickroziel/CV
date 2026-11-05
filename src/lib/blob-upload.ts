@@ -1,16 +1,13 @@
 /**
- * Vercel Blob uploads for portfolio edit mode.
+ * Media uploads for portfolio edit mode.
  *
- * New files go to Blob (public URLs). Existing Cloudinary URLs in defaults /
- * localStorage keep working as plain image/video src strings — we never rewrite them.
- *
- * Large showreel / feature / demo videos should use unlisted YouTube links instead
- * of multi‑hundred‑MB Blob uploads.
+ * Prefers Cloudflare R2 when configured, falls back to Vercel Blob.
+ * Existing Blob / Cloudinary URLs keep working.
  */
 
 import { upload } from "@vercel/blob/client";
 
-/** Folder namespace on the Blob store (pathname prefix). */
+/** Folder namespace on the store (pathname prefix). */
 export const MEDIA_FOLDERS = {
   profile: "patrick-roziel/profile",
   projects: "patrick-roziel/projects",
@@ -34,7 +31,7 @@ export type CloudinaryFolder = MediaFolder;
 export type MediaResourceType = "image" | "video" | "raw" | "auto";
 
 export type MediaUploadResult = {
-  /** Public HTTPS URL (Blob or legacy Cloudinary) */
+  /** Public HTTPS URL (R2, Blob or legacy Cloudinary) */
   url: string;
   /** Alias of `url` for older call sites expecting Cloudinary shape */
   secure_url: string;
@@ -44,13 +41,14 @@ export type MediaUploadResult = {
 
 export type MediaUploadOptions = {
   folder?: string;
-  /** Hint only — Blob uses content-type of the file */
+  /** Hint only */
   resourceType?: MediaResourceType;
   onProgress?: (percent: number) => void;
   signal?: AbortSignal;
 };
 
-const HANDLE_UPLOAD_URL = "/api/blob/upload";
+const BLOB_HANDLE_UPLOAD_URL = "/api/blob/upload";
+const R2_PRESIGN_URL = "/api/r2/upload";
 
 function sanitizeFilename(name: string): string {
   const base = (name || "file").split(/[/\\]/).pop() || "file";
@@ -68,25 +66,86 @@ function buildPathname(folder: string | undefined, file: File): string {
   return `${safe}/${Date.now()}-${sanitizeFilename(file.name)}`;
 }
 
-/**
- * Upload a File to Vercel Blob (public).
- * Uses client upload + server token route so the RW token never ships to the browser.
- */
-export async function uploadToBlob(
+function isR2Configured(): boolean {
+  // Client cannot see secrets; we probe by attempting the route and falling back.
+  // The server route itself returns 503 if vars are missing.
+  return true;
+}
+
+async function uploadToR2(
   file: File,
   options: MediaUploadOptions = {}
 ): Promise<MediaUploadResult> {
   const { folder, onProgress, signal } = options;
 
-  if (signal?.aborted) {
-    throw new DOMException("Upload annulé", "AbortError");
+  if (signal?.aborted) throw new DOMException("Upload annulé", "AbortError");
+  if (!file || file.size <= 0) throw new Error("Fichier vide.");
+
+  const MAX = 100 * 1024 * 1024;
+  if (file.size > MAX) {
+    throw new Error(
+      "Fichier trop lourd (max 100 Mo). Pour un showreel ou une longue démo, utilisez un lien YouTube non listé."
+    );
   }
 
-  if (!file || file.size <= 0) {
-    throw new Error("Fichier vide.");
+  const pathname = buildPathname(folder, file);
+
+  const presignRes = await fetch(R2_PRESIGN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      pathname,
+      contentType: file.type || "application/octet-stream",
+      size: file.size,
+    }),
+    signal,
+  });
+
+  if (!presignRes.ok) {
+    const data = (await presignRes.json().catch(() => ({}))) as { error?: string };
+    throw new Error(data.error || `R2 presign failed (${presignRes.status})`);
   }
 
-  // Soft guard: Blob free tier / practical limit — prefer YouTube for huge videos
+  const { uploadUrl, publicUrl } = (await presignRes.json()) as {
+    uploadUrl: string;
+    publicUrl: string;
+    pathname: string;
+  };
+
+  onProgress?.(10);
+
+  const putRes = await fetch(uploadUrl, {
+    method: "PUT",
+    body: file,
+    headers: {
+      "Content-Type": file.type || "application/octet-stream",
+    },
+    signal,
+  });
+
+  if (!putRes.ok) {
+    throw new Error(`R2 upload failed (${putRes.status})`);
+  }
+
+  onProgress?.(100);
+
+  return {
+    url: publicUrl,
+    secure_url: publicUrl,
+    pathname,
+    contentType: file.type || null,
+  };
+}
+
+async function uploadToBlobLegacy(
+  file: File,
+  options: MediaUploadOptions = {}
+): Promise<MediaUploadResult> {
+  const { folder, onProgress, signal } = options;
+
+  if (signal?.aborted) throw new DOMException("Upload annulé", "AbortError");
+  if (!file || file.size <= 0) throw new Error("Fichier vide.");
+
   const MAX = 100 * 1024 * 1024;
   if (file.size > MAX) {
     throw new Error(
@@ -97,40 +156,58 @@ export async function uploadToBlob(
   const pathname = buildPathname(folder, file);
   const useMultipart = file.size > 4 * 1024 * 1024;
 
+  const blob = await upload(pathname, file, {
+    access: "public",
+    handleUploadUrl: BLOB_HANDLE_UPLOAD_URL,
+    multipart: useMultipart,
+    abortSignal: signal,
+    contentType: file.type || undefined,
+    onUploadProgress: (event) => {
+      if (typeof event.percentage === "number") {
+        onProgress?.(Math.min(100, Math.max(0, Math.round(event.percentage))));
+      }
+    },
+  });
+
+  onProgress?.(100);
+
+  return {
+    url: blob.url,
+    secure_url: blob.url,
+    pathname: blob.pathname,
+    contentType: blob.contentType,
+  };
+}
+
+/**
+ * Upload a File. Prefers Cloudflare R2, falls back to Vercel Blob.
+ */
+export async function uploadToBlob(
+  file: File,
+  options: MediaUploadOptions = {}
+): Promise<MediaUploadResult> {
   try {
-    const blob = await upload(pathname, file, {
-      access: "public",
-      handleUploadUrl: HANDLE_UPLOAD_URL,
-      multipart: useMultipart,
-      abortSignal: signal,
-      contentType: file.type || undefined,
-      onUploadProgress: (event) => {
-        if (typeof event.percentage === "number") {
-          onProgress?.(Math.min(100, Math.max(0, Math.round(event.percentage))));
-        }
-      },
-    });
-
-    onProgress?.(100);
-
-    return {
-      url: blob.url,
-      secure_url: blob.url,
-      pathname: blob.pathname,
-      contentType: blob.contentType,
-    };
+    return await uploadToR2(file, options);
   } catch (err) {
-    if (err instanceof DOMException && err.name === "AbortError") throw err;
-    if (signal?.aborted) {
-      throw new DOMException("Upload annulé", "AbortError");
-    }
     const msg = err instanceof Error ? err.message : String(err);
-    if (/BLOB_READ_WRITE_TOKEN|token|unauthorized|401/i.test(msg)) {
-      throw new Error(
-        "Upload Blob non configuré. Ajoutez BLOB_READ_WRITE_TOKEN (Vercel → Storage → Blob → token) dans .env.local / le projet Vercel."
-      );
+    // Fall back to Blob if R2 is not configured or fails
+    if (
+      /R2_|CLOUDFLARE_|Variables R2|presign|503|not configured/i.test(msg) ||
+      /failed/i.test(msg)
+    ) {
+      try {
+        return await uploadToBlobLegacy(file, options);
+      } catch (blobErr) {
+        const blobMsg = blobErr instanceof Error ? blobErr.message : String(blobErr);
+        if (/BLOB_READ_WRITE_TOKEN|token|unauthorized|401/i.test(blobMsg)) {
+          throw new Error(
+            "Upload non configuré. Vérifiez les variables R2 (CLOUDFLARE_ACCOUNT_ID, R2_*) ou le token Vercel Blob."
+          );
+        }
+        throw blobErr;
+      }
     }
-    throw new Error(msg || "Échec de l’upload vers Vercel Blob.");
+    throw err;
   }
 }
 
@@ -165,5 +242,16 @@ export function isCloudinaryUrl(url: string | null | undefined): boolean {
     return new URL(url).hostname === "res.cloudinary.com";
   } catch {
     return /res\.cloudinary\.com/i.test(url);
+  }
+}
+
+/** True if URL points at the Cloudflare R2 public domain */
+export function isR2Url(url: string | null | undefined): boolean {
+  if (!url) return false;
+  try {
+    const host = new URL(url).hostname;
+    return host === "media.patrickroziel.com" || host.endsWith(".r2.dev");
+  } catch {
+    return false;
   }
 }
