@@ -1087,7 +1087,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   overflow: hidden;
   border-radius: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(48, 78, 128, 0.96);
+  background: #305080;
   box-shadow: none;
   color: #fff;
   backdrop-filter: none;
@@ -1161,7 +1161,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   max-width: 100%;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(48, 78, 128, 0.96);
+  background: #305080;
   padding: 0.32rem 0.8rem;
   color: #fff;
   font-size: 0.78rem;
@@ -1171,7 +1171,10 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
 .air-article h2.air-part-title {
   position: relative;
   z-index: 2;
-  background: rgba(48, 78, 128, 0.96);
+  background: #305080;
+}
+h2.air-part-title.air-part-held {
+  visibility: hidden;
 }
 [id^="air-body-"],
 [id^="note-body-"] {

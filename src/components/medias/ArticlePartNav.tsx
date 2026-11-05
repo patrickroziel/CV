@@ -20,6 +20,7 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
       const title = root.closest("article")?.querySelector(".air-title-pill");
       const line = title ? title.getBoundingClientRect().bottom : 160;
       const stuck = heads.filter((el) => el.getBoundingClientRect().top < line - 8);
+      heads.forEach((el) => el.classList.toggle("air-part-held", stuck.includes(el)));
       setParts(stuck.map((el) => ({
         id: el.id,
         label: (el.textContent || "").replace(/\s+/g, " ").trim(),
