@@ -9,7 +9,7 @@ import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import type { SocialPost } from "@/lib/types";
 
-type Current = "notes" | "air";
+type Current = "notes" | "air" | "work";
 
 function shuffle<T>(array: T[]): T[] {
   const copy = [...array];
@@ -51,17 +51,24 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
 
   const featured = shuffled[articleIndex % Math.max(shuffled.length, 1)] ?? null;
 
-  const slides = current === "air"
-    ? [
-        { label: "Vous êtes dans Air", content: "Décryptages, expériences et observations.", href: "/air" },
-        { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-        { label: "Work", content: "Portfolio · CV · Compétences", href: "/work" },
-      ]
-    : [
-        { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-        { label: "Air", content: "Décryptages · Expériences · Observations", href: "/air" },
-        { label: "Work", content: "Portfolio · CV · Compétences", href: "/work" },
-      ];
+  const slides =
+    current === "air"
+      ? [
+          { label: "Vous êtes dans Air", content: "Décryptages, expériences et observations.", href: "/air" },
+          { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
+          { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
+        ]
+      : current === "work"
+        ? [
+            { label: "Vous êtes dans Work", content: "Parcours, showreel et compétences.", href: "/work" },
+            { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
+            { label: "Air", content: "Décryptages, expériences et observations.", href: "/air" },
+          ]
+        : [
+            { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
+            { label: "Air", content: "Décryptages, expériences et observations.", href: "/air" },
+            { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
+          ];
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -182,9 +189,11 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
               <Cloud className="h-3 w-3" /> Air
             </Link>
           )}
-          <Link href="/work" className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[.05] px-2.5 py-1.5 text-[10px] text-zinc-100 transition-colors hover:bg-white/10">
-            <BriefcaseBusiness className="h-3 w-3" /> Work
-          </Link>
+          {current !== "work" && (
+            <Link href="/work" className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[.05] px-2.5 py-1.5 text-[10px] text-zinc-100 transition-colors hover:bg-white/10">
+              <BriefcaseBusiness className="h-3 w-3" /> Work
+            </Link>
+          )}
         </div>
       </div>
     </section>

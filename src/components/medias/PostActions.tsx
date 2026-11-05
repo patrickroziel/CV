@@ -172,27 +172,31 @@ export function PostActions({ postId, title, visible = true, sharePath = "/notes
   }
 
   const likeClass = tone === "light"
-    ? "border-rose-700 bg-rose-600 text-white shadow-sm"
-    : "border-rose-200/50 bg-rose-500 text-white shadow-[0_10px_24px_-14px_rgba(244,63,94,0.95)]";
+    ? liked
+      ? "border-[#1c1917]/20 bg-[#1c1917]/[0.04] text-[#7f1d1d]"
+      : "border-[#1c1917]/12 bg-transparent text-[#1c1917]/80 hover:border-[#1c1917]/25 hover:bg-[#1c1917]/[0.03]"
+    : liked
+      ? "border-white/25 bg-white/[0.07] text-rose-100"
+      : "border-white/14 bg-white/[0.03] text-zinc-200 hover:border-white/28 hover:bg-white/[0.06]";
   const shareClass = tone === "light"
-    ? "border-sky-950 bg-sky-900 text-white shadow-sm"
-    : "border-cyan-100/40 bg-cyan-300 text-slate-950";
+    ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/80 hover:border-[#1c1917]/25 hover:bg-[#1c1917]/[0.03]"
+    : "border-white/14 bg-white/[0.03] text-zinc-200 hover:border-white/28 hover:bg-white/[0.06]";
   const chipClass = tone === "light"
-    ? "border-slate-900/15 bg-white text-slate-900 hover:bg-slate-50"
-    : "border-white/15 bg-white/10 text-white hover:bg-white/16";
+    ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/75 hover:bg-[#1c1917]/[0.04]"
+    : "border-white/12 bg-white/[0.03] text-zinc-300 hover:bg-white/[0.07]";
 
   return <div className="flex min-w-0 flex-col gap-2">
     <div className="flex min-w-0 flex-wrap items-center gap-2">
       <button type="button" onClick={() => void react()}
         aria-pressed={liked} title={liked ? "Retirer mon like" : "J'aime"}
-        className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition hover:brightness-110 ${likeClass} ${liked ? "ring-2 ring-white/70" : ""}`}>
-        <Heart className="h-4 w-4 fill-current" aria-hidden />
+        className={`inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-[0.78rem] font-medium tracking-[0.01em] transition ${likeClass}`}>
+        <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current" : ""}`} aria-hidden />
         <span>J'aime</span>
         {ready && enabled ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
       </button>
       <button type="button" onClick={() => { setShareOpen((open) => !open); setMessage(""); }}
         aria-expanded={shareOpen}
-        className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition hover:brightness-110 ${shareClass}`}
+        className={`inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-[0.78rem] font-medium tracking-[0.01em] transition ${shareClass}`}
         aria-label={`Partager ${title || "la publication"}`}>
         <Share2 className="h-4 w-4" aria-hidden /> Partager
       </button>

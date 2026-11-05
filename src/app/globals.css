@@ -869,7 +869,7 @@ html,
 body {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 main,
@@ -1549,6 +1549,15 @@ blockquote.rich-link-card.ghost-link-card {
 }
 .rich-bio-editor a {
   color: #a5f3fc;
+}
+
+@media (min-width: 1024px) {
+  .work-rail {
+    scrollbar-width: none;
+  }
+  .work-rail::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Experience cards: almost no glass, forest stays visible */
