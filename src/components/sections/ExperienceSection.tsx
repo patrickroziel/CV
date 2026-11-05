@@ -82,13 +82,12 @@ export function ExperienceSection() {
           }
         />
 
-        <GlassCard className="p-6 sm:p-8">
-          {experiences.length === 0 ? (
-            <p className="py-8 text-center text-zinc-400">
-              {t("sections.experienceEmpty")}
-            </p>
-          ) : (
-            <div className="relative">
+        {experiences.length === 0 ? (
+          <p className="py-8 text-center text-zinc-400">
+            {t("sections.experienceEmpty")}
+          </p>
+        ) : (
+          <div className="relative">
               <div
                 aria-hidden
                 className="absolute left-[11px] top-2 bottom-2 w-px bg-gradient-to-b from-teal-300/70 via-white/15 to-transparent sm:left-[15px]"
@@ -110,7 +109,7 @@ export function ExperienceSection() {
                     <span className="absolute left-0 top-5 flex h-6 w-6 items-center justify-center sm:h-8 sm:w-8">
                       <span className="h-3 w-3 rounded-full bg-teal-300 shadow-[0_0_12px_rgba(94,234,212,0.7)] ring-4 ring-teal-300/20" />
                     </span>
-                    <GlassCard nested glow className="group p-5 sm:p-6">
+                    <GlassCard nested glow className="experience-card group p-5 sm:p-6">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <h3 className="text-base font-medium tracking-tight text-zinc-50 sm:text-[1.05rem]">
@@ -183,8 +182,7 @@ export function ExperienceSection() {
               </ul>
             </div>
           )}
-        </GlassCard>
-      </div>
+        </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
