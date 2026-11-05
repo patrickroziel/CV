@@ -1059,7 +1059,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
 
 .article-sticky-head {
   position: sticky;
-  top: 7.6rem;
+  top: 4.5rem;
   z-index: 20;
   max-width: 100%;
   padding: 0.85rem 1rem 0.75rem;

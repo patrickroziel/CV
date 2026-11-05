@@ -11,7 +11,6 @@ import { SupportBar } from "@/components/layout/SupportBar";
 import { ScrollProgress } from "@/components/shared/ScrollProgress";
 import { CvPrintView } from "@/components/print/CvPrintView";
 import { ComingSoonView } from "@/components/coming-soon/ComingSoonView";
-import { UniversesBanner } from "@/components/layout/UniversesBanner";
 import { DEFAULT_COMING_SOON } from "@/lib/types";
 import { universeFromPath } from "@/lib/universe";
 
@@ -65,7 +64,6 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <AmbientOrbs />
       <ScrollProgress />
       <Header />
-      <UniversesBanner />
       <div className="relative z-10">{children}</div>
       <Footer />
       <SupportBar />
