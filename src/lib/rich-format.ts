@@ -239,6 +239,21 @@ export function applyRichFormat(
     return true;
   }
 
+  if (command === "insertGif" && arg) {
+    const src = safeImageSrc(arg);
+    if (!src) return false;
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "GIF";
+    img.className = "rich-gif";
+    img.setAttribute("contenteditable", "false");
+    img.style.maxWidth = "100%";
+    img.style.height = "auto";
+    img.style.borderRadius = "0.75rem";
+    insertBlockAfterCaret(editor, img, active);
+    return true;
+  }
+
   if (command === "foreColor" && arg) {
     const color = arg;
     if (!active.collapsed) {
@@ -578,17 +593,9 @@ export function restoreColorMarkers(html: string): string {
   shell.querySelectorAll("span[style]").forEach((el) => {
     if (!isElement(el)) return;
     const c = el.style.color;
-    if (c) el.setAttribute("data-rich-color", rgbToHexOrKeep(c));
+    if (c && !el.getAttribute("data-rich-color")) {
+      el.setAttribute("data-rich-color", c);
+    }
   });
   return shell.innerHTML;
-}
-
-function rgbToHexOrKeep(color: string): string {
-  const m = color.match(
-    /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i
-  );
-  if (!m) return color;
-  const h = (n: string) =>
-    Math.max(0, Math.min(255, Number(n))).toString(16).padStart(2, "0");
-  return `#${h(m[1])}${h(m[2])}${h(m[3])}`;
 }

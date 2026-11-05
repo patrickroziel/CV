@@ -16,7 +16,7 @@ export type SanitizeHtmlOptions = {
 
 /**
  * Allow a small HTML subset for rich text fields:
- * b, strong, i, em, u, a, br, p, div, span, ul, ol, li, blockquote
+ * b, strong, i, em, u, a, br, p, div, span, ul, ol, li, blockquote, img
  * style: font-weight, font-style, text-align, text-decoration
  *        + color / font-size only when NOT from paste (manual edit)
  * Never keeps font-family — site default font always wins.
@@ -55,7 +55,7 @@ export function sanitizeBioHtml(
     "A",
     "IMG",
   ]);
-  const linkCardClass = new Set([
+  const allowedClasses = new Set([
     "rich-link-card",
     "rich-link-card-img",
     "rich-link-card-copy",
@@ -63,6 +63,7 @@ export function sanitizeBioHtml(
     "rich-link-card-title",
     "rich-link-card-desc",
     "ghost-link-card",
+    "rich-gif",
   ]);
   // Never font-family. Color/size only for manual editor commits.
   // line-height only when not paste (wrapper + editor) — Word line-heights stripped on paste.
@@ -143,7 +144,7 @@ export function sanitizeBioHtml(
             .split(/\s+/)
             .filter(
               (t) =>
-                isRichSpacingClass(t) || t === "rich-lh" || linkCardClass.has(t)
+                isRichSpacingClass(t) || t === "rich-lh" || allowedClasses.has(t)
             );
           if (kept.length) el.setAttribute("class", kept.join(" "));
           else el.removeAttribute("class");
@@ -174,8 +175,11 @@ export function sanitizeBioHtml(
           else el.removeAttribute(attr.name);
         } else if (name === "src" && el.tagName === "IMG") {
           const src = safeImageSrc(attr.value);
-          if (src && el.classList.contains("rich-link-card-img")) el.setAttribute("src", src);
-          else el.removeAttribute(attr.name);
+          if (src && (el.classList.contains("rich-link-card-img") || el.classList.contains("rich-gif"))) {
+            el.setAttribute("src", src);
+          } else {
+            el.removeAttribute(attr.name);
+          }
         } else if (name === "alt" && el.tagName === "IMG") {
           el.setAttribute("alt", attr.value.replace(/[<>]/g, "").slice(0, 180));
         } else {
@@ -203,7 +207,7 @@ export function sanitizeBioHtml(
         el.remove();
         continue;
       }
-      if (el.classList.contains("rich-link-card")) {
+      if (el.classList.contains("rich-link-card") || el.classList.contains("rich-gif")) {
         el.setAttribute("contenteditable", "false");
       }
       // If we kept data-rich-color, ensure style.color exists after style cleanup

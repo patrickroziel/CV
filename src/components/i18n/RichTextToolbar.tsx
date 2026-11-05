@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bold, Eraser, Italic, Link2, List, Quote, Minus, Plus, Underline } from "lucide-react";
+import { Bold, Eraser, Italic, Link2, List, Quote, Minus, Plus, Underline, Image as ImageIcon } from "lucide-react";
 import { safeHref } from "@/lib/safe-href";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +13,7 @@ type RichTextToolbarProps = {
   onLineHeightChange?: (value: number) => void;
 };
 
-/** Gras, italique, souligné, lien, taille, liste et remise à zéro. */
+/** Gras, italique, souligné, lien, GIF, taille, liste et remise à zéro. */
 export function RichTextToolbar({ onCommand, className, compact = false }: RichTextToolbarProps) {
   const btn = "inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-200 transition hover:bg-white/10 hover:text-white";
   const [fontSizeDraft, setFontSizeDraft] = useState("14");
@@ -21,6 +21,9 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
   const [linkUrl, setLinkUrl] = useState("");
   const [linkBusy, setLinkBusy] = useState(false);
   const [linkError, setLinkError] = useState("");
+  const [gifOpen, setGifOpen] = useState(false);
+  const [gifUrl, setGifUrl] = useState("");
+  const [gifError, setGifError] = useState("");
 
   const commitFontSize = (raw = fontSizeDraft) => {
     const parsed = Number(String(raw).replace(",", "."));
@@ -71,6 +74,22 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
     }
   };
 
+  const applyGif = () => {
+    const href = safeHref(gifUrl);
+    if (!href || !/^https:\/\//i.test(href)) {
+      setGifError("URL GIF https invalide.");
+      return;
+    }
+    const applied = onCommand("insertGif", href);
+    if (applied === false) {
+      setGifError("Impossible d’insérer le GIF.");
+      return;
+    }
+    setGifError("");
+    setGifOpen(false);
+    setGifUrl("");
+  };
+
   return (
     <div
       className={cn("flex flex-wrap items-center gap-1 rounded-xl border border-white/10 bg-black/30 px-1.5 py-1", className)}
@@ -88,7 +107,8 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
       <button type="button" title="Gras" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("bold")}><Bold className="h-3.5 w-3.5" /></button>
       <button type="button" title="Italique" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("italic")}><Italic className="h-3.5 w-3.5" /></button>
       <button type="button" title="Souligner" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("underline")}><Underline className="h-3.5 w-3.5" /></button>
-      <button type="button" title="Lien" aria-expanded={linkOpen} className={cn(btn, linkOpen && "bg-white/15 text-white")} onMouseDown={(e) => e.preventDefault()} onClick={() => { setLinkOpen((open) => !open); setLinkError(""); }}><Link2 className="h-3.5 w-3.5" /></button>
+      <button type="button" title="Lien" aria-expanded={linkOpen} className={cn(btn, linkOpen && "bg-white/15 text-white")} onMouseDown={(e) => e.preventDefault()} onClick={() => { setLinkOpen((open) => !open); setLinkError(""); setGifOpen(false); }}><Link2 className="h-3.5 w-3.5" /></button>
+      {!compact && <button type="button" title="GIF" aria-expanded={gifOpen} className={cn(btn, gifOpen && "bg-white/15 text-white")} onMouseDown={(e) => e.preventDefault()} onClick={() => { setGifOpen((open) => !open); setGifError(""); setLinkOpen(false); }}><ImageIcon className="h-3.5 w-3.5" /></button>}
       {!compact && <button type="button" title="Citation — barre verticale" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("formatBlock", "blockquote")}><Quote className="h-3.5 w-3.5" /></button>}
       {!compact && <button type="button" title="Liste à puces" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("insertUnorderedList")}><List className="h-3.5 w-3.5" /></button>}
 
@@ -158,6 +178,37 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
             )}
           </div>
           {linkError && <p className="text-[11px] font-normal normal-case tracking-normal text-rose-200">{linkError}</p>}
+        </form>
+      )}
+
+      {gifOpen && (
+        <form
+          className="mt-1 flex w-full min-w-0 basis-full flex-col gap-2 rounded-lg border border-white/10 bg-black/40 p-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            applyGif();
+          }}
+        >
+          <label className="grid gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+            URL du GIF
+            <input
+              type="url"
+              inputMode="url"
+              placeholder="https://….gif"
+              value={gifUrl}
+              onChange={(e) => setGifUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                e.stopPropagation();
+                applyGif();
+              }}
+              className="h-9 rounded-lg border border-white/15 bg-black/50 px-2 text-sm font-normal normal-case tracking-normal text-zinc-100 outline-none focus:border-cyan-200/50"
+            />
+          </label>
+          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={applyGif} className="inline-flex h-9 items-center rounded-full bg-cyan-300 px-3 text-xs font-semibold text-slate-950">Insérer le GIF</button>
+          {gifError && <p className="text-[11px] font-normal normal-case tracking-normal text-rose-200">{gifError}</p>}
         </form>
       )}
     </div>
