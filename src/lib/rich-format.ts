@@ -239,6 +239,21 @@ export function applyRichFormat(
     return true;
   }
 
+  if (command === "insertPartTitle") {
+    const heading = document.createElement("h2");
+    heading.className = "air-part-title";
+    heading.textContent = "Titre de la partie";
+    insertBlockAfterCaret(editor, heading, active);
+    const selection = window.getSelection();
+    if (selection) {
+      const caret = document.createRange();
+      caret.selectNodeContents(heading);
+      selection.removeAllRanges();
+      selection.addRange(caret);
+    }
+    return true;
+  }
+
   if (command === "insertGif" && arg) {
     const src = safeImageSrc(arg);
     if (!src) return false;

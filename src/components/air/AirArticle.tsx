@@ -7,6 +7,7 @@ import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
+import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import type { SocialPost } from "@/lib/types";
@@ -29,14 +30,17 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
       <Link href="/air" className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
       <PostEditButton post={post} universe="air" />
     </div>
-    <article className={`air-surface mt-6 overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
+    <article className={`air-surface mt-6 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
       {cover&&<div className="aspect-[16/8] overflow-hidden sm:aspect-[16/7]"><img src={cover} alt={title} className="h-full w-full object-cover"/></div>}
-      <div className="space-y-6 p-5 sm:p-10">
+      <div className="article-sticky-head">
         <p className="text-[11px] font-semibold uppercase tracking-[.2em] text-white/55">{coercePostCategory(post)} · {post.date}</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">{title}</h1>
-        {post.subtitle&&<p className="text-lg text-white/75">{l(post.subtitle)}</p>}
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">{title}</h1>
+        {post.subtitle&&<p className="mt-3 text-lg text-white/75">{l(post.subtitle)}</p>}
+        <ArticlePartNav targetId={`air-body-${post.id}`} />
+      </div>
+      <div id={`air-body-${post.id}`} className="space-y-6 px-5 pb-5 sm:px-10 sm:pb-10">
         <FeaturedMedia media={post.featuredEmbed} title={title}/>
-        <PostRichBody html={proxyBlobImages(l(post.description))} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full"/>
+        <PostRichBody html={proxyBlobImages(l(post.description))} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
         <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" />
       </div>
     </article>
