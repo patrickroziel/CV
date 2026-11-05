@@ -80,11 +80,6 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           );
         })}
       </nav>
-      <div className="air-surface mt-8 rounded-2xl border p-5 backdrop-blur-xl">
-        <p className="text-[10px] uppercase tracking-[.24em] text-white/60">À propos d’Air</p>
-        <p className="mt-3 text-sm leading-6 text-white/90">Regarder les choses en face. Les comprendre. Les formuler.</p>
-        <p className="mt-3 text-xs leading-5 text-white/75">Un espace de réflexion et de transmission autour de la communication, des institutions et des expériences qui poussent à questionner ce qui semble aller de soi.</p>
-      </div>
       <UniversesWidget current="air" />
       <KofiCard className="mt-3" />
     </div>
