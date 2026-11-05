@@ -12,6 +12,43 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [logoutError, setLogoutError] = useState(false);
+  const [blobNote, setBlobNote] = useState("");
+
+  async function moveBlobToCloudflare() {
+    setBusy(true);
+    setBlobNote("Transfert des médias encore chez Vercel…");
+    const skip: string[] = [];
+    let moved = 0;
+    try {
+      for (let step = 0; step < 80; step += 1) {
+        const response = await fetch("/api/r2/migrate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phase: "content", skip }),
+        });
+        const result = (await response.json().catch(() => ({}))) as { done?: boolean; remaining?: number; error?: string; copied?: string; failed?: string };
+        if (!response.ok) throw new Error(result.error || "Transfert refusé.");
+        if (result.failed) {
+          skip.push(result.failed);
+          setBlobNote(`${moved} copié(s). Un fichier a été laissé : ${result.error || "erreur"}.`);
+          continue;
+        }
+        if (result.done || result.remaining === 0) {
+          setBlobNote(moved ? `${moved} média(s) sont sur Cloudflare.` : "Aucun média Blob dans le contenu.");
+          return;
+        }
+        if (result.copied) {
+          moved += 1;
+          setBlobNote(`${moved} copié(s), encore ${result.remaining ?? "…"}.`);
+        }
+      }
+      setBlobNote(`${moved} copié(s). Relance pour la suite.`);
+    } catch (error) {
+      setBlobNote(error instanceof Error ? error.message : "Transfert impossible.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function currentCloud(): Promise<PortfolioCloudState> {
     const response = await fetch("/api/backoffice/content", { cache: "no-store" });
@@ -141,6 +178,15 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
                 onChange={(e) => { const selected = e.target.files?.[0]; if (selected) void importSnapshot(selected); }} />
               {busy && <p role="status" className="mt-3 text-sm text-zinc-300">Opération en cours…</p>}
               {message && <p role="status" className="mt-3 text-sm text-cyan-100">{message}</p>}
+            </section>
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <h2 className="font-semibold">Médias Vercel vers Cloudflare</h2>
+              <p className="mt-2 text-sm text-zinc-300">Copie les images encore liées au contenu, une par une, vers Cloudflare. Les fichiers orphelins du stockage restent chez Vercel tant que tu ne les supprimes pas.</p>
+              <button type="button" disabled={busy} onClick={() => void moveBlobToCloudflare()}
+                className="mt-4 rounded-xl bg-cyan-200 px-4 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">
+                Transférer les médias du site
+              </button>
+              {blobNote && <p role="status" className="mt-3 text-sm text-cyan-100">{blobNote}</p>}
             </section>
             <button className="text-xs text-zinc-400 underline" onClick={async () => {
               setLogoutError(false);
