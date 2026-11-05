@@ -13,6 +13,7 @@ import { CvPrintView } from "@/components/print/CvPrintView";
 import { ComingSoonView } from "@/components/coming-soon/ComingSoonView";
 import { DEFAULT_COMING_SOON } from "@/lib/types";
 import { universeFromPath } from "@/lib/universe";
+import { BlobMediaGuard } from "@/components/media/BlobMediaGuard";
 
 /**
  * Shared shell for Work + Notes + Air.
@@ -62,6 +63,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     <>
       <Wallpaper />
       <AmbientOrbs />
+      <BlobMediaGuard />
       <ScrollProgress />
       <Header />
       <div className="relative z-10">{children}</div>

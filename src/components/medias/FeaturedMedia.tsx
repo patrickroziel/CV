@@ -4,6 +4,13 @@ import { Play } from "lucide-react";
 import type { FeaturedEmbed } from "@/lib/types";
 import { normalizeFeaturedEmbed } from "@/lib/featured-embed";
 import { XEmbed } from "@/components/projects/XEmbed";
+import { WorkInProgress } from "@/components/media/WorkInProgress";
+import { isVercelBlobUrl } from "@/lib/blob-upload";
+
+function isBlockedMedia(url: string | null | undefined) {
+  if (!url) return false;
+  return isVercelBlobUrl(url) || url.includes("blob.vercel-storage.com") || url.includes("/api/media/blob");
+}
 
 function ViewportYouTube({ id, title, autoplay }: {
   id: string;
@@ -86,6 +93,9 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
   if (!featured) return null;
 
   if (featured.type === "image") {
+    if (isBlockedMedia(featured.url)) {
+      return <WorkInProgress className="aspect-video max-h-[420px] w-full rounded-2xl" />;
+    }
     return <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
       <img src={featured.url} alt={title || "Image intégrée"} loading="lazy" referrerPolicy="no-referrer"
         className="absolute inset-0 h-full w-full object-cover object-center" />

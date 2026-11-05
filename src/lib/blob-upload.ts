@@ -1,11 +1,7 @@
 /**
  * Media uploads for portfolio edit mode.
- *
- * Prefers Cloudflare R2 when configured, falls back to Vercel Blob.
- * Existing Blob / Cloudinary URLs keep working.
+ * New files go to Cloudflare R2 only. Vercel Blob is no longer used.
  */
-
-import { upload } from "@vercel/blob/client";
 
 /** Folder namespace on the store (pathname prefix). */
 export const MEDIA_FOLDERS = {
@@ -47,7 +43,6 @@ export type MediaUploadOptions = {
   signal?: AbortSignal;
 };
 
-const BLOB_HANDLE_UPLOAD_URL = "/api/blob/upload";
 const R2_PRESIGN_URL = "/api/r2/upload";
 
 function sanitizeFilename(name: string): string {
@@ -64,12 +59,6 @@ function buildPathname(folder: string | undefined, file: File): string {
       ? prefix
       : `patrick-roziel/${prefix}`;
   return `${safe}/${Date.now()}-${sanitizeFilename(file.name)}`;
-}
-
-function isR2Configured(): boolean {
-  // Client cannot see secrets; we probe by attempting the route and falling back.
-  // The server route itself returns 503 if vars are missing.
-  return true;
 }
 
 async function uploadToR2(
@@ -124,7 +113,7 @@ async function uploadToR2(
   });
 
   if (!putRes.ok) {
-    throw new Error(`R2 upload failed (${putRes.status})`);
+    throw new Error(`Envoi Cloudflare refusé (${putRes.status}).`);
   }
 
   onProgress?.(100);
@@ -137,51 +126,7 @@ async function uploadToR2(
   };
 }
 
-async function uploadToBlobLegacy(
-  file: File,
-  options: MediaUploadOptions = {}
-): Promise<MediaUploadResult> {
-  const { folder, onProgress, signal } = options;
-
-  if (signal?.aborted) throw new DOMException("Upload annulé", "AbortError");
-  if (!file || file.size <= 0) throw new Error("Fichier vide.");
-
-  const MAX = 100 * 1024 * 1024;
-  if (file.size > MAX) {
-    throw new Error(
-      "Fichier trop lourd (max 100 Mo). Pour un showreel ou une longue démo, utilisez un lien YouTube non listé."
-    );
-  }
-
-  const pathname = buildPathname(folder, file);
-  const useMultipart = file.size > 4 * 1024 * 1024;
-
-  const blob = await upload(pathname, file, {
-    access: "public",
-    handleUploadUrl: BLOB_HANDLE_UPLOAD_URL,
-    multipart: useMultipart,
-    abortSignal: signal,
-    contentType: file.type || undefined,
-    onUploadProgress: (event) => {
-      if (typeof event.percentage === "number") {
-        onProgress?.(Math.min(100, Math.max(0, Math.round(event.percentage))));
-      }
-    },
-  });
-
-  onProgress?.(100);
-
-  return {
-    url: blob.url,
-    secure_url: blob.url,
-    pathname: blob.pathname,
-    contentType: blob.contentType,
-  };
-}
-
-/**
- * Upload a File. Prefers Cloudflare R2, falls back to Vercel Blob.
- */
+/** Upload a file to Cloudflare R2. Vercel Blob is not used. */
 export async function uploadToBlob(
   file: File,
   options: MediaUploadOptions = {}
@@ -190,24 +135,10 @@ export async function uploadToBlob(
     return await uploadToR2(file, options);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    // Fall back to Blob if R2 is not configured or fails
-    if (
-      /R2_|CLOUDFLARE_|Variables R2|presign|503|not configured/i.test(msg) ||
-      /failed/i.test(msg)
-    ) {
-      try {
-        return await uploadToBlobLegacy(file, options);
-      } catch (blobErr) {
-        const blobMsg = blobErr instanceof Error ? blobErr.message : String(blobErr);
-        if (/BLOB_READ_WRITE_TOKEN|token|unauthorized|401/i.test(blobMsg)) {
-          throw new Error(
-            "Upload non configuré. Vérifiez les variables R2 (CLOUDFLARE_ACCOUNT_ID, R2_*) ou le token Vercel Blob."
-          );
-        }
-        throw blobErr;
-      }
+    if (/Variables R2|R2_BUCKET|R2_PUBLIC|CLOUDFLARE_ACCOUNT/i.test(msg)) {
+      throw new Error("Cloudflare n’est pas configuré. Vérifiez les variables R2 dans Vercel.");
     }
-    throw err;
+    throw err instanceof Error ? err : new Error(msg);
   }
 }
 
