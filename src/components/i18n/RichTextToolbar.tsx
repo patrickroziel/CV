@@ -92,7 +92,7 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
 
   return (
     <div
-      className={cn("sticky top-0 z-30 flex flex-wrap items-center gap-1 rounded-xl border border-white/10 bg-[#0b1016]/95 px-1.5 py-1 shadow-[0_10px_28px_-18px_rgba(0,0,0,0.9)] backdrop-blur-xl", className)}
+      className={cn("sticky top-2 z-40 flex flex-wrap items-center gap-1 rounded-xl border border-white/10 bg-[#0b1016]/95 px-1.5 py-1 shadow-[0_10px_28px_-18px_rgba(0,0,0,0.9)] backdrop-blur-xl", className)}
       onMouseDown={(e) => {
         const target = e.target as HTMLElement;
         if (target.closest("input, button")) return;

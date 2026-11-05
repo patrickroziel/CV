@@ -123,7 +123,6 @@ export function RichLocalizedField({
       <Label htmlFor={fieldId}>{label}</Label>
       <div onMouseDownCapture={rememberSelection} onPointerDownCapture={rememberSelection}>
         <RichTextToolbar onCommand={run} compact={compact} />
-      </div>
       <div
         id={fieldId}
         ref={editorRef}
@@ -164,6 +163,7 @@ export function RichLocalizedField({
         )}
         style={{ minHeight: `${minHeight}rem`, lineHeight }}
       />
+      </div>
       {hint ? <p className="text-[10px] text-zinc-500">{hint}</p> : null}
     </div>
   );

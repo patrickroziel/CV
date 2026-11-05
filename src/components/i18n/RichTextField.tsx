@@ -108,7 +108,6 @@ export function RichTextField({
           lineHeight={lineHeight}
           onLineHeightChange={compact ? undefined : handleLineHeight}
         />
-      </div>
       <div
         id={fieldId}
         ref={editorRef}
@@ -157,6 +156,7 @@ export function RichTextField({
           lineHeight: formatLineHeight(lineHeight),
         }}
       />
+      </div>
       {hint && <p className="text-[10px] text-zinc-500">{hint}</p>}
     </div>
   );
