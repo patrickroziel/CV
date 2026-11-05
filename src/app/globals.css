@@ -1640,15 +1640,14 @@ blockquote.rich-link-card.ghost-link-card {
 }
 
 
-/* Force white text in the rich text editor */
-.rich-bio-editor {
-  color: #fafafa !important;
-}
+/* Force white text in the rich text editor, even if a post still stores black. */
+.rich-bio-editor,
 .rich-bio-editor * {
-  color: inherit;
+  color: #f4f4f5 !important;
 }
-.rich-bio-editor a {
-  color: #a5f3fc;
+.rich-bio-editor a,
+.rich-bio-editor a * {
+  color: #a5f3fc !important;
 }
 
 @media (min-width: 1024px) {

@@ -233,6 +233,34 @@ export function looksLikeHtml(value: string): boolean {
   return /<\/?[a-z][\s\S]*>/i.test(value);
 }
 
+function isDarkInk(value: string): boolean {
+  const v = value.trim().toLowerCase();
+  if (v === "black" || v === "#000" || v === "#000000" || v === "#111" || v === "#111111") return true;
+  const hex = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  if (hex) {
+    const full = hex[1].length === 3 ? hex[1].split("").map((c) => c + c).join("") : hex[1];
+    const channels = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16));
+    return channels.every((n) => n < 55);
+  }
+  const rgb = v.match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
+  if (!rgb) return false;
+  return [1, 2, 3].every((i) => Number(rgb[i]) < 55);
+}
+
+/** Drop leftover black ink so the dark editor stays readable. */
+function stripDarkInk(html: string): string {
+  if (!html || typeof document === "undefined") return html;
+  const root = document.createElement("div");
+  root.innerHTML = html;
+  root.querySelectorAll<HTMLElement>("[style], [data-rich-color]").forEach((el) => {
+    const marker = el.getAttribute("data-rich-color");
+    if (marker && isDarkInk(marker)) el.removeAttribute("data-rich-color");
+    if (el.style.color && isDarkInk(el.style.color)) el.style.removeProperty("color");
+    if (!el.getAttribute("style")?.trim()) el.removeAttribute("style");
+  });
+  return root.innerHTML;
+}
+
 /**
  * Prepare stored content for a contentEditable surface.
  * Plain text with newlines / list markers becomes structured HTML so
@@ -245,7 +273,7 @@ export function toEditableHtml(value: string): string {
     const { body } = extractRichSpacing(value);
     // Normalize to a single homogeneous tree, then sanitize (keeps colours)
     const flat = normalizeRichBody(body || value);
-    return sanitizeBioHtml(flat);
+    return stripDarkInk(sanitizeBioHtml(flat));
   }
   // Defer plain→HTML conversion to clipboard helper only when structure is present
   if (/[\n\r]/.test(value) || /^\s*(?:[•●○▪\-–—*]|(\d+[\.\)]))\s+/m.test(value)) {
