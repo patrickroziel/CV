@@ -19,6 +19,8 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
     setBlobNote("Transfert des médias encore chez Vercel…");
     const skip: string[] = [];
     let moved = 0;
+    let failed = 0;
+    let lastError = "";
     try {
       for (let step = 0; step < 80; step += 1) {
         const response = await fetch("/api/r2/migrate", {
@@ -30,11 +32,15 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
         if (!response.ok) throw new Error(result.error || "Transfert refusé.");
         if (result.failed) {
           skip.push(result.failed);
-          setBlobNote(`${moved} copié(s). Un fichier a été laissé : ${result.error || "erreur"}.`);
+          failed += 1;
+          lastError = result.error || "erreur";
+          setBlobNote(`${moved} copié(s), ${failed} laissé(s) : ${lastError}`);
           continue;
         }
         if (result.done || result.remaining === 0) {
-          setBlobNote(moved ? `${moved} média(s) sont sur Cloudflare.` : "Aucun média Blob dans le contenu.");
+          if (moved && !failed) setBlobNote(`${moved} média(s) sont sur Cloudflare.`);
+          else if (failed) setBlobNote(`${moved} copié(s), ${failed} refusé(s). ${lastError}`);
+          else setBlobNote("Aucun média Blob dans le contenu.");
           return;
         }
         if (result.copied) {
@@ -42,7 +48,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
           setBlobNote(`${moved} copié(s), encore ${result.remaining ?? "…"}.`);
         }
       }
-      setBlobNote(`${moved} copié(s). Relance pour la suite.`);
+      setBlobNote(`${moved} copié(s), ${failed} laissé(s). Relance pour la suite.`);
     } catch (error) {
       setBlobNote(error instanceof Error ? error.message : "Transfert impossible.");
     } finally {

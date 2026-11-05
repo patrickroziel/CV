@@ -1,4 +1,4 @@
-import { list } from "@vercel/blob";
+import { get, list } from "@vercel/blob";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
 import { isBackofficeAdmin, validateOrigin } from "@/lib/server/backoffice-auth";
@@ -57,21 +57,37 @@ function replaceUrl(value: unknown, from: string, to: string): unknown {
   return value;
 }
 
+async function readBlob(url: string) {
+  const token = process.env.BLOB_READ_WRITE_TOKEN!.trim();
+  const options = { token, useCache: false } as const;
+  try {
+    return await get(url, { ...options, access: "private" });
+  } catch {
+    return get(url, { ...options, access: "public" });
+  }
+}
+
 async function copyOne(url: string) {
   const store = r2();
-  const token = process.env.BLOB_READ_WRITE_TOKEN!.trim();
-  const source = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!source.ok) throw new Error(`Blob ${source.status}`);
-  const length = Number(source.headers.get("content-length") || 0);
-  if (length > 45 * 1024 * 1024) throw new Error("Fichier trop lourd pour un passage (plus de 45 Mo).");
-  const pathname = decodeURIComponent(new URL(url).pathname.replace(/^\/+/, ""));
+  const source = await readBlob(url);
+  if (source.statusCode !== 200 || !source.stream) throw new Error("Blob vide");
+  const pathname = source.blob.pathname.replace(/^\/+/, "");
   if (!pathname || pathname.includes("..")) throw new Error("Chemin refusé.");
-  const body = Buffer.from(await source.arrayBuffer());
+  const reader = source.stream.getReader();
+  const chunks: Buffer[] = [];
+  let size = 0;
+  while (true) {
+    const part = await reader.read();
+    if (part.done) break;
+    size += part.value.byteLength;
+    if (size > 45 * 1024 * 1024) throw new Error("Fichier trop lourd pour un passage (plus de 45 Mo).");
+    chunks.push(Buffer.from(part.value));
+  }
   await store.client.send(new PutObjectCommand({
     Bucket: store.bucket,
     Key: pathname,
-    Body: body,
-    ContentType: source.headers.get("content-type") || "application/octet-stream",
+    Body: Buffer.concat(chunks),
+    ContentType: source.blob.contentType || "application/octet-stream",
     CacheControl: "public, max-age=31536000, immutable",
   }));
   return `${store.publicUrl}/${pathname}`;
