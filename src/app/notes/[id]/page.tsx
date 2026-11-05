@@ -11,9 +11,9 @@ import {
 } from "@/lib/server/notes-sharing";
 import { openGraphLocale, requestedShareLanguage, shareImageUrl, translateShareText } from "@/lib/server/share-locale";
 
-// Published content lives in Neon and can change without a code deployment.
+// Published content lives in Neon. Public HTML can lag a save by one minute.
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type NoteParams = {
   params: Promise<{ id: string }>;
