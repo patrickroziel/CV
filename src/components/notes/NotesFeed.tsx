@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BookOpen, Music, PenLine, Plus } from "lucide-react";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { KofiCard } from "@/components/support/KofiCard";
-import { PostTagList } from "@/components/medias/PostTagList";
+import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostCard } from "@/components/medias/SocialPostCard";
 import {
@@ -95,7 +95,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   };
 
   return (
-    <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+    <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
       <aside>
         <div className="lg:sticky lg:top-28">
           <p className="text-xs text-zinc-500">Patrick Roziel</p>
@@ -202,15 +202,6 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           <UniversesWidget current="notes" />
           <KofiCard className="mt-3" />
         </div>
-        <PostTagList
-          tags={tags}
-          activeTag={activeTag}
-          onClear={() => setActiveTag(null)}
-          onToggle={(tag) => {
-            setActiveTag((current) => current?.toLocaleLowerCase("fr") === tag.toLocaleLowerCase("fr") ? null : tag);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        />
       </aside>
 
       <section className="min-w-0">
@@ -307,6 +298,15 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           ) : null}
         </DialogContent>
       </Dialog>
+      <AirTagTicker
+        tags={tags}
+        activeTag={activeTag}
+        onClear={() => setActiveTag(null)}
+        onToggle={(tag) => {
+          setActiveTag((current) => current?.toLocaleLowerCase("fr") === tag.toLocaleLowerCase("fr") ? null : tag);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
     </div>
   );
 }
