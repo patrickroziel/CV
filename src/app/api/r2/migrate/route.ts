@@ -59,12 +59,23 @@ function replaceUrl(value: unknown, from: string, to: string): unknown {
 
 async function readBlob(url: string) {
   const token = process.env.BLOB_READ_WRITE_TOKEN!.trim();
-  const options = { token, useCache: false } as const;
-  try {
-    return await get(url, { ...options, access: "private" });
-  } catch {
-    return get(url, { ...options, access: "public" });
+  const pathname = decodeURIComponent(new URL(url).pathname.replace(/^\/+/, ""));
+  const privateUrl = url.replace(".public.blob.vercel-storage.com", ".private.blob.vercel-storage.com");
+  const attempts = [
+    () => get(pathname, { access: "private", token, useCache: false }),
+    () => get(privateUrl, { access: "private", token, useCache: false }),
+    () => get(pathname, { access: "public", token }),
+  ];
+  let last = "Blob inaccessible";
+  for (const attempt of attempts) {
+    try {
+      const source = await attempt();
+      if (source?.statusCode === 200 && source.stream) return source;
+    } catch (error) {
+      last = error instanceof Error ? error.message : last;
+    }
   }
+  throw new Error(last);
 }
 
 async function copyOne(url: string) {
