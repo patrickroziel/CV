@@ -70,18 +70,20 @@ function AirReadHead({
   const episodeLabel = episode ? `Épisode ${episode.replace(/^épisode\s+/i, "")}` : "";
   const seriesLabel = [series, episodeLabel].filter(Boolean).join(" · ");
   return (
-    <div ref={ref} className="air-read-head">
-      <p className="text-[11px] font-semibold uppercase tracking-[.2em] text-white/50">{category} · {date}</p>
-      {seriesLabel ? (
-        <p className="air-series-line">
-          <Layers className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          <span>{seriesLabel}</span>
-        </p>
-      ) : null}
-      <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
-        <h1>{title}</h1>
-      </a>
-    </div>
+    <>
+      <p className="air-read-meta">{category} · {date}</p>
+      <div ref={ref} className="air-read-head">
+        {seriesLabel ? (
+          <p className="air-series-line">
+            <Layers className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span>{seriesLabel}</span>
+          </p>
+        ) : null}
+        <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
+          <h1>{title}</h1>
+        </a>
+      </div>
+    </>
   );
 }
 
