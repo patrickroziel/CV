@@ -1051,6 +1051,12 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   border-color: rgba(255, 255, 255, 0.22);
 }
 
+/* This article still stores an inline black color. */
+.article-force-white .air-article-body,
+.article-force-white .air-article-body * {
+  color: #fff !important;
+}
+
 .rich-bio-editor blockquote.rich-link-card,
 .rich-html blockquote.rich-link-card,
 .book-reading-text blockquote.rich-link-card {

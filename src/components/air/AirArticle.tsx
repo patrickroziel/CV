@@ -15,6 +15,8 @@ function proxyBlobImages(html: string) {
   return html.replace(/https:\/\/[a-z0-9.-]*blob\.vercel-storage\.com\/[^"'\\\s)<]+/gi, (url) => `/api/media/blob?url=${encodeURIComponent(url)}`);
 }
 
+const FORCE_WHITE_ARTICLE = "adbaf437-0909-4347-a846-7910e702b954";
+
 export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: string; initialPost?: SocialPost | null; seedPosts?: SocialPost[] }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
   const fromStore = (data.socialPosts ?? []).find(p => p.id === id && p.universe === "air" && (p.visible !== false || editMode));
@@ -27,7 +29,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
       <Link href="/air" className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
       <PostEditButton post={post} universe="air" />
     </div>
-    <article className="air-surface mt-6 overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl">
+    <article className={`air-surface mt-6 overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
       {cover&&<div className="aspect-[16/8] overflow-hidden sm:aspect-[16/7]"><img src={cover} alt={title} className="h-full w-full object-cover"/></div>}
       <div className="space-y-6 p-5 sm:p-10">
         <p className="text-[11px] font-semibold uppercase tracking-[.2em] text-white/55">{coercePostCategory(post)} · {post.date}</p>
