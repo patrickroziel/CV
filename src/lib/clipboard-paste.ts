@@ -544,24 +544,36 @@ export function clipboardToRichHtml(
     const meaningful =
       /<(ul|ol|li|b|strong|i|em|p|br|h[1-6]|div|span)[\s>]/i.test(html);
     if (meaningful) {
-      return cleanPastedHtml(html);
+      return atEditorSize(cleanPastedHtml(html));
     }
   }
 
   if (text && text.trim()) {
     // Plain path: structure + emojis only — force black
     const structured = sanitizeBioHtml(plainTextToHtml(text), { fromPaste: true });
-    return forceBlackColor(structured);
+    return atEditorSize(forceBlackColor(structured));
   }
 
   if (html && html.trim()) {
-    return cleanPastedHtml(html);
+    return atEditorSize(cleanPastedHtml(html));
   }
 
   return "";
 }
 
-/** Insert HTML at caret in a contentEditable element */
+function atEditorSize(html: string): string {
+  if (!html || typeof document === "undefined") return html;
+  const template = document.createElement("template");
+  template.innerHTML = html;
+  template.content.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
+    el.style.removeProperty("font-size");
+    if (!el.getAttribute("style")?.trim()) el.removeAttribute("style");
+  });
+  Array.from(template.content.children).forEach((node) => {
+    if (node instanceof HTMLElement && node.tagName !== "IMG") node.style.fontSize = "12px";
+  });
+  return template.innerHTML;
+}
 export function insertHtmlAtSelection(html: string): boolean {
   if (!html) return false;
   try {

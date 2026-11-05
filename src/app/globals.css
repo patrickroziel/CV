@@ -1645,6 +1645,9 @@ blockquote.rich-link-card.ghost-link-card {
 .rich-bio-editor * {
   color: #f4f4f5 !important;
 }
+.rich-bio-editor {
+  font-size: 12px;
+}
 .rich-bio-editor a,
 .rich-bio-editor a * {
   color: #a5f3fc !important;

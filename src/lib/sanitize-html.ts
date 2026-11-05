@@ -247,6 +247,20 @@ function isDarkInk(value: string): boolean {
   return [1, 2, 3].every((i) => Number(rgb[i]) < 55);
 }
 
+function isDefaultFourteen(value: string): boolean {
+  const v = value.trim().toLowerCase().replace(/\s+/g, "");
+  return v === "14px" || v === "0.875rem" || v === "0.875em";
+}
+
+/** The old editor default was 14px. Pasted and stored text should inherit 12px. */
+export function stripDefaultFontSize(root: ParentNode) {
+  root.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
+    if (!el.style.fontSize || !isDefaultFourteen(el.style.fontSize)) return;
+    el.style.removeProperty("font-size");
+    if (!el.getAttribute("style")?.trim()) el.removeAttribute("style");
+  });
+}
+
 /** Drop leftover black ink so the dark editor stays readable. */
 function stripDarkInk(html: string): string {
   if (!html || typeof document === "undefined") return html;
@@ -256,6 +270,7 @@ function stripDarkInk(html: string): string {
     const marker = el.getAttribute("data-rich-color");
     if (marker && isDarkInk(marker)) el.removeAttribute("data-rich-color");
     if (el.style.color && isDarkInk(el.style.color)) el.style.removeProperty("color");
+    if (el.style.fontSize && isDefaultFourteen(el.style.fontSize)) el.style.removeProperty("font-size");
     if (!el.getAttribute("style")?.trim()) el.removeAttribute("style");
   });
   return root.innerHTML;

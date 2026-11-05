@@ -8,7 +8,7 @@ import { handleRichPaste } from "@/lib/clipboard-paste";
 import { captureEditorSelection } from "@/lib/rich-editor";
 import { applyRichFormat, normalizeCompactRichBody, normalizeRichBody } from "@/lib/rich-format";
 import { DEFAULT_LINE_HEIGHT, extractRichSpacing, wrapWithRichSpacing } from "@/lib/rich-spacing";
-import { sanitizeBioHtml, toEditableHtml } from "@/lib/sanitize-html";
+import { sanitizeBioHtml, stripDefaultFontSize, toEditableHtml } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 
 type RichLocalizedFieldProps = {
@@ -150,6 +150,7 @@ export function RichLocalizedField({
               const el = editorRef.current;
               if (!el) return;
               el.innerHTML = compact ? normalizeCompactRichBody(el.innerHTML) : normalizeRichBody(el.innerHTML);
+              stripDefaultFontSize(el);
               commit();
             });
           }

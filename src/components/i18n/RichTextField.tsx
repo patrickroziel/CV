@@ -13,7 +13,7 @@ import {
   formatLineHeight,
   wrapWithRichSpacing,
 } from "@/lib/rich-spacing";
-import { sanitizeBioHtml, toEditableHtml } from "@/lib/sanitize-html";
+import { sanitizeBioHtml, stripDefaultFontSize, toEditableHtml } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 
 type RichTextFieldProps = {
@@ -139,6 +139,7 @@ export function RichTextField({
               el.innerHTML = compact
                 ? normalizeCompactRichBody(el.innerHTML)
                 : normalizeRichBody(el.innerHTML);
+              stripDefaultFontSize(el);
               commit();
             });
           }
