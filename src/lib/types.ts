@@ -722,8 +722,10 @@ export type SocialPost = {
   /** Content universe. Missing = legacy Notes. */
   universe?: "notes" | "air";
   title: Translatable;
-  /** Optional subtitle, shown under the title. */
+  /** Optional subtitle. On Air this is the series title. */
   subtitle?: Translatable;
+  /** Air series episode number, shown next to the series title. */
+  episode?: string | null;
   description: Translatable;
   /** ISO date YYYY-MM-DD */
   date: string;

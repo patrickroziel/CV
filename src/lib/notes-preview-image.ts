@@ -13,8 +13,8 @@ function readableMediaUrl(raw: string): string | null {
   }
 }
 
-/** Public visual source, matching the Notes share-card preference. */
-export function getNoteSharePhoto(post: SocialPost): string | null {
+/** Every usable cover, first choice first. Blob addresses go through the site. */
+export function getNoteSharePhotos(post: SocialPost): string[] {
   const urls: unknown[] = [post.bookCoverUrl];
   if (post.featuredEmbed?.type === "image") urls.push(post.featuredEmbed.url);
   if (post.fileKind === "image") urls.push(post.fileUrl);
@@ -22,10 +22,16 @@ export function getNoteSharePhoto(post: SocialPost): string | null {
     if (item.type === "image") urls.push(item.url);
     if (item.type === "carousel") urls.push(...item.items.filter(x => x.type === "image").map(x => x.url));
   }
+  const found: string[] = [];
   for (const raw of urls) {
     if (typeof raw !== "string") continue;
     const readable = readableMediaUrl(raw);
-    if (readable) return readable;
+    if (readable && !found.includes(readable)) found.push(readable);
   }
-  return null;
+  return found;
+}
+
+/** Public visual source, matching the Notes share-card preference. */
+export function getNoteSharePhoto(post: SocialPost): string | null {
+  return getNoteSharePhotos(post)[0] ?? null;
 }

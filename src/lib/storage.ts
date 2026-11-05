@@ -723,6 +723,12 @@ export function normalizeSocialPost(
     title: liftToLocalized(raw.title ?? ""),
     subtitle:
       raw.subtitle != null ? liftToLocalized(raw.subtitle as never) : undefined,
+    episode:
+      typeof raw.episode === "number" && Number.isFinite(raw.episode)
+        ? String(raw.episode)
+        : typeof raw.episode === "string" && raw.episode.trim()
+          ? raw.episode.trim().slice(0, 16)
+          : null,
     description: liftToLocalized(raw.description ?? ""),
     date,
     youtubeUrl,

@@ -152,6 +152,7 @@ export function SocialPostForm({
 }: SocialPostFormProps) {
   const [title, setTitle] = useState<LocalizedString>(liftToLocalized(initial?.title));
   const [subtitle, setSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.subtitle));
+  const [episode, setEpisode] = useState(initial?.episode?.trim() ?? "");
   const [description, setDescription] = useState<LocalizedString>(liftToLocalized(initial?.description));
   const categories = universe === "air" ? AIR_CATEGORIES : NOTES_CATEGORIES;
   const [category, setCategory] = useState<PostCategory>(
@@ -321,6 +322,7 @@ export function SocialPostForm({
     universe: initial?.universe ?? universe,
     title,
     subtitle: getL(subtitle, "fr").trim() ? subtitle : undefined,
+    episode: universe === "air" && episode.trim() ? episode.trim().slice(0, 16) : null,
     description,
     date: initial?.date || new Date().toISOString().slice(0, 10),
     youtubeUrl: legacyFeatured?.type === "youtube" ? legacyFeatured.url : null,
@@ -410,11 +412,23 @@ export function SocialPostForm({
       />
 
       <LocalizedField
-        label="Sous-titre (facultatif)"
+        label={universe === "air" ? "Titre de la série" : "Sous-titre (facultatif)"}
         value={subtitle}
         onChange={setSubtitle}
-        placeholder={isBook ? "Une phrase courte pour introduire le chapitre" : "Une phrase courte sous le titre"}
+        placeholder={universe === "air" ? "Ex. La France, le pays de la désillusion !" : isBook ? "Une phrase courte pour introduire le chapitre" : "Une phrase courte sous le titre"}
       />
+      {universe === "air" && (
+        <div className="grid max-w-[12rem] gap-2">
+          <Label htmlFor="air-episode">Numéro d’épisode</Label>
+          <Input
+            id="air-episode"
+            inputMode="numeric"
+            value={episode}
+            onChange={(e) => setEpisode(e.target.value)}
+            placeholder="7"
+          />
+        </div>
+      )}
 
       <LocalizedField
         label={isBook ? "Texte du chapitre *" : "Texte"}
