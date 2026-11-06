@@ -114,8 +114,9 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                   const title = l(post.title).trim() || "Sans titre";
                   const episode = post.episode?.trim().replace(/^épisode\s+/i, "");
                   return (
-                    <Link key={post.id} href={`/air/${post.id}`} className="block rounded-lg px-3 py-1.5 text-xs leading-5 text-white/75 hover:bg-white/10 hover:text-white">
-                      {episode ? `Épisode ${episode} — ${title}` : title}
+                    <Link key={post.id} href={`/air/${post.id}`} title={title} className="flex min-w-0 items-center gap-2 rounded-lg px-1.5 py-1 text-white/80 hover:bg-white/10 hover:text-white">
+                      {episode ? <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#305080] px-1 text-[10px] font-semibold tabular-nums text-white ring-1 ring-white/30">{episode}</span> : null}
+                      <span className="min-w-0 flex-1 truncate text-xs">{title}</span>
                     </Link>
                   );
                 })}
