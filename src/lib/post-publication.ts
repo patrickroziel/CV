@@ -18,7 +18,8 @@ export function visibleCoverUrl(post: {
   return url || null;
 }
 
-export const TEASER_PUBLIC_LINE = "Work in progress — le texte de cet article n’est pas encore visible.";
+export const TEASER_LABEL = "Work in progress — en cours d’édition";
+export const TEASER_PUBLIC_LINE = "Work in progress — en cours d’édition.";
 
 /**
  * Public copies must not carry the unpublished body, inline media or files.

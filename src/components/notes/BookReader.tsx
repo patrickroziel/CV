@@ -10,7 +10,7 @@ import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { coercePostCategory } from "@/lib/post-taxonomy";
-import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
 
@@ -83,11 +83,11 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
         <PostCover post={post} className="border-b border-white/10" />
 
         <div className="min-w-0 p-4 sm:p-8 md:p-10">
-          <div className="flex min-w-0 flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-cyan-100/50">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 text-[11px] tracking-[0.04em] text-cyan-100/50">
             <span>Livre</span>
             <span aria-hidden>·</span>
             <time dateTime={post.date}>{formatDate(post.date)}</time>
-            {teaser ? <><span aria-hidden>·</span><span>Work in progress</span></> : null}
+            {teaser ? <><span aria-hidden>·</span><span>{TEASER_LABEL}</span></> : null}
           </div>
 
           <h1 className="mt-4 max-w-full break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">

@@ -799,7 +799,7 @@ export function SocialPostForm({
               )}
             >
               <span className="block font-medium">Work in progress</span>
-              <span className="mt-0.5 block text-xs font-normal text-zinc-400">Seul le titre est publié. Le texte reste masqué.</span>
+              <span className="mt-0.5 block text-xs font-normal text-zinc-400">En cours d’édition : seul le titre est publié, le texte reste masqué.</span>
             </button>
           </div>
         </div>

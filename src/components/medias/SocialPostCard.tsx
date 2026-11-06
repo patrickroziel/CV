@@ -12,7 +12,7 @@ import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import type { SocialPost, FeaturedEmbed } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
-import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { stripHtml } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 
@@ -61,8 +61,8 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
                   </span>
                 )}
                 {teaser && (
-                  <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-100">
-                    Work in progress
+                  <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] font-semibold tracking-[0.04em] text-zinc-100">
+                    {TEASER_LABEL}
                   </span>
                 )}
               </div>

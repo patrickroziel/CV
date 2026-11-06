@@ -11,7 +11,7 @@ import { PostPager } from "@/components/notes/PostPager";
 import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { getNoteSharePhotos } from "@/lib/notes-preview-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
-import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import type { SocialPost } from "@/lib/types";
 
@@ -128,7 +128,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
       )}
       <AirReadHead
         category={series || "Air"}
-        date={teaser ? `${post.date} · work in progress` : post.date}
+        date={teaser ? `${post.date} · ${TEASER_LABEL}` : post.date}
         series={series}
         episode={episode}
         title={title}

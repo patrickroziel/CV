@@ -11,7 +11,7 @@ import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
-import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import type { FeaturedEmbed, SocialPost } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -49,7 +49,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
     <article className="mt-6 overflow-visible rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
       <PostCover post={post} alt={title} className="border-b border-white/10" />
       <div className="article-sticky-head">
-        <p className="text-xs uppercase tracking-[0.15em] text-cyan-100/55">{category} · {formatDate(post.date)}{teaser ? " · work in progress" : ""}</p>
+        <p className="text-xs tracking-[0.04em] text-cyan-100/55">{category} · {formatDate(post.date)}{teaser ? ` · ${TEASER_LABEL}` : ""}</p>
         <h1 className="mt-3 break-words text-2xl font-semibold text-white sm:text-3xl">{title}</h1>
         {post.subtitle && <p className="mt-3 text-sm text-zinc-400">{l(post.subtitle)}</p>}
         {!teaser && <ArticlePartNav targetId={`note-body-${post.id}`} />}
