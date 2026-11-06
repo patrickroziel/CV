@@ -74,6 +74,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     return scopedPosts.filter((post) => (post.tags ?? []).some((tag) => tag.trim().toLocaleLowerCase("fr") === key));
   }, [scopedPosts, activeTag]);
   const tags = useMemo(() => collectPostTags(visiblePosts), [visiblePosts]);
+  const scopeCount = scope === "Tout" ? posts.length : posts.filter((post) => seriesName(post).toLocaleLowerCase("fr") === scope.toLocaleLowerCase("fr")).length;
   const publish = (values: SocialPostFormValues) => {
     if (editing) updateSocialPost(editing.id,{...values,universe:"air"});
     else addSocialPost({...values,universe:"air",order:0});
@@ -93,10 +94,11 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               key={item}
               type="button"
               onClick={() => { setScope(item); setActiveTag(null); }}
+              aria-label={item === "Tout" ? `Tout, ${count} articles` : `${item}, ${count} article${count > 1 ? "s" : ""}`}
               className={`flex shrink-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm lg:w-full ${active ? "border-white/50 bg-white/20 text-white" : "border-transparent text-white/70 hover:bg-white/10 hover:text-white"}`}
             >
-              <span className="min-w-0 break-words">{item}</span>
-              <span className="text-[10px] text-white/50">{count}</span>
+              <span className="min-w-0 flex-1 break-words">{item}</span>
+              <span className="shrink-0 rounded-full border border-white/25 bg-white/15 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">{count}</span>
             </button>
           );
         })}
@@ -108,7 +110,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     <section aria-label="Articles AIR" className="min-w-0">
     <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-4 pb-2">
       <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-white/55">Journal / Air</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-3xl">{activeTag ? `#${activeTag}` : scope === "Tout" ? "Articles & décryptages" : scope}</h2></div>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-3xl">{activeTag ? `#${activeTag}` : scope === "Tout" ? "Articles & décryptages" : scope}{!activeTag && scope !== "Tout" ? <span className="ml-3 align-middle text-base font-medium text-white/60">{scopeCount} article{scopeCount > 1 ? "s" : ""}</span> : null}</h2></div>
       {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-md"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
     </div>
     {visiblePosts.length ? <div className="space-y-6">
