@@ -180,7 +180,16 @@ export function SocialPostForm({
   const [noticesHidden, setNoticesHidden] = useState(initial?.noticesHidden === true);
   const [noticeIntro, setNoticeIntro] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeIntro, AIR_NOTICE_INTRO)));
   const [noticeReply, setNoticeReply] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeReply, AIR_NOTICE_REPLY)));
+  const noticesTouched = useRef(false);
   const { data: portfolioData, renameAirSeries } = usePortfolio();
+  useEffect(() => {
+    if (universe !== "air" || initial || noticesTouched.current) return;
+    const posts = (portfolioData.socialPosts ?? []).filter((post) => post.universe === "air");
+    const intro = posts.find((post) => getL(post.noticeIntro, "fr").trim());
+    const reply = posts.find((post) => getL(post.noticeReply, "fr").trim());
+    if (intro) setNoticeIntro(liftToLocalized(airNoticeHtml(intro.noticeIntro, AIR_NOTICE_INTRO)));
+    if (reply) setNoticeReply(liftToLocalized(airNoticeHtml(reply.noticeReply, AIR_NOTICE_REPLY)));
+  }, [universe, initial, portfolioData.socialPosts]);
   const existingSeries = useMemo(() => {
     const seen = new Map<string, string>();
     for (const post of portfolioData.socialPosts ?? []) {
@@ -693,14 +702,14 @@ export function SocialPostForm({
             id="air-notice-intro"
             label="Sous la couverture"
             value={noticeIntro}
-            onChange={setNoticeIntro}
+            onChange={(value) => { noticesTouched.current = true; setNoticeIntro(value); }}
             rows={4}
           />
           <RichLocalizedField
             id="air-notice-reply"
             label="En fin d’article"
             value={noticeReply}
-            onChange={setNoticeReply}
+            onChange={(value) => { noticesTouched.current = true; setNoticeReply(value); }}
             rows={5}
           />
         </div>

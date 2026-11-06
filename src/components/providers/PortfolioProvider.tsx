@@ -750,6 +750,28 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     [persist]
   );
 
+function noticeMarkup(value: SocialPost["noticeIntro"]) {
+  return getL(value, "fr").replace(/\s+/g, " ").trim();
+}
+
+function withSharedAirNotices(
+  posts: SocialPost[],
+  intro: SocialPost["noticeIntro"] | undefined,
+  reply: SocialPost["noticeReply"] | undefined,
+  introChanged: boolean,
+  replyChanged: boolean,
+) {
+  if (!introChanged && !replyChanged) return posts;
+  return posts.map((post) => {
+    if ((post.universe ?? "notes") !== "air") return post;
+    return {
+      ...post,
+      ...(introChanged ? { noticeIntro: intro } : {}),
+      ...(replyChanged ? { noticeReply: reply } : {}),
+    };
+  });
+}
+
   const addSocialPost = useCallback(
     (post: Omit<SocialPost, "id">) => {
       persist((prev) => {
@@ -758,13 +780,17 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           (min, p) => Math.min(min, p.order),
           0
         );
-        return {
-          ...prev,
-          socialPosts: [
-            { ...post, id: createId(), order: minOrder - 1 },
-            ...current,
-          ],
-        };
+        const created: SocialPost = { ...post, id: createId(), order: minOrder - 1 };
+        const isAir = (created.universe ?? "notes") === "air";
+        const sample = current.find((item) => (item.universe ?? "notes") === "air");
+        const posts = withSharedAirNotices(
+          [created, ...current],
+          created.noticeIntro,
+          created.noticeReply,
+          isAir && noticeMarkup(created.noticeIntro) !== noticeMarkup(sample?.noticeIntro),
+          isAir && noticeMarkup(created.noticeReply) !== noticeMarkup(sample?.noticeReply),
+        );
+        return { ...prev, socialPosts: posts };
       }, "Post ajouté");
     },
     [persist]
@@ -772,15 +798,23 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
 
   const updateSocialPost = useCallback(
     (id: string, partial: Partial<SocialPost>) => {
-      persist(
-        (prev) => ({
+      persist((prev) => {
+        const posts = prev.socialPosts ?? [];
+        const current = posts.find((post) => post.id === id);
+        const isAir = (partial.universe ?? current?.universe ?? "notes") === "air";
+        const introChanged = isAir && partial.noticeIntro !== undefined && noticeMarkup(partial.noticeIntro) !== noticeMarkup(current?.noticeIntro);
+        const replyChanged = isAir && partial.noticeReply !== undefined && noticeMarkup(partial.noticeReply) !== noticeMarkup(current?.noticeReply);
+        return {
           ...prev,
-          socialPosts: (prev.socialPosts ?? []).map((p) =>
-            p.id === id ? { ...p, ...partial } : p
+          socialPosts: withSharedAirNotices(
+            posts.map((post) => (post.id === id ? { ...post, ...partial } : post)),
+            partial.noticeIntro,
+            partial.noticeReply,
+            introChanged,
+            replyChanged,
           ),
-        }),
-        "Enregistré"
-      );
+        };
+      }, "Enregistré");
     },
     [persist]
   );
