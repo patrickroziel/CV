@@ -1,43 +1,19 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState, Fragment } from "react";
-import { ArrowUpRight, FilePlus2, Pencil, Trash2 } from "lucide-react";
+import { FilePlus2, Pencil, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostForm, type SocialPostFormValues } from "@/components/medias/SocialPostForm";
 import { PostActions } from "@/components/medias/PostActions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
-import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
-import { AirSeriesLine } from "@/components/air/AirArticle";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { collectPostTags } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
-
-function partTitles(html: string) {
-  const titles: string[] = [];
-  const pattern = /<h2\b[^>]*\bair-part-title\b[^>]*>([\s\S]*?)<\/h2>/gi;
-  for (const match of html.matchAll(pattern)) {
-    const text = stripHtml(match[1] ?? "").replace(/\s+/g, " ").trim();
-    if (text && text.toLocaleLowerCase("fr") !== "titre de la partie") titles.push(text);
-  }
-  return titles;
-}
-
-function previewText(html: string) {
-  const text = stripHtml(html)
-    .replace(/\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  if (text.length <= 700) return text;
-  const window = text.slice(0, 700);
-  const space = window.lastIndexOf(" ");
-  return (space > 400 ? window.slice(0, space) : window).trimEnd();
-}
 
 export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   const { data, editMode, l, addSocialPost, updateSocialPost, removeSocialPost, isHydrated } = usePortfolio();
@@ -110,36 +86,19 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     </div>
     {visiblePosts.length ? <div className="space-y-6">
       {visiblePosts.map((post, index) => { const photo=post.coverSource === "wip" ? null : getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
-        const teaser = isTeaserPost(post);
-        const parts = teaser ? [] : partTitles(l(post.description));
-        const excerpt = teaser ? TEASER_PUBLIC_LINE : previewText(l(post.description));
         return <Fragment key={post.id}>
         <article className="air-surface overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl transition-colors">
-          <Link href={`/air/${post.id}`} className="group block">
+          <Link href={`/air/${post.id}`} className="air-hover-card group relative block">
             <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-900/20 to-sky-700/10 sm:aspect-[16/7]">
               {post.coverSource === "wip" ? (
                 <WorkInProgress className="blob-wip--fill" />
               ) : photo ? (
-                isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>
-            <div className="air-card-copy p-5 sm:p-6">
-              <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p>
-              <AirSeriesLine label={[seriesName(post), post.episode?.trim() ? `Épisode ${post.episode.trim().replace(/^épisode\s+/i, "")}` : ""].filter(Boolean).join(" · ")} />
-              <h3 className="mt-3 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
-              {parts.length ? (
-                <div className="air-part-stack air-card-parts">
-                  {parts.map((label, partIndex) => (
-                    <span key={`${partIndex}-${label}`} className="air-part-float" title={label}>
-                      <span className="air-part-num">{partIndex + 1}</span>
-                      <span className="air-part-name">{label}</span>
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p>
-              )}
-              <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
+            <span className="air-hover-name">
+              <span className="air-hover-name__title">{title}</span>
+            </span>
           </Link>
           <div className="border-t border-white/15 px-5 py-4">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} sharePath="/air" />
