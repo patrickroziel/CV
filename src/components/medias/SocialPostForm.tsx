@@ -32,7 +32,7 @@ type SocialPostFormProps = {
 
 const MAX_BYTES = 20 * 1024 * 1024;
 
-type UploadTarget = "general" | "cover" | "bookPdf" | "inline" | null;
+type UploadTarget = "general" | "cover" | "bookPdf" | "inline" | "replace" | null;
 
 /** Existing plain-text blocks become editable HTML only when the user edits them. */
 function legacyBlockToEditableHtml(text: string) {
@@ -217,6 +217,9 @@ export function SocialPostForm({
   const [textBlockTitle, setTextBlockTitle] = useState("");
   const [textBlockBody, setTextBlockBody] = useState("");
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
+  const [replacingPhotoId, setReplacingPhotoId] = useState<string | null>(null);
+  const [replaceSource, setReplaceSource] = useState<"web" | "cloudflare">("web");
+  const [replaceInput, setReplaceInput] = useState("");
   const [insertInput, setInsertInput] = useState("");
   const [mediaInsertion, setMediaInsertion] = useState<{ nonce: string; token: string }>();
   const [tagsText, setTagsText] = useState((initial?.tags ?? []).join(", "));
@@ -334,6 +337,32 @@ export function SocialPostForm({
   const removeInlineMedia = (id: string) => {
     setInlineMedia(prev => prev.filter(media => media.id !== id));
     setDescription(prev => setL(prev, "fr", removeInlineMediaMarker(getL(prev, "fr"), id)));
+    if (replacingPhotoId === id) setReplacingPhotoId(null);
+  };
+
+  const applyPhotoReplacement = (id: string, raw: string, source: "web" | "cloudflare") => {
+    const url = safeHttpsUrl(raw.trim());
+    if (!url) {
+      setError("Le lien de la photo doit commencer par https://.");
+      return false;
+    }
+    if (source === "cloudflare" && !isR2Url(url)) {
+      setError("Pour Cloudflare, téléverse une image ou colle un lien media.patrickroziel.com.");
+      return false;
+    }
+    if (source === "web" && isR2Url(url)) {
+      setError("Cette image est déjà sur Cloudflare. Choisis Cloudflare.");
+      return false;
+    }
+    const valid = normalizeFeaturedEmbed({ type: "image", url });
+    if (!valid) {
+      setError("Ce lien n’est pas une image utilisable.");
+      return false;
+    }
+    setInlineMedia(prev => prev.map(item => item.id === id && item.type === "image" ? { ...item, url: valid.url } : item));
+    setReplaceInput(valid.url);
+    setError(null);
+    return true;
   };
 
   const insertFromLink = () => {
@@ -364,6 +393,13 @@ export function SocialPostForm({
       });
       if (target === "inline") {
         insertInlineMedia({ type: "image", url: result.url });
+      } else if (target === "replace") {
+        if (replacingPhotoId) {
+          setInlineMedia(prev => prev.map(item => item.id === replacingPhotoId && item.type === "image" ? { ...item, url: result.url } : item));
+          setReplaceInput(result.url);
+          setReplaceSource("cloudflare");
+          setError(null);
+        }
       } else if (target === "cover") {
         setBookCoverUrl(result.url);
         setBookCoverName(file.name);
@@ -385,7 +421,7 @@ export function SocialPostForm({
       setProgress(0);
       abortRef.current = null;
     }
-  }, [insertInlineMedia]);
+  }, [insertInlineMedia, replacingPhotoId]);
 
   const resolveCover = (): {
     coverSource: SocialPostCoverSource | null;
@@ -696,6 +732,21 @@ export function SocialPostForm({
                     {" — "}{media.type === "text" ? (media.title || "Extrait à lire") : media.type === "carousel" ? `${media.title || "Photos et vidéos"} (${media.items.length})` : media.url}
                   </span>
                   <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                    {media.type === "image" && (
+                      <Button type="button" variant="secondary" size="sm"
+                        onClick={() => {
+                          if (replacingPhotoId === media.id) {
+                            setReplacingPhotoId(null);
+                            return;
+                          }
+                          setReplacingPhotoId(media.id);
+                          setReplaceSource(isR2Url(media.url) ? "cloudflare" : "web");
+                          setReplaceInput(media.url);
+                          setError(null);
+                        }}>
+                        {replacingPhotoId === media.id ? "Terminer" : "Remplacer"}
+                      </Button>
+                    )}
                     {media.type === "text" && (
                       <Button type="button" variant="secondary" size="sm"
                         onClick={() => setEditingTextId(current => current === media.id ? null : media.id)}>
@@ -723,6 +774,47 @@ export function SocialPostForm({
                     </Button>
                   </div>
                 </div>
+                {media.type === "image" && (
+                  <img src={media.url} alt="" className="h-20 w-32 rounded-lg object-cover" referrerPolicy="no-referrer" />
+                )}
+                {media.type === "image" && replacingPhotoId === media.id && (
+                  <div className="grid gap-3 border-t border-white/10 pt-3">
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <button type="button" onClick={() => setReplaceSource("web")}
+                        className={cn("rounded-xl border px-3 py-2 text-left text-sm", replaceSource === "web" ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50" : "border-white/10 bg-black/20 text-zinc-300")}>
+                        Lien
+                      </button>
+                      <button type="button" onClick={() => setReplaceSource("cloudflare")}
+                        className={cn("rounded-xl border px-3 py-2 text-left text-sm", replaceSource === "cloudflare" ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50" : "border-white/10 bg-black/20 text-zinc-300")}>
+                        Cloudflare
+                      </button>
+                    </div>
+                    {replaceSource === "web" ? (
+                      <>
+                        <Label htmlFor={`replace-web-${media.id}`}>Lien de la nouvelle photo</Label>
+                        <Input id={`replace-web-${media.id}`} value={replaceInput} onChange={(e) => setReplaceInput(e.target.value)} placeholder="https://…/photo.jpg" />
+                        <Button type="button" variant="secondary" className="w-fit" onClick={() => applyPhotoReplacement(media.id, replaceInput, "web")}>
+                          Remplacer par ce lien
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Label htmlFor={`replace-r2-${media.id}`}>Lien Cloudflare</Label>
+                        <Input id={`replace-r2-${media.id}`} value={replaceInput} onChange={(e) => setReplaceInput(e.target.value)} placeholder="https://media.patrickroziel.com/…" />
+                        <Button type="button" variant="secondary" className="w-fit" onClick={() => applyPhotoReplacement(media.id, replaceInput, "cloudflare")}>
+                          Utiliser ce lien Cloudflare
+                        </Button>
+                        <FilePicker
+                          label="Ou téléverser une autre photo sur Cloudflare"
+                          accept="image/*" value={null} fileName={null}
+                          uploading={uploadTarget === "replace"} progress={progress}
+                          onPick={file => void processFile(file, "replace")} onClear={() => {}}
+                          icon={ImageIcon}
+                        />
+                      </>
+                    )}
+                  </div>
+                )}
                 {media.type === "carousel" && editingCarouselId === media.id && (
                   <div className="grid min-w-0 gap-3 border-t border-white/10 pt-3">
                     <Label htmlFor={`carousel-title-${media.id}`}>Titre du carrousel</Label>
