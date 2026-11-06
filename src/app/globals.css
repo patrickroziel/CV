@@ -1051,12 +1051,11 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   border-color: rgba(255, 255, 255, 0.22);
 }
 
-/* This article still stores an inline black color. */
+/* Every article body stays white, even when an old inline color is stored. */
 .article-force-white .air-article-body,
-.article-force-white .air-article-body * {
-  color: #fff !important;
-}
-
+.article-force-white .air-article-body *,
+.air-article-body,
+.air-article-body *,
 .notes-force-white,
 .notes-force-white * {
   color: #fff !important;
