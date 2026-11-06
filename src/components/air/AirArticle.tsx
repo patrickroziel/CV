@@ -138,7 +138,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const bodyId = `air-body-${post.id}`;
   const teaser = isTeaserPost(post);
   return <div className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
-    <div className="sticky top-16 z-30 mb-3 flex items-center justify-between gap-3">
+    <div className="air-float-bar">
       <Link href="/air" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#071433]/75 px-3.5 py-2 text-sm text-white/90 shadow-[0_10px_28px_rgba(2,8,28,0.45)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
       <PostEditButton post={post} universe="air" />
     </div>

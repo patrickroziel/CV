@@ -20,7 +20,7 @@ export function Header() {
   const [wallpaperOpen, setWallpaperOpen] = useState(false);
 
   return (
-    <header className="no-print fixed inset-x-0 top-0 z-40 border-b border-cyan-100/10 bg-[#031014]/55 shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.04)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#031014]/42">
+    <header data-editing={editMode ? "true" : undefined} className="no-print fixed inset-x-0 top-0 z-40 border-b border-cyan-100/10 bg-[#031014]/55 shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.04)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#031014]/42">
       {editMode && (
         <div className="border-b border-cyan-200/10 bg-cyan-200/[0.08] px-4 py-1.5 text-center text-[11px] font-medium text-cyan-50/80">
           {cloudStatus === "local" ? "Mode édition · sauvegarde locale" : cloudStatus === "saved" ? "Mode édition · synchronisé dans le cloud" : cloudStatus === "saving" ? "Mode édition · sauvegarde en cours…" : "Mode édition · ERREUR CLOUD : exporter une copie JSON"}
