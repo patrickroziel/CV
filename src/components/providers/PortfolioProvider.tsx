@@ -136,7 +136,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   });
   const [editModeRaw, setEditModeRaw] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const locale: Locale = "fr";
+  const [locale, setLocaleState] = useState<Locale>("fr");
   const editingLocale: Locale = "fr";
 
   // editMode is always false for public/production visitors
@@ -173,7 +173,6 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           setCloudMode(result.revision > 0);
           setCloudStatus(result.revision > 0 ? "saved" : "local");
           setEditAllowed(result.revision > 0);
-          document.documentElement.lang = "fr";
           setIsHydrated(true);
           return;
         } catch { if (!cancelled) setCloudStatus("error"); }
@@ -194,7 +193,6 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       setData({ ...initial, ghostPages: normalizeGhostPages(initial.ghostPages) });
       setEditAllowed(local);
       setEditModeRaw(false);
-      document.documentElement.lang = "fr";
       setIsHydrated(true);
     }
     void hydrate();
@@ -253,9 +251,11 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [data, isHydrated, cloudMode]);
 
-  const setLocale = useCallback((_next: Locale) => {
-    // Site volontairement mono-langue.
-    if (typeof document !== "undefined") document.documentElement.lang = "fr";
+  const setLocale = useCallback((next: Locale) => {
+    setLocaleState(next === "en" ? "en" : "fr");
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = next === "en" ? "en" : "fr";
+    }
   }, []);
 
   const setEditingLocale = useCallback((_next: Locale) => {
@@ -271,15 +271,15 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   }, [editAllowed]);
 
   const t = useCallback(
-    (key: string) => translate(key, "fr"),
-    []
+    (key: string) => translate(key, locale),
+    [locale]
   );
 
-  /** Display content: follow editingLocale in edit mode for WYSIWYG */
+  /** Public pages use the active locale. Edit mode stays on the French source. */
   const l = useCallback(
     (value: MaybeLocalized) =>
-      getL(value, "fr"),
-    []
+      getL(value, editMode ? "fr" : locale),
+    [editMode, locale]
   );
 
   const le = useCallback(

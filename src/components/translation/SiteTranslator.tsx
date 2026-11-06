@@ -15,10 +15,24 @@ import {
   SITE_LANGUAGES,
   SITE_LANGUAGE_STORAGE_KEY,
 } from "@/lib/site-translation";
+import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { cn } from "@/lib/utils";
 
 const TRANSLATABLE_ATTRIBUTES = ["placeholder", "title", "aria-label", "alt"] as const;
 const CACHE_KEY = "patrick-google-translation-cache-v1";
+const ENGLISH_TARGETS = new Set(["en", "en-GB", "en-US"]);
+let englishPackPromise: Promise<Record<string, string>> | null = null;
+
+function loadEnglishPack() {
+  englishPackPromise ??= import("@/i18n/english-pack.json").then((mod) => mod.default as Record<string, string>);
+  return englishPackPromise;
+}
+
+async function withEnglishPack(cache: Record<string, Record<string, string>>, target: string) {
+  if (!ENGLISH_TARGETS.has(target)) return cache[target] ?? {};
+  const pack = await loadEnglishPack();
+  return { ...(cache[target] ?? {}), ...pack };
+}
 const MAX_BATCH_ITEMS = 80;
 const MAX_BATCH_CHARS = 4_800;
 const MAX_CONCURRENT_BATCHES = 4;
@@ -244,6 +258,7 @@ async function translateBatches({
 
 export function SiteTranslator({ className, tone = "site" }: { className?: string; tone?: "site" | "ghost" }) {
   const pathname = usePathname();
+  const { setLocale } = usePortfolio();
   const [languageCode, setLanguageCode] = useState(DEFAULT_SITE_LANGUAGE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -257,6 +272,10 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
   const previousPathnameRef = useRef(pathname);
 
   const language = useMemo(() => getSiteLanguage(languageCode), [languageCode]);
+
+  const syncContentLocale = useCallback((code: string) => {
+    setLocale(ENGLISH_TARGETS.has(code) ? "en" : "fr");
+  }, [setLocale]);
 
   const translateTargets = useCallback(
     async (targets: TranslationTarget[], target: string, quiet = false, restoreFirst = false) => {
@@ -285,7 +304,7 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
 
       try {
         const cache = loadCache();
-        const languageCache = cache[target] ?? {};
+        const languageCache = await withEnglishPack(cache, target);
         const unique = Array.from(new Set(targets.map((item) => item.original.trim()).filter(Boolean)));
         const missing = unique.filter((text) => languageCache[text] == null);
         const batches = buildBatches(missing);
@@ -342,15 +361,17 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
 
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("lang");
+    const requested = fromUrl === "en" ? "en-GB" : fromUrl;
     const saved = localStorage.getItem(SITE_LANGUAGE_STORAGE_KEY) || DEFAULT_SITE_LANGUAGE;
-    const preferred = fromUrl && SITE_LANGUAGES.some((item) => item.code === fromUrl) ? fromUrl : saved;
+    const preferred = requested && SITE_LANGUAGES.some((item) => item.code === requested) ? requested : saved;
     const initial = SITE_LANGUAGES.some((item) => item.code === preferred) ? preferred : DEFAULT_SITE_LANGUAGE;
-    if (fromUrl && initial === fromUrl) localStorage.setItem(SITE_LANGUAGE_STORAGE_KEY, initial);
+    if (requested && initial === requested) localStorage.setItem(SITE_LANGUAGE_STORAGE_KEY, initial);
     languageRef.current = initial;
     setLanguageCode(initial);
-    window.setTimeout(() => void translateCurrentPage(initial), 100);
+    syncContentLocale(initial);
+    window.setTimeout(() => void translateCurrentPage(initial), 180);
     return () => abortRef.current?.abort();
-  }, [translateCurrentPage]);
+  }, [translateCurrentPage, syncContentLocale]);
 
   useEffect(() => {
     if (previousPathnameRef.current === pathname) return;
@@ -398,7 +419,8 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
     languageRef.current = next;
     setLanguageCode(next);
     localStorage.setItem(SITE_LANGUAGE_STORAGE_KEY, next);
-    void translateCurrentPage(next);
+    syncContentLocale(next);
+    window.setTimeout(() => void translateCurrentPage(next), 180);
   };
 
   return (
