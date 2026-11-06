@@ -48,6 +48,8 @@ import { isEditEnvironment } from "@/lib/edit-env";
 import { t as translate } from "@/i18n";
 import {
   getL,
+  liftToLocalized,
+  setL,
   type MaybeLocalized,
 } from "@/lib/i18n-content";
 
@@ -115,6 +117,7 @@ type PortfolioContextValue = {
   updateSocial: (partial: Partial<SocialConfig>) => void;
   addSocialPost: (post: Omit<SocialPost, "id">) => void;
   updateSocialPost: (id: string, partial: Partial<SocialPost>) => void;
+  renameAirSeries: (from: string, to: string) => void;
   removeSocialPost: (id: string) => void;
   reorderSocialPosts: (orderedIds: string[]) => void;
   addGhostPage: (page: GhostPage) => void;
@@ -782,6 +785,23 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     [persist]
   );
 
+  const renameAirSeries = useCallback((from: string, to: string) => {
+    const previous = from.trim().replace(/\s+/g, " ");
+    const nextName = to.trim().replace(/\s+/g, " ").slice(0, 160);
+    if (!previous || !nextName || previous === nextName) return;
+    const key = previous.toLocaleLowerCase("fr");
+    persist((prev) => ({
+      ...prev,
+      socialPosts: (prev.socialPosts ?? []).map((post) => {
+        if ((post.universe ?? "notes") !== "air") return post;
+        const name = getL(post.subtitle, "fr").trim().replace(/\s+/g, " ");
+        if (name.toLocaleLowerCase("fr") !== key) return post;
+        return { ...post, subtitle: setL(liftToLocalized(post.subtitle), "fr", nextName) };
+      }),
+    }), "Série renommée");
+  }, [persist]);
+
+
   const removeSocialPost = useCallback(
     (id: string) => {
       persist(
@@ -900,6 +920,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       updateSocial,
       addSocialPost,
       updateSocialPost,
+      renameAirSeries,
       removeSocialPost,
       reorderSocialPosts,
       addGhostPage,
@@ -952,6 +973,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       updateSocial,
       addSocialPost,
       updateSocialPost,
+      renameAirSeries,
       removeSocialPost,
       reorderSocialPosts,
       addGhostPage,

@@ -176,7 +176,7 @@ export function SocialPostForm({
   const [title, setTitle] = useState<LocalizedString>(liftToLocalized(initial?.title));
   const [subtitle, setSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.subtitle));
   const [episode, setEpisode] = useState(initial?.episode?.trim() ?? "");
-  const { data: portfolioData } = usePortfolio();
+  const { data: portfolioData, renameAirSeries } = usePortfolio();
   const existingSeries = useMemo(() => {
     const seen = new Map<string, string>();
     for (const post of portfolioData.socialPosts ?? []) {
@@ -191,6 +191,7 @@ export function SocialPostForm({
   const knownSeries = existingSeries.find((name) => name.toLocaleLowerCase("fr") === initialSeries.toLocaleLowerCase("fr"));
   const [seriesChoice, setSeriesChoice] = useState(knownSeries ?? (initialSeries ? NEW_SERIES : ""));
   const [newSeriesName, setNewSeriesName] = useState(knownSeries ? "" : initialSeries);
+  const [renameDraft, setRenameDraft] = useState(knownSeries ?? initialSeries);
   const seriesSynced = useRef(false);
   useEffect(() => {
     if (seriesSynced.current || !initialSeries) return;
@@ -247,12 +248,28 @@ export function SocialPostForm({
 
   const applySeries = (choice: string, draftName = newSeriesName) => {
     setSeriesChoice(choice);
+    if (choice && choice !== NEW_SERIES) setRenameDraft(choice);
     if (choice === NEW_SERIES) {
       const name = draftName.trim().replace(/\s+/g, " ").slice(0, 160);
       setSubtitle(name ? liftToLocalized(name) : liftToLocalized(""));
       return;
     }
     setSubtitle(choice ? liftToLocalized(choice) : liftToLocalized(""));
+  };
+
+  const renameCurrentSeries = () => {
+    if (!seriesChoice || seriesChoice === NEW_SERIES) return;
+    const next = renameDraft.trim().replace(/\s+/g, " ").slice(0, 160);
+    if (!next) {
+      setError("Écris le nouveau nom de la série.");
+      return;
+    }
+    if (next === seriesChoice) return;
+    renameAirSeries(seriesChoice, next);
+    setSeriesChoice(next);
+    setSubtitle(liftToLocalized(next));
+    setRenameDraft(next);
+    setError(null);
   };
 
   const isBook = category === "Livre";
@@ -548,6 +565,23 @@ export function SocialPostForm({
                 }}
                 placeholder="Nom de la nouvelle série"
               />
+            )}
+            {seriesChoice && seriesChoice !== NEW_SERIES && (
+              <div className="grid gap-2 pt-1">
+                <Label htmlFor="air-series-rename">Renommer cette série</Label>
+                <div className="flex min-w-0 items-center gap-2">
+                  <Input
+                    id="air-series-rename"
+                    value={renameDraft}
+                    maxLength={160}
+                    onChange={(e) => setRenameDraft(e.target.value)}
+                  />
+                  <Button type="button" variant="secondary" onClick={renameCurrentSeries} className="shrink-0">
+                    Renommer
+                  </Button>
+                </div>
+                <p className="text-xs leading-5 text-zinc-500">Le nouveau nom remplace l’ancien sur tous les épisodes de cette série.</p>
+              </div>
             )}
           </>
         ) : (
