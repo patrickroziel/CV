@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from "react";
 
+function shortName(label: string, words: number) {
+  const clean = label.replace(/\s+/g, " ").trim();
+  const parts = clean.split(" ").filter(Boolean);
+  if (parts.length <= words) return clean;
+  return `${parts.slice(0, words).join(" ")}…`;
+}
+
 type Part = { id: string; label: string };
 
 export function ArticlePartNav({ targetId }: { targetId: string }) {
@@ -40,19 +47,24 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
 
   return (
     <div className="air-part-stack">
-      {parts.map((part) => (
-        <a
-          key={part.id}
-          href={`#${part.id}`}
-          className="air-part-float"
-          onClick={(event) => {
-            event.preventDefault();
-            document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-        >
-          {part.label}
-        </a>
-      ))}
+      {parts.map((part, index) => {
+        const current = index === parts.length - 1;
+        return (
+          <a
+            key={part.id}
+            href={`#${part.id}`}
+            title={part.label}
+            aria-current={current ? "true" : undefined}
+            className={current ? "air-part-float is-current" : "air-part-float"}
+            onClick={(event) => {
+              event.preventDefault();
+              document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          >
+            {shortName(part.label, current ? 5 : 2)}
+          </a>
+        );
+      })}
     </div>
   );
 }

@@ -1150,23 +1150,36 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.16rem;
-  margin-top: 0.28rem;
+  gap: 0.14rem;
+  width: max-content;
+  max-width: min(16rem, 72%);
+  margin-top: 0.4rem;
 }
 .air-part-float {
   position: relative;
   z-index: 1;
-  display: flex;
-  width: fit-content;
+  display: block;
   max-width: 100%;
+  overflow: hidden;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(48, 80, 128, 0.55);
+  padding: 0.02rem 0.48rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.62rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.air-part-float.is-current {
+  border-color: rgba(255, 255, 255, 0.28);
   background: #305080;
   padding: 0.08rem 0.62rem;
   color: #fff;
-  font-size: 0.68rem;
-  font-weight: 500;
-  line-height: 1.25;
+  font-size: 0.74rem;
+  font-weight: 600;
 }
 .air-article h2.air-part-title {
   position: relative;
