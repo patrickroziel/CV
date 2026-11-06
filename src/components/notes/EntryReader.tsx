@@ -62,7 +62,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={post.fileUrl} alt={title} className="absolute inset-0 h-full w-full object-cover object-center" />
           </div>}
-        <PostRichBody html={l(post.description)} inlineMedia={post.inlineMedia} title={title} className="min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-zinc-200 [&_*]:max-w-full [&_a]:break-all" />
+        <PostRichBody html={l(post.description)} inlineMedia={post.inlineMedia} title={title} className="notes-force-white min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-white [&_*]:max-w-full [&_a]:break-all" />
         {post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100">
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}

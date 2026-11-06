@@ -1057,6 +1057,11 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   color: #fff !important;
 }
 
+.notes-force-white,
+.notes-force-white * {
+  color: #fff !important;
+}
+
 .article-sticky-head {
   position: sticky;
   top: 4.5rem;

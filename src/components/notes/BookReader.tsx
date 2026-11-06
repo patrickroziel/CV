@@ -128,7 +128,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
             html={body}
             inlineMedia={post.inlineMedia}
             title={title}
-            className="book-reading-text min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-zinc-200 sm:text-base sm:leading-7 [&_*]:max-w-full [&_a]:break-all"
+            className="notes-force-white book-reading-text min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-white sm:text-base sm:leading-7 [&_*]:max-w-full [&_a]:break-all"
           />
 
           {post.bookPdfUrl ? (
