@@ -12,6 +12,7 @@ import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { getNoteSharePhotos } from "@/lib/notes-preview-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
+import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import type { SocialPost } from "@/lib/types";
 
@@ -110,24 +111,35 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const series = post.subtitle ? l(post.subtitle).trim() : "";
   const episode = post.episode?.trim() ?? "";
   const bodyId = `air-body-${post.id}`;
+  const teaser = isTeaserPost(post);
   return <div className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
     <div className="flex items-center justify-between gap-3">
       <Link href="/air" className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
       <PostEditButton post={post} universe="air" />
     </div>
     <article className={`air-article air-surface mt-6 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
-      <ArticleCover sources={getNoteSharePhotos(post)} />
+      {post.coverSource === "wip" ? (
+        <div className="overflow-hidden rounded-t-[1.35rem]">
+          <div className="relative aspect-[16/8] sm:aspect-[16/7]">
+            <WorkInProgress className="blob-wip--fill" />
+          </div>
+        </div>
+      ) : (
+        <ArticleCover sources={getNoteSharePhotos(post)} />
+      )}
       <AirReadHead
         category={coercePostCategory(post)}
-        date={post.date}
+        date={teaser ? `${post.date} · work in progress` : post.date}
         series={series}
         episode={episode}
         title={title}
         bodyId={bodyId}
       />
       <div id={bodyId} className="space-y-6 px-5 pb-5 sm:px-10 sm:pb-10">
+        {teaser ? <p className="text-sm leading-7 text-white/70">{TEASER_PUBLIC_LINE}</p> : <>
         <FeaturedMedia media={post.featuredEmbed} title={title}/>
         <PostRichBody html={proxyBlobImages(l(post.description))} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
+        </>}
         <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" />
       </div>
     </article>

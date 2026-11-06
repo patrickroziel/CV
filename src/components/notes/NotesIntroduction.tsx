@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
+import { isTeaserPost } from "@/lib/post-publication";
 
 /**
  * An editorial note below the left-hand Notes menu, not a hero or a video.
@@ -25,7 +26,7 @@ export function NotesIntroduction() {
   }, [data.socialPosts]);
 
   const image = featured ? getNoteSharePhoto(featured) : null;
-  const quote = featured
+  const quote = featured && !isTeaserPost(featured)
     ? stripHtml(l(featured.description))
         .replace(/\[\[MEDIA:[A-Za-z0-9_-]{8,80}\]\]/g, "")
         .replace(/\s+/g, " ")

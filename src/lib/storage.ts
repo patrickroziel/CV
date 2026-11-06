@@ -742,6 +742,11 @@ export function normalizeSocialPost(
     bookCoverName,
     bookPdfUrl,
     bookPdfName,
+    coverSource:
+      raw.coverSource === "wip" || raw.coverSource === "web" || raw.coverSource === "cloudflare"
+        ? raw.coverSource
+        : null,
+    contentHidden: raw.contentHidden === true,
     category,
     tags: Array.isArray(raw.tags)
       ? raw.tags

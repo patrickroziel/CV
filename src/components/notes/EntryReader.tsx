@@ -5,11 +5,13 @@ import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
+import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
+import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import type { FeaturedEmbed, SocialPost } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -33,8 +35,9 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
 
   const title = l(post.title).trim() || (editMode ? "Brouillon" : "");
   const category = coercePostCategory(post);
-  const featured: FeaturedEmbed | null = post.featuredEmbed ??
-    (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null);
+  const teaser = isTeaserPost(post);
+  const featured: FeaturedEmbed | null = teaser ? null : (post.featuredEmbed ??
+    (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null));
 
   return <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
     <div className="flex items-center justify-between gap-3">
@@ -44,17 +47,15 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
       <PostEditButton post={post} universe="notes" />
     </div>
     <article className="mt-6 overflow-visible rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
-      {post.bookCoverUrl && <div className="relative aspect-[16/8] w-full overflow-hidden border-b border-white/10 bg-black/30 sm:aspect-[16/7]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={post.bookCoverUrl} className="h-full w-full object-cover" alt={title} />
-      </div>}
+      <PostCover post={post} alt={title} className="border-b border-white/10" />
       <div className="article-sticky-head">
-        <p className="text-xs uppercase tracking-[0.15em] text-cyan-100/55">{category} · {formatDate(post.date)}</p>
+        <p className="text-xs uppercase tracking-[0.15em] text-cyan-100/55">{category} · {formatDate(post.date)}{teaser ? " · work in progress" : ""}</p>
         <h1 className="mt-3 break-words text-2xl font-semibold text-white sm:text-3xl">{title}</h1>
         {post.subtitle && <p className="mt-3 text-sm text-zinc-400">{l(post.subtitle)}</p>}
-        <ArticlePartNav targetId={`note-body-${post.id}`} />
+        {!teaser && <ArticlePartNav targetId={`note-body-${post.id}`} />}
       </div>
       <div id={`note-body-${post.id}`} className="min-w-0 space-y-6 px-4 pb-4 sm:px-8 sm:pb-8 md:px-10 md:pb-10">
+        {teaser ? <p className="text-sm leading-6 text-zinc-400">{TEASER_PUBLIC_LINE}</p> : <>
         <FeaturedMedia media={featured} title={title} />
         {post.fileKind === "image" && post.fileUrl && post.fileUrl !== featured?.url && post.fileUrl !== post.bookCoverUrl &&
           <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
@@ -66,6 +67,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
           className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100">
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}
         </a>}
+        </>}
         <PostActions postId={post.id} title={title} visible={post.visible !== false} />
       </div>
     </article>

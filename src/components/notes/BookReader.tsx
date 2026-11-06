@@ -5,10 +5,12 @@ import { ArrowLeft, FileDown } from "lucide-react";
 import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
+import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { coercePostCategory } from "@/lib/post-taxonomy";
+import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
 
@@ -63,6 +65,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
   const title = l(post.title).trim() || (editMode && !post.visible ? "Brouillon sans titre" : "");
   const subtitle = post.subtitle ? l(post.subtitle) : "";
   const body = l(post.description);
+  const teaser = isTeaserPost(post);
 
   return (
     <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
@@ -77,19 +80,14 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
       </div>
 
       <article className="mt-6 min-w-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]">
-        {post.bookCoverUrl ? (
-          <div className="relative aspect-[16/8] w-full overflow-hidden border-b border-white/10 bg-black/30 sm:aspect-[16/7]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.bookCoverUrl} alt="" className="h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#031014]/70 via-transparent to-transparent" />
-          </div>
-        ) : null}
+        <PostCover post={post} className="border-b border-white/10" />
 
         <div className="min-w-0 p-4 sm:p-8 md:p-10">
           <div className="flex min-w-0 flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-cyan-100/50">
             <span>Livre</span>
             <span aria-hidden>·</span>
             <time dateTime={post.date}>{formatDate(post.date)}</time>
+            {teaser ? <><span aria-hidden>·</span><span>Work in progress</span></> : null}
           </div>
 
           <h1 className="mt-4 max-w-full break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
@@ -117,6 +115,10 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
 
           <div className="my-7 h-px bg-white/[0.07] sm:my-9" />
 
+          {teaser ? (
+            <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
+          ) : (
+            <>
           {(post.featuredEmbed || post.youtubeUrl) && (
             <div className="mb-7">
               <FeaturedMedia media={post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null)} title={title} />
@@ -142,6 +144,8 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
               </a>
             </div>
           ) : null}
+            </>
+          )}
           <div className="mt-8">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} />
           </div>

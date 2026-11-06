@@ -8,6 +8,7 @@ import { PostActions } from "@/components/medias/PostActions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
+import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
@@ -91,13 +92,16 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-md"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
     </div>
     {visiblePosts.length ? <div className="space-y-6">
-      {visiblePosts.map((post, index) => { const photo=getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
-        const excerpt = previewText(l(post.description));
+      {visiblePosts.map((post, index) => { const photo=post.coverSource === "wip" ? null : getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
+        const teaser = isTeaserPost(post);
+        const excerpt = teaser ? TEASER_PUBLIC_LINE : previewText(l(post.description));
         return <Fragment key={post.id}>
         <article className="air-surface overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl transition-colors">
           <Link href={`/air/${post.id}`} className="group block">
             <div className="relative aspect-[16/8] overflow-hidden bg-gradient-to-br from-sky-900/20 to-sky-700/10 sm:aspect-[16/7]">
-              {photo ? (
+              {post.coverSource === "wip" ? (
+                <WorkInProgress className="blob-wip--fill" />
+              ) : photo ? (
                 isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>

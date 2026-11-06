@@ -705,6 +705,9 @@ export type HeroGlassConfig = {
 /** Attachment on a Médias / Social post (Vercel Blob) */
 export type SocialPostFileKind = "pdf" | "image";
 
+/** How the article cover is chosen in the back office. */
+export type SocialPostCoverSource = "wip" | "web" | "cloudflare";
+
 /** A safe external visual displayed at the top of a post; URL only, never raw HTML. */
 export type FeaturedEmbed = { type: "youtube" | "x" | "image"; url: string };
 /** External media or a self-contained, independently scrollable text excerpt. */
@@ -746,6 +749,19 @@ export type SocialPost = {
   /** Optional downloadable PDF version of a Livre entry. */
   bookPdfUrl?: string | null;
   bookPdfName?: string | null;
+  /**
+   * Cover choice.
+   * - "wip": the work-in-progress graphic
+   * - "web": an https image link (bookCoverUrl)
+   * - "cloudflare": an image hosted on Cloudflare (bookCoverUrl)
+   * Missing keeps the legacy cover image, if any.
+   */
+  coverSource?: SocialPostCoverSource | null;
+  /**
+   * Published teaser: title and cover stay public, the body stays hidden
+   * while the article is still being prepared.
+   */
+  contentHidden?: boolean;
   /** Primary category. Notes and Air each have their own set. */
   category?: PostCategory;
   /** Free-form tags — shared across locales, used by search. */

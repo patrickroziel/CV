@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { BookOpen, FileText, FileUp, ImageIcon, Loader2, Plus, Save, X } from "lucide-react";
-import type { SocialPost, SocialPostFileKind, InlinePostMedia, FeaturedEmbed, MediaItem } from "@/lib/types";
+import { BookOpen, Cloud, FileText, FileUp, ImageIcon, Link2, Loader2, Plus, Save, X } from "lucide-react";
+import type { SocialPost, SocialPostCoverSource, SocialPostFileKind, InlinePostMedia, FeaturedEmbed, MediaItem } from "@/lib/types";
 import { AIR_CATEGORIES, NOTES_CATEGORIES, coercePostCategory, type PostCategory } from "@/lib/post-taxonomy";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +12,12 @@ import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
 import { MediaCarouselEditor } from "@/components/shared/MediaCarouselEditor";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getL, liftToLocalized, setL, type LocalizedString } from "@/lib/i18n-content";
-import { MEDIA_FOLDERS, uploadToBlob } from "@/lib/blob-upload";
+import { MEDIA_FOLDERS, isR2Url, uploadToBlob } from "@/lib/blob-upload";
 import { cn } from "@/lib/utils";
 import { featuredEmbedFromInput, normalizeFeaturedEmbed } from "@/lib/featured-embed";
 import { mediaMarker, removeInlineMediaMarker, normalizeInlinePostMedia, normalizeInlineCarouselItems } from "@/lib/post-inline-media";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
+import { WorkInProgress } from "@/components/media/WorkInProgress";
 
 export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
 
@@ -46,6 +47,26 @@ function detectFileKind(file: File): SocialPostFileKind | null {
   if (file.type === "application/pdf" || name.endsWith(".pdf")) return "pdf";
   if (file.type.startsWith("image/") || /\.(png|jpe?g|webp|gif|avif|svg)$/i.test(name)) return "image";
   return null;
+}
+
+function safeHttpsUrl(value: string): string | null {
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || url.username || url.password || !url.hostname.includes(".")) return null;
+    if (url.toString().length > 2048) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function initialCoverChoice(initial?: Partial<SocialPost>): SocialPostCoverSource {
+  if (initial?.coverSource === "wip" || initial?.coverSource === "web" || initial?.coverSource === "cloudflare") {
+    return initial.coverSource;
+  }
+  if (initial?.bookCoverUrl && isR2Url(initial.bookCoverUrl)) return "cloudflare";
+  if (initial?.bookCoverUrl) return "web";
+  return "cloudflare";
 }
 
 function FilePicker({
@@ -180,6 +201,16 @@ export function SocialPostForm({
   const [bookCoverName, setBookCoverName] = useState<string | null>(initial?.bookCoverName ?? null);
   const [bookPdfUrl, setBookPdfUrl] = useState<string | null>(initial?.bookPdfUrl ?? null);
   const [bookPdfName, setBookPdfName] = useState<string | null>(initial?.bookPdfName ?? null);
+  const [contentHidden, setContentHidden] = useState(initial?.contentHidden === true);
+  const [coverChoice, setCoverChoice] = useState<SocialPostCoverSource>(initialCoverChoice(initial));
+  const [webCoverInput, setWebCoverInput] = useState(
+    initial?.coverSource === "web" || (!initial?.coverSource && initial?.bookCoverUrl && !isR2Url(initial.bookCoverUrl))
+      ? (initial.bookCoverUrl ?? "")
+      : ""
+  );
+  const [cloudCoverInput, setCloudCoverInput] = useState(
+    initial?.bookCoverUrl && isR2Url(initial.bookCoverUrl) ? initial.bookCoverUrl : ""
+  );
   const [error, setError] = useState<string | null>(null);
   const [uploadTarget, setUploadTarget] = useState<UploadTarget>(null);
   const [progress, setProgress] = useState(0);
@@ -300,6 +331,8 @@ export function SocialPostForm({
       } else if (target === "cover") {
         setBookCoverUrl(result.url);
         setBookCoverName(file.name);
+        setCloudCoverInput(result.url);
+        setCoverChoice("cloudflare");
       } else if (target === "bookPdf") {
         setBookPdfUrl(result.url);
         setBookPdfName(file.name);
@@ -318,7 +351,40 @@ export function SocialPostForm({
     }
   }, [insertInlineMedia]);
 
-  const buildValues = (nextVisible: boolean): SocialPostFormValues => ({
+  const resolveCover = (): {
+    coverSource: SocialPostCoverSource | null;
+    bookCoverUrl: string | null;
+    bookCoverName: string | null;
+    error?: string;
+  } => {
+    if (coverChoice === "wip") {
+      return { coverSource: "wip", bookCoverUrl: null, bookCoverName: null };
+    }
+    if (coverChoice === "web") {
+      const raw = webCoverInput.trim();
+      if (!raw) return { coverSource: null, bookCoverUrl: null, bookCoverName: null };
+      const url = safeHttpsUrl(raw);
+      if (!url) return { coverSource: null, bookCoverUrl: null, bookCoverName: null, error: "Le lien de couverture doit commencer par https://." };
+      if (isR2Url(url)) {
+        return { coverSource: null, bookCoverUrl: null, bookCoverName: null, error: "Cette image est déjà sur Cloudflare. Choisis l’option Cloudflare." };
+      }
+      return { coverSource: "web", bookCoverUrl: url, bookCoverName: null };
+    }
+    const candidate = cloudCoverInput.trim() || (bookCoverUrl && isR2Url(bookCoverUrl) ? bookCoverUrl : "");
+    if (!candidate) return { coverSource: null, bookCoverUrl: null, bookCoverName: null };
+    if (!safeHttpsUrl(candidate) || !isR2Url(candidate)) {
+      return { coverSource: null, bookCoverUrl: null, bookCoverName: null, error: "Pour Cloudflare, téléverse une image ou colle un lien media.patrickroziel.com." };
+    }
+    return { coverSource: "cloudflare", bookCoverUrl: candidate, bookCoverName };
+  };
+
+  const buildValues = (nextVisible: boolean): SocialPostFormValues | null => {
+    const cover = resolveCover();
+    if (cover.error) {
+      setError(cover.error);
+      return null;
+    }
+    return {
     universe: initial?.universe ?? universe,
     title,
     subtitle: getL(subtitle, "fr").trim() ? subtitle : undefined,
@@ -331,27 +397,31 @@ export function SocialPostForm({
     fileUrl,
     fileKind: fileUrl ? fileKind : null,
     fileName: fileUrl ? fileName : null,
-    bookCoverUrl,
-    bookCoverName,
+    bookCoverUrl: cover.bookCoverUrl,
+    bookCoverName: cover.bookCoverName,
     bookPdfUrl,
     bookPdfName,
+    coverSource: cover.coverSource,
+    contentHidden,
     category,
     tags: Array.from(
       new Set(tagsText.split(",").map((tag) => tag.trim()).filter(Boolean))
     ),
     visible: nextVisible,
-  });
+  };
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (e.target !== e.currentTarget) return;
     setError(null);
     if (!getL(title, "fr").trim()) return setError("Le titre est obligatoire pour publier.");
-    if (isBook && !getL(description, "fr").trim()) return setError("Ajoute le texte du chapitre avant de publier.");
-    if (inlineMedia.some(invalidCarousel)) return setError("Un carrousel contient des médias invalides ou trop nombreux (maximum 24).");
-    if (inlineMedia.some(media => media.type === "text" && !stripHtml(media.body).trim())) return setError("Un bloc de texte est vide. Complète-le avant de publier.");
-    if (inlineMedia.some(media => media.type === "text" && media.body.length > MAX_TEXT_BLOCK_LENGTH)) return setError("Un bloc de texte dépasse 40 000 caractères.");
-    onSubmit(buildValues(true));
+    if (!contentHidden && isBook && !getL(description, "fr").trim()) return setError("Ajoute le texte du chapitre avant de publier.");
+    if (!contentHidden && inlineMedia.some(invalidCarousel)) return setError("Un carrousel contient des médias invalides ou trop nombreux (maximum 24).");
+    if (!contentHidden && inlineMedia.some(media => media.type === "text" && !stripHtml(media.body).trim())) return setError("Un bloc de texte est vide. Complète-le avant de publier.");
+    if (!contentHidden && inlineMedia.some(media => media.type === "text" && media.body.length > MAX_TEXT_BLOCK_LENGTH)) return setError("Un bloc de texte dépasse 40 000 caractères.");
+    const values = buildValues(true);
+    if (values) onSubmit(values);
   };
 
   const handleSaveDraft = () => {
@@ -373,7 +443,8 @@ export function SocialPostForm({
       setError("Ajoute au moins un titre ou un contenu avant d’enregistrer le brouillon.");
       return;
     }
-    onSubmit(buildValues(false));
+    const values = buildValues(false);
+    if (values) onSubmit(values);
   };
 
   return (
@@ -620,17 +691,126 @@ export function SocialPostForm({
         )}
       </div>
 
-      <FilePicker
-        label={isBook ? "Couverture du chapitre (facultatif)" : "Photo de couverture du post (facultatif)"}
-        accept="image/*"
-        value={bookCoverUrl}
-        fileName={bookCoverName}
-        uploading={uploadTarget === "cover"}
-        progress={progress}
-        onPick={(file) => void processFile(file, "cover")}
-        onClear={() => { setBookCoverUrl(null); setBookCoverName(null); }}
-        icon={ImageIcon}
-      />
+      <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="grid gap-2">
+          <Label>Publication</Label>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setContentHidden(false)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left text-sm transition",
+                !contentHidden
+                  ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50"
+                  : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+              )}
+            >
+              <span className="block font-medium">Article complet</span>
+              <span className="mt-0.5 block text-xs font-normal text-zinc-400">Le titre et le texte sont visibles.</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setContentHidden(true)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left text-sm transition",
+                contentHidden
+                  ? "border-amber-200/50 bg-amber-200/10 text-amber-50"
+                  : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+              )}
+            >
+              <span className="block font-medium">Work in progress</span>
+              <span className="mt-0.5 block text-xs font-normal text-zinc-400">Seul le titre est publié. Le texte reste masqué.</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-2">
+          <Label>Photo de couverture</Label>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {([
+              ["wip", "Work in progress", ImageIcon],
+              ["web", "Lien web", Link2],
+              ["cloudflare", "Cloudflare", Cloud],
+            ] as const).map(([value, label, Icon]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setCoverChoice(value)}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 rounded-xl border px-2 py-2 text-xs font-medium transition",
+                  coverChoice === value
+                    ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50"
+                    : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+                )}
+              >
+                <Icon className="h-3.5 w-3.5 shrink-0" />
+                {label}
+              </button>
+            ))}
+          </div>
+          {coverChoice === "wip" && (
+            <div className="overflow-hidden rounded-xl border border-white/10">
+              <div className="relative aspect-[16/7]">
+                <WorkInProgress className="blob-wip--fill" />
+              </div>
+              <p className="px-3 py-2 text-xs leading-5 text-zinc-400">
+                La création « work in progress » actuelle sert de couverture. Aucune photo n’est publiée.
+              </p>
+            </div>
+          )}
+          {coverChoice === "web" && (
+            <div className="grid gap-2">
+              <Input
+                id="cover-web-url"
+                value={webCoverInput}
+                onChange={(e) => setWebCoverInput(e.target.value)}
+                placeholder="https://…/photo.jpg"
+                inputMode="url"
+              />
+              <p className="text-xs leading-5 text-zinc-500">Une image déjà en ligne, ailleurs que sur ton Cloudflare.</p>
+              {safeHttpsUrl(webCoverInput) && !isR2Url(webCoverInput) && (
+                <div className="relative aspect-[16/7] overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={safeHttpsUrl(webCoverInput) ?? ""} alt="" referrerPolicy="no-referrer" className="h-full w-full object-cover" />
+                </div>
+              )}
+            </div>
+          )}
+          {coverChoice === "cloudflare" && (
+            <div className="grid gap-2">
+              <FilePicker
+                label="Téléverser sur Cloudflare"
+                accept="image/*"
+                value={cloudCoverInput || (bookCoverUrl && isR2Url(bookCoverUrl) ? bookCoverUrl : null)}
+                fileName={bookCoverName}
+                uploading={uploadTarget === "cover"}
+                progress={progress}
+                onPick={(file) => void processFile(file, "cover")}
+                onClear={() => { setBookCoverUrl(null); setBookCoverName(null); setCloudCoverInput(""); }}
+                icon={ImageIcon}
+              />
+              <Label htmlFor="cover-r2-url">Ou un lien déjà hébergé sur Cloudflare</Label>
+              <Input
+                id="cover-r2-url"
+                value={cloudCoverInput}
+                onChange={(e) => {
+                  setCloudCoverInput(e.target.value);
+                  setBookCoverUrl(e.target.value.trim() || null);
+                  if (!e.target.value.trim()) setBookCoverName(null);
+                }}
+                placeholder="https://media.patrickroziel.com/…"
+                inputMode="url"
+              />
+              {isR2Url(cloudCoverInput) && (
+                <div className="relative aspect-[16/7] overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={cloudCoverInput} alt="" className="h-full w-full object-cover" />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
       {isBook ? (
         <FilePicker
           label="PDF du chapitre (facultatif)"
@@ -674,11 +854,13 @@ export function SocialPostForm({
           disabled={uploadTarget !== null}
           className="bg-cyan-200 text-zinc-950 hover:bg-cyan-100"
         >
-          {submitLabel}
+          {contentHidden ? "Publier le titre" : submitLabel}
         </Button>
       </div>
       <p className="text-xs leading-5 text-zinc-500 sm:text-right">
-        Les brouillons restent dans tes données et sont inclus dans l’Export JSON, mais ils ne sont pas visibles publiquement.
+        {contentHidden
+          ? "Le titre et la couverture seront en ligne. Le texte, les médias et les fichiers restent masqués jusqu’à ce que tu publies l’article complet."
+          : "Les brouillons restent dans tes données et sont inclus dans l’Export JSON, mais ils ne sont pas visibles publiquement."}
       </p>
     </form>
   );

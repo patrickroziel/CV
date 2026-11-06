@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
+import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import type { SocialPost, FeaturedEmbed } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
+import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { stripHtml } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +35,8 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
   const description = l(post.description);
   const category = coercePostCategory(post);
   const isBook = category === "Livre";
-  const featured: FeaturedEmbed | null = post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null);
+  const teaser = isTeaserPost(post);
+  const featured: FeaturedEmbed | null = teaser ? null : (post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null));
 
   return (
     <motion.article
@@ -43,13 +46,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
       className="min-w-0"
     >
       <GlassCard glow className={cn("min-w-0 overflow-hidden p-0 ring-1 ring-cyan-300/10", !post.visible && "opacity-70")}>
-        {post.bookCoverUrl && (
-          <div className="relative aspect-[16/8] w-full overflow-hidden border-b border-white/10 bg-black/40 sm:aspect-[16/7]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.bookCoverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          </div>
-        )}
+        <PostCover post={post} />
         <div className="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
           <header className="flex min-w-0 items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
@@ -61,6 +58,11 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
                 {editMode && !post.visible && (
                   <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/35 bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-100">
                     <EyeOff className="h-3 w-3" /> Brouillon
+                  </span>
+                )}
+                {teaser && (
+                  <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-100">
+                    Work in progress
                   </span>
                 )}
               </div>
@@ -81,15 +83,17 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
             </div>}
           </header>
 
-          {!isBook && featured && <FeaturedMedia media={featured} title={title} />}
-          {!isBook && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
+          {!teaser && !isBook && featured && <FeaturedMedia media={featured} title={title} />}
+          {!teaser && !isBook && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
             post.fileUrl !== featured?.url && <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/40">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={post.fileUrl} alt={title} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
             </div>
           }
 
-          {description ? isBook ? (
+          {teaser ? (
+            <p className="text-sm leading-6 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
+          ) : description ? isBook ? (
             <p className="break-words text-sm leading-6 text-zinc-400">{excerpt(description)}</p>
           ) : (
             <PostRichBody html={description} inlineMedia={post.inlineMedia} title={title} className="min-w-0 max-w-full overflow-hidden text-sm leading-6 text-zinc-300 [&_*]:max-w-full [&_a]:break-all" />
@@ -100,12 +104,12 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
               className="break-words rounded-full border border-cyan-300/20 bg-cyan-400/10 px-2.5 py-0.5 text-left text-[11px] font-medium text-cyan-50 hover:bg-cyan-400/20">{tag}</button></li>)}
           </ul> : null}
 
-          {post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"
+          {!teaser && post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"
             className="inline-flex w-fit items-center gap-2 break-words rounded-full border border-cyan-300/30 bg-cyan-400/15 px-3.5 py-2 text-sm font-medium text-cyan-50 hover:bg-cyan-400/25">
             <FileDown className="h-4 w-4" />{post.fileName || "Télécharger le document"}
           </a>}
 
-          {isBook && post.bookPdfUrl && <a href={post.bookPdfUrl} target="_blank" rel="noopener noreferrer"
+          {!teaser && isBook && post.bookPdfUrl && <a href={post.bookPdfUrl} target="_blank" rel="noopener noreferrer"
             className="inline-flex w-fit items-center gap-2 text-xs font-medium text-zinc-400 hover:text-zinc-200">
             <FileDown className="h-4 w-4" /> Télécharger le chapitre en PDF
           </a>}

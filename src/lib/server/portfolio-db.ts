@@ -3,6 +3,7 @@ import "server-only";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { neon } from "@neondatabase/serverless";
 import { normalizeGhostPages } from "@/lib/ghost-pages";
+import { concealHiddenPost } from "@/lib/post-publication";
 import type { PortfolioData } from "@/lib/types";
 
 type Snapshot = { data: PortfolioData | null; revision: number };
@@ -109,7 +110,9 @@ export async function writePortfolio(data: PortfolioData, expectedRevision: numb
 export function publicPortfolio(data: PortfolioData): PortfolioData {
   return {
     ...data,
-    socialPosts: (data.socialPosts ?? []).filter((post) => post.visible !== false),
+    socialPosts: (data.socialPosts ?? [])
+      .filter((post) => post.visible !== false)
+      .map((post) => concealHiddenPost(post)),
     ghostPages: normalizeGhostPages(data.ghostPages).filter((page) => page.visible),
   };
 }

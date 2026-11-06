@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
+import { isTeaserPost } from "@/lib/post-publication";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import type { SocialPost } from "@/lib/types";
 
@@ -91,7 +92,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   }, [reduceMotion, shuffled.length]);
 
   const image = featured ? getNoteSharePhoto(featured) : null;
-  const quote = featured
+  const quote = featured && !isTeaserPost(featured)
     ? stripHtml(l(featured.description))
         .replace(/\[\[MEDIA:[A-Za-z0-9_-]{8,80}\]\]/g, "")
         .replace(/\s+/g, " ")

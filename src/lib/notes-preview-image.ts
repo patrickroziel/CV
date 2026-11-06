@@ -1,4 +1,5 @@
 import type { SocialPost } from "@/lib/types";
+import { isTeaserPost, isWipCover } from "@/lib/post-publication";
 
 function readableMediaUrl(raw: string): string | null {
   try {
@@ -15,6 +16,11 @@ function readableMediaUrl(raw: string): string | null {
 
 /** Every usable cover, first choice first. Blob addresses go through the site. */
 export function getNoteSharePhotos(post: SocialPost): string[] {
+  if (isWipCover(post)) return [];
+  if (isTeaserPost(post) || post.coverSource === "web" || post.coverSource === "cloudflare") {
+    const readable = typeof post.bookCoverUrl === "string" ? readableMediaUrl(post.bookCoverUrl) : null;
+    return readable ? [readable] : [];
+  }
   const urls: unknown[] = [post.bookCoverUrl];
   if (post.featuredEmbed?.type === "image") urls.push(post.featuredEmbed.url);
   if (post.fileKind === "image") urls.push(post.fileUrl);

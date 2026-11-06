@@ -7,6 +7,7 @@ import { stripHtml } from "@/lib/sanitize-html";
 import { readPublicPortfolio } from "@/lib/server/portfolio-db";
 import type { SocialPost } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
+import { concealHiddenPost, isTeaserPost, isWipCover, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { youtubeVideoId } from "@/lib/utils";
 
 export const NOTES_ORIGIN = "https://patrickroziel.com";
@@ -29,7 +30,8 @@ export const listPublicPosts = cache(async function listPublicPosts(): Promise<S
     .filter((post) => post.visible !== false)
     .map((post) => {
       const category = coercePostCategory(post);
-      return category === post.category ? post : { ...post, category };
+      const next = category === post.category ? post : { ...post, category };
+      return concealHiddenPost(next);
     });
 });
 
@@ -59,6 +61,10 @@ function pushYoutubeThumb(options: unknown[], url: unknown) {
 
 /** Prefer the actual cover, then the first photo, then a YouTube thumbnail. */
 export function getNoteSharePhoto(post: SocialPost): string | null {
+  if (isWipCover(post)) return null;
+  if (isTeaserPost(post) || post.coverSource === "web" || post.coverSource === "cloudflare") {
+    return validPublicImage(post.bookCoverUrl);
+  }
   const options: unknown[] = [post.bookCoverUrl];
   if (post.featuredEmbed?.type === "image") options.push(post.featuredEmbed.url);
   if (post.fileKind === "image") options.push(post.fileUrl);
@@ -86,6 +92,9 @@ export function titleForSearch(title: string) {
 
 export function getNoteShareText(post: SocialPost) {
   const title = stripHtml(getL(post.title, "fr")).replace(/\s+/g, " ").trim().slice(0, 130) || "Notes de Patrick Roziel";
+  if (isTeaserPost(post)) {
+    return { title, description: TEASER_PUBLIC_LINE };
+  }
   const raw = stripHtml(getL(post.description, "fr"))
     .replace(/\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]/g, "")
     .replace(/\s+/g, " ")
