@@ -1133,6 +1133,15 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
 .air-card-copy .air-series-line {
   margin-top: 0.75rem;
 }
+.air-card-copy .air-card-parts {
+  margin-top: 0.85rem;
+  grid-template-columns: 1fr;
+}
+.air-card-copy .air-part-name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
 .air-series-line > span:last-child {
   position: relative;
   z-index: 1;

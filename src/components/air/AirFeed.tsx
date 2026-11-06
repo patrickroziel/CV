@@ -18,6 +18,16 @@ import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { collectPostTags } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
+function partTitles(html: string) {
+  const titles: string[] = [];
+  const pattern = /<h2\b[^>]*\bair-part-title\b[^>]*>([\s\S]*?)<\/h2>/gi;
+  for (const match of html.matchAll(pattern)) {
+    const text = stripHtml(match[1] ?? "").replace(/\s+/g, " ").trim();
+    if (text && text.toLocaleLowerCase("fr") !== "titre de la partie") titles.push(text);
+  }
+  return titles;
+}
+
 function previewText(html: string) {
   const text = stripHtml(html)
     .replace(/\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]/g, " ")
@@ -101,6 +111,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     {visiblePosts.length ? <div className="space-y-6">
       {visiblePosts.map((post, index) => { const photo=post.coverSource === "wip" ? null : getNoteSharePhoto(post);const title=l(post.title)||"Sans titre";
         const teaser = isTeaserPost(post);
+        const parts = teaser ? [] : partTitles(l(post.description));
         const excerpt = teaser ? TEASER_PUBLIC_LINE : previewText(l(post.description));
         return <Fragment key={post.id}>
         <article className="air-surface overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl transition-colors">
@@ -116,7 +127,18 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p>
               <AirSeriesLine label={[seriesName(post), post.episode?.trim() ? `Épisode ${post.episode.trim().replace(/^épisode\s+/i, "")}` : ""].filter(Boolean).join(" · ")} />
               <h3 className="mt-3 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
-              <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p>
+              {parts.length ? (
+                <div className="air-part-stack air-card-parts">
+                  {parts.map((label, partIndex) => (
+                    <span key={`${partIndex}-${label}`} className="air-part-float" title={label}>
+                      <span className="air-part-num">{partIndex + 1}</span>
+                      <span className="air-part-name">{label}</span>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p>
+              )}
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
           </Link>
           <div className="border-t border-white/15 px-5 py-4">
