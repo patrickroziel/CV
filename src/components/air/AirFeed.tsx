@@ -13,6 +13,7 @@ import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
+import { AirSeriesLine } from "@/components/air/AirArticle";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { collectPostTags } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
@@ -111,7 +112,10 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                 isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>
-            <div className="p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-white/50">{[seriesName(post), post.episode?.trim() ? `Épisode ${post.episode.trim()}` : "", post.date].filter(Boolean).join(" · ")}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
+            <div className="air-card-copy p-5 sm:p-6">
+              <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p>
+              <AirSeriesLine label={[seriesName(post), post.episode?.trim() ? `Épisode ${post.episode.trim().replace(/^épisode\s+/i, "")}` : ""].filter(Boolean).join(" · ")} />
+              <h3 className="mt-3 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
               <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
           </Link>

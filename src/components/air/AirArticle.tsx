@@ -47,6 +47,24 @@ function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function seriesLine(series: string, episode: string) {
+  const episodeLabel = episode ? `Épisode ${episode.replace(/^épisode\s+/i, "")}` : "";
+  return [series, episodeLabel].filter(Boolean).join(" · ");
+}
+
+export function AirSeriesLine({ label }: { label: string }) {
+  if (!label) return null;
+  return (
+    <p className="air-series-line">
+      <span className="air-frame-sheen" aria-hidden />
+      <span className="air-series-mark" aria-hidden>
+        <Layers className="h-3.5 w-3.5" />
+      </span>
+      <span>{label}</span>
+    </p>
+  );
+}
+
 function AirReadHead({
   category,
   date,
@@ -75,21 +93,12 @@ function AirReadHead({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  const episodeLabel = episode ? `Épisode ${episode.replace(/^épisode\s+/i, "")}` : "";
-  const seriesLabel = [series, episodeLabel].filter(Boolean).join(" · ");
+  const seriesLabel = seriesLine(series, episode);
   return (
     <>
       <p className="air-read-meta">{category} · {date}</p>
       <div ref={ref} className="air-read-head">
-        {seriesLabel ? (
-          <p className="air-series-line">
-            <span className="air-frame-sheen" aria-hidden />
-            <span className="air-series-mark" aria-hidden>
-              <Layers className="h-3.5 w-3.5" />
-            </span>
-            <span>{seriesLabel}</span>
-          </p>
-        ) : null}
+        <AirSeriesLine label={seriesLabel} />
         <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
           <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
           <h1>{title}</h1>

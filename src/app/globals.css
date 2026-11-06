@@ -1130,6 +1130,9 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   letter-spacing: -0.01em;
   color: #fbf7f1;
 }
+.air-card-copy .air-series-line {
+  margin-top: 0.75rem;
+}
 .air-series-line > span:last-child {
   position: relative;
   z-index: 1;
