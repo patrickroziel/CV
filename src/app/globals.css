@@ -1130,39 +1130,42 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   letter-spacing: -0.01em;
   color: #fbf7f1;
 }
-.air-hover-card {
-  position: relative;
+.air-side-articles {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 1.15rem;
+  max-height: 22rem;
+  overflow: auto;
 }
-.air-hover-name {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 2;
-  display: flex;
-  align-items: flex-end;
-  min-height: 46%;
-  padding: 1.4rem 1.15rem 1rem;
-  background: linear-gradient(to top, rgba(6, 18, 36, 0.92) 0%, rgba(6, 18, 36, 0.45) 55%, transparent 100%);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.28s ease, transform 0.28s ease;
-  pointer-events: none;
+.air-side-article {
+  display: block;
+  border-radius: 0.75rem;
+  padding: 0.42rem 0.7rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
-.air-hover-name__title {
+.air-side-article:hover,
+.air-side-article:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
 }
-.air-hover-card:hover .air-hover-name,
-.air-hover-card:focus-visible .air-hover-name {
-  opacity: 1;
-  transform: none;
-}
-@media (hover: none) {
-  .air-hover-name {
+@media (hover: hover) and (min-width: 1024px) {
+  .air-side-articles {
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, max-height 0.28s ease, margin-top 0.28s ease;
+  }
+  .air-side:hover .air-side-articles,
+  .air-side:focus-within .air-side-articles {
+    max-height: 22rem;
+    margin-top: 1.15rem;
     opacity: 1;
-    transform: none;
+    overflow: auto;
+    pointer-events: auto;
   }
 }
 .air-series-line > span:last-child {
