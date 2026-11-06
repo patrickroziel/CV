@@ -9,7 +9,6 @@ import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
-import { coercePostCategory } from "@/lib/post-taxonomy";
 import { getNoteSharePhotos } from "@/lib/notes-preview-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
@@ -128,7 +127,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         <ArticleCover sources={getNoteSharePhotos(post)} />
       )}
       <AirReadHead
-        category={coercePostCategory(post)}
+        category={series || "Air"}
         date={teaser ? `${post.date} · work in progress` : post.date}
         series={series}
         episode={episode}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BookOpen, Cloud, FileText, FileUp, ImageIcon, Link2, Loader2, Plus, Save, X } from "lucide-react";
 import type { SocialPost, SocialPostCoverSource, SocialPostFileKind, InlinePostMedia, FeaturedEmbed, MediaItem } from "@/lib/types";
 import { AIR_CATEGORIES, NOTES_CATEGORIES, coercePostCategory, type PostCategory } from "@/lib/post-taxonomy";
@@ -18,6 +18,7 @@ import { featuredEmbedFromInput, normalizeFeaturedEmbed } from "@/lib/featured-e
 import { mediaMarker, removeInlineMediaMarker, normalizeInlinePostMedia, normalizeInlineCarouselItems } from "@/lib/post-inline-media";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
+import { usePortfolio } from "@/components/providers/PortfolioProvider";
 
 export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
 
@@ -41,6 +42,7 @@ function legacyBlockToEditableHtml(text: string) {
 
 const MAX_TEXT_BLOCK_LENGTH = 40000;
 const MAX_CAROUSEL_ITEMS = 24;
+const NEW_SERIES = "__new_series__";
 
 function detectFileKind(file: File): SocialPostFileKind | null {
   const name = file.name.toLowerCase();
@@ -174,6 +176,30 @@ export function SocialPostForm({
   const [title, setTitle] = useState<LocalizedString>(liftToLocalized(initial?.title));
   const [subtitle, setSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.subtitle));
   const [episode, setEpisode] = useState(initial?.episode?.trim() ?? "");
+  const { data: portfolioData } = usePortfolio();
+  const existingSeries = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const post of portfolioData.socialPosts ?? []) {
+      if ((post.universe ?? "notes") !== "air") continue;
+      const name = getL(post.subtitle, "fr").trim().replace(/\s+/g, " ").slice(0, 160);
+      const key = name.toLocaleLowerCase("fr");
+      if (name && !seen.has(key)) seen.set(key, name);
+    }
+    return [...seen.values()];
+  }, [portfolioData.socialPosts]);
+  const initialSeries = getL(liftToLocalized(initial?.subtitle), "fr").trim();
+  const knownSeries = existingSeries.find((name) => name.toLocaleLowerCase("fr") === initialSeries.toLocaleLowerCase("fr"));
+  const [seriesChoice, setSeriesChoice] = useState(knownSeries ?? (initialSeries ? NEW_SERIES : ""));
+  const [newSeriesName, setNewSeriesName] = useState(knownSeries ? "" : initialSeries);
+  const seriesSynced = useRef(false);
+  useEffect(() => {
+    if (seriesSynced.current || !initialSeries) return;
+    const match = existingSeries.find((name) => name.toLocaleLowerCase("fr") === initialSeries.toLocaleLowerCase("fr"));
+    if (!match) return;
+    seriesSynced.current = true;
+    setSeriesChoice(match);
+    setNewSeriesName("");
+  }, [existingSeries, initialSeries]);
   const [description, setDescription] = useState<LocalizedString>(liftToLocalized(initial?.description));
   const categories = universe === "air" ? AIR_CATEGORIES : NOTES_CATEGORIES;
   const [category, setCategory] = useState<PostCategory>(
@@ -215,6 +241,16 @@ export function SocialPostForm({
   const [uploadTarget, setUploadTarget] = useState<UploadTarget>(null);
   const [progress, setProgress] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
+
+  const applySeries = (choice: string, draftName = newSeriesName) => {
+    setSeriesChoice(choice);
+    if (choice === NEW_SERIES) {
+      const name = draftName.trim().replace(/\s+/g, " ").slice(0, 160);
+      setSubtitle(name ? liftToLocalized(name) : liftToLocalized(""));
+      return;
+    }
+    setSubtitle(choice ? liftToLocalized(choice) : liftToLocalized(""));
+  };
 
   const isBook = category === "Livre";
   const parsedMedia = insertType !== "text" && insertType !== "carousel" && insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
@@ -450,17 +486,49 @@ export function SocialPostForm({
   return (
     <form onSubmit={handleSubmit} className="grid min-w-0 gap-5">
       <div className="grid gap-2">
-        <Label htmlFor="notes-category">Catégorie</Label>
-        <select
-          id="notes-category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value as PostCategory)}
-          className="h-10 w-full min-w-0 rounded-xl border border-white/12 bg-black/35 px-3 text-sm text-zinc-100 outline-none focus:ring-1 focus:ring-cyan-300/40"
-        >
-          {categories.map((item) => (
-            <option key={item} value={item}>{item}</option>
-          ))}
-        </select>
+        {universe === "air" ? (
+          <>
+            <Label htmlFor="air-series">Série</Label>
+            <select
+              id="air-series"
+              value={seriesChoice}
+              onChange={(e) => applySeries(e.target.value)}
+              className="h-10 w-full min-w-0 rounded-xl border border-white/12 bg-black/35 px-3 text-sm text-zinc-100 outline-none focus:ring-1 focus:ring-cyan-300/40"
+            >
+              <option value="">Choisir une série</option>
+              {existingSeries.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+              <option value={NEW_SERIES}>Créer une nouvelle série…</option>
+            </select>
+            {seriesChoice === NEW_SERIES && (
+              <Input
+                id="air-series-new"
+                value={newSeriesName}
+                maxLength={160}
+                onChange={(e) => {
+                  setNewSeriesName(e.target.value);
+                  applySeries(NEW_SERIES, e.target.value);
+                }}
+                placeholder="Nom de la nouvelle série"
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <Label htmlFor="notes-category">Catégorie</Label>
+            <select
+              id="notes-category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value as PostCategory)}
+              className="h-10 w-full min-w-0 rounded-xl border border-white/12 bg-black/35 px-3 text-sm text-zinc-100 outline-none focus:ring-1 focus:ring-cyan-300/40"
+            >
+              {categories.map((item) => (
+                <option key={item} value={item}>{item}</option>
+              ))}
+            </select>
+          </>
+        )}
       </div>
 
       {isBook && (
@@ -475,19 +543,31 @@ export function SocialPostForm({
         </div>
       )}
 
+      {universe !== "air" && (
       <LocalizedField
         label={isBook ? "Titre du chapitre *" : "Titre *"}
         value={title}
         onChange={setTitle}
         placeholder={isBook ? "Ex. Chapitre 1 — Le départ" : "Titre du post"}
       />
-
+      )}
+      {universe === "air" && (
       <LocalizedField
-        label={universe === "air" ? "Titre de la série" : "Sous-titre (facultatif)"}
+        label="Titre *"
+        value={title}
+        onChange={setTitle}
+        placeholder="Titre de l’article"
+      />
+      )}
+
+      {universe !== "air" && (
+      <LocalizedField
+        label="Sous-titre (facultatif)"
         value={subtitle}
         onChange={setSubtitle}
-        placeholder={universe === "air" ? "Ex. La France, le pays de la désillusion !" : isBook ? "Une phrase courte pour introduire le chapitre" : "Une phrase courte sous le titre"}
+        placeholder={isBook ? "Une phrase courte pour introduire le chapitre" : "Une phrase courte sous le titre"}
       />
+      )}
       {universe === "air" && (
         <div className="grid max-w-[12rem] gap-2">
           <Label htmlFor="air-episode">Numéro d’épisode</Label>

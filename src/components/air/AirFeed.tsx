@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState, Fragment } from "react";
-import { ArrowUpRight, Briefcase, FilePlus2, Pencil, Route, Scale, Trash2 } from "lucide-react";
+import { ArrowUpRight, FilePlus2, Pencil, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostForm, type SocialPostFormValues } from "@/components/medias/SocialPostForm";
 import { PostActions } from "@/components/medias/PostActions";
@@ -14,7 +14,7 @@ import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
-import { AIR_CATEGORIES, coercePostCategory, collectPostTags, type AirCategory } from "@/lib/post-taxonomy";
+import { collectPostTags } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
 function previewText(html: string) {
@@ -33,16 +33,26 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<SocialPost | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [scope, setScope] = useState<"Tout" | AirCategory>("Tout");
+  const [scope, setScope] = useState("Tout");
+  const seriesName = (post: SocialPost) => (post.subtitle ? l(post.subtitle).trim() : "");
   const posts = useMemo(() => {
     const source = !isHydrated && seedPosts.length ? seedPosts : (data.socialPosts ?? []);
     return source
       .filter(p => p.universe === "air" && (editMode || p.visible !== false))
       .sort((a,b) => a.order - b.order || b.date.localeCompare(a.date));
   }, [data.socialPosts, editMode, isHydrated, seedPosts]);
+  const series = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const post of posts) {
+      const name = seriesName(post);
+      const key = name.toLocaleLowerCase("fr");
+      if (name && !seen.has(key)) seen.set(key, name);
+    }
+    return [...seen.values()];
+  }, [posts, l]);
   const scopedPosts = useMemo(
-    () => (scope === "Tout" ? posts : posts.filter((post) => coercePostCategory(post) === scope)),
-    [posts, scope]
+    () => (scope === "Tout" ? posts : posts.filter((post) => seriesName(post).toLocaleLowerCase("fr") === scope.toLocaleLowerCase("fr"))),
+    [posts, scope, l]
   );
   const tags = useMemo(() => collectPostTags(scopedPosts), [scopedPosts]);
   const visiblePosts = useMemo(() => {
@@ -60,11 +70,10 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       <p className="text-xs text-white/70">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white drop-shadow-sm">Air</h1>
       <p className="mt-2 max-w-[18rem] text-xs leading-5 text-white/75">Décryptages, expériences et observations.</p>
-      <nav className="mt-6 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible" aria-label="Catégories Air">
-        {(["Tout", ...AIR_CATEGORIES] as const).map((item) => {
-          const active = scope === item;
-          const Icon = item === "Parcours" ? Route : item === "Travail" ? Briefcase : item === "Droits" ? Scale : null;
-          const count = item === "Tout" ? posts.length : posts.filter((post) => coercePostCategory(post) === item).length;
+      <nav className="mt-6 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible" aria-label="Séries Air">
+        {["Tout", ...series].map((item) => {
+          const active = scope.toLocaleLowerCase("fr") === item.toLocaleLowerCase("fr");
+          const count = item === "Tout" ? posts.length : posts.filter((post) => seriesName(post).toLocaleLowerCase("fr") === item.toLocaleLowerCase("fr")).length;
           return (
             <button
               key={item}
@@ -72,10 +81,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               onClick={() => { setScope(item); setActiveTag(null); }}
               className={`flex shrink-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm lg:w-full ${active ? "border-white/50 bg-white/20 text-white" : "border-transparent text-white/70 hover:bg-white/10 hover:text-white"}`}
             >
-              <span className="inline-flex items-center gap-2">
-                {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
-                {item}
-              </span>
+              <span className="min-w-0 break-words">{item}</span>
               <span className="text-[10px] text-white/50">{count}</span>
             </button>
           );
@@ -105,8 +111,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                 isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>
-            <div className="p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-white/50">{coercePostCategory(post)} · {post.date}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
-              {post.subtitle ? <p className="mt-1 text-sm leading-6 text-white/70">{l(post.subtitle)}</p> : null}
+            <div className="p-5 sm:p-6"><p className="text-[10px] uppercase tracking-[.2em] text-white/50">{[seriesName(post), post.episode?.trim() ? `Épisode ${post.episode.trim()}` : "", post.date].filter(Boolean).join(" · ")}</p><h3 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
               <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p>
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span></div>
           </Link>
