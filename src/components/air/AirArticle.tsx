@@ -84,13 +84,11 @@ function AirReadHead({
   episode,
   title,
   bodyId,
-  post,
 }: {
   series: string;
   episode: string;
   title: string;
   bodyId: string;
-  post: SocialPost;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -107,18 +105,16 @@ function AirReadHead({
   }, []);
   const seriesLabel = seriesLine(series, episode);
   return (
-    <div ref={ref} className="air-read-head">
-      <div className="air-float-bar">
-        <Link href="/air" className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/16"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
-        <PostEditButton post={post} universe="air" />
+    <>
+      <div ref={ref} className="air-read-head">
+        <AirSeriesLine label={seriesLabel} />
+        <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
+          <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
+          <h1>{title}</h1>
+        </a>
+        <ArticlePartNav targetId={bodyId} />
       </div>
-      <AirSeriesLine label={seriesLabel} />
-      <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
-        <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
-        <h1>{title}</h1>
-      </a>
-      <ArticlePartNav targetId={bodyId} />
-    </div>
+    </>
   );
 }
 
@@ -142,7 +138,11 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const bodyId = `air-body-${post.id}`;
   const teaser = isTeaserPost(post);
   return <div className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
-    <article className={`air-article air-surface overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
+    <div className="sticky top-16 z-30 mb-3 flex items-center justify-between gap-3">
+      <Link href="/air" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#071433]/75 px-3.5 py-2 text-sm text-white/90 shadow-[0_10px_28px_rgba(2,8,28,0.45)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
+      <PostEditButton post={post} universe="air" />
+    </div>
+    <article className={`air-article air-surface mt-3 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
       {post.coverSource === "wip" ? (
         <div className="overflow-hidden rounded-t-[1.35rem]">
           <div className="relative aspect-[16/8] sm:aspect-[16/7]">
@@ -157,7 +157,6 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         episode={episode}
         title={title}
         bodyId={bodyId}
-        post={post}
       />
       <div id={bodyId} className="space-y-6 px-5 pb-5 sm:px-10 sm:pb-10">
         {teaser ? <p className="text-sm leading-7 text-white/70">{TEASER_PUBLIC_LINE}</p> : <>
