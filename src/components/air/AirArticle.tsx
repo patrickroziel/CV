@@ -80,15 +80,11 @@ export function AirSeriesLine({ label }: { label: string }) {
 }
 
 function AirReadHead({
-  category,
-  date,
   series,
   episode,
   title,
   bodyId,
 }: {
-  category: string;
-  date: string;
   series: string;
   episode: string;
   title: string;
@@ -110,7 +106,6 @@ function AirReadHead({
   const seriesLabel = seriesLine(series, episode);
   return (
     <>
-      <p className="air-read-meta">{category} · {date}</p>
       <div ref={ref} className="air-read-head">
         <AirSeriesLine label={seriesLabel} />
         <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
@@ -158,8 +153,6 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         <ArticleCover sources={getNoteSharePhotos(post)} />
       )}
       <AirReadHead
-        category={series || "Air"}
-        date={teaser ? `${post.date} · ${TEASER_LABEL}` : post.date}
         series={series}
         episode={episode}
         title={title}
@@ -171,6 +164,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         <PostRichBody html={stampPartAnchors(proxyBlobImages(l(post.description)), post.id)} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
         </>}
         <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" />
+        <p className="text-right text-xs tracking-wide text-white/45">{teaser ? `${post.date} · ${TEASER_LABEL}` : post.date}</p>
       </div>
     </article>
     <PostPager postId={post.id} universe="air" seedPosts={seedPosts} />
