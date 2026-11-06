@@ -1130,55 +1130,12 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   letter-spacing: -0.01em;
   color: #fbf7f1;
 }
-.air-side-articles {
-  display: grid;
-  gap: 0.2rem;
-  margin-top: 1.15rem;
-  max-height: 22rem;
-  overflow: auto;
-}
-.air-side-article {
-  display: block;
-  border-radius: 0.75rem;
-  padding: 0.42rem 0.7rem;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.82rem;
-  line-height: 1.35;
-}
-.air-side-series + .air-side-series {
-  margin-top: 0.85rem;
-}
-.air-side-series-name {
-  padding: 0.1rem 0.7rem 0.2rem;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.68rem;
-  font-weight: 600;
-  line-height: 1.35;
-}
 a.air-part-float {
   color: #fff;
   text-decoration: none;
 }
 a.air-part-float:hover {
   border-color: rgba(255, 255, 255, 0.55);
-}
-@media (hover: hover) and (min-width: 1024px) {
-  .air-side-articles {
-    max-height: 0;
-    margin-top: 0;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
-    transition: opacity 0.22s ease, max-height 0.28s ease, margin-top 0.28s ease;
-  }
-  .air-side:hover .air-side-articles,
-  .air-side:focus-within .air-side-articles {
-    max-height: 22rem;
-    margin-top: 1.15rem;
-    opacity: 1;
-    overflow: auto;
-    pointer-events: auto;
-  }
 }
 .air-series-line > span:last-child {
   position: relative;

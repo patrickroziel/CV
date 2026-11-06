@@ -47,6 +47,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<SocialPost | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [scope, setScope] = useState("Tout");
   const seriesName = (post: SocialPost) => (post.subtitle ? l(post.subtitle).trim() : "");
   const posts = useMemo(() => {
     const source = !isHydrated && seedPosts.length ? seedPosts : (data.socialPosts ?? []);
@@ -54,22 +55,24 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       .filter(p => p.universe === "air" && (editMode || p.visible !== false))
       .sort((a,b) => a.order - b.order || b.date.localeCompare(a.date));
   }, [data.socialPosts, editMode, isHydrated, seedPosts]);
-  const seriesGroups = useMemo(() => {
-    const groups = new Map<string, { name: string; posts: SocialPost[] }>();
+  const series = useMemo(() => {
+    const seen = new Map<string, string>();
     for (const post of posts) {
-      const name = (post.subtitle ? l(post.subtitle).trim() : "") || "Sans série";
+      const name = seriesName(post);
       const key = name.toLocaleLowerCase("fr");
-      const group = groups.get(key) ?? { name, posts: [] };
-      group.posts.push(post);
-      groups.set(key, group);
+      if (name && !seen.has(key)) seen.set(key, name);
     }
-    return [...groups.values()];
+    return [...seen.values()];
   }, [posts, l]);
+  const scopedPosts = useMemo(
+    () => (scope === "Tout" ? posts : posts.filter((post) => seriesName(post).toLocaleLowerCase("fr") === scope.toLocaleLowerCase("fr"))),
+    [posts, scope, l]
+  );
   const visiblePosts = useMemo(() => {
-    if (!activeTag) return posts;
+    if (!activeTag) return scopedPosts;
     const key = activeTag.toLocaleLowerCase("fr");
-    return posts.filter((post) => (post.tags ?? []).some((tag) => tag.trim().toLocaleLowerCase("fr") === key));
-  }, [posts, activeTag]);
+    return scopedPosts.filter((post) => (post.tags ?? []).some((tag) => tag.trim().toLocaleLowerCase("fr") === key));
+  }, [scopedPosts, activeTag]);
   const tags = useMemo(() => collectPostTags(visiblePosts), [visiblePosts]);
   const publish = (values: SocialPostFormValues) => {
     if (editing) updateSocialPost(editing.id,{...values,universe:"air"});
@@ -77,25 +80,26 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     setCreateOpen(false); setEditing(null);
   };
   return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
-    <aside className="air-side"><div className="lg:sticky lg:top-28">
+    <aside><div className="lg:sticky lg:top-28">
       <p className="text-xs text-white/70">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white drop-shadow-sm">Air</h1>
       <p className="mt-2 max-w-[18rem] text-xs leading-5 text-white/75">Décryptages, expériences et observations.</p>
-      <nav className="air-side-articles" aria-label="Séries et épisodes">
-        {seriesGroups.map((group) => (
-          <div key={group.name} className="air-side-series">
-            <p className="air-side-series-name">{group.name}</p>
-            {group.posts.map((post) => {
-              const name = l(post.title).trim() || "Sans titre";
-              const episode = post.episode?.trim().replace(/^épisode\s+/i, "");
-              return (
-                <Link key={post.id} href={`/air/${post.id}`} className="air-side-article">
-                  {episode ? `Épisode ${episode} — ${name}` : name}
-                </Link>
-              );
-            })}
-          </div>
-        ))}
+      <nav className="mt-6 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible" aria-label="Séries Air">
+        {["Tout", ...series].map((item) => {
+          const active = scope.toLocaleLowerCase("fr") === item.toLocaleLowerCase("fr");
+          const count = item === "Tout" ? posts.length : posts.filter((post) => seriesName(post).toLocaleLowerCase("fr") === item.toLocaleLowerCase("fr")).length;
+          return (
+            <button
+              key={item}
+              type="button"
+              onClick={() => { setScope(item); setActiveTag(null); }}
+              className={`flex shrink-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm lg:w-full ${active ? "border-white/50 bg-white/20 text-white" : "border-transparent text-white/70 hover:bg-white/10 hover:text-white"}`}
+            >
+              <span className="min-w-0 break-words">{item}</span>
+              <span className="text-[10px] text-white/50">{count}</span>
+            </button>
+          );
+        })}
       </nav>
       <UniversesWidget current="air" />
       <KofiCard className="mt-3" />
@@ -104,7 +108,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     <section aria-label="Articles AIR" className="min-w-0">
     <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-4 pb-2">
       <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-white/55">Journal / Air</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-3xl">{activeTag ? `#${activeTag}` : "Articles & décryptages"}</h2></div>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-3xl">{activeTag ? `#${activeTag}` : scope === "Tout" ? "Articles & décryptages" : scope}</h2></div>
       {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-md"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
     </div>
     {visiblePosts.length ? <div className="space-y-6">
@@ -157,9 +161,9 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
         </Fragment>;
       })}
     </div> : <div className="air-surface rounded-2xl border p-10 text-center backdrop-blur-xl">
-      <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{activeTag ? "Sélection" : "À suivre"}</p>
-      <h3 className="mt-3 text-xl text-white">{activeTag ? "Aucun article dans cette sélection." : "Les premiers articles prennent forme."}</h3>
-      {!activeTag ? <p className="mt-3 text-sm text-white/70">Ici paraîtront mes décryptages, expériences et observations.</p> : null}
+      <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{activeTag || scope !== "Tout" ? "Sélection" : "À suivre"}</p>
+      <h3 className="mt-3 text-xl text-white">{activeTag || scope !== "Tout" ? "Aucun article dans cette sélection." : "Les premiers articles prennent forme."}</h3>
+      {!activeTag && scope === "Tout" ? <p className="mt-3 text-sm text-white/70">Ici paraîtront mes décryptages, expériences et observations.</p> : null}
     </div>}
     <Dialog open={createOpen || !!editing} onOpenChange={v=>{if(!v){setCreateOpen(false);setEditing(null)}}}>
       <DialogContent size="form" className="max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>{editing?"Modifier un article AIR":"Nouvel article AIR"}</DialogTitle></DialogHeader>
