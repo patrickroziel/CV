@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
@@ -19,12 +20,14 @@ export function PostPager({
   seedPosts = [],
   tone = "dark",
   placement = "footer",
+  extra,
 }: {
   postId: string;
   universe: "notes" | "air";
   seedPosts?: SocialPost[];
   tone?: "dark" | "light";
   placement?: "footer" | "pills";
+  extra?: ReactNode;
 }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
   const posts = useMemo(() => {
@@ -90,25 +93,30 @@ export function PostPager({
     const pill = "inline-flex min-w-0 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-[#071433]/75 px-3 py-2 text-sm text-white/90 shadow-[0_10px_28px_rgba(2,8,28,0.45)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white";
     const idlePill = "inline-flex min-w-0 items-center justify-center gap-1.5 rounded-full border border-white/12 bg-[#071433]/40 px-3 py-2 text-sm text-white/35";
     return (
-      <nav className="no-print flex min-w-0 flex-1 flex-wrap items-center gap-1.5" aria-label="Navigation entre les publications">
-        {previous ? (
-          <Link href={href(previous.id)} className={pill} aria-label={`Précédent : ${label(previous)}`} title={label(previous)}>
-            <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
-            <span className="truncate">Précédent</span>
-          </Link>
-        ) : (
-          <span className={idlePill} aria-hidden="true"><ChevronLeft className="h-4 w-4 shrink-0" /> Précédent</span>
-        )}
-        <Link href={home} className={`${pill} shrink-0`}>Retour à Air</Link>
-        {next ? (
-          <Link href={href(next.id)} className={pill} aria-label={`Suivant : ${label(next)}`} title={label(next)}>
-            <span className="truncate">Suivant</span>
-            <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
-          </Link>
-        ) : (
-          <span className={idlePill} aria-hidden="true">Suivant <ChevronRight className="h-4 w-4 shrink-0" /></span>
-        )}
-      </nav>
+      <>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Link href={home} className={`${pill} shrink-0`}>Retour à Air</Link>
+          {extra}
+        </div>
+        <nav className="no-print ml-auto flex shrink-0 items-center gap-1.5" aria-label="Navigation entre les publications">
+          {previous ? (
+            <Link href={href(previous.id)} className={pill} aria-label={`Précédent : ${label(previous)}`} title={label(previous)}>
+              <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="truncate">Précédent</span>
+            </Link>
+          ) : (
+            <span className={idlePill} aria-hidden="true"><ChevronLeft className="h-4 w-4 shrink-0" /> Précédent</span>
+          )}
+          {next ? (
+            <Link href={href(next.id)} className={pill} aria-label={`Suivant : ${label(next)}`} title={label(next)}>
+              <span className="truncate">Suivant</span>
+              <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
+            </Link>
+          ) : (
+            <span className={idlePill} aria-hidden="true">Suivant <ChevronRight className="h-4 w-4 shrink-0" /></span>
+          )}
+        </nav>
+      </>
     );
   }
 

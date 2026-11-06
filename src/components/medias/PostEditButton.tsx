@@ -11,10 +11,12 @@ export function PostEditButton({
   post,
   universe,
   tone = "dark",
+  className,
 }: {
   post: SocialPost;
   universe: "notes" | "air";
   tone?: "dark" | "light";
+  className?: string;
 }) {
   const { editMode, updateSocialPost } = usePortfolio();
   const [open, setOpen] = useState(false);
@@ -30,9 +32,9 @@ export function PostEditButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={tone === "light"
+        className={className ?? (tone === "light"
           ? "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-slate-900/15 bg-white/80 px-3 text-xs font-semibold text-slate-900 shadow-sm hover:bg-white"
-          : "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-cyan-100/20 bg-cyan-100/[0.07] px-3 text-xs font-semibold text-cyan-50 hover:bg-cyan-100/[0.14]"}
+          : "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-cyan-100/20 bg-cyan-100/[0.07] px-3 text-xs font-semibold text-cyan-50 hover:bg-cyan-100/[0.14]")}
       >
         <Pencil className="h-3.5 w-3.5" />
         Modifier

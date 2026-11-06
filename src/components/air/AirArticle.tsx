@@ -154,8 +154,13 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const showNotices = post.noticesHidden !== true;
   return <div ref={pageRef} className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
     <div ref={barRef} className="air-float-bar">
-      <PostPager postId={post.id} universe="air" seedPosts={seedPosts} placement="pills" />
-      <PostEditButton post={post} universe="air" />
+      <PostPager
+        postId={post.id}
+        universe="air"
+        seedPosts={seedPosts}
+        placement="pills"
+        extra={<PostEditButton post={post} universe="air" className="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-[#071433]/75 px-3 py-2 text-sm text-white/90 shadow-[0_10px_28px_rgba(2,8,28,0.45)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white" />}
+      />
     </div>
     <article className={`air-article air-surface mt-3 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
       {post.coverSource === "wip" ? (
