@@ -47,6 +47,20 @@ function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+export function airPartAnchor(postId: string, index: number) {
+  return `part-${index}-air-body-${postId}`;
+}
+
+function stampPartAnchors(html: string, postId: string) {
+  let index = 0;
+  return html.replace(/<h2\b([^>]*\bair-part-title\b[^>]*)>/gi, (_full, attrs: string) => {
+    const id = airPartAnchor(postId, index);
+    index += 1;
+    if (/\sid\s*=/i.test(attrs)) return `<h2${attrs}>`;
+    return `<h2 id="${id}"${attrs}>`;
+  });
+}
+
 function seriesLine(series: string, episode: string) {
   const episodeLabel = episode ? `Épisode ${episode.replace(/^épisode\s+/i, "")}` : "";
   return [series, episodeLabel].filter(Boolean).join(" · ");
@@ -113,6 +127,14 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const { data, editMode, l, isHydrated } = usePortfolio();
   const fromStore = (data.socialPosts ?? []).find(p => p.id === id && p.universe === "air" && (p.visible !== false || editMode));
   const post = isHydrated ? (fromStore ?? null) : (initialPost ?? fromStore ?? null);
+  useEffect(() => {
+    const anchor = window.location.hash.replace(/^#/, "");
+    if (!anchor || !post) return;
+    const jump = () => document.getElementById(anchor)?.scrollIntoView({ block: "start" });
+    jump();
+    const frame = window.requestAnimationFrame(jump);
+    return () => window.cancelAnimationFrame(frame);
+  }, [post?.id]);
   if (!post && !isHydrated && initialPost === undefined) return <div className="mx-auto h-60 max-w-3xl animate-pulse rounded-2xl bg-white/10" />;
   if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Air</Link><p className="mt-8">Article indisponible.</p></div>;
   const title = l(post.title);
@@ -146,7 +168,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
       <div id={bodyId} className="space-y-6 px-5 pb-5 sm:px-10 sm:pb-10">
         {teaser ? <p className="text-sm leading-7 text-white/70">{TEASER_PUBLIC_LINE}</p> : <>
         <FeaturedMedia media={post.featuredEmbed} title={title}/>
-        <PostRichBody html={proxyBlobImages(l(post.description))} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
+        <PostRichBody html={stampPartAnchors(proxyBlobImages(l(post.description)), post.id)} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
         </>}
         <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" />
       </div>

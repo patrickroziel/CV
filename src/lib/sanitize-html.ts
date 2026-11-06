@@ -171,6 +171,8 @@ export function sanitizeBioHtml(
         } else if (name === "color" && !fromPaste && el.tagName === "FONT") {
           // handled above when converting FONT
           el.removeAttribute(attr.name);
+        } else if (name === "id" && el.tagName === "H2" && /^part-\d+-air-body-[A-Za-z0-9-]{8,80}$/.test(attr.value)) {
+          el.setAttribute("id", attr.value);
         } else if (name === "href" && el.tagName === "A") {
           const href = safeHref(attr.value);
           if (href) el.setAttribute("href", href);

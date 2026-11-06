@@ -1145,10 +1145,22 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   font-size: 0.82rem;
   line-height: 1.35;
 }
-.air-side-article:hover,
-.air-side-article:focus-visible {
-  background: rgba(255, 255, 255, 0.1);
+.air-side-series + .air-side-series {
+  margin-top: 0.85rem;
+}
+.air-side-series-name {
+  padding: 0.1rem 0.7rem 0.2rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+a.air-part-float {
   color: #fff;
+  text-decoration: none;
+}
+a.air-part-float:hover {
+  border-color: rgba(255, 255, 255, 0.55);
 }
 @media (hover: hover) and (min-width: 1024px) {
   .air-side-articles {

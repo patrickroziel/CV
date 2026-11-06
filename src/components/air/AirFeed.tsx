@@ -13,17 +13,19 @@ import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
-import { AirSeriesLine } from "@/components/air/AirArticle";
+import { AirSeriesLine, airPartAnchor } from "@/components/air/AirArticle";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { collectPostTags } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
 function partTitles(html: string) {
-  const titles: string[] = [];
+  const titles: { label: string; index: number }[] = [];
   const pattern = /<h2\b[^>]*\bair-part-title\b[^>]*>([\s\S]*?)<\/h2>/gi;
+  let index = 0;
   for (const match of html.matchAll(pattern)) {
     const text = stripHtml(match[1] ?? "").replace(/\s+/g, " ").trim();
-    if (text && text.toLocaleLowerCase("fr") !== "titre de la partie") titles.push(text);
+    if (text && text.toLocaleLowerCase("fr") !== "titre de la partie") titles.push({ label: text, index });
+    index += 1;
   }
   return titles;
 }
@@ -52,6 +54,17 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       .filter(p => p.universe === "air" && (editMode || p.visible !== false))
       .sort((a,b) => a.order - b.order || b.date.localeCompare(a.date));
   }, [data.socialPosts, editMode, isHydrated, seedPosts]);
+  const seriesGroups = useMemo(() => {
+    const groups = new Map<string, { name: string; posts: SocialPost[] }>();
+    for (const post of posts) {
+      const name = (post.subtitle ? l(post.subtitle).trim() : "") || "Sans série";
+      const key = name.toLocaleLowerCase("fr");
+      const group = groups.get(key) ?? { name, posts: [] };
+      group.posts.push(post);
+      groups.set(key, group);
+    }
+    return [...groups.values()];
+  }, [posts, l]);
   const visiblePosts = useMemo(() => {
     if (!activeTag) return posts;
     const key = activeTag.toLocaleLowerCase("fr");
@@ -68,15 +81,21 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       <p className="text-xs text-white/70">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white drop-shadow-sm">Air</h1>
       <p className="mt-2 max-w-[18rem] text-xs leading-5 text-white/75">Décryptages, expériences et observations.</p>
-      <nav className="air-side-articles" aria-label="Articles Air">
-        {posts.map((post) => {
-          const name = l(post.title).trim() || "Sans titre";
-          return (
-            <Link key={post.id} href={`/air/${post.id}`} className="air-side-article">
-              {name}
-            </Link>
-          );
-        })}
+      <nav className="air-side-articles" aria-label="Séries et épisodes">
+        {seriesGroups.map((group) => (
+          <div key={group.name} className="air-side-series">
+            <p className="air-side-series-name">{group.name}</p>
+            {group.posts.map((post) => {
+              const name = l(post.title).trim() || "Sans titre";
+              const episode = post.episode?.trim().replace(/^épisode\s+/i, "");
+              return (
+                <Link key={post.id} href={`/air/${post.id}`} className="air-side-article">
+                  {episode ? `Épisode ${episode} — ${name}` : name}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
       <UniversesWidget current="air" />
       <KofiCard className="mt-3" />
@@ -104,24 +123,28 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                 isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
             </div>
-            <div className="p-5 sm:p-6">
+          </Link>
+          <div className="p-5 sm:p-6">
+            <Link href={`/air/${post.id}`} className="block">
               <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p>
               {seriesLabel ? <div className="mt-3"><AirSeriesLine label={seriesLabel} /></div> : null}
               <h3 className="mt-3 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
-              {parts.length ? (
-                <div className="air-part-stack mt-3">
-                  {parts.map((label, partIndex) => (
-                    <span key={`${partIndex}-${label}`} className="air-part-float" title={label}>
-                      <span className="air-part-num">{partIndex + 1}</span>
-                      <span className="air-part-name">{label}</span>
-                    </span>
-                  ))}
-                </div>
-              ) : null}
+            </Link>
+            {parts.length ? (
+              <div className="air-part-stack mt-3">
+                {parts.map((part) => (
+                  <Link key={part.index} href={`/air/${post.id}#${airPartAnchor(post.id, part.index)}`} className="air-part-float" title={part.label}>
+                    <span className="air-part-num">{part.index + 1}</span>
+                    <span className="air-part-name">{part.label}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+            <Link href={`/air/${post.id}`} className="block">
               {excerpt ? <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p> : null}
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span>
-            </div>
-          </Link>
+            </Link>
+          </div>
           <div className="border-t border-white/15 px-5 py-4">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} sharePath="/air" />
           </div>
