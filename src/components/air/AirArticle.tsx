@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Layers } from "lucide-react";
+import { Layers } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
@@ -13,6 +13,8 @@ import { getNoteSharePhotos } from "@/lib/notes-preview-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
+import { RichHtml } from "@/components/shared/RichHtml";
+import { AIR_NOTICE_INTRO, AIR_NOTICE_REPLY, airNoticeHtml } from "@/lib/air-notices";
 import type { SocialPost } from "@/lib/types";
 
 function proxyBlobImages(html: string) {
@@ -130,6 +132,18 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
     const frame = window.requestAnimationFrame(jump);
     return () => window.cancelAnimationFrame(frame);
   }, [post?.id]);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const page = pageRef.current;
+    const bar = barRef.current;
+    if (!page || !bar) return;
+    const apply = () => page.style.setProperty("--air-float-h", `${bar.offsetHeight + 12}px`);
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, [post?.id]);
   if (!post && !isHydrated && initialPost === undefined) return <div className="mx-auto h-60 max-w-3xl animate-pulse rounded-2xl bg-white/10" />;
   if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Air</Link><p className="mt-8">Article indisponible.</p></div>;
   const title = l(post.title);
@@ -137,9 +151,10 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const episode = post.episode?.trim() ?? "";
   const bodyId = `air-body-${post.id}`;
   const teaser = isTeaserPost(post);
-  return <div className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
-    <div className="air-float-bar">
-      <Link href="/air" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#071433]/75 px-3.5 py-2 text-sm text-white/90 shadow-[0_10px_28px_rgba(2,8,28,0.45)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white"><ArrowLeft className="h-4 w-4"/> Retour à Air</Link>
+  const showNotices = post.noticesHidden !== true;
+  return <div ref={pageRef} className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
+    <div ref={barRef} className="air-float-bar">
+      <PostPager postId={post.id} universe="air" seedPosts={seedPosts} placement="pills" />
       <PostEditButton post={post} universe="air" />
     </div>
     <article className={`air-article air-surface mt-3 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
@@ -151,6 +166,9 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         </div>
       ) : (
         <ArticleCover sources={getNoteSharePhotos(post)} />
+      )}
+      {showNotices && (
+        <RichHtml html={airNoticeHtml(post.noticeIntro, AIR_NOTICE_INTRO)} className="px-5 pt-4 italic text-[13.5px] leading-6 text-white/70 sm:px-10" />
       )}
       <AirReadHead
         series={series}
@@ -165,8 +183,10 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         </>}
         <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" />
         <p className="text-right text-xs tracking-wide text-white/45">{teaser ? `${post.date} · ${TEASER_LABEL}` : post.date}</p>
+        {showNotices && (
+          <RichHtml html={airNoticeHtml(post.noticeReply, AIR_NOTICE_REPLY)} className="border-t border-white/10 pt-4 text-[13px] leading-6 text-white/55" />
+        )}
       </div>
     </article>
-    <PostPager postId={post.id} universe="air" seedPosts={seedPosts} />
   </div>;
 }

@@ -768,6 +768,12 @@ export type SocialPost = {
   tags: string[];
   /** When false: hidden from the public, visible in Mode Édition */
   visible: boolean;
+  /** Air only. Hides both legal notices together. Missing means shown. */
+  noticesHidden?: boolean;
+  /** Air notice under the cover. Empty uses the default testimony line. */
+  noticeIntro?: Translatable;
+  /** Air notice at the end of the article. Empty uses the default reply line. */
+  noticeReply?: Translatable;
   /** Lower = higher in the list */
   order: number;
 };

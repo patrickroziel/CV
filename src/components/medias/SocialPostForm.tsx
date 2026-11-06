@@ -19,6 +19,7 @@ import { mediaMarker, removeInlineMediaMarker, normalizeInlinePostMedia, normali
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { AIR_NOTICE_INTRO, AIR_NOTICE_REPLY, airNoticeHtml } from "@/lib/air-notices";
 
 export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
 
@@ -176,6 +177,9 @@ export function SocialPostForm({
   const [title, setTitle] = useState<LocalizedString>(liftToLocalized(initial?.title));
   const [subtitle, setSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.subtitle));
   const [episode, setEpisode] = useState(initial?.episode?.trim() ?? "");
+  const [noticesHidden, setNoticesHidden] = useState(initial?.noticesHidden === true);
+  const [noticeIntro, setNoticeIntro] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeIntro, AIR_NOTICE_INTRO)));
+  const [noticeReply, setNoticeReply] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeReply, AIR_NOTICE_REPLY)));
   const { data: portfolioData, renameAirSeries } = usePortfolio();
   const existingSeries = useMemo(() => {
     const seen = new Map<string, string>();
@@ -492,6 +496,9 @@ export function SocialPostForm({
     bookPdfName,
     coverSource: cover.coverSource,
     contentHidden,
+    noticesHidden: universe === "air" ? noticesHidden : undefined,
+    noticeIntro: universe === "air" ? noticeIntro : undefined,
+    noticeReply: universe === "air" ? noticeReply : undefined,
     category,
     tags: Array.from(
       new Set(tagsText.split(",").map((tag) => tag.trim()).filter(Boolean))
@@ -647,6 +654,54 @@ export function SocialPostForm({
             value={episode}
             onChange={(e) => setEpisode(e.target.value)}
             placeholder="7"
+          />
+        </div>
+      )}
+
+      {universe === "air" && (
+        <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <Label>Mentions de l’article</Label>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setNoticesHidden(false)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left text-sm transition",
+                !noticesHidden
+                  ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50"
+                  : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+              )}
+            >
+              <span className="block font-medium">Afficher les deux mentions</span>
+              <span className="mt-0.5 block text-xs font-normal text-zinc-400">Sous la couverture et en fin d’article.</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setNoticesHidden(true)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left text-sm transition",
+                noticesHidden
+                  ? "border-amber-200/50 bg-amber-200/10 text-amber-50"
+                  : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+              )}
+            >
+              <span className="block font-medium">Masquer les deux mentions</span>
+              <span className="mt-0.5 block text-xs font-normal text-zinc-400">L’une ne peut pas rester seule.</span>
+            </button>
+          </div>
+          <RichLocalizedField
+            id="air-notice-intro"
+            label="Sous la couverture"
+            value={noticeIntro}
+            onChange={setNoticeIntro}
+            rows={4}
+          />
+          <RichLocalizedField
+            id="air-notice-reply"
+            label="En fin d’article"
+            value={noticeReply}
+            onChange={setNoticeReply}
+            rows={5}
           />
         </div>
       )}
