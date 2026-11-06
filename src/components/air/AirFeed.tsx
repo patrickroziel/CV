@@ -48,6 +48,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   const [editing, setEditing] = useState<SocialPost | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [scope, setScope] = useState("Tout");
+  const [pinnedSeries, setPinnedSeries] = useState<string | null>(null);
   const seriesName = (post: SocialPost) => (post.subtitle ? l(post.subtitle).trim() : "");
   const posts = useMemo(() => {
     const source = !isHydrated && seedPosts.length ? seedPosts : (data.socialPosts ?? []);
@@ -85,21 +86,41 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       <p className="text-xs text-white/70">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white drop-shadow-sm">Air</h1>
       <p className="mt-2 max-w-[18rem] text-xs leading-5 text-white/75">Décryptages, expériences et observations.</p>
-      <nav className="mt-6 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible" aria-label="Séries Air">
-        {["Tout", ...series].map((item) => {
-          const active = scope.toLocaleLowerCase("fr") === item.toLocaleLowerCase("fr");
-          const count = item === "Tout" ? posts.length : posts.filter((post) => seriesName(post).toLocaleLowerCase("fr") === item.toLocaleLowerCase("fr")).length;
+      <nav className="mt-6 space-y-1" aria-label="Séries Air">
+        {series.map((name) => {
+          const key = name.toLocaleLowerCase("fr");
+          const active = scope.toLocaleLowerCase("fr") === key;
+          const episodes = posts
+            .filter((post) => seriesName(post).toLocaleLowerCase("fr") === key)
+            .sort((a, b) => {
+              const number = (post: SocialPost) => Number(post.episode?.replace(/\D/g, "")) || 999;
+              return number(a) - number(b) || b.date.localeCompare(a.date);
+            });
+          const pinned = pinnedSeries?.toLocaleLowerCase("fr") === key;
           return (
-            <button
-              key={item}
-              type="button"
-              onClick={() => { setScope(item); setActiveTag(null); }}
-              aria-label={item === "Tout" ? `Tout, ${count} articles` : `${item}, ${count} article${count > 1 ? "s" : ""}`}
-              className={`flex shrink-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm lg:w-full ${active ? "border-white/50 bg-white/20 text-white" : "border-transparent text-white/70 hover:bg-white/10 hover:text-white"}`}
-            >
-              <span className="min-w-0 flex-1 break-words">{item}</span>
-              <span className="shrink-0 rounded-full border border-white/25 bg-white/15 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">{count}</span>
-            </button>
+            <div key={name} className="group/series">
+              <button
+                type="button"
+                onClick={() => { setScope(active ? "Tout" : name); setActiveTag(null); setPinnedSeries(pinned ? null : name); }}
+                aria-expanded={pinned}
+                aria-label={`${name}, ${episodes.length} article${episodes.length > 1 ? "s" : ""}`}
+                className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm ${active ? "border-white/50 bg-white/20 text-white" : "border-transparent text-white/70 hover:bg-white/10 hover:text-white"}`}
+              >
+                <span className="min-w-0 flex-1 break-words">{name}</span>
+                <span className="shrink-0 rounded-full border border-white/25 bg-white/15 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">{episodes.length}</span>
+              </button>
+              <div className={`mt-1 space-y-0.5 pl-2 ${pinned ? "block" : "hidden group-hover/series:block"}`}>
+                {episodes.map((post) => {
+                  const title = l(post.title).trim() || "Sans titre";
+                  const episode = post.episode?.trim().replace(/^épisode\s+/i, "");
+                  return (
+                    <Link key={post.id} href={`/air/${post.id}`} className="block rounded-lg px-3 py-1.5 text-xs leading-5 text-white/75 hover:bg-white/10 hover:text-white">
+                      {episode ? `Épisode ${episode} — ${title}` : title}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </nav>
