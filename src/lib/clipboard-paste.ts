@@ -313,31 +313,6 @@ export function plainTextToHtml(raw: string): string {
 
 
 /**
- * Force black color on pasted content while preserving structure.
- * Applies to text-bearing elements without flattening the tree.
- */
-function forceBlackColor(html: string): string {
-  if (!html || typeof document === "undefined") return html;
-  const template = document.createElement("template");
-  template.innerHTML = html;
-  const BLACK = "#111111";
-
-  const walk = (node: Node) => {
-    if (node.nodeType !== Node.ELEMENT_NODE) return;
-    const el = node as HTMLElement;
-    const hasText = Boolean((el.textContent || "").trim());
-    if (hasText && el.tagName !== "IMG" && el.tagName !== "A") {
-      el.style.color = BLACK;
-      el.setAttribute("data-rich-color", BLACK);
-    }
-    Array.from(el.childNodes).forEach(walk);
-  };
-
-  Array.from(template.content.childNodes).forEach(walk);
-  return template.innerHTML;
-}
-
-/**
  * Clean Word / Google Docs / browser HTML into our allowed subset,
  * fixing list-ish markup and emojis in text nodes.
  */
@@ -382,7 +357,10 @@ export function cleanPastedHtml(rawHtml: string): string {
         const val = rest.join(":").trim();
         // Keep only structure-related bold/italic via style if tags missing
         if (
-          (key === "font-weight" || key === "font-style" || key === "text-align") &&
+          (key === "font-weight" ||
+            key === "font-style" ||
+            key === "text-align" ||
+            (key === "text-decoration" && val.toLowerCase() === "underline")) &&
           val
         ) {
           keep.push(`${key}: ${val}`);
@@ -411,10 +389,8 @@ export function cleanPastedHtml(rawHtml: string): string {
   // Post-pass: consecutive <p> that look like bullets → ul/ol
   coalesceBulletParagraphs(template.content);
 
-  // fromPaste: drop external fonts/colors — site theme + manual color only
-  const sanitized = sanitizeBioHtml(template.innerHTML, { fromPaste: true });
-  // Force black on the result while preserving structure
-  return forceBlackColor(sanitized);
+  // fromPaste: drop colours and sizes. Keep bold, italic, underline and lists.
+  return sanitizeBioHtml(template.innerHTML, { fromPaste: true });
 }
 
 function coalesceBulletParagraphs(root: DocumentFragment | HTMLElement) {
@@ -549,9 +525,8 @@ export function clipboardToRichHtml(
   }
 
   if (text && text.trim()) {
-    // Plain path: structure + emojis only — force black
     const structured = sanitizeBioHtml(plainTextToHtml(text), { fromPaste: true });
-    return atEditorSize(forceBlackColor(structured));
+    return atEditorSize(structured);
   }
 
   if (html && html.trim()) {
