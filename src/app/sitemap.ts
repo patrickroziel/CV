@@ -15,8 +15,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await listPublicPosts();
   const ghosts = await listPublicGhosts();
   const staticPages: MetadataRoute.Sitemap = [
-    { url: `${NOTES_ORIGIN}/air`, changeFrequency: "daily", priority: 1 },
-    { url: `${NOTES_ORIGIN}/notes`, changeFrequency: "daily", priority: 0.85 },
+    { url: `${NOTES_ORIGIN}/notes`, changeFrequency: "daily", priority: 1 },
+    { url: `${NOTES_ORIGIN}/air`, changeFrequency: "daily", priority: 0.85 },
     { url: `${NOTES_ORIGIN}/work`, changeFrequency: "weekly", priority: 0.85 },
   ];
 

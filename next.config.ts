@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        destination: "/air",
+        destination: "/notes",
         permanent: true,
       },
     ];

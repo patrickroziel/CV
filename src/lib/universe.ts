@@ -1,6 +1,6 @@
 export type SiteUniverse = "portfolio" | "medias" | "air";
 
-/** Air is the public home (redirected from /). Notes lives under /notes. */
+/** Notes is the public home (redirected from /). Air lives under /air. */
 export function universeFromPath(pathname: string | null | undefined): SiteUniverse {
   if (pathname === "/air" || pathname?.startsWith("/air/")) return "air";
   if (pathname === "/work" || pathname?.startsWith("/work/")) return "portfolio";
