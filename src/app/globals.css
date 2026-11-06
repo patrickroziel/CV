@@ -1057,7 +1057,9 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
 .air-article-body,
 .air-article-body *,
 .notes-force-white,
-.notes-force-white * {
+.notes-force-white *,
+.article-ink,
+.article-ink * {
   color: #fff !important;
 }
 
