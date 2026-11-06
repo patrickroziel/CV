@@ -2,14 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-function shortName(label: string, words: number) {
-  const clean = label.replace(/\s+/g, " ").trim();
-  const parts = clean.split(" ").filter(Boolean);
-  if (parts.length <= words) return clean;
-  return `${parts.slice(0, words).join(" ")}…`;
-}
-
-type Part = { id: string; label: string };
+type Part = { id: string; label: string; n: number };
 
 export function ArticlePartNav({ targetId }: { targetId: string }) {
   const [parts, setParts] = useState<Part[]>([]);
@@ -30,6 +23,7 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
       heads.forEach((el) => el.classList.toggle("air-part-held", stuck.includes(el)));
       setParts(stuck.map((el) => ({
         id: el.id,
+        n: heads.indexOf(el) + 1,
         label: (el.textContent || "").replace(/\s+/g, " ").trim(),
       })));
     };
@@ -53,7 +47,7 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
           <a
             key={part.id}
             href={`#${part.id}`}
-            title={part.label}
+            title={`Partie ${part.n}. ${part.label}`}
             aria-current={current ? "true" : undefined}
             className={current ? "air-part-float is-current" : "air-part-float"}
             onClick={(event) => {
@@ -61,7 +55,8 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
               document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
           >
-            {shortName(part.label, current ? 5 : 2)}
+            <span className="air-part-num">{part.n}</span>
+            <span className="air-part-name">{part.label}</span>
           </a>
         );
       })}
