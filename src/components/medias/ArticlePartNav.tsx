@@ -215,7 +215,7 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   if (!parts.length) return null;
 
   return (
-    <div className="air-part-stack">
+    <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
       {parts.map((part, index) => {
         const current = index === parts.length - 1;
         return (
@@ -249,7 +249,7 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   );
 }
 
-export function NotesFloatingStack({ postId, title }: { postId: string; title: string }) {
+export function NotesFloatingStack({ postId, title, subtitle = "" }: { postId: string; title: string; subtitle?: string }) {
   const [raised, setRaised] = useState(false);
   useEffect(() => {
     const titleEl = document.getElementById(`note-title-${postId}`);
@@ -273,6 +273,14 @@ export function NotesFloatingStack({ postId, title }: { postId: string; title: s
           document.getElementById(`note-title-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}>
           <span>{title}</span>
+        </a>
+      ) : null}
+      {raised && subtitle.trim() ? (
+        <a href={`#note-title-${postId}`} className="notes-title-pill notes-subtitle-pill" onClick={(event) => {
+          event.preventDefault();
+          document.getElementById(`note-title-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}>
+          <span>{subtitle.trim()}</span>
         </a>
       ) : null}
       <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />

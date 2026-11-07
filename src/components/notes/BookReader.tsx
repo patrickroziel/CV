@@ -109,7 +109,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
               {subtitle}
             </p>
           ) : null}
-          {!teaser ? <NotesFloatingStack postId={post.id} title={title} /> : null}
+          {!teaser ? <NotesFloatingStack postId={post.id} title={title} subtitle={subtitle} /> : null}
 
           {post.tags?.length ? (
             <div className="mt-5 flex min-w-0 flex-wrap gap-1.5">

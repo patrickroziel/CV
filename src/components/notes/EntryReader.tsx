@@ -55,7 +55,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
         <p className="text-[11px] tracking-[0.04em] text-cyan-100/55">{category} · {formatDate(post.date)}{teaser ? ` · ${TEASER_LABEL}` : ""}</p>
         <h1 id={`note-title-${post.id}`} className="mt-4 break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">{title}</h1>
         {post.subtitle && <p className="mt-3 break-words text-sm leading-7 text-zinc-400 sm:text-base">{l(post.subtitle)}</p>}
-        {!teaser && <NotesFloatingStack postId={post.id} title={title} />}
+        {!teaser && <NotesFloatingStack postId={post.id} title={title} subtitle={post.subtitle ? l(post.subtitle) : ""} />}
         <div id={`note-body-${post.id}`} className="mt-6 min-w-0 space-y-6">
         {teaser ? <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p> : <>
         <FeaturedMedia media={featured} title={title} />
