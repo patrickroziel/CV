@@ -15,7 +15,10 @@ type XEmbedProps = {
 
 type FxTweet = {
   author?: { name?: string; screen_name?: string; avatar_url?: string };
-  media?: { photos?: { url: string }[] };
+  media?: {
+    photos?: { url: string }[];
+    videos?: { thumbnail_url?: string; url?: string }[];
+  };
   text?: string;
 };
 
@@ -59,7 +62,8 @@ export function XEmbed({
   const authorName = data?.author?.name || title;
   const authorHandle = data?.author?.screen_name;
   const avatar = data?.author?.avatar_url;
-  const image = poster || data?.media?.photos?.[0]?.url;
+  const image = poster || data?.media?.photos?.[0]?.url || data?.media?.videos?.[0]?.thumbnail_url;
+  const text = data?.text?.replace(/\s+$/g, "").trim();
 
   return (
     <a
@@ -86,17 +90,21 @@ export function XEmbed({
         <ExternalLink className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-300" />
       </div>
 
+      {text ? (
+        <p className="whitespace-pre-wrap px-4 py-3 text-sm leading-relaxed text-zinc-100">{text}</p>
+      ) : null}
+
       {image ? (
         <div className="relative bg-black">
-          <img src={image} alt="" className="w-full object-cover" />
+          <img src={image} alt="" className="max-h-[28rem] w-full object-cover" />
         </div>
-      ) : (
+      ) : !text ? (
         <div className="flex min-h-[160px] items-center justify-center bg-zinc-900 px-6 py-10 text-center">
           <p className="text-sm leading-relaxed text-zinc-400">
             {loading ? "Chargement…" : "Voir le post complet sur X"}
           </p>
         </div>
-      )}
+      ) : null}
 
       <div className="px-4 py-3 text-xs text-zinc-500 group-hover:text-zinc-400">
         Ouvrir sur x.com →
