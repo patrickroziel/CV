@@ -42,6 +42,7 @@ import {
   savePortfolio,
 } from "@/lib/storage";
 import { createId } from "@/lib/utils";
+import { coercePostCategory } from "@/lib/post-taxonomy";
 import { normalizeGhostPages } from "@/lib/ghost-pages";
 import { isEditEnvironment } from "@/lib/edit-env";
 
@@ -772,6 +773,19 @@ function withSharedAirNotices(
   });
 }
 
+function isLivrePost(post: SocialPost) {
+  return (post.universe ?? "notes") !== "air" && coercePostCategory(post) === "Livre";
+}
+
+function withSharedBookNotice(
+  posts: SocialPost[],
+  notice: SocialPost["noticeIntro"] | undefined,
+  changed: boolean,
+) {
+  if (!changed || notice === undefined) return posts;
+  return posts.map((post) => (isLivrePost(post) ? { ...post, noticeIntro: notice } : post));
+}
+
   const addSocialPost = useCallback(
     (post: Omit<SocialPost, "id">) => {
       persist((prev) => {
@@ -782,13 +796,19 @@ function withSharedAirNotices(
         );
         const created: SocialPost = { ...post, id: createId(), order: minOrder - 1 };
         const isAir = (created.universe ?? "notes") === "air";
+        const isBook = isLivrePost(created);
         const sample = current.find((item) => (item.universe ?? "notes") === "air");
-        const posts = withSharedAirNotices(
-          [created, ...current],
+        const bookSample = current.find((item) => isLivrePost(item));
+        const posts = withSharedBookNotice(
+          withSharedAirNotices(
+            [created, ...current],
+            created.noticeIntro,
+            created.noticeReply,
+            isAir && noticeMarkup(created.noticeIntro) !== noticeMarkup(sample?.noticeIntro),
+            isAir && noticeMarkup(created.noticeReply) !== noticeMarkup(sample?.noticeReply),
+          ),
           created.noticeIntro,
-          created.noticeReply,
-          isAir && noticeMarkup(created.noticeIntro) !== noticeMarkup(sample?.noticeIntro),
-          isAir && noticeMarkup(created.noticeReply) !== noticeMarkup(sample?.noticeReply),
+          isBook && noticeMarkup(created.noticeIntro) !== noticeMarkup(bookSample?.noticeIntro),
         );
         return { ...prev, socialPosts: posts };
       }, "Post ajouté");
@@ -811,14 +831,20 @@ function withSharedAirNotices(
         if (nextPartial.pinned === false) nextPartial = { ...nextPartial, pinnedAt: null };
         const introChanged = isAir && nextPartial.noticeIntro !== undefined && noticeMarkup(nextPartial.noticeIntro) !== noticeMarkup(current?.noticeIntro);
         const replyChanged = isAir && nextPartial.noticeReply !== undefined && noticeMarkup(nextPartial.noticeReply) !== noticeMarkup(current?.noticeReply);
+        const merged = { ...current, ...nextPartial, universe: nextPartial.universe ?? current?.universe } as SocialPost;
+        const bookChanged = isLivrePost(merged) && nextPartial.noticeIntro !== undefined && noticeMarkup(nextPartial.noticeIntro) !== noticeMarkup(current?.noticeIntro);
         return {
           ...prev,
-          socialPosts: withSharedAirNotices(
-            posts.map((post) => (post.id === id ? { ...post, ...nextPartial } : post)),
+          socialPosts: withSharedBookNotice(
+            withSharedAirNotices(
+              posts.map((post) => (post.id === id ? { ...post, ...nextPartial } : post)),
+              nextPartial.noticeIntro,
+              nextPartial.noticeReply,
+              introChanged,
+              replyChanged,
+            ),
             nextPartial.noticeIntro,
-            nextPartial.noticeReply,
-            introChanged,
-            replyChanged,
+            bookChanged,
           ),
         };
       }, "Enregistré");

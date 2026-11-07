@@ -19,7 +19,7 @@ import { mediaMarker, removeInlineMediaMarker, normalizeInlinePostMedia, normali
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
-import { AIR_NOTICE_INTRO, AIR_NOTICE_REPLY, airNoticeHtml } from "@/lib/air-notices";
+import { AIR_NOTICE_INTRO, AIR_NOTICE_REPLY, BOOK_NOTICE, airNoticeHtml } from "@/lib/air-notices";
 
 export type SocialPostFormValues = Omit<SocialPost, "id" | "order">;
 
@@ -181,7 +181,9 @@ export function SocialPostForm({
   const [pinned, setPinned] = useState(initial?.pinned === true);
   const [noticeIntro, setNoticeIntro] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeIntro, AIR_NOTICE_INTRO)));
   const [noticeReply, setNoticeReply] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeReply, AIR_NOTICE_REPLY)));
+  const [bookNotice, setBookNotice] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeIntro, BOOK_NOTICE)));
   const noticesTouched = useRef(false);
+  const bookNoticeTouched = useRef(false);
   const { data: portfolioData, renameAirSeries } = usePortfolio();
   useEffect(() => {
     if (universe !== "air" || initial || noticesTouched.current) return;
@@ -287,6 +289,17 @@ export function SocialPostForm({
   };
 
   const isBook = category === "Livre";
+  useEffect(() => {
+    if (universe === "air" || !isBook || bookNoticeTouched.current) return;
+    if (getL(initial?.noticeIntro, "fr").trim()) return;
+    const source = (portfolioData.socialPosts ?? []).find((post) =>
+      (post.universe ?? "notes") !== "air"
+      && coercePostCategory(post) === "Livre"
+      && post.id !== initial?.id
+      && getL(post.noticeIntro, "fr").trim()
+    );
+    if (source) setBookNotice(liftToLocalized(airNoticeHtml(source.noticeIntro, BOOK_NOTICE)));
+  }, [universe, isBook, initial, portfolioData.socialPosts]);
   const parsedMedia = insertType !== "text" && insertType !== "carousel" && insertInput.trim() ? featuredEmbedFromInput(insertType, insertInput) : null;
 
   const insertInlineMedia = useCallback((media: FeaturedEmbed) => {
@@ -510,8 +523,8 @@ export function SocialPostForm({
       pinned,
       pinnedAt: pinned ? (initial?.pinnedAt || new Date().toISOString()) : null,
     }),
-    noticesHidden: universe === "air" ? noticesHidden : undefined,
-    noticeIntro: universe === "air" ? noticeIntro : undefined,
+    noticesHidden: universe === "air" || isBook ? noticesHidden : undefined,
+    noticeIntro: universe === "air" ? noticeIntro : isBook ? bookNotice : undefined,
     noticeReply: universe === "air" ? noticeReply : undefined,
     category,
     tags: Array.from(
@@ -740,6 +753,47 @@ export function SocialPostForm({
             label="En fin d’article"
             value={noticeReply}
             onChange={(value) => { noticesTouched.current = true; setNoticeReply(value); }}
+            rows={5}
+          />
+        </div>
+      )}
+
+      {isBook && (
+        <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <Label>Mention du livre</Label>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setNoticesHidden(false)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left text-sm transition",
+                !noticesHidden
+                  ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50"
+                  : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+              )}
+            >
+              <span className="block font-medium">Afficher la mention</span>
+              <span className="mt-0.5 block text-xs font-normal text-zinc-400">Au-dessus de ce chapitre.</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setNoticesHidden(true)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left text-sm transition",
+                noticesHidden
+                  ? "border-amber-200/50 bg-amber-200/10 text-amber-50"
+                  : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+              )}
+            >
+              <span className="block font-medium">Masquer la mention</span>
+              <span className="mt-0.5 block text-xs font-normal text-zinc-400">Uniquement pour ce chapitre.</span>
+            </button>
+          </div>
+          <RichLocalizedField
+            id="book-notice"
+            label="Au-dessus du chapitre"
+            value={bookNotice}
+            onChange={(value) => { bookNoticeTouched.current = true; setBookNotice(value); }}
             rows={5}
           />
         </div>

@@ -13,6 +13,8 @@ import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { shareExcerpt } from "@/lib/post-excerpt";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
+import { RichHtml } from "@/components/shared/RichHtml";
+import { BOOK_NOTICE, airNoticeHtml } from "@/lib/air-notices";
 import type { SocialPost } from "@/lib/types";
 
 function sortBookPosts(posts: SocialPost[]) {
@@ -67,6 +69,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
   const subtitle = post.subtitle ? l(post.subtitle) : "";
   const body = l(post.description);
   const teaser = isTeaserPost(post);
+  const showNotice = post.noticesHidden !== true;
 
   return (
     <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
@@ -81,6 +84,9 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
       </div>
 
       <article className="mt-6 min-w-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]">
+        {showNotice ? (
+          <RichHtml html={airNoticeHtml(post.noticeIntro, BOOK_NOTICE)} className="px-5 pt-5 italic text-[13.5px] leading-6 text-white/70 sm:px-10" />
+        ) : null}
         <PostCover post={post} className="border-b border-white/10" />
 
         <div className="min-w-0 p-4 sm:p-8 md:p-10">

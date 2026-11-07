@@ -768,9 +768,9 @@ export type SocialPost = {
   tags: string[];
   /** When false: hidden from the public, visible in Mode Édition */
   visible: boolean;
-  /** Air only. Hides both legal notices together. Missing means shown. */
+  /** Air and Livre. Hides the notice on this publication only. Missing means shown. */
   noticesHidden?: boolean;
-  /** Air notice under the cover. Empty uses the default testimony line. */
+  /** Air notice under the cover, or the shared Livre notice. Empty uses the default line. */
   noticeIntro?: Translatable;
   /** Air notice at the end of the article. Empty uses the default reply line. */
   noticeReply?: Translatable;
