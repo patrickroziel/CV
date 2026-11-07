@@ -31,13 +31,14 @@ export function firstPostLines(html: string, count = 10, width = 72) {
   return rows.slice(0, count);
 }
 
-/** Text sent with a share: the first ten words, then the invitation to continue. */
-export function shareExcerpt(html: string, count = 10) {
+/** Text sent with a share: eleven or twelve words, then an ellipsis when the post continues. */
+export function shareExcerpt(html: string, count = 12) {
   const plain = stripHtml(html || "")
     .replace(MEDIA_TOKEN, " ")
     .replace(/\s+/g, " ")
     .trim();
-  const words = plain.split(" ").filter(Boolean).slice(0, count);
+  const words = plain.split(" ").filter(Boolean);
   if (!words.length) return "";
-  return `${words.join(" ")}\nLire plus...`;
+  const taken = words.slice(0, count);
+  return words.length > count ? `${taken.join(" ")}...` : taken.join(" ");
 }

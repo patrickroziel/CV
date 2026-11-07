@@ -98,8 +98,6 @@ export function getNoteShareText(post: SocialPost) {
     return { title, subtitle, description: TEASER_PUBLIC_LINE };
   }
   const lines = firstPostLines(getL(post.description, "fr"));
-  const description = lines.length
-    ? `${lines.join(" ")} Lire plus...`
-    : (subtitle || "Une publication de Patrick Roziel, dans Notes.");
+  const description = lines.join(" ") || subtitle || "Une publication de Patrick Roziel, dans Notes.";
   return { title, subtitle, description };
 }

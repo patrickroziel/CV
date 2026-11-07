@@ -87,9 +87,6 @@ function previewCard(title: string, subtitle: string, meta: string, photo: strin
             {subtitle.slice(0, 180)}
           </div>
         ) : null}
-        {story ? (
-          <div style={{ display: "flex", marginTop: 36, fontSize: 30, color: "#a5f3fc" }}>Lire plus...</div>
-        ) : null}
       </div>
     </div>
   );
