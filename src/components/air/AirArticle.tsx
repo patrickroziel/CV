@@ -85,11 +85,13 @@ function AirReadHead({
   series,
   episode,
   title,
+  lead,
   bodyId,
 }: {
   series: string;
   episode: string;
   title: string;
+  lead: string;
   bodyId: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -114,6 +116,7 @@ function AirReadHead({
           <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
           <h1>{title}</h1>
         </a>
+        {lead ? <p className="mt-2 max-w-full px-1 text-sm leading-6 text-white/75">{lead}</p> : null}
         <ArticlePartNav targetId={bodyId} />
       </div>
     </>
@@ -148,6 +151,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Air</Link><p className="mt-8">Article indisponible.</p></div>;
   const title = l(post.title);
   const series = post.subtitle ? l(post.subtitle).trim() : "";
+  const lead = post.articleSubtitle ? l(post.articleSubtitle).trim() : "";
   const episode = post.episode?.trim() ?? "";
   const bodyId = `air-body-${post.id}`;
   const teaser = isTeaserPost(post);
@@ -179,6 +183,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         series={series}
         episode={episode}
         title={title}
+        lead={lead}
         bodyId={bodyId}
       />
       <div id={bodyId} className="space-y-6 px-5 pb-5 sm:px-10 sm:pb-10">

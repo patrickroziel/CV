@@ -105,7 +105,8 @@ function previewCard(
           <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: subtitle ? (story ? 28 : 18) : 0 }}>
             <div style={{
               display: "flex", maxWidth: story ? 900 : 980, borderRadius: 28,
-              border: "1px solid rgba(255,255,255,0.35)", backgroundColor: "#305080",
+              border: "1px solid rgba(255,255,255,0.42)",
+              backgroundColor: "rgba(48,80,128,0.42)",
               padding: story ? "22px 36px" : "16px 28px",
               fontSize: titleSize, fontWeight: 700, lineHeight: 1.15, color: "#ffffff", textAlign: "center",
             }}>

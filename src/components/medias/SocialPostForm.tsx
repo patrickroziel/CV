@@ -176,6 +176,7 @@ export function SocialPostForm({
 }: SocialPostFormProps) {
   const [title, setTitle] = useState<LocalizedString>(liftToLocalized(initial?.title));
   const [subtitle, setSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.subtitle));
+  const [articleSubtitle, setArticleSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.articleSubtitle));
   const [episode, setEpisode] = useState(initial?.episode?.trim() ?? "");
   const [noticesHidden, setNoticesHidden] = useState(initial?.noticesHidden === true);
   const [pinned, setPinned] = useState(initial?.pinned === true);
@@ -504,6 +505,7 @@ export function SocialPostForm({
     universe: initial?.universe ?? universe,
     title,
     subtitle: getL(subtitle, "fr").trim() ? subtitle : undefined,
+    articleSubtitle: universe === "air" && getL(articleSubtitle, "fr").trim() ? articleSubtitle : undefined,
     episode: universe === "air" && episode.trim() ? episode.trim().slice(0, 16) : null,
     description,
     date: initial?.date || new Date().toISOString().slice(0, 10),
@@ -555,6 +557,7 @@ export function SocialPostForm({
     const hasSomething = Boolean(
       getL(title, "fr").trim() ||
         getL(subtitle, "fr").trim() ||
+        getL(articleSubtitle, "fr").trim() ||
         getL(description, "fr").trim() ||
         inlineMedia.length > 0 ||
         Boolean(legacyFeatured) ||
@@ -681,12 +684,20 @@ export function SocialPostForm({
         </button>
       )}
       {universe === "air" && (
+      <>
       <LocalizedField
         label="Titre *"
         value={title}
         onChange={setTitle}
         placeholder="Titre de l’article"
       />
+      <LocalizedField
+        label="Sous-titre (facultatif)"
+        value={articleSubtitle}
+        onChange={setArticleSubtitle}
+        placeholder="Une phrase courte sous le titre"
+      />
+      </>
       )}
 
       {universe !== "air" && (

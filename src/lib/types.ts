@@ -727,6 +727,8 @@ export type SocialPost = {
   title: Translatable;
   /** Optional subtitle. On Air this is the series title. */
   subtitle?: Translatable;
+  /** Air article subtitle, distinct from the series title. */
+  articleSubtitle?: Translatable;
   /** Air series episode number, shown next to the series title. */
   episode?: string | null;
   description: Translatable;
