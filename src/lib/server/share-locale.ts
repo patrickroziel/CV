@@ -34,7 +34,7 @@ export function openGraphLocale(lang: string | null) {
 
 export function shareImageUrl(id: string, lang: string | null) {
   const url = new URL(`${NOTES_ORIGIN}/api/notes/${encodeURIComponent(id)}/share-image`);
-  url.searchParams.set("v", "6");
+  url.searchParams.set("v", "7");
   if (lang) url.searchParams.set("lang", lang);
   return url.toString();
 }

@@ -72,7 +72,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
         secureUrl: image,
         width: 1200,
         height: 630,
-        type: "image/png",
+        type: "image/jpeg",
         alt: title,
       }],
     },

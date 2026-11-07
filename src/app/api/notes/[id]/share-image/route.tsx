@@ -123,9 +123,16 @@ export async function GET(
     if (jpeg) photoSrc = `data:image/jpeg;base64,${jpeg.toString("base64")}`;
   }
 
-  return new ImageResponse(previewCard(title, subtitle, category, photoSrc, story), {
+  const rendered = new ImageResponse(previewCard(title, subtitle, category, photoSrc, story), {
     width,
     height,
-    headers: { "Cache-Control": "public, max-age=300, s-maxage=86400" },
+  });
+  const png = Buffer.from(await rendered.arrayBuffer());
+  const jpeg = await sharp(png).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
+  return new Response(jpeg, {
+    headers: {
+      "Content-Type": "image/jpeg",
+      "Cache-Control": "public, max-age=300, s-maxage=86400",
+    },
   });
 }
