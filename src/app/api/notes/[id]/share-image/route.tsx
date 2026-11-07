@@ -79,7 +79,7 @@ function previewCard(title: string, subtitle: string, meta: string, photo: strin
         }}>
           {title.slice(0, 140)}
         </div>
-        {subtitle && story ? (
+        {subtitle ? (
           <div style={{
             display: "flex", marginTop: story ? 20 : 14, maxWidth: story ? 900 : 980,
             fontSize: story ? 34 : 26, lineHeight: 1.35, color: "#a1a1aa",

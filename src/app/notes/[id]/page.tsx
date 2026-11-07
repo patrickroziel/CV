@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { ArticleJsonLd } from "@/components/seo/JsonLd";
 import { EntryReader } from "@/components/notes/EntryReader";
 import {
@@ -47,8 +46,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
     ? (await translateShareText(french.subtitle, french.subtitle, lang)).title
     : "";
   const cardText = subtitle || description;
-  const facebook = /facebookexternalhit|Facebot|FacebookBot/i.test((await headers()).get("user-agent") || "");
-  const linkTitle = facebook && subtitle ? `${title} — ${subtitle}` : title;
+  const linkTitle = subtitle ? `${title} — ${subtitle}` : title;
   const preview = new URL(url);
   if (share) preview.searchParams.set("share", share);
   if (lang) preview.searchParams.set("lang", lang);
@@ -80,7 +78,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: linkTitle,
       description: cardText,
       images: [image],
     },
