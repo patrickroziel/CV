@@ -23,7 +23,7 @@ function proxyBlobImages(html: string) {
 
 const FORCE_WHITE_ARTICLE = "adbaf437-0909-4347-a846-7910e702b954";
 
-function ArticleCover({ sources }: { sources: string[] }) {
+function ArticleCover({ sources, seriesLabel }: { sources: string[]; seriesLabel?: string }) {
   const [index, setIndex] = useState(0);
   if (index >= sources.length) return null;
   const src = sources[index];
@@ -40,6 +40,11 @@ function ArticleCover({ sources }: { sources: string[] }) {
             onError={() => setIndex((current) => current + 1)}
           />
         )}
+        {seriesLabel ? (
+          <div className="air-cover-series">
+            <AirSeriesLine label={seriesLabel} />
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -82,14 +87,10 @@ export function AirSeriesLine({ label }: { label: string }) {
 }
 
 function AirReadHead({
-  series,
-  episode,
   title,
   lead,
   bodyId,
 }: {
-  series: string;
-  episode: string;
   title: string;
   lead: string;
   bodyId: string;
@@ -107,16 +108,14 @@ function AirReadHead({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  const seriesLabel = seriesLine(series, episode);
   return (
     <>
       <div ref={ref} className="air-read-head">
-        <AirSeriesLine label={seriesLabel} />
         <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
           <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
           <h1>{title}</h1>
         </a>
-        {lead ? <p className="mt-2 max-w-full px-1 text-sm leading-6 text-white/75">{lead}</p> : null}
+        {lead ? <p className="air-lead-pill">{lead}</p> : null}
         <ArticlePartNav targetId={bodyId} />
       </div>
     </>
@@ -153,6 +152,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const series = post.subtitle ? l(post.subtitle).trim() : "";
   const lead = post.articleSubtitle ? l(post.articleSubtitle).trim() : "";
   const episode = post.episode?.trim() ?? "";
+  const seriesLabel = seriesLine(series, episode);
   const bodyId = `air-body-${post.id}`;
   const teaser = isTeaserPost(post);
   const showNotices = post.noticesHidden !== true;
@@ -171,17 +171,20 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         <div className="overflow-hidden rounded-t-[1.35rem]">
           <div className="relative aspect-[16/8] sm:aspect-[16/7]">
             <WorkInProgress className="blob-wip--fill" />
+            {seriesLabel ? (
+              <div className="air-cover-series">
+                <AirSeriesLine label={seriesLabel} />
+              </div>
+            ) : null}
           </div>
         </div>
       ) : (
-        <ArticleCover sources={getNoteSharePhotos(post)} />
+        <ArticleCover sources={getNoteSharePhotos(post)} seriesLabel={seriesLabel} />
       )}
       {showNotices && (
         <RichHtml html={airNoticeHtml(post.noticeIntro, AIR_NOTICE_INTRO)} className="px-5 pt-4 italic text-[13.5px] leading-6 text-white/70 sm:px-10" />
       )}
       <AirReadHead
-        series={series}
-        episode={episode}
         title={title}
         lead={lead}
         bodyId={bodyId}
