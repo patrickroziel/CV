@@ -216,21 +216,25 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
         {pinnedPosts.length > 0 ? (
           <div className="mb-7">
             <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-cyan-100/50">Posts épinglés</p>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               {pinnedPosts.map((post) => {
                 const title = l(post.title).trim() || "Sans titre";
+                const subtitle = post.subtitle ? l(post.subtitle).trim() : "";
                 const visual = visibleCoverUrl(post)
                   || (post.featuredEmbed?.type === "image" ? post.featuredEmbed.url : null)
                   || (post.fileKind === "image" ? post.fileUrl : null);
                 return (
-                  <Link key={post.id} href={`/notes/${post.id}`} className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-[rgba(3,16,20,0.72)] p-2 pr-4 shadow-xl backdrop-blur-xl transition hover:border-cyan-100/25">
-                    <span className="relative h-14 w-24 shrink-0 overflow-hidden rounded-xl bg-black/40">
+                  <Link key={post.id} href={`/notes/${post.id}`} className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-[rgba(3,16,20,0.72)] p-2 shadow-xl backdrop-blur-xl transition hover:border-cyan-100/25">
+                    <span className="relative h-14 w-16 shrink-0 overflow-hidden rounded-xl bg-black/40 sm:w-24">
                       {visual ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={visual} alt="" className="h-full w-full object-cover" />
                       ) : null}
                     </span>
-                    <span className="min-w-0 flex-1 break-words text-sm font-semibold leading-5 text-white">{title}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block break-words text-sm font-semibold leading-5 text-white">{title}</span>
+                      {subtitle ? <span className="mt-0.5 block break-words text-xs leading-5 text-zinc-400">{subtitle}</span> : null}
+                    </span>
                   </Link>
                 );
               })}
