@@ -69,7 +69,13 @@ function previewCard(title: string, subtitle: string, category: string, photo: s
       }}>
         {category ? (
           <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-            <div style={{ display: "flex", fontSize: story ? 26 : 18, letterSpacing: 3, color: "#a5f3fc", textAlign: "center" }}>
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: 999, border: "1px solid rgba(165,243,252,0.45)",
+              backgroundColor: "rgba(3,16,20,0.45)",
+              padding: story ? "10px 22px" : "7px 16px",
+              fontSize: story ? 24 : 16, letterSpacing: 2.5, color: "#a5f3fc",
+            }}>
               {category}
             </div>
           </div>
