@@ -160,6 +160,10 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodeURIComponent(coverShareUrl(postId))}&description=${encodedExcerpt}`,
       };
       const href = hrefs[target];
+      if (target === "facebook" && excerpt) {
+        try { await navigator.clipboard.writeText(excerpt); } catch { /* the link preview still opens */ }
+        setMessage("Texte copié. Colle-le dans la publication.");
+      }
       if (href) openPopup(href);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
