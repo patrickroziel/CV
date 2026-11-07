@@ -3,6 +3,8 @@ import sharp from "sharp";
 import { getNoteSharePhoto, getNoteShareText, getPublicNote } from "@/lib/server/notes-sharing";
 import { requestedShareLanguage, translateShareText } from "@/lib/server/share-locale";
 import { coercePostCategory } from "@/lib/post-taxonomy";
+import { getL } from "@/lib/i18n-content";
+import { stripHtml } from "@/lib/sanitize-html";
 
 export const runtime = "nodejs";
 export const revalidate = 60;
@@ -52,6 +54,7 @@ function previewCard(
   photo: string | null,
   story: boolean,
   air: boolean,
+  lead = "",
 ) {
   const titleSize = story ? (title.length > 48 ? 52 : 64) : (title.length > 48 ? 36 : 46);
   const subtitleSize = story ? 36 : 28;
@@ -123,6 +126,16 @@ function previewCard(
             </div>
           </div>
         )}
+        {air && lead ? (
+          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: story ? 22 : 14 }}>
+            <div style={{
+              display: "flex", maxWidth: story ? 860 : 920, fontSize: story ? 32 : 24, fontWeight: 500,
+              lineHeight: 1.3, color: "#ffffff", textAlign: "center",
+            }}>
+              {lead.slice(0, 180)}
+            </div>
+          </div>
+        ) : null}
         {!air && subtitle ? (
           <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: story ? 24 : 16 }}>
             <div style={{
@@ -159,6 +172,10 @@ export async function GET(
   const series = post.universe === "air" && post.episode?.trim()
     ? [subtitle, `Épisode ${post.episode.trim().replace(/^épisode\s+/i, "")}`].filter(Boolean).join(" · ")
     : subtitle;
+  const leadRaw = post.universe === "air"
+    ? stripHtml(getL(post.articleSubtitle, "fr")).replace(/\s+/g, " ").trim().slice(0, 180)
+    : "";
+  const lead = leadRaw ? (await translateShareText(leadRaw, " ", lang)).title : "";
   const category = post.universe === "air"
     ? ""
     : (await translateShareText(coercePostCategory(post), " ", lang)).title;
@@ -169,7 +186,7 @@ export async function GET(
     if (jpeg) photoSrc = `data:image/jpeg;base64,${jpeg.toString("base64")}`;
   }
 
-  const rendered = new ImageResponse(previewCard(title, series, category, photoSrc, story, post.universe === "air"), {
+  const rendered = new ImageResponse(previewCard(title, series, category, photoSrc, story, post.universe === "air", lead), {
     width,
     height,
   });
