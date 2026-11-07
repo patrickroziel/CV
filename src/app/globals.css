@@ -1183,9 +1183,10 @@ body:has(header[data-editing="true"]) .air-read-head {
 .air-cover-series {
   position: absolute;
   z-index: 2;
-  left: 34%;
-  top: 63%;
-  max-width: min(26rem, calc(100% - 36%));
+  left: 1rem;
+  top: 50%;
+  max-width: min(20rem, calc(100% - 2rem));
+  transform: translateY(-50%);
 }
 .air-cover-series .air-series-line {
   width: auto;
