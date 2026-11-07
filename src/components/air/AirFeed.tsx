@@ -141,6 +141,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
         const parts = teaser ? [] : partTitles(l(post.description));
         const excerpt = teaser ? TEASER_PUBLIC_LINE : previewText(l(post.description));
         const seriesLabel = [seriesName(post), post.episode?.trim() ? `Épisode ${post.episode.trim().replace(/^épisode\s+/i, "")}` : ""].filter(Boolean).join(" · ");
+        const lead = post.articleSubtitle ? l(post.articleSubtitle).trim() : "";
         return <Fragment key={post.id}>
         <article className="air-surface overflow-hidden rounded-[1.35rem] border backdrop-blur-2xl transition-colors">
           <Link href={`/air/${post.id}`} className="group block">
@@ -150,13 +151,18 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               ) : photo ? (
                 isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
+              {seriesLabel ? (
+                <div className="air-cover-series">
+                  <AirSeriesLine label={seriesLabel} />
+                </div>
+              ) : null}
             </div>
           </Link>
           <div className="p-5 sm:p-6">
             <Link href={`/air/${post.id}`} className="block">
               <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p>
-              {seriesLabel ? <div className="mt-3"><AirSeriesLine label={seriesLabel} /></div> : null}
-              <h3 className="mt-3 text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
+              <h3 className="air-title-pill mt-3 text-base font-semibold leading-snug text-white sm:text-lg">{title}</h3>
+              {lead ? <p className="air-lead-pill">{lead}</p> : null}
             </Link>
             {parts.length ? (
               <div className="air-part-stack mt-3">
