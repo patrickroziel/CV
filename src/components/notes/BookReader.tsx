@@ -83,10 +83,11 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
         <PostEditButton post={post} universe="notes" />
       </div>
 
-      <article className="mt-6 min-w-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]">
-        {showNotice ? (
-          <RichHtml html={airNoticeHtml(post.noticeIntro, BOOK_NOTICE)} className="px-5 pt-5 italic text-[13.5px] leading-6 text-white/70 sm:px-10" />
-        ) : null}
+      {showNotice ? (
+        <RichHtml html={airNoticeHtml(post.noticeIntro, BOOK_NOTICE)} className="mt-6 text-[13px] italic leading-relaxed text-white/55" />
+      ) : null}
+
+      <article className={`${showNotice ? "mt-4" : "mt-6"} min-w-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]`}>
         <PostCover post={post} className="border-b border-white/10" />
 
         <div className="min-w-0 p-4 sm:p-8 md:p-10">
