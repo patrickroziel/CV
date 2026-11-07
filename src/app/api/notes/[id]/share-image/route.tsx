@@ -59,13 +59,13 @@ function previewCard(title: string, subtitle: string, category: string, photo: s
       <div style={{
         display: "flex", position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
         backgroundImage: photo
-          ? "radial-gradient(ellipse at center, rgba(3,16,20,0.78) 0%, rgba(3,16,20,0.42) 52%, rgba(3,16,20,0.55) 100%)"
+          ? "linear-gradient(rgba(3,16,20,0.42), rgba(3,16,20,0.42))"
           : "linear-gradient(160deg, rgba(3,16,20,0.15) 0%, rgba(3,16,20,0.45) 100%)",
       }} />
       <div style={{
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         position: "relative", width: "100%", height: "100%",
-        padding: story ? "220px 80px" : "48px 72px", textAlign: "center",
+        padding: story ? "0 80px" : "0 72px", textAlign: "center",
       }}>
         {category ? (
           <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
