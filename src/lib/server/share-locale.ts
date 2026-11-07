@@ -32,10 +32,15 @@ export function openGraphLocale(lang: string | null) {
   return OPEN_GRAPH_LOCALES[lang ?? "fr"] ?? "fr_FR";
 }
 
-export function shareImageUrl(id: string, lang: string | null) {
+export function shareImageUrl(id: string, lang: string | null, cover?: string | null) {
   const url = new URL(`${NOTES_ORIGIN}/api/notes/${encodeURIComponent(id)}/share-image`);
-  url.searchParams.set("v", "8");
+  url.searchParams.set("v", "9");
   if (lang) url.searchParams.set("lang", lang);
+  if (cover) {
+    let hash = 0;
+    for (const char of cover) hash = (Math.imul(hash, 33) + char.charCodeAt(0)) >>> 0;
+    url.searchParams.set("c", hash.toString(36));
+  }
   return url.toString();
 }
 

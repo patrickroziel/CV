@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArticleJsonLd } from "@/components/seo/JsonLd";
 import { EntryReader } from "@/components/notes/EntryReader";
 import {
+  getNoteSharePhoto,
   getNoteShareText,
   getPublicNote,
   listPublicPosts,
@@ -50,7 +51,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
   const preview = new URL(url);
   if (share) preview.searchParams.set("share", share);
   if (lang) preview.searchParams.set("lang", lang);
-  const image = shareImageUrl(id, lang);
+  const image = shareImageUrl(id, lang, getNoteSharePhoto(post));
 
   return {
     metadataBase: new URL(NOTES_ORIGIN),

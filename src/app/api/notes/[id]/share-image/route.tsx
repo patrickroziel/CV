@@ -138,7 +138,9 @@ export async function GET(
   return new Response(jpeg, {
     headers: {
       "Content-Type": "image/jpeg",
-      "Cache-Control": "public, max-age=300, s-maxage=86400",
+      "Cache-Control": photoSrc
+        ? "public, max-age=300, s-maxage=86400"
+        : "public, max-age=60, s-maxage=60",
     },
   });
 }

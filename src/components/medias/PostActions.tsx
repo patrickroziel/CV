@@ -31,6 +31,7 @@ function articleShareUrl(sharePath: string, postId: string) {
 function coverShareUrl(postId: string, format?: "story") {
   const lang = selectedLanguage();
   const image = new URL(`/api/notes/${encodeURIComponent(postId)}/share-image`, "https://patrickroziel.com");
+  image.searchParams.set("v", "9");
   if (lang) image.searchParams.set("lang", lang);
   if (format) image.searchParams.set("format", format);
   return image.toString();
