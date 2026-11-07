@@ -802,14 +802,21 @@ function withSharedAirNotices(
         const posts = prev.socialPosts ?? [];
         const current = posts.find((post) => post.id === id);
         const isAir = (partial.universe ?? current?.universe ?? "notes") === "air";
-        const introChanged = isAir && partial.noticeIntro !== undefined && noticeMarkup(partial.noticeIntro) !== noticeMarkup(current?.noticeIntro);
-        const replyChanged = isAir && partial.noticeReply !== undefined && noticeMarkup(partial.noticeReply) !== noticeMarkup(current?.noticeReply);
+        let nextPartial = partial;
+        if (nextPartial.pinned === true && current?.pinned !== true) {
+          const pinnedCount = posts.filter((post) => post.universe !== "air" && post.pinned && post.id !== id).length;
+          if (pinnedCount >= 6) nextPartial = { ...nextPartial, pinned: false, pinnedAt: null };
+          else if (!nextPartial.pinnedAt) nextPartial = { ...nextPartial, pinnedAt: new Date().toISOString() };
+        }
+        if (nextPartial.pinned === false) nextPartial = { ...nextPartial, pinnedAt: null };
+        const introChanged = isAir && nextPartial.noticeIntro !== undefined && noticeMarkup(nextPartial.noticeIntro) !== noticeMarkup(current?.noticeIntro);
+        const replyChanged = isAir && nextPartial.noticeReply !== undefined && noticeMarkup(nextPartial.noticeReply) !== noticeMarkup(current?.noticeReply);
         return {
           ...prev,
           socialPosts: withSharedAirNotices(
-            posts.map((post) => (post.id === id ? { ...post, ...partial } : post)),
-            partial.noticeIntro,
-            partial.noticeReply,
+            posts.map((post) => (post.id === id ? { ...post, ...nextPartial } : post)),
+            nextPartial.noticeIntro,
+            nextPartial.noticeReply,
             introChanged,
             replyChanged,
           ),

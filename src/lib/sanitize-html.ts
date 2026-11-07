@@ -151,12 +151,15 @@ export function sanitizeBioHtml(
           if (kept.length) el.setAttribute("class", kept.join(" "));
           else el.removeAttribute("class");
         } else if (name === "data-rich-lh") {
-          // Numeric interligne marker on the outer wrapper
-          const n = Number(String(attr.value).replace(",", "."));
-          if (Number.isFinite(n) && n >= 1 && n <= 2.5) {
-            el.setAttribute("data-rich-lh", String(Math.round(n * 100) / 100));
-          } else {
+          if (fromPaste) {
             el.removeAttribute("data-rich-lh");
+          } else {
+            const n = Number(String(attr.value).replace(",", "."));
+            if (Number.isFinite(n) && n >= 1 && n <= 2.5) {
+              el.setAttribute("data-rich-lh", String(Math.round(n * 100) / 100));
+            } else {
+              el.removeAttribute("data-rich-lh");
+            }
           }
         } else if (name === "data-rich-color") {
           // Intentional colour from the editor toolbar — always keep

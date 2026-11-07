@@ -1,24 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Heart, Share2 } from "lucide-react";
+import { Heart } from "lucide-react";
 import { SITE_LANGUAGE_CODES, SITE_LANGUAGE_STORAGE_KEY } from "@/lib/site-translation";
 
 type ResponseState = { available?: boolean; count?: number; liked?: boolean };
 type ShareTarget = "x" | "facebook" | "instagram" | "youtube" | "whatsapp" | "linkedin" | "telegram" | "threads" | "bluesky" | "pinterest" | "email" | "copy" | "more";
 
 const SHARE_TARGETS: { id: ShareTarget; label: string }[] = [
-  { id: "x", label: "X" },
-  { id: "facebook", label: "Facebook" },
-  { id: "instagram", label: "Instagram" },
-  { id: "youtube", label: "YouTube" },
-  { id: "whatsapp", label: "WhatsApp" },
-  { id: "linkedin", label: "LinkedIn" },
-  { id: "telegram", label: "Telegram" },
-  { id: "threads", label: "Threads" },
-  { id: "bluesky", label: "Bluesky" },
-  { id: "pinterest", label: "Pinterest" },
-  { id: "email", label: "E-mail" },
-  { id: "copy", label: "Copier" },
+  { id: "x", label: "X (Publications)" },
+  { id: "facebook", label: "Facebook (Publications)" },
+  { id: "instagram", label: "Instagram (Stories)" },
+  { id: "linkedin", label: "LinkedIn (Publications)" },
+  { id: "threads", label: "Threads (Publications)" },
+  { id: "email", label: "Email" },
 ];
 
 function selectedLanguage() {
@@ -45,8 +39,8 @@ function openPopup(href: string) {
   window.open(href, "_blank", "noopener,noreferrer,width=720,height=760");
 }
 
-export function PostActions({ postId, title, visible = true, sharePath = "/notes", tone = "dark" }: {
-  postId: string; title: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light";
+export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark" }: {
+  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light";
 }) {
   const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState(false);
@@ -54,12 +48,6 @@ export function PostActions({ postId, title, visible = true, sharePath = "/notes
   const [count, setCount] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const [shareOpen, setShareOpen] = useState(false);
-  const [canNativeShare, setCanNativeShare] = useState(false);
-
-  useEffect(() => {
-    setCanNativeShare(typeof navigator.share === "function");
-  }, []);
 
   useEffect(() => {
     let active = true;
@@ -104,7 +92,7 @@ export function PostActions({ postId, title, visible = true, sharePath = "/notes
   async function shareTo(target: ShareTarget) {
     const url = articleShareUrl(sharePath, postId);
     const headline = title.trim() || "Patrick Roziel";
-    const text = `${headline}\n${url}`;
+    const text = [headline, summary.trim(), url].filter(Boolean).join("\n\n");
     setMessage("");
     try {
       if (target === "copy") {
@@ -113,7 +101,12 @@ export function PostActions({ postId, title, visible = true, sharePath = "/notes
         return;
       }
       if (target === "more") {
-        await navigator.share({ title: headline, text: headline, url });
+        if (typeof navigator.share === "function") {
+          await navigator.share({ title: headline, text, url });
+          return;
+        }
+        await navigator.clipboard.writeText(text);
+        setMessage("Lien copié.");
         return;
       }
       if (target === "email") {
@@ -178,9 +171,6 @@ export function PostActions({ postId, title, visible = true, sharePath = "/notes
     : liked
       ? "border-white/25 bg-white/[0.07] text-rose-100"
       : "border-white/14 bg-white/[0.03] text-zinc-200 hover:border-white/28 hover:bg-white/[0.06]";
-  const shareClass = tone === "light"
-    ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/80 hover:border-[#1c1917]/25 hover:bg-[#1c1917]/[0.03]"
-    : "border-white/14 bg-white/[0.03] text-zinc-200 hover:border-white/28 hover:bg-white/[0.06]";
   const chipClass = tone === "light"
     ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/75 hover:bg-[#1c1917]/[0.04]"
     : "border-white/12 bg-white/[0.03] text-zinc-300 hover:bg-white/[0.07]";
@@ -194,29 +184,19 @@ export function PostActions({ postId, title, visible = true, sharePath = "/notes
         <span>J'aime</span>
         {ready && enabled ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
       </button>
-      <button type="button" onClick={() => { setShareOpen((open) => !open); setMessage(""); }}
-        aria-expanded={shareOpen}
-        className={`inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-[0.78rem] font-medium tracking-[0.01em] transition ${shareClass}`}
-        aria-label={`Partager ${title || "la publication"}`}>
-        <Share2 className="h-4 w-4" aria-hidden /> Partager
+    </div>
+    <div className="flex max-w-full flex-wrap gap-1.5" data-no-translate="true">
+      {SHARE_TARGETS.map((item) => (
+        <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
+          className={`inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-semibold transition ${chipClass}`}>
+          {item.label}
+        </button>
+      ))}
+      <button type="button" onClick={() => void shareTo("more")}
+        className={`inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-semibold transition ${chipClass}`}>
+        Plus
       </button>
     </div>
-    {shareOpen && (
-      <div className="flex max-w-xl flex-wrap gap-1.5" data-no-translate="true">
-        {SHARE_TARGETS.map((item) => (
-          <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
-            className={`inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-semibold transition ${chipClass}`}>
-            {item.label}
-          </button>
-        ))}
-        {canNativeShare && (
-          <button type="button" onClick={() => void shareTo("more")}
-            className={`inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-semibold transition ${chipClass}`}>
-            Plus
-          </button>
-        )}
-      </div>
-    )}
     {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
   </div>;
 }

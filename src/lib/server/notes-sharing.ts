@@ -4,6 +4,7 @@ import { cache } from "react";
 import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
 import { getL } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
+import { firstPostLines } from "@/lib/post-excerpt";
 import { readPublicPortfolio } from "@/lib/server/portfolio-db";
 import type { SocialPost } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
@@ -92,16 +93,13 @@ export function titleForSearch(title: string) {
 
 export function getNoteShareText(post: SocialPost) {
   const title = stripHtml(getL(post.title, "fr")).replace(/\s+/g, " ").trim().slice(0, 130) || "Notes de Patrick Roziel";
+  const subtitle = stripHtml(getL(post.subtitle, "fr")).replace(/\s+/g, " ").trim().slice(0, 180);
   if (isTeaserPost(post)) {
-    return { title, description: TEASER_PUBLIC_LINE };
+    return { title, subtitle, description: TEASER_PUBLIC_LINE };
   }
-  const raw = stripHtml(getL(post.description, "fr"))
-    .replace(/\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  const summary = raw.slice(0, 190).trimEnd();
-  const description = (summary.length ? (raw.length > 190 ? summary + "…" : summary) :
-    (post.subtitle ? stripHtml(getL(post.subtitle, "fr")).replace(/\s+/g, " ").trim().slice(0, 190) : "")) ||
-    "Une publication de Patrick Roziel, dans Notes.";
-  return { title, description };
+  const lines = firstPostLines(getL(post.description, "fr"));
+  const description = lines.length
+    ? `${lines.join(" ")} Lire plus...`
+    : (subtitle || "Une publication de Patrick Roziel, dans Notes.");
+  return { title, subtitle, description };
 }

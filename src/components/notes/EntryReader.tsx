@@ -10,6 +10,7 @@ import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
+import { shareExcerpt } from "@/lib/post-excerpt";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import type { FeaturedEmbed, SocialPost } from "@/lib/types";
@@ -46,29 +47,29 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
       </Link>
       <PostEditButton post={post} universe="notes" />
     </div>
-    <article className="mt-6 overflow-visible rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
-      <PostCover post={post} alt={title} className="border-b border-white/10" />
-      <div className="article-sticky-head">
-        <p className="text-xs tracking-[0.04em] text-cyan-100/55">{category} · {formatDate(post.date)}{teaser ? ` · ${TEASER_LABEL}` : ""}</p>
-        <h1 className="mt-3 break-words text-2xl font-semibold text-white sm:text-3xl">{title}</h1>
-        {post.subtitle && <p className="mt-3 text-sm text-zinc-400">{l(post.subtitle)}</p>}
-        {!teaser && <ArticlePartNav targetId={`note-body-${post.id}`} />}
-      </div>
-      <div id={`note-body-${post.id}`} className="min-w-0 space-y-6 px-4 pb-4 sm:px-8 sm:pb-8 md:px-10 md:pb-10">
-        {teaser ? <p className="text-sm leading-6 text-zinc-400">{TEASER_PUBLIC_LINE}</p> : <>
+    <article className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
+      <PostCover post={post} alt={title} />
+      <div className="min-w-0 px-4 pb-4 pt-5 sm:px-8 sm:pb-8 sm:pt-7 md:px-10 md:pb-10">
+        <p className="text-[11px] tracking-[0.04em] text-cyan-100/55">{category} · {formatDate(post.date)}{teaser ? ` · ${TEASER_LABEL}` : ""}</p>
+        <h1 className="mt-4 break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">{title}</h1>
+        {post.subtitle && <p className="mt-3 break-words text-sm leading-7 text-zinc-400 sm:text-base">{l(post.subtitle)}</p>}
+        {!teaser && <div className="mt-4"><ArticlePartNav targetId={`note-body-${post.id}`} /></div>}
+        <div id={`note-body-${post.id}`} className="mt-6 min-w-0 space-y-6">
+        {teaser ? <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p> : <>
         <FeaturedMedia media={featured} title={title} />
         {post.fileKind === "image" && post.fileUrl && post.fileUrl !== featured?.url && post.fileUrl !== post.bookCoverUrl &&
           <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={post.fileUrl} alt={title} className="absolute inset-0 h-full w-full object-cover object-center" />
           </div>}
-        <PostRichBody html={l(post.description)} inlineMedia={post.inlineMedia} title={title} className="notes-force-white min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-white [&_*]:max-w-full [&_a]:break-all" />
+        <PostRichBody html={l(post.description)} inlineMedia={post.inlineMedia} title={title} className="notes-force-white min-w-0 max-w-full overflow-hidden text-[15px] text-white [&_*]:max-w-full [&_a]:break-all" />
         {post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100">
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}
         </a>}
         </>}
-        <PostActions postId={post.id} title={title} visible={post.visible !== false} />
+        <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(l(post.description))} visible={post.visible !== false} />
+        </div>
       </div>
     </article>
     <PostPager postId={post.id} universe="notes" seedPosts={seedPosts} />

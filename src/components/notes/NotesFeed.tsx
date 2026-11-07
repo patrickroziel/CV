@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { SocialPost } from "@/lib/types";
+import { visibleCoverUrl } from "@/lib/post-publication";
 import { NOTES_CATEGORIES, coercePostCategory, collectPostTags, type NotesCategory } from "@/lib/post-taxonomy";
 
 type Scope = "Tout" | NotesCategory;
@@ -71,6 +72,13 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       (post.tags ?? []).some((tag) => tag.toLowerCase() === activeTag.toLowerCase())
     );
   }, [scopedPosts, activeTag]);
+
+  const pinnedPosts = useMemo(() => {
+    return [...visiblePosts]
+      .filter((post) => post.pinned)
+      .sort((a, b) => (b.pinnedAt || "").localeCompare(a.pinnedAt || ""))
+      .slice(0, 6);
+  }, [visiblePosts]);
 
   const bookChapters = useMemo(
     () => posts.filter((post) => categoryOf(post) === "Livre"),
@@ -205,6 +213,32 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       </aside>
 
       <section className="min-w-0">
+        {pinnedPosts.length > 0 ? (
+          <div className="mb-7">
+            <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-cyan-100/50">Posts épinglés</p>
+            <div className="space-y-2">
+              {pinnedPosts.map((post) => {
+                const title = l(post.title).trim() || "Sans titre";
+                const visual = visibleCoverUrl(post)
+                  || (post.featuredEmbed?.type === "image" ? post.featuredEmbed.url : null)
+                  || (post.fileKind === "image" ? post.fileUrl : null);
+                return (
+                  <Link key={post.id} href={`/notes/${post.id}`} className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-[rgba(3,16,20,0.72)] p-2 pr-4 shadow-xl backdrop-blur-xl transition hover:border-cyan-100/25">
+                    <span className="relative h-14 w-24 shrink-0 overflow-hidden rounded-xl bg-black/40">
+                      {visual ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={visual} alt="" className="h-full w-full object-cover" />
+                      ) : null}
+                    </span>
+                    <span className="min-w-0 flex-1 break-words text-sm font-semibold leading-5 text-white">{title}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ) : editMode ? (
+          <p className="mb-7 text-xs text-zinc-500">Aucun post épinglé. Tu peux en épingler jusqu’à 6.</p>
+        ) : null}
         <header className="mb-7 flex min-w-0 flex-col gap-4 border-b border-white/[0.07] pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-[0.24em] text-cyan-100/50">

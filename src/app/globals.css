@@ -1063,11 +1063,31 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   color: #fff !important;
 }
 
+.article-ink,
+.article-ink p,
+.article-ink li,
+.article-ink span,
+.article-ink div,
+.notes-force-white,
+.notes-force-white p,
+.notes-force-white li,
+.notes-force-white span,
+.notes-force-white div {
+  line-height: 1.7 !important;
+}
+
+.notes-preview-clamp {
+  max-height: calc(1.7em * 10);
+  overflow: hidden;
+}
+.notes-preview-clamp.is-faded {
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+}
+
 .article-sticky-head {
-  position: sticky;
-  top: 4.5rem;
-  z-index: 20;
-  padding: 0.85rem 1rem 0.75rem;
+  position: static;
+  padding: 1.15rem 1rem 0.35rem;
 }
 .air-read-meta {
   padding: 0.95rem 1.15rem 0;

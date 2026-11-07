@@ -18,6 +18,7 @@ type RichHtmlProps = {
   className?: string;
   as?: "p" | "div" | "span" | "h1" | "h2" | "h3";
   plain?: boolean;
+  lockLineHeight?: number;
 };
 
 /**
@@ -29,6 +30,7 @@ export function RichHtml({
   className,
   as: Tag = "div",
   plain = false,
+  lockLineHeight,
 }: RichHtmlProps) {
   const isHtml = useMemo(() => looksLikeHtml(html), [html]);
   const { lineHeight, body } = useMemo(
@@ -45,7 +47,7 @@ export function RichHtml({
 
   if (!html) return null;
 
-  const lhStyle = { lineHeight: formatLineHeight(lineHeight) };
+  const lhStyle = { lineHeight: formatLineHeight(lockLineHeight ?? lineHeight) };
 
   if (plain || !isHtml) {
     return (

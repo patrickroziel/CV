@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BookOpen, EyeOff, FileDown, Pencil, Trash2 } from "lucide-react";
+import { BookOpen, EyeOff, FileDown, Pencil, Pin, Trash2 } from "lucide-react";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { Button } from "@/components/ui/button";
 import { PostRichBody } from "@/components/medias/PostRichBody";
@@ -13,16 +14,35 @@ import { PostActions } from "@/components/medias/PostActions";
 import type { SocialPost, FeaturedEmbed } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
-import { stripHtml } from "@/lib/sanitize-html";
+import { shareExcerpt } from "@/lib/post-excerpt";
 import { cn } from "@/lib/utils";
+
+function PostPreview({ html, title, inlineMedia }: { html: string; title: string; inlineMedia?: SocialPost["inlineMedia"] }) {
+  const [open, setOpen] = useState(false);
+  const [overflows, setOverflows] = useState(true);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || open) return;
+    setOverflows(el.scrollHeight > el.clientHeight + 12);
+  }, [html, open]);
+  return (
+    <div>
+      <div ref={ref} className={open ? undefined : `notes-preview-clamp text-sm${overflows ? " is-faded" : ""}`}>
+        <PostRichBody html={html} inlineMedia={inlineMedia} title={title} className="min-w-0 max-w-full overflow-hidden text-sm text-zinc-100 [&_*]:max-w-full [&_a]:break-all" />
+      </div>
+      {!open && overflows ? (
+        <button type="button" onClick={() => setOpen(true)} className="mt-3 text-sm font-medium text-cyan-100 hover:text-white">
+          Lire plus...
+        </button>
+      ) : null}
+    </div>
+  );
+}
 
 function formatDate(iso: string) {
   const value = new Date(iso.length === 10 ? iso + "T12:00:00" : iso);
   return Number.isNaN(value.getTime()) ? iso : value.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-}
-function excerpt(html: string) {
-  const text = stripHtml(html).replace(/\[\[MEDIA:[a-zA-Z0-9_-]{8,80}\]\]/g, "").replace(/\s+/g, " ").trim();
-  return text.length > 260 ? text.slice(0, 260).trimEnd() + "…" : text;
 }
 export function SocialPostCard({ post, index, onEdit, onTagClick }: {
   post: SocialPost;
@@ -30,7 +50,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
   onEdit: (post: SocialPost) => void;
   onTagClick?: (tag: string) => void;
 }) {
-  const { l, editMode, removeSocialPost } = usePortfolio();
+  const { l, editMode, removeSocialPost, updateSocialPost, data } = usePortfolio();
   const title = l(post.title).trim() || (editMode && !post.visible ? "Brouillon sans titre" : "");
   const description = l(post.description);
   const category = coercePostCategory(post);
@@ -72,6 +92,20 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
               {post.subtitle && <p className="mt-1 break-words text-sm leading-6 text-zinc-400">{l(post.subtitle)}</p>}
             </div>
             {editMode && <div className="flex shrink-0 items-center gap-1">
+              <Button type="button" variant="ghost" size="icon" className={cn("h-8 w-8", post.pinned ? "text-cyan-100" : "text-zinc-400")} title={post.pinned ? "Retirer l'épingle" : "Épingler"} onClick={() => {
+                if (post.pinned) {
+                  updateSocialPost(post.id, { pinned: false, pinnedAt: null });
+                  return;
+                }
+                const pinnedCount = (data.socialPosts ?? []).filter((item) => item.universe !== "air" && item.pinned && item.id !== post.id).length;
+                if (pinnedCount >= 6) {
+                  window.alert("Six posts sont déjà épinglés.");
+                  return;
+                }
+                updateSocialPost(post.id, { pinned: true, pinnedAt: new Date().toISOString() });
+              }}>
+                <Pin className="h-4 w-4" />
+              </Button>
               <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-zinc-400" title="Modifier" onClick={() => onEdit(post)}>
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -92,11 +126,9 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
           }
 
           {teaser ? (
-            <p className="text-sm leading-6 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
-          ) : description ? isBook ? (
-            <p className="break-words text-sm leading-6 text-zinc-400">{excerpt(description)}</p>
-          ) : (
-            <PostRichBody html={description} inlineMedia={post.inlineMedia} title={title} className="min-w-0 max-w-full overflow-hidden text-sm leading-6 text-zinc-300 [&_*]:max-w-full [&_a]:break-all" />
+            <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
+          ) : description ? (
+            <PostPreview html={description} title={title} inlineMedia={isBook ? undefined : post.inlineMedia} />
           ) : null}
 
           {post.tags?.length ? <ul className="flex min-w-0 flex-wrap gap-1.5">
@@ -118,7 +150,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
             <Link href={`/notes/${post.id}`} className="inline-flex w-fit items-center rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3.5 py-2 text-sm font-medium text-cyan-50 hover:bg-cyan-400/20">
               {isBook ? "Lire le chapitre" : "Ouvrir le post"} →
             </Link>
-            <PostActions postId={post.id} title={title} visible={post.visible !== false} />
+            <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(description)} visible={post.visible !== false} />
           </div>
         </div>
       </GlassCard>

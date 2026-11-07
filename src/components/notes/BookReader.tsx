@@ -11,6 +11,7 @@ import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { shareExcerpt } from "@/lib/post-excerpt";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import type { SocialPost } from "@/lib/types";
 
@@ -147,7 +148,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
             </>
           )}
           <div className="mt-8">
-            <PostActions postId={post.id} title={title} visible={post.visible !== false} />
+            <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(body)} visible={post.visible !== false} />
           </div>
         </div>
       </article>

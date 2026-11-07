@@ -776,6 +776,10 @@ export type SocialPost = {
   noticeReply?: Translatable;
   /** Lower = higher in the list */
   order: number;
+  /** Notes homepage. At most six posts stay pinned. */
+  pinned?: boolean;
+  /** When the post was pinned, so the strip keeps a stable order. */
+  pinnedAt?: string | null;
 };
 
 /** Editable headings for the Médias universe */

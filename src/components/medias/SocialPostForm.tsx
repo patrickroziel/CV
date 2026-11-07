@@ -178,6 +178,7 @@ export function SocialPostForm({
   const [subtitle, setSubtitle] = useState<LocalizedString>(liftToLocalized(initial?.subtitle));
   const [episode, setEpisode] = useState(initial?.episode?.trim() ?? "");
   const [noticesHidden, setNoticesHidden] = useState(initial?.noticesHidden === true);
+  const [pinned, setPinned] = useState(initial?.pinned === true);
   const [noticeIntro, setNoticeIntro] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeIntro, AIR_NOTICE_INTRO)));
   const [noticeReply, setNoticeReply] = useState<LocalizedString>(liftToLocalized(airNoticeHtml(initial?.noticeReply, AIR_NOTICE_REPLY)));
   const noticesTouched = useRef(false);
@@ -505,6 +506,10 @@ export function SocialPostForm({
     bookPdfName,
     coverSource: cover.coverSource,
     contentHidden,
+    ...(universe === "air" ? {} : {
+      pinned,
+      pinnedAt: pinned ? (initial?.pinnedAt || new Date().toISOString()) : null,
+    }),
     noticesHidden: universe === "air" ? noticesHidden : undefined,
     noticeIntro: universe === "air" ? noticeIntro : undefined,
     noticeReply: universe === "air" ? noticeReply : undefined,
@@ -636,6 +641,31 @@ export function SocialPostForm({
         onChange={setTitle}
         placeholder={isBook ? "Ex. Chapitre 1 — Le départ" : "Titre du post"}
       />
+      )}
+      {universe !== "air" && (
+        <button
+          type="button"
+          onClick={() => {
+            if (!pinned) {
+              const count = (portfolioData.socialPosts ?? []).filter((post) => post.universe !== "air" && post.pinned && post.id !== initial?.id).length;
+              if (count >= 6) {
+                setError("Six posts sont déjà épinglés.");
+                return;
+              }
+            }
+            setError(null);
+            setPinned((value) => !value);
+          }}
+          className={cn(
+            "w-fit rounded-xl border px-3 py-2.5 text-left text-sm transition",
+            pinned
+              ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50"
+              : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+          )}
+        >
+          <span className="block font-medium">{pinned ? "Épinglé sur l’accueil" : "Épingler sur l’accueil"}</span>
+          <span className="mt-0.5 block text-xs font-normal text-zinc-400">Jusqu’à 6 posts, avec leur visuel et leur titre.</span>
+        </button>
       )}
       {universe === "air" && (
       <LocalizedField

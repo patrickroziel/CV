@@ -11,13 +11,14 @@ import { looksLikeHtml } from "@/lib/sanitize-html";
 function withoutSavedColor(html: string) {
   return html
     .replace(/\sdata-rich-color=(?:"[^"]*"|'[^']*')/gi, "")
+    .replace(/\sdata-rich-lh=(?:"[^"]*"|'[^']*')/gi, "")
     .replace(/\sstyle=("([^"]*)"|'([^']*)')/gi, (_match, _quoted, doubleQuoted: string | undefined, singleQuoted: string | undefined) => {
       const raw = doubleQuoted ?? singleQuoted ?? "";
       const quote = doubleQuoted != null ? '"' : "'";
       const kept = raw
         .split(";")
         .map((part) => part.trim())
-        .filter((part) => part && !/^color\s*:/i.test(part));
+        .filter((part) => part && !/^color\s*:/i.test(part) && !/^line-height\s*:/i.test(part));
       return kept.length ? ` style=${quote}${kept.join("; ")}${quote}` : "";
     });
 }
@@ -48,7 +49,7 @@ export function PostRichBody({ html, inlineMedia, title, className }: {
 }) {
   const embeds = normalizeInlinePostMedia(inlineMedia);
   // Existing posts without inline media remain unchanged.
-  if (!embeds.length) return <RichHtml html={withoutSavedColor(html)} className={inkClass(className)} />;
+  if (!embeds.length) return <RichHtml html={withoutSavedColor(html)} className={inkClass(className)} lockLineHeight={1.7} />;
   const isMarkup = looksLikeHtml(html);
   const { body, lineHeight } = isMarkup ? extractRichSpacing(html) : { body: html, lineHeight: DEFAULT_LINE_HEIGHT };
   const segments: Segment[] = [];
@@ -69,7 +70,7 @@ export function PostRichBody({ html, inlineMedia, title, className }: {
   const unplaced = embeds.filter(media => !located.has(media.id));
   if (!located.size) {
     return <div className="min-w-0 space-y-5">
-      <RichHtml html={withoutSavedColor(html)} className={inkClass(className)} />
+      <RichHtml html={withoutSavedColor(html)} className={inkClass(className)} lockLineHeight={1.7} />
       {unplaced.map(media => <div key={media.id} className="min-w-0">
         <EmbeddedItem item={media} title={title} />
       </div>)}
@@ -83,7 +84,7 @@ export function PostRichBody({ html, inlineMedia, title, className }: {
       }
       if (!segment.html.trim()) return null;
       const part = isMarkup ? wrapWithRichSpacing(segment.html, lineHeight) : segment.html;
-      return <RichHtml key={i} html={withoutSavedColor(part)} className={inkClass(className)} />;
+      return <RichHtml key={i} html={withoutSavedColor(part)} className={inkClass(className)} lockLineHeight={1.7} />;
     })}
     {unplaced.map(media => <div key={media.id} className="min-w-0">
       <EmbeddedItem item={media} title={title} />

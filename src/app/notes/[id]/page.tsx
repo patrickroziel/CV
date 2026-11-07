@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { ArticleJsonLd } from "@/components/seo/JsonLd";
 import { EntryReader } from "@/components/notes/EntryReader";
 import {
-  getNoteSharePhoto,
   getNoteShareText,
   getPublicNote,
   listPublicPosts,
@@ -47,7 +46,6 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
   if (share) preview.searchParams.set("share", share);
   if (lang) preview.searchParams.set("lang", lang);
   const image = shareImageUrl(id, lang);
-  const imageType = getNoteSharePhoto(post) ? "image/jpeg" : "image/png";
 
   return {
     metadataBase: new URL(NOTES_ORIGIN),
@@ -69,7 +67,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
         secureUrl: image,
         width: 1200,
         height: 630,
-        type: imageType,
+        type: "image/png",
         alt: title,
       }],
     },
