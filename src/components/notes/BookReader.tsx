@@ -9,6 +9,7 @@ import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
+import { NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { shareExcerpt } from "@/lib/post-excerpt";
@@ -87,8 +88,10 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
         <RichHtml html={airNoticeHtml(post.noticeIntro, BOOK_NOTICE)} className="mt-6 text-[13px] italic leading-relaxed text-white/55" />
       ) : null}
 
-      <article className={`${showNotice ? "mt-4" : "mt-6"} min-w-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]`}>
-        <PostCover post={post} className="border-b border-white/10" />
+      <article className={`${showNotice ? "mt-4" : "mt-6"} min-w-0 overflow-visible rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl sm:rounded-[2rem]`}>
+        <div className="overflow-hidden rounded-t-[1.7rem] sm:rounded-t-[1.95rem]">
+          <PostCover post={post} className="border-b border-white/10" />
+        </div>
 
         <div className="min-w-0 p-4 sm:p-8 md:p-10">
           <div className="flex min-w-0 flex-wrap items-center gap-2 text-[11px] tracking-[0.04em] text-cyan-100/50">
@@ -98,7 +101,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
             {teaser ? <><span aria-hidden>·</span><span>{TEASER_LABEL}</span></> : null}
           </div>
 
-          <h1 className="mt-4 max-w-full break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
+          <h1 id={`note-title-${post.id}`} className="mt-4 max-w-full break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
             {title}
           </h1>
           {subtitle ? (
@@ -106,6 +109,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
               {subtitle}
             </p>
           ) : null}
+          {!teaser ? <NotesFloatingStack postId={post.id} title={title} /> : null}
 
           {post.tags?.length ? (
             <div className="mt-5 flex min-w-0 flex-wrap gap-1.5">
@@ -123,6 +127,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
 
           <div className="my-7 h-px bg-white/[0.07] sm:my-9" />
 
+          <div id={`note-body-${post.id}`}>
           {teaser ? (
             <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
           ) : (
@@ -133,7 +138,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
             </div>
           )}
           <PostRichBody
-            html={body}
+            html={stampNotePartAnchors(body, post.id)}
             inlineMedia={post.inlineMedia}
             title={title}
             className="notes-force-white book-reading-text min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-white sm:text-base sm:leading-7 [&_*]:max-w-full [&_a]:break-all"
@@ -154,6 +159,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
           ) : null}
             </>
           )}
+          </div>
           <div className="mt-8">
             <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(body)} visible={post.visible !== false} />
           </div>

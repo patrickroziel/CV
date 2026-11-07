@@ -15,6 +15,7 @@ import type { SocialPost, FeaturedEmbed } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { shareExcerpt } from "@/lib/post-excerpt";
+import { notePartAnchor, notePartTitles } from "@/components/medias/ArticlePartNav";
 import { cn } from "@/lib/utils";
 
 function PostPreview({ html, title, inlineMedia }: { html: string; title: string; inlineMedia?: SocialPost["inlineMedia"] }) {
@@ -56,6 +57,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
   const category = coercePostCategory(post);
   const isBook = category === "Livre";
   const teaser = isTeaserPost(post);
+  const parts = teaser ? [] : notePartTitles(description);
   const featured: FeaturedEmbed | null = teaser ? null : (post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null));
 
   return (
@@ -90,6 +92,16 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
                 <Link href={`/notes/${post.id}`} className="hover:text-cyan-100">{title}</Link>
               </h3>
               {post.subtitle && <p className="mt-1 break-words text-sm leading-6 text-zinc-400">{l(post.subtitle)}</p>}
+              {parts.length ? (
+                <div className="air-part-stack mt-3">
+                  {parts.map((part) => (
+                    <Link key={part.index} href={`/notes/${post.id}#${notePartAnchor(post.id, part.index)}`} className="air-part-float is-notes" title={part.label}>
+                      <span className="air-part-num">{part.index + 1}</span>
+                      <span className="air-part-name">{part.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
             </div>
             {editMode && <div className="flex shrink-0 items-center gap-1">
               <Button type="button" variant="ghost" size="icon" className={cn("h-8 w-8", post.pinned ? "text-cyan-100" : "text-zinc-400")} title={post.pinned ? "Retirer l'épingle" : "Épingler"} onClick={() => {

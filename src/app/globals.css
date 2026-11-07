@@ -1249,6 +1249,59 @@ a.air-part-float:hover {
   border-color: rgba(255, 255, 255, 0.55);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
+.air-part-float.is-notes,
+.air-part-morph.is-notes,
+.air-part-morph.is-notes.is-compact {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(8, 18, 24, 0.92);
+  color: #fff;
+}
+.air-part-float.is-notes.is-current {
+  border-color: rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+.air-part-float.is-notes.is-landed {
+  animation-name: notes-part-land;
+}
+@keyframes notes-part-land {
+  from { background-color: rgba(255, 255, 255, 0.28); }
+  to { background-color: rgba(8, 18, 24, 0.92); }
+}
+.notes-read-head {
+  position: sticky;
+  top: 4.35rem;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+body:has(header[data-editing="true"]) .notes-read-head {
+  top: 6.45rem;
+}
+.notes-title-pill {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(8, 18, 24, 0.92);
+  padding: 0.4rem 0.95rem;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+}
+.notes-title-pill span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .air-part-float.is-arriving {
   opacity: 0;
 }

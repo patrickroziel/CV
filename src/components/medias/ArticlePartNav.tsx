@@ -5,13 +5,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 type Part = { id: string; label: string; n: number };
 type Flight = { id: string; from: DOMRect; to?: DOMRect; label: string; n: number; towardChip: boolean };
 
-function flyMorph(from: DOMRect, to: DOMRect, label: string, n: number, towardChip: boolean, onDone: () => void) {
+function flyMorph(from: DOMRect, to: DOMRect, label: string, n: number, towardChip: boolean, notes: boolean, onDone: () => void) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || to.width < 2) {
     onDone();
     return () => {};
   }
   const el = document.createElement("div");
-  el.className = towardChip ? "air-part-morph" : "air-part-morph is-compact";
+  el.className = `${towardChip ? "air-part-morph" : "air-part-morph is-compact"}${notes ? " is-notes" : ""}`;
   const num = document.createElement("span");
   num.className = "air-part-num";
   num.textContent = String(n);
@@ -36,6 +36,7 @@ function flyMorph(from: DOMRect, to: DOMRect, label: string, n: number, towardCh
   };
   const start = window.setTimeout(() => {
     el.classList.toggle("is-compact", towardChip);
+    if (notes) el.classList.add("is-notes");
     place(to);
   }, 24);
   const end = window.setTimeout(finish, 520);
@@ -58,7 +59,33 @@ function expandedRect(el: HTMLElement) {
   return rect;
 }
 
-export function ArticlePartNav({ targetId }: { targetId: string }) {
+export function notePartAnchor(postId: string, index: number) {
+  return `part-${index}-note-body-${postId}`;
+}
+
+export function stampNotePartAnchors(html: string, postId: string) {
+  let index = 0;
+  return html.replace(/<h2\b([^>]*\bair-part-title\b[^>]*)>/gi, (_full, attrs: string) => {
+    const id = notePartAnchor(postId, index);
+    index += 1;
+    if (/\sid\s*=/i.test(attrs)) return `<h2${attrs}>`;
+    return `<h2 id="${id}"${attrs}>`;
+  });
+}
+
+export function notePartTitles(html: string) {
+  const titles: { label: string; index: number }[] = [];
+  const pattern = /<h2\b[^>]*\bair-part-title\b[^>]*>([\s\S]*?)<\/h2>/gi;
+  let index = 0;
+  for (const match of html.matchAll(pattern)) {
+    const text = (match[1] ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    if (text && text.toLocaleLowerCase("fr") !== "titre de la partie") titles.push({ label: text, index });
+    index += 1;
+  }
+  return titles;
+}
+
+export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; tone?: "air" | "notes" }) {
   const [parts, setParts] = useState<Part[]>([]);
   const [arriving, setArriving] = useState<string[]>([]);
   const [landed, setLanded] = useState<string | null>(null);
@@ -88,7 +115,7 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
 
     let primed = false;
     const pick = () => {
-      const title = root.closest("article")?.querySelector(".air-title-pill");
+      const title = root.closest("article")?.querySelector(".notes-title-pill, .air-title-pill");
       const line = title ? title.getBoundingClientRect().bottom : 160;
       const stuck = heads.filter((el) => el.getBoundingClientRect().top < line - 8);
       const nextIds = stuck.map((el) => el.id);
@@ -165,7 +192,7 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
       return;
     }
     if (flight.towardChip) document.getElementById(flight.id)?.classList.add("air-part-held");
-    cancelFlight.current = flyMorph(flight.from, to, flight.label, flight.n, flight.towardChip, () => {
+    cancelFlight.current = flyMorph(flight.from, to, flight.label, flight.n, flight.towardChip, tone === "notes", () => {
       cancelFlight.current = null;
       flying.current = false;
       const el = document.getElementById(flight.id);
@@ -199,6 +226,7 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
             aria-current={current ? "true" : undefined}
             className={[
               "air-part-float",
+              tone === "notes" ? "is-notes" : "",
               current ? "is-current" : "",
               arriving.includes(part.id) ? "is-arriving" : "",
               landed === part.id ? "is-landed" : "",
@@ -217,6 +245,37 @@ export function ArticlePartNav({ targetId }: { targetId: string }) {
           </a>
         );
       })}
+    </div>
+  );
+}
+
+export function NotesFloatingStack({ postId, title }: { postId: string; title: string }) {
+  const [raised, setRaised] = useState(false);
+  useEffect(() => {
+    const titleEl = document.getElementById(`note-title-${postId}`);
+    const onScroll = () => {
+      if (!titleEl) return;
+      setRaised(titleEl.getBoundingClientRect().bottom < 78);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [postId]);
+  return (
+    <div className="notes-read-head">
+      {raised ? (
+        <a href={`#note-title-${postId}`} className="notes-title-pill" onClick={(event) => {
+          event.preventDefault();
+          document.getElementById(`note-title-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}>
+          <span>{title}</span>
+        </a>
+      ) : null}
+      <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
     </div>
   );
 }
