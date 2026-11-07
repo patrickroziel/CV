@@ -45,8 +45,15 @@ async function coverJpeg(url: string, width: number, height: number) {
   }
 }
 
-function previewCard(title: string, subtitle: string, category: string, photo: string | null, story: boolean) {
-  const titleSize = story ? (title.length > 48 ? 58 : 72) : (title.length > 48 ? 42 : 54);
+function previewCard(
+  title: string,
+  subtitle: string,
+  category: string,
+  photo: string | null,
+  story: boolean,
+  air: boolean,
+) {
+  const titleSize = story ? (title.length > 48 ? 52 : 64) : (title.length > 48 ? 36 : 46);
   const subtitleSize = story ? 36 : 28;
   return (
     <div style={{
@@ -67,7 +74,7 @@ function previewCard(title: string, subtitle: string, category: string, photo: s
         position: "relative", width: "100%", height: "100%",
         padding: story ? "0 80px" : "0 72px", textAlign: "center",
       }}>
-        {category ? (
+        {!air && category ? (
           <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -80,15 +87,42 @@ function previewCard(title: string, subtitle: string, category: string, photo: s
             </div>
           </div>
         ) : null}
-        <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: category ? (story ? 28 : 18) : 0 }}>
-          <div style={{
-            display: "flex", maxWidth: story ? 880 : 980, fontSize: titleSize, fontWeight: 600,
-            lineHeight: 1.12, letterSpacing: -1, color: "#ffffff", textAlign: "center",
-          }}>
-            {title.slice(0, 140)}
+        {air && subtitle ? (
+          <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: 999, border: "1px solid rgba(185,228,255,0.75)",
+              backgroundColor: "rgba(3,16,20,0.28)",
+              padding: story ? "12px 28px" : "8px 18px",
+              fontSize: story ? 26 : 18, fontWeight: 600, letterSpacing: 1.2, color: "#d7f3ff",
+              textAlign: "center",
+            }}>
+              {subtitle.slice(0, 120)}
+            </div>
           </div>
-        </div>
-        {subtitle ? (
+        ) : null}
+        {air ? (
+          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: subtitle ? (story ? 28 : 18) : 0 }}>
+            <div style={{
+              display: "flex", maxWidth: story ? 900 : 980, borderRadius: 28,
+              border: "1px solid rgba(255,255,255,0.35)", backgroundColor: "#305080",
+              padding: story ? "22px 36px" : "16px 28px",
+              fontSize: titleSize, fontWeight: 700, lineHeight: 1.15, color: "#ffffff", textAlign: "center",
+            }}>
+              {title.slice(0, 140)}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: category ? (story ? 28 : 18) : 0 }}>
+            <div style={{
+              display: "flex", maxWidth: story ? 880 : 980, fontSize: titleSize + 8, fontWeight: 600,
+              lineHeight: 1.12, letterSpacing: -1, color: "#ffffff", textAlign: "center",
+            }}>
+              {title.slice(0, 140)}
+            </div>
+          </div>
+        )}
+        {!air && subtitle ? (
           <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: story ? 24 : 16 }}>
             <div style={{
               display: "flex", maxWidth: story ? 860 : 920, fontSize: subtitleSize, fontWeight: 700,
@@ -121,7 +155,12 @@ export async function GET(
   const translated = await translateShareText(french.title, french.subtitle || " ", lang);
   const title = translated.title;
   const subtitle = french.subtitle ? translated.description.trim() : "";
-  const category = (await translateShareText(coercePostCategory(post), " ", lang)).title;
+  const series = post.universe === "air" && post.episode?.trim()
+    ? [subtitle, `Épisode ${post.episode.trim().replace(/^épisode\s+/i, "")}`].filter(Boolean).join(" · ")
+    : subtitle;
+  const category = post.universe === "air"
+    ? ""
+    : (await translateShareText(coercePostCategory(post), " ", lang)).title;
   let photoSrc: string | null = null;
   const photo = getNoteSharePhoto(post);
   if (photo) {
@@ -129,7 +168,7 @@ export async function GET(
     if (jpeg) photoSrc = `data:image/jpeg;base64,${jpeg.toString("base64")}`;
   }
 
-  const rendered = new ImageResponse(previewCard(title, subtitle, category, photoSrc, story), {
+  const rendered = new ImageResponse(previewCard(title, series, category, photoSrc, story, post.universe === "air"), {
     width,
     height,
   });
