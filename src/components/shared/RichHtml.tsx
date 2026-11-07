@@ -12,6 +12,7 @@ import {
   stripHtml,
 } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
+import { shrinkHostedImages } from "@/lib/display-image";
 
 type RichHtmlProps = {
   html: string;
@@ -41,7 +42,7 @@ export function RichHtml({
     [html, isHtml]
   );
   const safe = useMemo(
-    () => (isHtml ? sanitizeBioHtml(body) : body),
+    () => (isHtml ? shrinkHostedImages(sanitizeBioHtml(body)) : body),
     [body, isHtml]
   );
 

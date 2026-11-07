@@ -5,6 +5,7 @@ import type { FeaturedEmbed } from "@/lib/types";
 import { normalizeFeaturedEmbed } from "@/lib/featured-embed";
 import { XEmbed } from "@/components/projects/XEmbed";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
+import { displayImageUrl } from "@/lib/display-image";
 import { isVercelBlobUrl } from "@/lib/blob-upload";
 
 function isBlockedMedia(url: string | null | undefined) {
@@ -97,7 +98,7 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
       return <WorkInProgress className="aspect-video max-h-[420px] w-full rounded-2xl" />;
     }
     return <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-      <img src={featured.url} alt={title || "Image intégrée"} loading="lazy" referrerPolicy="no-referrer"
+      <img src={displayImageUrl(featured.url, 1200)} alt={title || "Image intégrée"} loading="lazy" decoding="async" referrerPolicy="no-referrer"
         className="absolute inset-0 h-full w-full object-cover object-center" />
     </div>;
   }

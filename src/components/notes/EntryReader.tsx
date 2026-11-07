@@ -13,6 +13,7 @@ import { NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/Ar
 import { shareExcerpt } from "@/lib/post-excerpt";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { displayImageUrl } from "@/lib/display-image";
 import type { FeaturedEmbed, SocialPost } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -62,7 +63,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
         {post.fileKind === "image" && post.fileUrl && post.fileUrl !== featured?.url && post.fileUrl !== post.bookCoverUrl &&
           <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.fileUrl} alt={title} className="absolute inset-0 h-full w-full object-cover object-center" />
+            <img src={displayImageUrl(post.fileUrl, 1200)} alt={title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-center" />
           </div>}
         <PostRichBody html={stampNotePartAnchors(l(post.description), post.id)} inlineMedia={post.inlineMedia} title={title} className="notes-force-white min-w-0 max-w-full overflow-hidden text-[15px] text-white [&_*]:max-w-full [&_a]:break-all" />
         {post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"

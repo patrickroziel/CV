@@ -12,6 +12,7 @@ import {
   DEFAULT_ALPHA_VIDEO_OPACITY,
   type BackgroundImage,
 } from "@/lib/types";
+import { displayImageUrl } from "@/lib/display-image";
 import { universeFromPath } from "@/lib/universe";
 
 function fallbackBackground(data: {
@@ -152,8 +153,10 @@ export function Wallpaper() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={img.url}
+          src={displayImageUrl(img.url, 1920)}
           alt=""
+          loading="lazy"
+          decoding="async"
           className={`${isAir ? "air-wallpaper-breathe" : "wallpaper-kenburns"} absolute inset-0 h-full w-full object-cover`}
           style={{ opacity: op, objectPosition: isAir ? "center 30%" : undefined }}
           draggable={false}

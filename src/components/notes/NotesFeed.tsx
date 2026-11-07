@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { SocialPost } from "@/lib/types";
+import { displayImageUrl } from "@/lib/display-image";
 import { visibleCoverUrl } from "@/lib/post-publication";
 import { NOTES_CATEGORIES, coercePostCategory, collectPostTags, type NotesCategory } from "@/lib/post-taxonomy";
 
@@ -228,7 +229,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                     <span className="relative h-14 w-16 shrink-0 overflow-hidden rounded-xl bg-black/40 sm:w-24">
                       {visual ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={visual} alt="" className="h-full w-full object-cover" />
+                        <img src={displayImageUrl(visual, 256)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                       ) : null}
                     </span>
                     <span className="min-w-0 flex-1">

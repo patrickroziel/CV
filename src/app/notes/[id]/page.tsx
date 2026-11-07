@@ -9,23 +9,23 @@ import {
   NOTES_ORIGIN,
   titleForSearch,
 } from "@/lib/server/notes-sharing";
-import { openGraphLocale, requestedShareLanguage, shareImageUrl, translateShareText } from "@/lib/server/share-locale";
+import { shareImageUrl } from "@/lib/server/share-locale";
 
 // Published content lives in Neon. Public HTML can lag a save by one minute.
+// Query strings are ignored on purpose: reading them made every article dynamic
+// and forced a fresh database read on each visit.
 export const runtime = "nodejs";
 export const revalidate = 60;
 
 type NoteParams = {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ share?: string | string[]; lang?: string | string[] }>;
 };
 
-export async function generateMetadata({ params, searchParams }: NoteParams): Promise<Metadata> {
+export async function generateMetadata({ params }: NoteParams): Promise<Metadata> {
   const { id } = await params;
   const post = await getPublicNote(id);
 
   if (!post || post.universe === "air") {
-    // Never reveal titles, descriptions or draft images in public previews.
     return {
       title: "Publication indisponible — Patrick Roziel",
       description: "Cette publication n'est pas disponible.",
@@ -35,37 +35,22 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
 
   const french = getNoteShareText(post);
   const url = `${NOTES_ORIGIN}/notes/${encodeURIComponent(id)}`;
-  // Give X and Facebook a distinct URL for each voluntary share so they can
-  // re-fetch stale preview data. Keep the page's SEO canonical on the clean URL.
-  const query = await searchParams;
-  const share = typeof query?.share === "string" && /^[a-z0-9]{8,24}$/.test(query.share)
-    ? query.share
-    : null;
-  const lang = requestedShareLanguage(query?.lang);
-  const { title, description } = await translateShareText(french.title, french.description, lang);
-  const subtitle = french.subtitle
-    ? (await translateShareText(french.subtitle, french.subtitle, lang)).title
-    : "";
-  const cardText = subtitle || description;
-  const linkTitle = subtitle ? `${title} — ${subtitle}` : title;
-  const preview = new URL(url);
-  if (share) preview.searchParams.set("share", share);
-  if (lang) preview.searchParams.set("lang", lang);
-  const image = shareImageUrl(id, lang, getNoteSharePhoto(post));
+  const subtitle = french.subtitle;
+  const cardText = subtitle || french.description;
+  const linkTitle = subtitle ? `${french.title} — ${subtitle}` : french.title;
+  const image = shareImageUrl(id, null, getNoteSharePhoto(post));
 
   return {
     metadataBase: new URL(NOTES_ORIGIN),
-    title: `${titleForSearch(title)} — Patrick Roziel`,
-    description,
-    alternates: { canonical: lang ? preview.toString() : url },
-    robots: share || lang
-      ? { index: false, follow: true }
-      : { index: true, follow: true },
+    title: `${titleForSearch(french.title)} — Patrick Roziel`,
+    description: french.description,
+    alternates: { canonical: url },
+    robots: { index: true, follow: true },
     openGraph: {
       type: "article",
-      locale: openGraphLocale(lang),
+      locale: "fr_FR",
       siteName: "Patrick Roziel — Notes",
-      url: preview.toString(),
+      url,
       title: linkTitle,
       description: cardText,
       images: [{
@@ -74,7 +59,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
         width: 1200,
         height: 630,
         type: "image/jpeg",
-        alt: title,
+        alt: french.title,
       }],
     },
     twitter: {

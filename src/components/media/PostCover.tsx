@@ -4,6 +4,7 @@ import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { isWipCover, visibleCoverUrl } from "@/lib/post-publication";
 import type { SocialPost } from "@/lib/types";
+import { displayImageUrl } from "@/lib/display-image";
 import { cn } from "@/lib/utils";
 
 export function PostCover({
@@ -39,9 +40,10 @@ export function PostCover({
     <div className={frame}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={src}
+        src={displayImageUrl(src, 1200)}
         alt={alt}
         loading="lazy"
+        decoding="async"
         referrerPolicy="no-referrer"
         className="h-full w-full object-cover"
     />

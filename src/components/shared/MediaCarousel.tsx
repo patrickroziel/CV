@@ -15,6 +15,7 @@ import {
   VolumeX,
   Play,
 } from "lucide-react";
+import { displayImageUrl } from "@/lib/display-image";
 import type { MediaItem } from "@/lib/types";
 import { getL } from "@/lib/i18n-content";
 import {
@@ -239,8 +240,10 @@ function MediaCard({ item }: { item: MediaItem }) {
       {kind === "image" && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={item.url}
+          src={displayImageUrl(item.url, 828)}
           alt={caption || "Média"}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
           draggable={false}
           referrerPolicy="no-referrer"

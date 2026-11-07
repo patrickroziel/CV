@@ -6,6 +6,34 @@ import { SITE_LANGUAGE_CODES, SITE_LANGUAGE_STORAGE_KEY } from "@/lib/site-trans
 type ResponseState = { available?: boolean; count?: number; liked?: boolean };
 type ShareTarget = "x" | "facebook" | "instagram" | "youtube" | "whatsapp" | "linkedin" | "telegram" | "threads" | "bluesky" | "pinterest" | "email" | "copy" | "more";
 
+const pendingLikes = new Map<string, Array<(state: ResponseState) => void>>();
+let likeFlush: ReturnType<typeof setTimeout> | null = null;
+
+function loadLike(postId: string): Promise<ResponseState> {
+  return new Promise((resolve) => {
+    const waiters = pendingLikes.get(postId) ?? [];
+    waiters.push(resolve);
+    pendingLikes.set(postId, waiters);
+    if (likeFlush) return;
+    likeFlush = setTimeout(() => {
+      likeFlush = null;
+      const batch = new Map(pendingLikes);
+      pendingLikes.clear();
+      const ids = [...batch.keys()];
+      const finish = (posts: Record<string, ResponseState>) => {
+        for (const [id, waiters] of batch) {
+          const state = posts[id] ?? { available: false, count: 0, liked: false };
+          for (const waiter of waiters) waiter(state);
+        }
+      };
+      fetch(`/api/notes/likes?ids=${encodeURIComponent(ids.join(","))}`, { cache: "no-store" })
+        .then((res) => res.ok ? res.json() as Promise<{ posts?: Record<string, ResponseState> }> : Promise.reject())
+        .then((body) => finish(body.posts ?? {}))
+        .catch(() => finish({}));
+    }, 40);
+  });
+}
+
 const SHARE_TARGETS: { id: ShareTarget; label: string }[] = [
   { id: "x", label: "X" },
   { id: "facebook", label: "Facebook" },
@@ -21,11 +49,7 @@ function selectedLanguage() {
 }
 
 function articleShareUrl(sharePath: string, postId: string) {
-  const shared = new URL(`${sharePath}/${encodeURIComponent(postId)}`, "https://patrickroziel.com");
-  shared.searchParams.set("share", Date.now().toString(36));
-  const lang = selectedLanguage();
-  if (lang) shared.searchParams.set("lang", lang);
-  return shared.toString();
+  return new URL(`${sharePath}/${encodeURIComponent(postId)}`, "https://patrickroziel.com").toString();
 }
 
 function coverShareUrl(postId: string, format?: "story") {
@@ -58,8 +82,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     setEnabled(false);
     setCount(0);
     setLiked(false);
-    fetch(`/api/notes/${encodeURIComponent(postId)}/likes`, { cache: "no-store" })
-      .then(res => res.ok ? res.json() as Promise<ResponseState> : Promise.reject())
+    loadLike(postId)
       .then(state => {
         if (!active) return;
         setEnabled(state.available === true);

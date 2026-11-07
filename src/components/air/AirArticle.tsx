@@ -10,6 +10,7 @@ import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
 import { getNoteSharePhotos } from "@/lib/notes-preview-image";
+import { displayImageUrl } from "@/lib/display-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
@@ -34,8 +35,10 @@ function ArticleCover({ sources, seriesLabel }: { sources: string[]; seriesLabel
           <WorkInProgress className="absolute inset-0" />
         ) : (
           <img
-            src={src}
+            src={displayImageUrl(src, 1200)}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="block h-full w-full object-cover object-center"
             onError={() => setIndex((current) => current + 1)}
           />

@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { displayImageUrl } from "@/lib/display-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
@@ -149,7 +150,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               {post.coverSource === "wip" ? (
                 <WorkInProgress className="blob-wip--fill" />
               ) : photo ? (
-                isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={photo} alt={title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={displayImageUrl(photo, 1200)} alt={title} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
               ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
               {seriesLabel ? (
                 <div className="air-cover-series">

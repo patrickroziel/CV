@@ -15,6 +15,7 @@ import type { SocialPost, FeaturedEmbed } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { shareExcerpt } from "@/lib/post-excerpt";
+import { displayImageUrl } from "@/lib/display-image";
 import { cn } from "@/lib/utils";
 
 function PostPreview({ html, title, inlineMedia }: { html: string; title: string; inlineMedia?: SocialPost["inlineMedia"] }) {
@@ -121,7 +122,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
           {!teaser && !isBook && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
             post.fileUrl !== featured?.url && <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/40">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={post.fileUrl} alt={title} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-center" />
+              <img src={displayImageUrl(post.fileUrl, 1200)} alt={title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-center" />
             </div>
           }
 

@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         hostname: "media.patrickroziel.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
   },
   async redirects() {
