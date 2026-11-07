@@ -7,11 +7,11 @@ type ResponseState = { available?: boolean; count?: number; liked?: boolean };
 type ShareTarget = "x" | "facebook" | "instagram" | "youtube" | "whatsapp" | "linkedin" | "telegram" | "threads" | "bluesky" | "pinterest" | "email" | "copy" | "more";
 
 const SHARE_TARGETS: { id: ShareTarget; label: string }[] = [
-  { id: "x", label: "X (Publications)" },
-  { id: "facebook", label: "Facebook (Publications)" },
-  { id: "instagram", label: "Instagram (Stories)" },
-  { id: "linkedin", label: "LinkedIn (Publications)" },
-  { id: "threads", label: "Threads (Publications)" },
+  { id: "x", label: "X" },
+  { id: "facebook", label: "Facebook" },
+  { id: "instagram", label: "Instagram" },
+  { id: "linkedin", label: "LinkedIn" },
+  { id: "threads", label: "Threads" },
   { id: "email", label: "Email" },
 ];
 
@@ -141,8 +141,9 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       const encodedUrl = encodeURIComponent(url);
       const encodedText = encodeURIComponent(text);
       const encodedTitle = encodeURIComponent(headline);
+      const tweet = encodeURIComponent([headline, summary.trim()].filter(Boolean).join("\n\n"));
       const hrefs: Partial<Record<ShareTarget, string>> = {
-        x: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+        x: `https://twitter.com/intent/tweet?text=${tweet}&url=${encodedUrl}`,
         facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
         whatsapp: `https://wa.me/?text=${encodedText}`,
         linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
