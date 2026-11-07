@@ -28,10 +28,11 @@ function articleShareUrl(sharePath: string, postId: string) {
   return shared.toString();
 }
 
-function coverShareUrl(postId: string) {
+function coverShareUrl(postId: string, format?: "story") {
   const lang = selectedLanguage();
   const image = new URL(`/api/notes/${encodeURIComponent(postId)}/share-image`, "https://patrickroziel.com");
   if (lang) image.searchParams.set("lang", lang);
+  if (format) image.searchParams.set("format", format);
   return image.toString();
 }
 
@@ -120,22 +121,28 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         return;
       }
       if (target === "instagram") {
-        const imageUrl = coverShareUrl(postId);
+        const imageUrl = coverShareUrl(postId, "story");
+        try { await navigator.clipboard.writeText(url); } catch { /* the image can still be shared */ }
         try {
           const response = await fetch(imageUrl);
           if (!response.ok) throw new Error();
           const blob = await response.blob();
-          const file = new File([blob], "patrick-roziel.jpg", { type: blob.type || "image/jpeg" });
+          const file = new File([blob], "story-patrick-roziel.png", { type: blob.type || "image/png" });
           if (navigator.canShare?.({ files: [file] })) {
-            await navigator.share({ files: [file], title: headline, text });
+            await navigator.share({ files: [file] });
+            setMessage("Dans Instagram, choisis Story. Le lien est copié pour le sticker.");
             return;
           }
+          const download = document.createElement("a");
+          download.href = URL.createObjectURL(blob);
+          download.download = "story-patrick-roziel.png";
+          download.click();
+          setMessage("Image Story téléchargée. Le lien est copié : ajoute-le dans la story.");
+          return;
         } catch (error) {
           if (error instanceof DOMException && error.name === "AbortError") return;
         }
-        await navigator.clipboard.writeText(text);
-        openPopup("https://www.instagram.com/");
-        setMessage("Image ou texte prêt. Choisis Instagram Story, puis colle le lien.");
+        setMessage("Le lien est copié. Ouvre Instagram, puis une story.");
         return;
       }
       const encodedUrl = encodeURIComponent(url);
