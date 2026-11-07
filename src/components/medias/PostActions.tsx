@@ -153,7 +153,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         x: `https://twitter.com/intent/tweet?text=${tweet}&url=${encodedUrl}`,
         facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
         whatsapp: `https://wa.me/?text=${encodedText}`,
-        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+        linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent([summary.trim(), url].filter(Boolean).join("\n\n"))}`,
         telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
         threads: `https://www.threads.net/intent/post?text=${encodedText}`,
         bluesky: `https://bsky.app/intent/compose?text=${encodedText}`,

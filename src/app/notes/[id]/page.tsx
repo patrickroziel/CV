@@ -42,6 +42,10 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
     : null;
   const lang = requestedShareLanguage(query?.lang);
   const { title, description } = await translateShareText(french.title, french.description, lang);
+  const subtitle = french.subtitle
+    ? (await translateShareText(french.subtitle, french.subtitle, lang)).title
+    : "";
+  const cardText = subtitle || description;
   const preview = new URL(url);
   if (share) preview.searchParams.set("share", share);
   if (lang) preview.searchParams.set("lang", lang);
@@ -61,7 +65,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
       siteName: "Patrick Roziel — Notes",
       url: preview.toString(),
       title,
-      description,
+      description: cardText,
       images: [{
         url: image,
         secureUrl: image,
@@ -74,7 +78,7 @@ export async function generateMetadata({ params, searchParams }: NoteParams): Pr
     twitter: {
       card: "summary_large_image",
       title,
-      description,
+      description: cardText,
       images: [image],
     },
   };
