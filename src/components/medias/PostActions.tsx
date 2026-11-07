@@ -93,7 +93,8 @@ export function PostActions({ postId, title, summary = "", visible = true, share
   async function shareTo(target: ShareTarget) {
     const url = articleShareUrl(sharePath, postId);
     const headline = title.trim() || "Patrick Roziel";
-    const text = [headline, summary.trim(), url].filter(Boolean).join("\n\n");
+    const excerpt = summary.trim();
+    const message = [excerpt, url].filter(Boolean).join("\n");
     setMessage("");
     try {
       if (target === "copy") {
@@ -103,26 +104,26 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       }
       if (target === "more") {
         if (typeof navigator.share === "function") {
-          await navigator.share({ title: headline, text, url });
+          await navigator.share({ title: headline, text: excerpt || headline, url });
           return;
         }
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(message);
         setMessage("Lien copié.");
         return;
       }
       if (target === "email") {
-        window.location.href = `mailto:?subject=${encodeURIComponent(headline)}&body=${encodeURIComponent(text)}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(headline)}&body=${encodeURIComponent(message)}`;
         return;
       }
       if (target === "youtube") {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(message);
         openPopup("https://studio.youtube.com/");
         setMessage("Texte copié. Colle-le dans une publication YouTube.");
         return;
       }
       if (target === "instagram") {
         const imageUrl = coverShareUrl(postId, "story");
-        try { await navigator.clipboard.writeText(url); } catch { /* the image can still be shared */ }
+        try { await navigator.clipboard.writeText(message); } catch { /* the image can still be shared */ }
         try {
           const response = await fetch(imageUrl);
           if (!response.ok) throw new Error();
@@ -146,18 +147,17 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         return;
       }
       const encodedUrl = encodeURIComponent(url);
-      const encodedText = encodeURIComponent(text);
-      const encodedTitle = encodeURIComponent(headline);
-      const tweet = encodeURIComponent([headline, summary.trim()].filter(Boolean).join("\n\n"));
+      const encodedMessage = encodeURIComponent(message);
+      const encodedExcerpt = encodeURIComponent(excerpt);
       const hrefs: Partial<Record<ShareTarget, string>> = {
-        x: `https://twitter.com/intent/tweet?text=${tweet}&url=${encodedUrl}`,
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-        whatsapp: `https://wa.me/?text=${encodedText}`,
-        linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent([summary.trim(), url].filter(Boolean).join("\n\n"))}`,
-        telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
-        threads: `https://www.threads.net/intent/post?text=${encodedText}`,
-        bluesky: `https://bsky.app/intent/compose?text=${encodedText}`,
-        pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodeURIComponent(coverShareUrl(postId))}&description=${encodedTitle}`,
+        x: `https://twitter.com/intent/tweet?text=${encodedExcerpt}&url=${encodedUrl}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedExcerpt}`,
+        whatsapp: `https://wa.me/?text=${encodedMessage}`,
+        linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${encodedMessage}`,
+        telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedExcerpt}`,
+        threads: `https://www.threads.net/intent/post?text=${encodedMessage}`,
+        bluesky: `https://bsky.app/intent/compose?text=${encodedMessage}`,
+        pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodeURIComponent(coverShareUrl(postId))}&description=${encodedExcerpt}`,
       };
       const href = hrefs[target];
       if (href) openPopup(href);

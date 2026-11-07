@@ -31,9 +31,13 @@ export function firstPostLines(html: string, count = 10, width = 72) {
   return rows.slice(0, count);
 }
 
-/** Text sent with a share: the first ten lines, then the invitation to continue. */
-export function shareExcerpt(html: string) {
-  const lines = firstPostLines(html);
-  if (!lines.length) return "";
-  return `${lines.join("\n")}\nLire plus...`;
+/** Text sent with a share: the first ten words, then the invitation to continue. */
+export function shareExcerpt(html: string, count = 10) {
+  const plain = stripHtml(html || "")
+    .replace(MEDIA_TOKEN, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const words = plain.split(" ").filter(Boolean).slice(0, count);
+  if (!words.length) return "";
+  return `${words.join(" ")}\nLire plus...`;
 }
