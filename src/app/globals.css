@@ -48,7 +48,7 @@ html {
 @media (min-width: 640px) {
   html {
     --chrome-top: 4.15rem;
-    --support-h: 3.55rem;
+    --support-h: 2.5rem;
   }
 }
 body:has(header[data-editing="true"]) {
@@ -1811,42 +1811,28 @@ blockquote.rich-link-card.ghost-link-card {
 .support-bar {
   position: fixed;
   z-index: 45;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: block;
+  left: 50%;
+  right: auto;
+  bottom: calc(0.4rem + env(safe-area-inset-bottom, 0px));
+  display: inline-flex;
+  width: max-content;
+  max-width: calc(100vw - 1.25rem);
+  transform: translateX(-50%);
   overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 228, 196, 0.38);
   text-decoration: none;
   color: #f7f1e8;
-  background:
-    linear-gradient(180deg, rgba(255, 248, 236, 0.1) 0%, rgba(255, 255, 255, 0.03) 38%, rgba(255, 255, 255, 0.02) 100%),
-    rgba(7, 9, 12, 0.78);
-  backdrop-filter: blur(28px) saturate(170%);
-  -webkit-backdrop-filter: blur(28px) saturate(170%);
-  border-top: 1px solid rgba(255, 228, 196, 0.28);
+  background: rgba(7, 9, 12, 0.84);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    0 -22px 48px -28px rgba(0, 0, 0, 0.72);
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 22px -14px rgba(0, 0, 0, 0.75);
 }
 
 .support-bar::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 214, 170, 0.15) 18%,
-    rgba(255, 244, 220, 0.95) 50%,
-    rgba(255, 186, 150, 0.35) 78%,
-    transparent 100%
-  );
-  background-size: 180% 100%;
-  animation: support-rim 9s ease-in-out infinite;
-  pointer-events: none;
+  display: none;
 }
 
 .support-bar__sheen {
@@ -1874,17 +1860,20 @@ blockquote.rich-link-card.ghost-link-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  max-width: 1180px;
-  min-height: 3.25rem;
-  margin: 0 auto;
-  padding: 0.45rem 1rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+  gap: 0.4rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0.18rem 0.7rem 0.18rem 0.2rem;
+}
+.support-bar__kicker,
+.support-bar__cta {
+  display: none;
 }
 
 .support-bar__mark {
   display: flex;
-  height: 1.85rem;
-  width: 1.85rem;
+  height: 1.35rem;
+  width: 1.35rem;
   flex: none;
   align-items: center;
   justify-content: center;
@@ -1919,9 +1908,10 @@ blockquote.rich-link-card.ghost-link-card {
 }
 
 .support-bar__title {
-  font-size: 0.92rem;
+  font-size: 0.74rem;
   font-weight: 650;
   letter-spacing: -0.01em;
+  white-space: nowrap;
   color: #fbf7f1;
 }
 
@@ -2012,7 +2002,7 @@ blockquote.rich-link-card.ghost-link-card {
   .support-bar__inner {
     min-height: 0;
     gap: 0.4rem;
-    padding: 0.22rem 0.65rem calc(0.22rem + env(safe-area-inset-bottom, 0px));
+    padding: 0.18rem 0.65rem 0.18rem 0.2rem;
   }
   .support-bar__mark {
     height: 1.4rem;
@@ -2452,7 +2442,7 @@ html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
   .support-bar__inner {
     min-height: 0;
     gap: 0.4rem;
-    padding: 0.12rem 0.65rem calc(0.1rem + env(safe-area-inset-bottom, 0px));
+    padding: 0.14rem 0.6rem 0.14rem 0.18rem;
   }
   .support-bar__kicker,
   .support-bar__cta span {
