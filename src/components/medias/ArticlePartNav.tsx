@@ -95,6 +95,8 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   const pending = useRef<Flight | null>(null);
   const cancelFlight = useRef<(() => void) | null>(null);
   const flying = useRef(false);
+  const openRef = useRef(false);
+  const openedAt = useRef<number | null>(null);
 
   useEffect(() => {
     const root = document.getElementById(targetId);
@@ -176,17 +178,28 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
     };
 
     pick();
-    window.addEventListener("scroll", pick, { passive: true });
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (openRef.current && openedAt.current != null && y < openedAt.current - 24) {
+        openedAt.current = null;
+        openRef.current = false;
+        setOpen(false);
+      }
+      pick();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", pick);
     return () => {
       cancelFlight.current?.();
-      window.removeEventListener("scroll", pick);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", pick);
       document.querySelectorAll(".air-part-morph").forEach((node) => node.remove());
     };
   }, [targetId]);
 
   useEffect(() => {
+    openRef.current = false;
+    openedAt.current = null;
     setOpen(false);
   }, [targetId]);
 
@@ -258,13 +271,17 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
-      {overflow ? (
+      {overflow && !open ? (
         <button
           type="button"
           className="air-part-more"
-          aria-expanded={open}
-          aria-label={open ? "Masquer les parties repliées" : "Afficher les parties masquées"}
-          onClick={() => setOpen((value) => !value)}
+          aria-expanded={false}
+          aria-label="Afficher les parties masquées"
+          onClick={() => {
+            openedAt.current = window.scrollY;
+            openRef.current = true;
+            setOpen(true);
+          }}
         >
           {hidden.map((part) => (
             <span key={part.id} className="air-part-num">{part.n}</span>

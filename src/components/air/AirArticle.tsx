@@ -168,7 +168,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         universe="air"
         seedPosts={seedPosts}
         placement="pills"
-        extra={<PostEditButton post={post} universe="air" className="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-[#071433]/75 px-3 py-2 text-sm text-white/90 shadow-[0_10px_28px_rgba(2,8,28,0.45)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white" />}
+        extra={<PostEditButton post={post} universe="air" className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full border border-white/20 bg-[#071433]/75 px-2 py-0.5 text-[11px] leading-none text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white [&_svg]:h-3 [&_svg]:w-3" />}
       />
     </div>
     <article className={`air-article air-surface mt-3 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
