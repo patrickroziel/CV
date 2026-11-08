@@ -6,14 +6,16 @@ const KOFI_URL = "https://ko-fi.com/patrickroziel";
 
 export function SupportBar() {
   return (
-    <a
-      href={KOFI_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={() => track("kofi_click")}
-      className="support-bar no-print group"
-      aria-label="Soutenir mon travail sur Ko-fi"
-    >
+    <div className="bottom-dock no-print">
+      <div id="bottom-nav-slot" className="bottom-nav-slot" />
+      <a
+        href={KOFI_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => track("kofi_click")}
+        className="support-bar group"
+        aria-label="Soutenir mon travail sur Ko-fi"
+      >
       <span className="support-bar__sheen" aria-hidden="true" />
       <span className="support-bar__inner">
         <span className="support-bar__mark" aria-hidden="true">
@@ -56,6 +58,7 @@ export function SupportBar() {
           </svg>
         </span>
       </span>
-    </a>
+      </a>
+    </div>
   );
 }

@@ -1119,21 +1119,37 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   text-transform: none;
 }
 .air-float-bar {
-  position: sticky;
-  top: var(--chrome-top);
-  z-index: 32;
+  position: static;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
-  height: auto;
-  min-height: 0;
-  flex-wrap: wrap;
-  margin-bottom: 0.35rem;
+  gap: 0.3rem;
+  width: auto;
+  margin: 0;
+  flex-wrap: nowrap;
+}
+.bottom-dock {
+  position: fixed;
+  z-index: 46;
+  left: 50%;
+  bottom: calc(0.4rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  max-width: calc(100vw - 0.7rem);
+  transform: translateX(-50%);
+}
+.bottom-nav-slot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.bottom-nav-slot:empty {
+  display: none;
 }
 .air-read-head {
   position: sticky;
-  top: calc(var(--chrome-top) + var(--air-float-h, 1.7rem));
+  top: var(--chrome-top);
   z-index: 31;
   padding: 0.15rem 0.7rem 0.15rem;
   background: transparent;
@@ -1809,15 +1825,12 @@ blockquote.rich-link-card.ghost-link-card {
 
 /* Ko-fi support bar — Notes, Air, Work */
 .support-bar {
-  position: fixed;
-  z-index: 45;
-  left: 50%;
-  right: auto;
-  bottom: calc(0.4rem + env(safe-area-inset-bottom, 0px));
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   width: max-content;
-  max-width: calc(100vw - 1.25rem);
-  transform: translateX(-50%);
+  max-width: 11rem;
+  flex: 0 1 auto;
   overflow: hidden;
   border-radius: 999px;
   border: 1px solid rgba(255, 228, 196, 0.38);
@@ -2029,9 +2042,6 @@ blockquote.rich-link-card.ghost-link-card {
   }
 }
 @media (min-width: 640px) {
-  .air-float-bar {
-    margin-bottom: 0.75rem;
-  }
   .air-read-head {
     padding: 0.4rem 1.15rem 0.35rem;
   }

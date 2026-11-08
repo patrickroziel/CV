@@ -90,30 +90,27 @@ export function PostPager({
   }
 
   if (placement === "pills") {
-    const pill = "inline-flex min-w-0 items-center justify-center gap-1 rounded-full border border-white/20 bg-[#071433]/75 px-2 py-0.5 text-[11px] leading-none text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white";
-    const idlePill = "inline-flex min-w-0 items-center justify-center gap-1 rounded-full border border-white/12 bg-[#071433]/40 px-2 py-0.5 text-[11px] leading-none text-white/35";
+    const pill = "inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 px-2.5 text-[11px] leading-none text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
+    const round = "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
+    const idleRound = "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#071433]/40 text-white/35";
     return (
       <>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <Link href={home} className={`${pill} shrink-0`}>Retour à Air</Link>
-          {extra}
-        </div>
-        <nav className="no-print ml-auto flex shrink-0 items-center gap-1.5" aria-label="Navigation entre les publications">
+        <Link href={home} className={pill}>Air</Link>
+        {extra}
+        <nav className="no-print flex shrink-0 items-center gap-1.5" aria-label="Navigation entre les publications">
           {previous ? (
-            <Link href={href(previous.id)} className={pill} aria-label={`Précédent : ${label(previous)}`} title={label(previous)}>
-              <ChevronLeft className="h-3 w-3 shrink-0" aria-hidden />
-              <span className="truncate">Précédent</span>
+            <Link href={href(previous.id)} className={round} aria-label={`Précédent : ${label(previous)}`} title={label(previous)}>
+              <ChevronLeft className="h-4 w-4" aria-hidden />
             </Link>
           ) : (
-            <span className={idlePill} aria-hidden="true"><ChevronLeft className="h-3 w-3 shrink-0" /> Précédent</span>
+            <span className={idleRound} aria-hidden="true"><ChevronLeft className="h-4 w-4" /></span>
           )}
           {next ? (
-            <Link href={href(next.id)} className={pill} aria-label={`Suivant : ${label(next)}`} title={label(next)}>
-              <span className="truncate">Suivant</span>
-              <ChevronRight className="h-3 w-3 shrink-0" aria-hidden />
+            <Link href={href(next.id)} className={round} aria-label={`Suivant : ${label(next)}`} title={label(next)}>
+              <ChevronRight className="h-4 w-4" aria-hidden />
             </Link>
           ) : (
-            <span className={idlePill} aria-hidden="true">Suivant <ChevronRight className="h-3 w-3 shrink-0" /></span>
+            <span className={idleRound} aria-hidden="true"><ChevronRight className="h-4 w-4" /></span>
           )}
         </nav>
       </>

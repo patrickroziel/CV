@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Layers } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
@@ -149,16 +150,9 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
     return () => window.cancelAnimationFrame(frame);
   }, [post?.id]);
   const pageRef = useRef<HTMLDivElement>(null);
-  const barRef = useRef<HTMLDivElement>(null);
+  const [navSlot, setNavSlot] = useState<HTMLElement | null>(null);
   useEffect(() => {
-    const page = pageRef.current;
-    const bar = barRef.current;
-    if (!page || !bar) return;
-    const apply = () => page.style.setProperty("--air-float-h", `${bar.offsetHeight + 12}px`);
-    apply();
-    const observer = new ResizeObserver(apply);
-    observer.observe(bar);
-    return () => observer.disconnect();
+    setNavSlot(document.getElementById("bottom-nav-slot"));
   }, [post?.id]);
   if (!post && !isHydrated && initialPost === undefined) return <div className="mx-auto h-60 max-w-3xl animate-pulse rounded-2xl bg-white/10" />;
   if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Air</Link><p className="mt-8">Article indisponible.</p></div>;
@@ -171,15 +165,18 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const teaser = isTeaserPost(post);
   const showNotices = post.noticesHidden !== true;
   return <div ref={pageRef} className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
-    <div ref={barRef} className="air-float-bar">
-      <PostPager
-        postId={post.id}
-        universe="air"
-        seedPosts={seedPosts}
-        placement="pills"
-        extra={<PostEditButton post={post} universe="air" className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full border border-white/20 bg-[#071433]/75 px-2 py-0.5 text-[11px] leading-none text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/90 hover:text-white [&_svg]:h-3 [&_svg]:w-3" />}
-      />
-    </div>
+    {navSlot ? createPortal(
+      <div className="air-float-bar">
+        <PostPager
+          postId={post.id}
+          universe="air"
+          seedPosts={seedPosts}
+          placement="pills"
+          extra={<PostEditButton post={post} universe="air" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-[#071433]/80 text-[0px] text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white [&_svg]:h-3.5 [&_svg]:w-3.5" />}
+        />
+      </div>,
+      navSlot,
+    ) : null}
     <article className={`air-article air-surface mt-3 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
       {post.coverSource === "wip" ? (
         <div className="overflow-hidden rounded-t-[1.35rem]">
