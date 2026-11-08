@@ -1903,7 +1903,7 @@ blockquote.rich-link-card.ghost-link-card {
   border-radius: 999px;
   color: #2a140c;
   background:
-    radial-gradient(circle at 30% 25%, #fff6ea 0%, #f3c79a 42%, #e39a62 100%);
+    radial-gradient(circle at 30% 25%, #fff8ee 0%, #f6d7a8 38%, #d7a15a 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.8),
     0 6px 16px -8px rgba(227, 154, 98, 0.9);
@@ -1911,8 +1911,8 @@ blockquote.rich-link-card.ghost-link-card {
 }
 
 .support-bar__cup {
-  height: 0.72rem;
-  width: 0.72rem;
+  height: 0.85rem;
+  width: 0.85rem;
 }
 
 .support-bar__copy {

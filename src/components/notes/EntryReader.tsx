@@ -7,8 +7,7 @@ import { BookReader } from "@/components/notes/BookReader";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
-import { PostEditButton } from "@/components/medias/PostEditButton";
-import { PostPager } from "@/components/notes/PostPager";
+import { NotesBottomNav } from "@/components/notes/PostPager";
 import { NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
 import { shareExcerpt } from "@/lib/post-excerpt";
 import { coercePostCategory } from "@/lib/post-taxonomy";
@@ -42,13 +41,8 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
     (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null));
 
   return <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
-    <div className="flex items-center justify-between gap-3">
-      <Link href="/notes" className="inline-flex items-center gap-2 text-sm text-cyan-100/65 hover:text-cyan-50">
-        <ArrowLeft className="h-4 w-4" /> Retour à Notes
-      </Link>
-      <PostEditButton post={post} universe="notes" />
-    </div>
-    <article className="mt-6 overflow-visible rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
+    <NotesBottomNav post={post} seedPosts={seedPosts} />
+    <article className="mt-3 overflow-visible rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
       <div className="overflow-hidden rounded-t-[1.75rem]">
         <PostCover post={post} alt={title} />
       </div>
@@ -75,6 +69,5 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
         </div>
       </div>
     </article>
-    <PostPager postId={post.id} universe="notes" seedPosts={seedPosts} />
   </div>;
 }

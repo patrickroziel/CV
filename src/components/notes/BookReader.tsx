@@ -7,8 +7,7 @@ import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
-import { PostEditButton } from "@/components/medias/PostEditButton";
-import { PostPager } from "@/components/notes/PostPager";
+import { NotesBottomNav } from "@/components/notes/PostPager";
 import { NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
@@ -74,15 +73,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
 
   return (
     <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
-      <div className="flex items-center justify-between gap-3">
-        <Link
-          href="/notes"
-          className="inline-flex items-center gap-2 text-sm text-cyan-100/65 transition hover:text-cyan-50"
-        >
-          <ArrowLeft className="h-4 w-4" /> Retour à Notes
-        </Link>
-        <PostEditButton post={post} universe="notes" />
-      </div>
+      <NotesBottomNav post={post} seedPosts={seedPosts} />
 
       {showNotice ? (
         <RichHtml html={airNoticeHtml(post.noticeIntro, BOOK_NOTICE)} className="mt-6 text-[13px] italic leading-relaxed text-white/55" />
@@ -165,8 +156,6 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
           </div>
         </div>
       </article>
-
-      <PostPager postId={post.id} universe="notes" seedPosts={seedPosts} />
     </div>
   );
 }

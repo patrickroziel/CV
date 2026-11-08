@@ -3,8 +3,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { PostEditButton } from "@/components/medias/PostEditButton";
 import type { SocialPost } from "@/lib/types";
 
 function sortPosts(posts: SocialPost[]) {
@@ -41,7 +43,7 @@ export function PostPager({
   const index = posts.findIndex((post) => post.id === postId);
   const previous = index > 0 ? posts[index - 1] : null;
   const next = index >= 0 && index < posts.length - 1 ? posts[index + 1] : null;
-  const home = universe === "air" ? "/air" : "/";
+  const home = universe === "air" ? "/air" : placement === "pills" ? "/notes" : "/";
   const href = (id: string) => (universe === "air" ? `/air/${id}` : `/notes/${id}`);
   const light = tone === "light";
 
@@ -90,9 +92,16 @@ export function PostPager({
   }
 
   if (placement === "pills") {
-    const pill = "inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 px-2.5 text-[11px] leading-none text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
-    const round = "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
-    const idleRound = "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#071433]/40 text-white/35";
+    const notes = universe === "notes";
+    const pill = notes
+      ? "inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-cyan-200/35 bg-[rgba(3,16,20,0.82)] px-2.5 text-[11px] leading-none text-cyan-50 shadow-[0_6px_16px_rgba(0,8,16,0.4)] backdrop-blur-md hover:bg-[rgba(8,32,40,0.94)] hover:text-white"
+      : "inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 px-2.5 text-[11px] leading-none text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
+    const round = notes
+      ? "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-200/35 bg-[rgba(3,16,20,0.82)] text-cyan-50 shadow-[0_6px_16px_rgba(0,8,16,0.4)] backdrop-blur-md hover:bg-[rgba(8,32,40,0.94)] hover:text-white"
+      : "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
+    const idleRound = notes
+      ? "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-200/15 bg-[rgba(3,16,20,0.4)] text-cyan-100/30"
+      : "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#071433]/40 text-white/35";
     return (
       <>
         <Link href={home} className={pill}>Retour</Link>
@@ -132,5 +141,27 @@ export function PostPager({
         <Side post={next} direction="next" />
       </div>
     </nav>
+  );
+}
+
+const notesEditClass = "inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-cyan-200/35 bg-[rgba(3,16,20,0.82)] text-[0px] text-cyan-50 shadow-[0_6px_16px_rgba(0,8,16,0.4)] backdrop-blur-md hover:bg-[rgba(8,32,40,0.94)] hover:text-white [&_svg]:h-3.5 [&_svg]:w-3.5";
+
+export function NotesBottomNav({ post, seedPosts = [] }: { post: SocialPost; seedPosts?: SocialPost[] }) {
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setSlot(document.getElementById("bottom-nav-slot"));
+  }, [post.id]);
+  if (!slot) return null;
+  return createPortal(
+    <div className="air-float-bar">
+      <PostPager
+        postId={post.id}
+        universe="notes"
+        seedPosts={seedPosts}
+        placement="pills"
+        extra={<PostEditButton post={post} universe="notes" className={notesEditClass} />}
+      />
+    </div>,
+    slot,
   );
 }
