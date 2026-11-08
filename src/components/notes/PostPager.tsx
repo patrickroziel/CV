@@ -95,7 +95,7 @@ export function PostPager({
     const idleRound = "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#071433]/40 text-white/35";
     return (
       <>
-        <Link href={home} className={pill}>Air</Link>
+        <Link href={home} className={pill}>Retour</Link>
         {extra}
         <nav className="no-print flex shrink-0 items-center gap-1.5" aria-label="Navigation entre les publications">
           {previous ? (
