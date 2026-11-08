@@ -98,7 +98,7 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
       return <WorkInProgress className="aspect-video max-h-[420px] w-full rounded-2xl" />;
     }
     return <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-      <img src={displayImageUrl(featured.url, 1200)} alt={title || "Image intégrée"} loading="lazy" decoding="async" referrerPolicy="no-referrer"
+      <img src={displayImageUrl(featured.url, 1200)} alt={title || "Image intégrée"} loading="eager" decoding="async"
         className="absolute inset-0 h-full w-full object-cover object-center" />
     </div>;
   }

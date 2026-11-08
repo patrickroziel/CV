@@ -242,11 +242,10 @@ function MediaCard({ item }: { item: MediaItem }) {
         <img
           src={displayImageUrl(item.url, 828)}
           alt={caption || "Média"}
-          loading="lazy"
+          loading="eager"
           decoding="async"
           className="h-full w-full object-cover"
           draggable={false}
-          referrerPolicy="no-referrer"
         />
       )}
 

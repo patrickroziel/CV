@@ -42,9 +42,8 @@ export function PostCover({
       <img
         src={displayImageUrl(src, 1200)}
         alt={alt}
-        loading="lazy"
+        loading="eager"
         decoding="async"
-        referrerPolicy="no-referrer"
         className="h-full w-full object-cover"
     />
     </div>
