@@ -27,7 +27,7 @@ export function Header() {
         </div>
       )}
 
-      <div className="mx-auto flex h-11 max-w-[1180px] items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-8">
+      <div className="site-header-bar mx-auto flex h-11 max-w-[1180px] items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Link
             href="/"

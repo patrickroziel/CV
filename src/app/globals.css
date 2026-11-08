@@ -2360,3 +2360,92 @@ html[data-universe="portfolio"] .work-notes-main .glass-card::before,
 html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
   opacity: 0.16 !important;
 }
+
+/* Phone landscape: the sticky pile must not cover the article. */
+@media (max-height: 520px) {
+  html,
+  body:has(header[data-editing="true"]) {
+    --chrome-top: 2.5rem;
+    --support-h: 2.15rem;
+  }
+  header > div:not(.site-header-bar) {
+    display: none;
+  }
+  .site-header-bar {
+    height: 2.4rem !important;
+    padding-left: 0.55rem !important;
+    padding-right: 0.55rem !important;
+  }
+  .air-float-bar {
+    flex-wrap: nowrap;
+    margin-bottom: 0.15rem;
+  }
+  .air-read-head,
+  .notes-read-head {
+    gap: 0.2rem;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .air-title-pill,
+  .notes-title-pill {
+    margin-top: 0;
+    padding: 0.16rem 0.7rem;
+    border-radius: 0.7rem;
+  }
+  .air-title-pill h1,
+  .air-title-sub,
+  .notes-title-main,
+  .notes-title-sub {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+  .air-title-copy,
+  .notes-title-copy {
+    gap: 0;
+  }
+  .air-part-stack,
+  .notes-part-stack {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    margin-top: 0.15rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .air-part-stack .air-part-float,
+  .notes-part-stack .air-part-float,
+  .air-part-more {
+    width: auto;
+    max-width: 14rem;
+    flex: none;
+    padding-top: 0.08rem;
+    padding-bottom: 0.08rem;
+  }
+  .support-bar__inner {
+    min-height: 0;
+    gap: 0.4rem;
+    padding: 0.12rem 0.65rem calc(0.1rem + env(safe-area-inset-bottom, 0px));
+  }
+  .support-bar__kicker,
+  .support-bar__cta span {
+    display: none;
+  }
+  .support-bar__title {
+    font-size: 0.75rem;
+  }
+  .support-bar__mark {
+    height: 1.35rem;
+    width: 1.35rem;
+  }
+  h2.air-part-title,
+  .rich-bio-editor h2.air-part-title,
+  [id^="air-body-"],
+  [id^="note-body-"] {
+    scroll-margin-top: 6.5rem;
+  }
+}
