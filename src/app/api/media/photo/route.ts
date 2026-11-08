@@ -15,11 +15,26 @@ export async function GET(req: NextRequest) {
   const width = WIDTHS.has(asked) ? asked : 1080;
   let upstream: Response;
   try {
-    upstream = await fetch(src, { cache: "force-cache", headers: { Accept: "image/*" } });
-  } catch {
-    return NextResponse.redirect(src, 302);
+    upstream = await fetch(src, {
+      cache: "no-store",
+      redirect: "follow",
+      headers: {
+        Accept: "image/jpeg,image/*,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (compatible; PatrickRoziel/1.0)",
+        Referer: "https://patrickroziel.com/",
+      },
+    });
+  } catch (error) {
+    const failed = NextResponse.redirect(src, 302);
+    failed.headers.set("X-Upstream-Status", error instanceof Error ? error.message : "fetch");
+    return failed;
   }
-  if (!upstream.ok) return NextResponse.redirect(src, 302);
+  if (!upstream.ok) {
+    const failed = NextResponse.redirect(src, 302);
+    failed.headers.set("X-Upstream-Status", String(upstream.status));
+    failed.headers.set("X-Upstream-Type", upstream.headers.get("content-type") || "");
+    return failed;
+  }
   const input = Buffer.from(await upstream.arrayBuffer());
   try {
     const output = await sharp(input, { failOn: "none", unlimited: true })
@@ -34,7 +49,9 @@ export async function GET(req: NextRequest) {
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
-  } catch {
-    return NextResponse.redirect(src, 302);
+  } catch (error) {
+    const failed = NextResponse.redirect(src, 302);
+    failed.headers.set("X-Upstream-Status", error instanceof Error ? error.name : "sharp");
+    return failed;
   }
 }
