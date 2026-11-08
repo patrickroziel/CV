@@ -316,15 +316,10 @@ export function NotesFloatingStack({ postId, title, subtitle = "" }: { postId: s
           event.preventDefault();
           document.getElementById(`note-title-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}>
-          <span>{title}</span>
-        </a>
-      ) : null}
-      {raised && subtitle.trim() ? (
-        <a href={`#note-title-${postId}`} className="notes-title-pill notes-subtitle-pill" onClick={(event) => {
-          event.preventDefault();
-          document.getElementById(`note-title-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }}>
-          <span>{subtitle.trim()}</span>
+          <span className="notes-title-copy">
+            <span className="notes-title-main">{title}</span>
+            {subtitle.trim() ? <span className="notes-title-sub">{subtitle.trim()}</span> : null}
+          </span>
         </a>
       ) : null}
       <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
