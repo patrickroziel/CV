@@ -1250,6 +1250,16 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   line-height: 1.35;
   color: rgba(251, 247, 241, 0.86);
 }
+.air-card-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #fbf7f1;
+}
 .air-title-pill {
   transition: padding 0.25s ease, border-radius 0.25s ease;
 }
@@ -1829,7 +1839,7 @@ blockquote.rich-link-card.ghost-link-card {
   z-index: 1;
   display: inline-flex;
   width: max-content;
-  max-width: 11rem;
+  max-width: 7.5rem;
   flex: 0 1 auto;
   overflow: hidden;
   border-radius: 999px;
@@ -1876,7 +1886,7 @@ blockquote.rich-link-card.ghost-link-card {
   gap: 0.4rem;
   min-height: 0;
   margin: 0;
-  padding: 0.18rem 0.7rem 0.18rem 0.2rem;
+  padding: 0.1rem 0.48rem 0.1rem 0.14rem;
 }
 .support-bar__kicker,
 .support-bar__cta {
@@ -1885,8 +1895,8 @@ blockquote.rich-link-card.ghost-link-card {
 
 .support-bar__mark {
   display: flex;
-  height: 1.35rem;
-  width: 1.35rem;
+  height: 1.05rem;
+  width: 1.05rem;
   flex: none;
   align-items: center;
   justify-content: center;
@@ -1901,8 +1911,8 @@ blockquote.rich-link-card.ghost-link-card {
 }
 
 .support-bar__cup {
-  height: 1.05rem;
-  width: 1.05rem;
+  height: 0.72rem;
+  width: 0.72rem;
 }
 
 .support-bar__copy {
@@ -1921,7 +1931,7 @@ blockquote.rich-link-card.ghost-link-card {
 }
 
 .support-bar__title {
-  font-size: 0.74rem;
+  font-size: 0.66rem;
   font-weight: 650;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -2018,18 +2028,18 @@ blockquote.rich-link-card.ghost-link-card {
     padding: 0.18rem 0.65rem 0.18rem 0.2rem;
   }
   .support-bar__mark {
-    height: 1.4rem;
-    width: 1.4rem;
+    height: 1.05rem;
+    width: 1.05rem;
   }
   .support-bar__cup {
-    height: 0.8rem;
-    width: 0.8rem;
+    height: 0.72rem;
+    width: 0.72rem;
   }
   .support-bar__kicker {
     display: none;
   }
   .support-bar__title {
-    font-size: 0.78rem;
+    font-size: 0.66rem;
   }
   .support-bar__cta span {
     display: none;
@@ -2431,8 +2441,8 @@ html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
   .notes-title-copy {
     gap: 0;
   }
-  .air-part-stack,
-  .notes-part-stack {
+  .air-read-head .air-part-stack,
+  .notes-read-head .notes-part-stack {
     flex-direction: row;
     flex-wrap: nowrap;
     gap: 0.3rem;
@@ -2440,9 +2450,9 @@ html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
     overflow-x: auto;
     scrollbar-width: none;
   }
-  .air-part-stack .air-part-float,
-  .notes-part-stack .air-part-float,
-  .air-part-more {
+  .air-read-head .air-part-stack .air-part-float,
+  .notes-read-head .notes-part-stack .air-part-float,
+  .air-read-head .air-part-more {
     width: auto;
     max-width: 14rem;
     flex: none;
@@ -2459,11 +2469,11 @@ html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
     display: none;
   }
   .support-bar__title {
-    font-size: 0.75rem;
+    font-size: 0.66rem;
   }
   .support-bar__mark {
-    height: 1.35rem;
-    width: 1.35rem;
+    height: 1.05rem;
+    width: 1.05rem;
   }
   h2.air-part-title,
   .rich-bio-editor h2.air-part-title,

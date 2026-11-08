@@ -43,6 +43,29 @@ function previewText(html: string) {
   return (space > 220 ? window.slice(0, space) : window).trimEnd();
 }
 
+function AirCardParts({ postId, parts }: { postId: string; parts: { label: string; index: number }[] }) {
+  const [open, setOpen] = useState(false);
+  if (!parts.length) return null;
+  const overflow = parts.length > 3;
+  const hidden = overflow && !open ? parts.slice(0, -2) : [];
+  const shown = overflow && !open ? parts.slice(-2) : parts;
+  return (
+    <div className="air-part-stack mt-3">
+      {hidden.length ? (
+        <button type="button" className="air-part-more" onClick={() => setOpen(true)} aria-expanded={false}>
+          {hidden.map((part) => <span key={part.index} className="air-part-num">{part.index + 1}</span>)}
+        </button>
+      ) : null}
+      {shown.map((part) => (
+        <Link key={part.index} href={`/air/${postId}#${airPartAnchor(postId, part.index)}`} className="air-part-float" title={part.label}>
+          <span className="air-part-num">{part.index + 1}</span>
+          <span className="air-part-name">{part.label}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   const { data, editMode, l, addSocialPost, updateSocialPost, removeSocialPost, isHydrated } = usePortfolio();
   const [createOpen, setCreateOpen] = useState(false);
@@ -162,19 +185,14 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           <div className="p-5 sm:p-6">
             <Link href={`/air/${post.id}`} className="block">
               <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p>
-              <h3 className="air-title-pill mt-3 text-base font-semibold leading-snug text-white sm:text-lg">{title}</h3>
-              {lead ? <p className="air-lead-pill">{lead}</p> : null}
+              <h3 className="air-title-pill mt-3">
+                <span className="air-title-copy">
+                  <span className="air-card-title">{title}</span>
+                  {lead ? <span className="air-title-sub">{lead}</span> : null}
+                </span>
+              </h3>
             </Link>
-            {parts.length ? (
-              <div className="air-part-stack mt-3">
-                {parts.map((part) => (
-                  <Link key={part.index} href={`/air/${post.id}#${airPartAnchor(post.id, part.index)}`} className="air-part-float" title={part.label}>
-                    <span className="air-part-num">{part.index + 1}</span>
-                    <span className="air-part-name">{part.label}</span>
-                  </Link>
-                ))}
-              </div>
-            ) : null}
+            <AirCardParts postId={post.id} parts={parts} />
             <Link href={`/air/${post.id}`} className="block">
               {excerpt ? <p className="mt-3 line-clamp-4 break-words text-sm leading-6 text-white/75">{excerpt}</p> : null}
               <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-sky-200">Lire l’article <ArrowUpRight className="h-4 w-4"/></span>

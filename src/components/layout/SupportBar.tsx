@@ -42,7 +42,7 @@ export function SupportBar() {
         </span>
         <span className="support-bar__copy">
           <span className="support-bar__kicker">Ko-fi</span>
-          <span className="support-bar__title">Soutenir mon travail</span>
+          <span className="support-bar__title">Soutenir</span>
         </span>
         <span className="support-bar__cta">
           <span>Soutenir</span>
