@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // iPhone Safari does not paint images served as attachments.
+    contentDispositionType: "inline",
+    contentSecurityPolicy: "script-src 'none'; frame-src 'none';",
     remotePatterns: [
       // Legacy media still referenced in defaults / localStorage
       {
