@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import {
   DEFAULT_LINE_HEIGHT,
   extractRichSpacing,
@@ -13,6 +13,8 @@ import {
 } from "@/lib/sanitize-html";
 import { cn } from "@/lib/utils";
 import { shrinkHostedImages } from "@/lib/display-image";
+import { ghostSlugFromHref } from "@/lib/ghost-href";
+import { useOptionalPortfolio } from "@/components/providers/PortfolioProvider";
 
 type RichHtmlProps = {
   html: string;
@@ -45,6 +47,55 @@ export function RichHtml({
     () => (isHtml ? shrinkHostedImages(sanitizeBioHtml(body)) : body),
     [body, isHtml]
   );
+  const rootRef = useRef<HTMLElement>(null);
+  const portfolio = useOptionalPortfolio();
+  const portfolioRef = useRef(portfolio);
+  portfolioRef.current = portfolio;
+  const ghostKey = (portfolio?.data.ghostPages ?? [])
+    .map((page) => `${page.slug}:${page.updatedAt}:${page.visible ? 1 : 0}`)
+    .join("|");
+  const locale = portfolio?.locale;
+  const editMode = portfolio?.editMode;
+
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    const current = portfolioRef.current;
+    if (!root || !current) return;
+    const pages = current.data.ghostPages ?? [];
+    root.querySelectorAll<HTMLElement>("blockquote.ghost-link-card").forEach((card) => {
+      if (card.closest(".ghost-inline-scroll")) return;
+      card.querySelector(":scope > .ghost-inline-read")?.remove();
+      const href = card.querySelector("a")?.getAttribute("href") || "";
+      const slug = ghostSlugFromHref(href);
+      const page = slug ? pages.find((item) => item.slug === slug) : undefined;
+      if (!page || (page.visible === false && !current.editMode)) return;
+      const text = current.l(page.body);
+      if (!stripHtml(text).trim()) return;
+      const panel = document.createElement("div");
+      panel.className = "ghost-inline-read";
+      const scroller = document.createElement("div");
+      scroller.className = "ghost-inline-scroll rich-html";
+      scroller.innerHTML = sanitizeBioHtml(text);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ghost-inline-more";
+      button.textContent = "Lire plus";
+      button.setAttribute("aria-expanded", "false");
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const open = panel.classList.toggle("is-open");
+        button.textContent = open ? "Réduire" : "Lire plus";
+        button.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      panel.append(scroller, button);
+      card.appendChild(panel);
+      if (scroller.scrollHeight <= 132) {
+        scroller.classList.add("is-short");
+        button.remove();
+      }
+    });
+  }, [safe, ghostKey, locale, editMode]);
 
   if (!html) return null;
 
@@ -63,6 +114,7 @@ export function RichHtml({
 
   return (
     <Tag
+      ref={rootRef as never}
       className={cn(
         "rich-html rich-lh whitespace-pre-line",
         "[&_*]:[font-family:inherit]",

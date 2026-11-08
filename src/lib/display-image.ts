@@ -1,5 +1,5 @@
 /** Keep the original Cloudflare file. iPhone Safari refuses the Next.js image proxy. */
-export function displayImageUrl(src: string): string {
+export function displayImageUrl(src: string, _width?: number): string {
   return src;
 }
 

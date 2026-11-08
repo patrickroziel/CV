@@ -1065,6 +1065,10 @@ function withSharedBookNotice(
   );
 }
 
+export function useOptionalPortfolio() {
+  return useContext(PortfolioContext);
+}
+
 export function usePortfolio() {
   const ctx = useContext(PortfolioContext);
   if (!ctx) {

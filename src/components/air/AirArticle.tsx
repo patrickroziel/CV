@@ -116,9 +116,11 @@ function AirReadHead({
       <div ref={ref} className="air-read-head">
         <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
           <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
-          <h1>{title}</h1>
+          <span className="air-title-copy">
+            <h1>{title}</h1>
+            {lead ? <span className="air-title-sub">{lead}</span> : null}
+          </span>
         </a>
-        {lead ? <p className="air-lead-pill">{lead}</p> : null}
         <ArticlePartNav targetId={bodyId} />
       </div>
     </>

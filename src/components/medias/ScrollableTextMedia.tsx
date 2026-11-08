@@ -9,18 +9,15 @@ import { RichHtml } from "@/components/shared/RichHtml";
  */
 export function ScrollableTextMedia({ title, body, format }: { title: string; body: string; format?: "rich" }) {
   return (
-    <figure className="min-w-0 overflow-hidden rounded-2xl border border-cyan-200/25 bg-[rgba(5,25,33,0.95)] shadow-[0_12px_32px_rgba(0,0,0,0.16)]">
-      <figcaption className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-100/15 bg-cyan-100/[0.055] px-4 py-3 sm:px-5">
+    <figure className="text-media-card min-w-0 overflow-hidden rounded-2xl border border-cyan-200/25 bg-[rgba(5,25,33,0.95)] shadow-[0_12px_32px_rgba(0,0,0,0.16)]">
+      <figcaption className="text-media-card__caption flex flex-wrap items-center justify-between gap-3 border-b border-cyan-100/15 bg-cyan-100/[0.055] px-4 py-3 sm:px-5">
         <div className="flex min-w-0 items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-200/10 text-cyan-100" aria-hidden="true">
+          <span className="text-media-card__mark flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-200/10 text-cyan-100" aria-hidden="true">
             <AlignLeft className="h-4 w-4" />
           </span>
-          <div className="min-w-0">
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100/60">Bloc de texte</span>
-            <span className="block break-words text-sm font-semibold text-cyan-50">{title || "Extrait à lire"}</span>
-          </div>
+          <span className="block min-w-0 break-words text-sm font-semibold text-cyan-50">{title || "Extrait à lire"}</span>
         </div>
-        <span className="inline-flex items-center gap-1.5 text-[11px] text-cyan-100/60">
+        <span className="text-media-card__hint inline-flex items-center gap-1.5 text-[11px] text-cyan-100/60">
           <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" /> Faire défiler pour lire
         </span>
       </figcaption>

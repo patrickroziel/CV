@@ -89,6 +89,7 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   const [parts, setParts] = useState<Part[]>([]);
   const [arriving, setArriving] = useState<string[]>([]);
   const [landed, setLanded] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
   const chipRefs = useRef(new Map<string, HTMLAnchorElement>());
   const prevIds = useRef<string[]>([]);
   const pending = useRef<Flight | null>(null);
@@ -154,7 +155,12 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       } else {
         const el = heads.find((head) => head.id === removed[0]);
         const chip = el ? chipRefs.current.get(el.id) : undefined;
-        if (!el || !chip) return;
+        if (!el || !chip) {
+          heads.forEach((head) => head.classList.toggle("air-part-held", nextIds.includes(head.id)));
+          primed = true;
+          publish(stuck);
+          return;
+        }
         pending.current = {
           id: el.id,
           from: chip.getBoundingClientRect(),
@@ -178,6 +184,10 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       window.removeEventListener("resize", pick);
       document.querySelectorAll(".air-part-morph").forEach((node) => node.remove());
     };
+  }, [targetId]);
+
+  useEffect(() => {
+    setOpen(false);
   }, [targetId]);
 
   useLayoutEffect(() => {
@@ -214,37 +224,54 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
   if (!parts.length) return null;
 
+  const overflow = parts.length > 3;
+  const hidden = overflow ? parts.slice(0, -2) : [];
+  const visible = overflow ? (open ? parts : parts.slice(-2)) : parts;
+  const currentId = parts[parts.length - 1]?.id;
+
+  const pill = (part: Part) => (
+    <a
+      key={part.id}
+      href={`#${part.id}`}
+      title={`Partie ${part.n}. ${part.label}`}
+      aria-current={part.id === currentId ? "true" : undefined}
+      className={[
+        "air-part-float",
+        tone === "notes" ? "is-notes" : "",
+        part.id === currentId ? "is-current" : "",
+        arriving.includes(part.id) ? "is-arriving" : "",
+        landed === part.id ? "is-landed" : "",
+      ].filter(Boolean).join(" ")}
+      ref={(node) => {
+        if (node) chipRefs.current.set(part.id, node);
+        else chipRefs.current.delete(part.id);
+      }}
+      onClick={(event) => {
+        event.preventDefault();
+        document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }}
+    >
+      <span className="air-part-num">{part.n}</span>
+      <span className="air-part-name">{part.label}</span>
+    </a>
+  );
+
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
-      {parts.map((part, index) => {
-        const current = index === parts.length - 1;
-        return (
-          <a
-            key={part.id}
-            href={`#${part.id}`}
-            title={`Partie ${part.n}. ${part.label}`}
-            aria-current={current ? "true" : undefined}
-            className={[
-              "air-part-float",
-              tone === "notes" ? "is-notes" : "",
-              current ? "is-current" : "",
-              arriving.includes(part.id) ? "is-arriving" : "",
-              landed === part.id ? "is-landed" : "",
-            ].filter(Boolean).join(" ")}
-            ref={(node) => {
-              if (node) chipRefs.current.set(part.id, node);
-              else chipRefs.current.delete(part.id);
-            }}
-            onClick={(event) => {
-              event.preventDefault();
-              document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-          >
-            <span className="air-part-num">{part.n}</span>
-            <span className="air-part-name">{part.label}</span>
-          </a>
-        );
-      })}
+      {overflow ? (
+        <button
+          type="button"
+          className="air-part-more"
+          aria-expanded={open}
+          aria-label={open ? "Masquer les parties repliées" : "Afficher les parties masquées"}
+          onClick={() => setOpen((value) => !value)}
+        >
+          {hidden.map((part) => (
+            <span key={part.id} className="air-part-num">{part.n}</span>
+          ))}
+        </button>
+      ) : null}
+      {visible.map(pill)}
     </div>
   );
 }
