@@ -1234,6 +1234,29 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   line-height: 1.35;
   color: rgba(251, 247, 241, 0.86);
 }
+.air-title-pill {
+  transition: padding 0.25s ease, border-radius 0.25s ease;
+}
+.air-title-pill.is-compact {
+  padding: 0.24rem 0.75rem;
+  border-radius: 0.75rem;
+}
+.air-title-pill.is-compact h1,
+.air-title-pill.is-compact .air-title-sub {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+.air-title-pill.is-compact h1 {
+  -webkit-line-clamp: 2;
+  font-size: 0.84rem;
+  line-height: 1.25;
+}
+.air-title-pill.is-compact .air-title-sub {
+  -webkit-line-clamp: 1;
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
 a.air-part-float {
   color: #fff;
   text-decoration: none;

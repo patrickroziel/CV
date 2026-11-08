@@ -99,22 +99,31 @@ function AirReadHead({
   bodyId: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const apply = () => {
       const article = el.closest("article");
       if (article instanceof HTMLElement) article.style.setProperty("--article-head-h", `${el.offsetHeight}px`);
+      const stuckAt = Number.parseFloat(getComputedStyle(el).top) || 0;
+      setCompact(el.getBoundingClientRect().top <= stuckAt + 2 && window.scrollY > 48);
     };
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(el);
-    return () => observer.disconnect();
+    window.addEventListener("scroll", apply, { passive: true });
+    window.addEventListener("resize", apply);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", apply);
+      window.removeEventListener("resize", apply);
+    };
   }, []);
   return (
     <>
       <div ref={ref} className="air-read-head">
-        <a href={`#${bodyId}`} className="air-title-pill" onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
+        <a href={`#${bodyId}`} className={compact ? "air-title-pill is-compact" : "air-title-pill"} onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
           <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
           <span className="air-title-copy">
             <h1>{title}</h1>
