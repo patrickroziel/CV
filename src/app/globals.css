@@ -1931,10 +1931,10 @@ blockquote.rich-link-card.ghost-link-card {
 }
 
 .support-bar__title {
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
   font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.015em;
+  font-weight: 750;
+  letter-spacing: 0.035em;
   white-space: nowrap;
   color: #fbf7f1;
 }
