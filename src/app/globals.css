@@ -2495,10 +2495,10 @@ html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
 }
 
 .support-bar__title {
-  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  font-family: var(--font-work-sans), system-ui, sans-serif;
   font-size: 0.88rem;
-  font-weight: 800;
-  letter-spacing: 0.015em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
 }
 
