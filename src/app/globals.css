@@ -43,12 +43,12 @@ html {
   scroll-behavior: smooth;
   color-scheme: dark;
   --chrome-top: 2.85rem;
-  --support-h: 2.45rem;
+  --support-h: 2.3rem;
 }
 @media (min-width: 640px) {
   html {
     --chrome-top: 4.15rem;
-    --support-h: 2.5rem;
+    --support-h: 2.35rem;
   }
 }
 body:has(header[data-editing="true"]) {
@@ -1131,7 +1131,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   position: fixed;
   z-index: 46;
   left: 50%;
-  bottom: calc(0.4rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(0.2rem + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
   justify-content: center;
