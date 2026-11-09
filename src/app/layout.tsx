@@ -7,6 +7,7 @@ import { SiteJsonLd } from "@/components/seo/JsonLd";
 import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import "./article-typography.css";
 
 const workSans = Manrope({
   variable: "--font-work-sans",
