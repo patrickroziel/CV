@@ -26,11 +26,9 @@ export function SupportBar() {
           </svg>
         </span>
         <span className="support-bar__copy">
-          <span className="support-bar__kicker">Ko-fi</span>
-          <span className="support-bar__title">tips</span>
+          <span className="support-bar__title">Tips</span>
         </span>
         <span className="support-bar__cta">
-          <span>Soutenir</span>
           <svg viewBox="0 0 16 16" className="support-bar__arrow" aria-hidden="true">
             <path
               d="M3 8h10M9 4l4 4-4 4"
