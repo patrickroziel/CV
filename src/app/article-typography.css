@@ -1,7 +1,7 @@
 /* Typographie éditoriale — Notes et Air.
    Appliquée au rendu complet des articles, y compris aux brouillons visibles en mode édition.
-   17pt CSS = 22,6667px ; !important neutralise les tailles enregistrées dans le HTML riche. */
+   14pt CSS ; !important neutralise les tailles enregistrées dans le HTML riche. */
 .article-ink,
 .article-ink * {
-  font-size: 17pt !important;
+  font-size: 14pt !important;
 }
