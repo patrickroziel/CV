@@ -226,7 +226,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                   || (post.fileKind === "image" ? post.fileUrl : null);
                 return (
                   <Link key={post.id} href={`/notes/${post.id}`} className="flex aspect-square min-w-0 flex-col items-stretch gap-2 rounded-2xl border border-white/10 bg-[rgba(3,16,20,0.72)] p-2 shadow-xl backdrop-blur-xl transition hover:border-cyan-100/25 sm:aspect-auto sm:flex-row sm:items-center sm:gap-3">
-                    <span className="relative aspect-square w-full shrink-0 overflow-hidden rounded-xl bg-black/40 sm:aspect-auto sm:h-14 sm:w-16 sm:rounded-xl sm:w-24">
+                    <span className="relative h-16 w-full shrink-0 overflow-hidden rounded-xl bg-black/40 sm:h-14 sm:w-24">
                       {visual ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={displayImageUrl(visual, 256)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
