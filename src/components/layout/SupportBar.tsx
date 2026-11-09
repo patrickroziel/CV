@@ -29,15 +29,10 @@ export function SupportBar() {
           <span className="support-bar__title">Tips</span>
         </span>
         <span className="support-bar__cta">
-          <svg viewBox="0 0 16 16" className="support-bar__arrow" aria-hidden="true">
-            <path
-              d="M3 8h10M9 4l4 4-4 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg viewBox="0 0 24 24" className="support-bar__card" fill="none" aria-hidden="true">
+            <rect x="3" y="5.5" width="18" height="13" rx="2.2" stroke="currentColor" strokeWidth="1.6" />
+            <path d="M3.5 9.5h17" stroke="currentColor" strokeWidth="1.6" />
+            <path d="M7 14.5h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
         </span>
       </span>
