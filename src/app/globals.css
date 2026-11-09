@@ -2125,14 +2125,10 @@ blockquote.rich-link-card.ghost-link-card {
     0 8px 16px -10px rgba(227, 154, 98, 0.95);
 }
 
-.kofi-card__cup {
-  height: 1.15rem;
-  width: 1.15rem;
-}
-
-.kofi-card__steam {
-  transform-origin: center;
-  animation: kofi-steam 2.8s ease-in-out infinite;
+.kofi-card__card {
+  display: block;
+  height: 1.2rem;
+  width: 1.2rem;
 }
 
 .blob-wip {
