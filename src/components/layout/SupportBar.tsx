@@ -18,13 +18,6 @@ export function SupportBar() {
       >
       <span className="support-bar__sheen" aria-hidden="true" />
       <span className="support-bar__inner">
-        <span className="support-bar__mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" className="support-bar__cup" fill="none">
-            <rect x="2.5" y="6" width="19" height="12" rx="2.2" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M2.5 10h19" stroke="currentColor" strokeWidth="1.5" />
-            <rect x="5.2" y="12.6" width="3.4" height="2.3" rx="0.4" fill="currentColor" />
-          </svg>
-        </span>
         <span className="support-bar__copy">
           <span className="support-bar__title">Tips</span>
         </span>
