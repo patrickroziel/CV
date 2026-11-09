@@ -225,16 +225,16 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                   || (post.featuredEmbed?.type === "image" ? post.featuredEmbed.url : null)
                   || (post.fileKind === "image" ? post.fileUrl : null);
                 return (
-                  <Link key={post.id} href={`/notes/${post.id}`} className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-[rgba(3,16,20,0.72)] p-2 shadow-xl backdrop-blur-xl transition hover:border-cyan-100/25">
-                    <span className="relative h-14 w-16 shrink-0 overflow-hidden rounded-xl bg-black/40 sm:w-24">
+                  <Link key={post.id} href={`/notes/${post.id}`} className="flex aspect-square min-w-0 flex-col items-stretch gap-2 rounded-2xl border border-white/10 bg-[rgba(3,16,20,0.72)] p-2 shadow-xl backdrop-blur-xl transition hover:border-cyan-100/25 sm:aspect-auto sm:flex-row sm:items-center sm:gap-3">
+                    <span className="relative aspect-square w-full shrink-0 overflow-hidden rounded-xl bg-black/40 sm:aspect-auto sm:h-14 sm:w-16 sm:rounded-xl sm:w-24">
                       {visual ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={displayImageUrl(visual, 256)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                       ) : null}
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block break-words text-sm font-semibold leading-5 text-white">{title}</span>
-                      {subtitle ? <span className="mt-0.5 block break-words text-xs leading-5 text-zinc-400">{subtitle}</span> : null}
+                    <span className="flex min-h-0 min-w-0 flex-1 flex-col">
+                      <span className="line-clamp-2 break-words text-xs font-semibold leading-4 text-white sm:text-sm sm:leading-5">{title}</span>
+                      {subtitle ? <span className="mt-1 line-clamp-2 break-words text-[10px] leading-4 text-zinc-400 sm:line-clamp-3 sm:text-xs sm:leading-5">{subtitle}</span> : null}
                     </span>
                   </Link>
                 );
