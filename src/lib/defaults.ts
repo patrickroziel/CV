@@ -16,8 +16,8 @@ import snapshot from "./default-snapshot.json";
 import { normalizeGhostPages } from "./ghost-pages";
 
 /**
- * Production defaults = full portfolio snapshot (Cloudinary media, languages,
- * feature videos, multilingual content). Used when localStorage is empty
+ * Production defaults = baked portfolio snapshot (legacy media, languages,
+ * feature videos and content). Used when localStorage is empty
  * (first visit / production). Edit mode can still override via localStorage.
  */
 const snap = snapshot as unknown as PortfolioData;

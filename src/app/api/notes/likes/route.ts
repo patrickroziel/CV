@@ -5,11 +5,11 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const noCache = { "Cache-Control": "private, no-store" };
 
-/** Counts for every visible heart, in a single database round-trip. */
+/** Counts for every visible heart, in a batched private-storage reads. */
 export async function GET(request: NextRequest) {
   const ids = cleanPostIds((request.nextUrl.searchParams.get("ids") ?? "").split(","));
   if (!ids.length) return NextResponse.json({ posts: {} }, { headers: noCache });
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.PRIVATE_BLOB_READ_WRITE_TOKEN) {
     const posts = Object.fromEntries(ids.map((id) => [id, { available: false, count: 0, liked: false }]));
     return NextResponse.json({ posts }, { headers: noCache });
   }

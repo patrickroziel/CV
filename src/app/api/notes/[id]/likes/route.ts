@@ -17,7 +17,7 @@ function correctOrigin(request: NextRequest) {
 export async function GET(request: NextRequest, { params }: Context) {
   const { id } = await params;
   if (!(await isPublishedPost(id))) return NextResponse.json({ error: "Publication introuvable" }, { status: 404, headers: noCache });
-  if (!process.env.DATABASE_URL) return NextResponse.json({ available: false, liked: false, count: 0 }, { headers: noCache });
+  if (!process.env.PRIVATE_BLOB_READ_WRITE_TOKEN) return NextResponse.json({ available: false, liked: false, count: 0 }, { headers: noCache });
   try {
     const cookie = request.cookies.get(likeCookie)?.value;
     const hash = tokenLooksValid(cookie) ? visitorHash(id, cookie!) : null;
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest, { params }: Context) {
   const { id } = await params;
   if (!correctOrigin(request)) return NextResponse.json({ error: "Origine non autorisée" }, { status: 403, headers: noCache });
   if (!(await isPublishedPost(id))) return NextResponse.json({ error: "Publication introuvable" }, { status: 404, headers: noCache });
-  if (!process.env.DATABASE_URL) return NextResponse.json({ error: "Base Neon non configurée" }, { status: 503, headers: noCache });
+  if (!process.env.PRIVATE_BLOB_READ_WRITE_TOKEN) return NextResponse.json({ error: "Stockage privé non configuré" }, { status: 503, headers: noCache });
   if (Number(request.headers.get("content-length") ?? 0) > 2048)
     return NextResponse.json({ error: "Requête trop volumineuse" }, { status: 413, headers: noCache });
   let body: unknown;
