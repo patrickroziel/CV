@@ -9,18 +9,18 @@ export const dynamic = "force-dynamic";
 const headers = { "Cache-Control": "private, no-store" };
 export async function GET() {
   if (!(await isBackofficeAdmin())) return NextResponse.json({ error: "Accès refusé." }, { status: 401, headers });
-  if (!process.env.DATABASE_URL) return NextResponse.json({ error: "Base de données non configurée." }, { status: 503, headers });
+  if (!process.env.PRIVATE_BLOB_READ_WRITE_TOKEN) return NextResponse.json({ error: "Stockage privé non configuré." }, { status: 503, headers });
   try {
     const result = await readPortfolio();
     return NextResponse.json({
       data: result.data ?? DEFAULT_PORTFOLIO, revision: result.revision, initialized: result.revision > 0,
     }, { headers });
-  } catch { return NextResponse.json({ error: "Base de données indisponible." }, { status: 503, headers }); }
+  } catch { return NextResponse.json({ error: "Stockage privé indisponible." }, { status: 503, headers }); }
 }
 export async function PUT(request: Request) {
   if (!(await isBackofficeAdmin())) return NextResponse.json({ error: "Accès refusé." }, { status: 401, headers });
   if (!validateOrigin(request)) return NextResponse.json({ error: "Origine interdite." }, { status: 403, headers });
-  if (!process.env.DATABASE_URL) return NextResponse.json({ error: "Base de données non configurée." }, { status: 503, headers });
+  if (!process.env.PRIVATE_BLOB_READ_WRITE_TOKEN) return NextResponse.json({ error: "Stockage privé non configuré." }, { status: 503, headers });
   if (Number(request.headers.get("content-length") ?? 0) > 3_000_000)
     return NextResponse.json({ error: "Contenu trop volumineux." }, { status: 413, headers });
   let body: string;

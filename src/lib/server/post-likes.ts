@@ -1,54 +1,36 @@
+import "server-only";
+
 import { createHash } from "node:crypto";
-import { unstable_cache } from "next/cache";
-import { neon } from "@neondatabase/serverless";
-import { getPublicNote } from "@/lib/server/notes-sharing";
+import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
+import { getPublicNote, listPublicPosts } from "@/lib/server/notes-sharing";
 
 export const likeCookie = "pr_post_reaction";
 const VALID_ID = /^[a-zA-Z0-9_-]{1,120}$/;
 const TOKEN_PATTERN = /^[a-f0-9]{64}$/;
 const MAX_BATCH = 60;
-let schemaReady: Promise<void> | undefined;
+const HASH_PATTERN = /^[a-f0-9]{64}$/;
 
-function database() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error("DATABASE_URL n'est pas définie");
-  return neon(connectionString);
+function token() {
+  const value = process.env.PRIVATE_BLOB_READ_WRITE_TOKEN?.trim();
+  if (!value) throw new Error("Stockage privé non configuré");
+  return value;
+}
+function pathFor(id: string) {
+  if (!VALID_ID.test(id)) throw new Error("Identifiant de publication invalide");
+  return `portfolio-private/likes/${id}.json`;
 }
 
-async function readyDatabase() {
-  const sql = database();
-  if (!schemaReady) {
-    schemaReady = (async () => {
-      await sql`CREATE TABLE IF NOT EXISTS portfolio_post_likes (
-        post_id text NOT NULL,
-        visitor_hash text NOT NULL,
-        created_at timestamptz NOT NULL DEFAULT now(),
-        PRIMARY KEY (post_id, visitor_hash)
-      )`;
-    })().catch(error => { schemaReady = undefined; throw error; });
-  }
-  await schemaReady;
-  return sql;
-}
+type LikesRecord = { hashes: string[]; etag: string | null };
 
-/**
- * Published ids only. The full portfolio JSON stays out of this path:
- * a likes check must not transfer every article.
- */
-const publishedIds = unstable_cache(async () => {
-  const sql = await readyDatabase();
-  const rows = await sql`
-    SELECT post->>'id' AS id
-    FROM portfolio_content,
-         LATERAL jsonb_array_elements(COALESCE(payload->'socialPosts', '[]'::jsonb)) AS post
-    WHERE portfolio_content.id = 1
-      AND COALESCE(post->>'visible', 'true') <> 'false'
-      AND COALESCE(post->>'id', '') <> ''
-  `;
-  return rows
-    .map((row) => String(row.id))
-    .filter((id) => VALID_ID.test(id));
-}, ["published-post-ids-v1"], { revalidate: 60, tags: ["portfolio-public"] });
+async function readRecord(id: string): Promise<LikesRecord> {
+  const result = await get(pathFor(id), { access: "private", token: token(), useCache: false });
+  if (!result || result.statusCode === 404 || !result.stream) return { hashes: [], etag: null };
+  if (result.statusCode !== 200) throw new Error("Lecture des réactions impossible");
+  const parsed = (await new Response(result.stream).json()) as { hashes?: unknown };
+  if (!Array.isArray(parsed.hashes) || parsed.hashes.some((hash) => typeof hash !== "string" || !HASH_PATTERN.test(hash)))
+    throw new Error("Réactions stockées invalides");
+  return { hashes: parsed.hashes, etag: result.etag };
+}
 
 export function cleanPostIds(ids: string[]) {
   const unique: string[] = [];
@@ -63,9 +45,10 @@ export function cleanPostIds(ids: string[]) {
 }
 
 export async function publishedIdSet() {
-  if (!process.env.DATABASE_URL) return null;
   try {
-    return new Set(await publishedIds());
+    return new Set((await listPublicPosts())
+      .map((post) => post.id)
+      .filter((id) => VALID_ID.test(id)));
   } catch {
     return null;
   }
@@ -73,63 +56,59 @@ export async function publishedIdSet() {
 
 export async function isPublishedPost(id: string) {
   if (!VALID_ID.test(id)) return false;
-  if (!process.env.DATABASE_URL) {
-    try { return (await getPublicNote(id)) !== null; } catch { return false; }
-  }
-  try {
-    return (await publishedIds()).includes(id);
-  } catch {
-    try { return (await getPublicNote(id)) !== null; } catch { return false; }
-  }
+  try { return (await getPublicNote(id)) !== null; }
+  catch { return false; }
 }
 
-export function tokenLooksValid(token: string | undefined) {
-  return typeof token === "string" && TOKEN_PATTERN.test(token);
+export function tokenLooksValid(value: string | undefined) {
+  return typeof value === "string" && TOKEN_PATTERN.test(value);
 }
 
-/** Token created randomly by the server. Hash varies per post and cannot be used to track a visitor across posts. */
-export function visitorHash(postId: string, token: string) {
-  return createHash("sha256").update("portfolio-like-v1:").update(postId).update(":").update(token).digest("hex");
+export function visitorHash(postId: string, value: string) {
+  return createHash("sha256").update("portfolio-like-v1:").update(postId).update(":").update(value).digest("hex");
 }
 
 export type LikeState = { count: number; liked: boolean };
 
 export async function readLikes(id: string, hash: string | null): Promise<LikeState> {
-  const states = await readLikeStates([id], hash ? { [id]: hash } : {});
-  return states[id] ?? { count: 0, liked: false };
+  const record = await readRecord(id);
+  return { count: record.hashes.length, liked: Boolean(hash && record.hashes.includes(hash)) };
 }
 
-/** One round-trip for every heart on the page. */
 export async function readLikeStates(ids: string[], hashes: Record<string, string>): Promise<Record<string, LikeState>> {
-  const unique = cleanPostIds(ids);
-  const result: Record<string, LikeState> = {};
-  for (const id of unique) result[id] = { count: 0, liked: false };
-  if (!unique.length) return result;
-  const sql = await readyDatabase();
-  const hashList = unique.map((id) => hashes[id]).filter((hash): hash is string => Boolean(hash));
-  const rows = await sql.query(
-    `SELECT post_id,
-            COUNT(*)::int AS count,
-            COALESCE(BOOL_OR(visitor_hash = ANY($2::text[])), false) AS liked
-     FROM portfolio_post_likes
-     WHERE post_id = ANY($1::text[])
-     GROUP BY post_id`,
-    [unique, hashList],
-  );
-  for (const row of rows) {
-    const id = String(row.post_id);
-    if (!result[id]) continue;
-    result[id] = { count: Number(row.count) || 0, liked: row.liked === true };
-  }
-  return result;
+  const states = await Promise.all(cleanPostIds(ids).map(async (id) => {
+    const state = await readLikes(id, hashes[id] || null);
+    return [id, state] as const;
+  }));
+  return Object.fromEntries(states);
 }
 
 export async function updateLike(id: string, hash: string, liked: boolean) {
-  const sql = await readyDatabase();
-  if (liked) {
-    await sql`INSERT INTO portfolio_post_likes (post_id, visitor_hash) VALUES (${id}, ${hash}) ON CONFLICT DO NOTHING`;
-  } else {
-    await sql`DELETE FROM portfolio_post_likes WHERE post_id = ${id} AND visitor_hash = ${hash}`;
+  if (!HASH_PATTERN.test(hash)) throw new Error("Réaction invalide");
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const previous = await readRecord(id);
+    const next = liked
+      ? [...new Set([...previous.hashes, hash])]
+      : previous.hashes.filter((value) => value !== hash);
+    if (next.length === previous.hashes.length) {
+      return { count: next.length, liked: next.includes(hash) };
+    }
+    try {
+      await put(pathFor(id), JSON.stringify({ hashes: next }), {
+        access: "private",
+        token: token(),
+        contentType: "application/json",
+        addRandomSuffix: false,
+        ...(previous.etag
+          ? { allowOverwrite: true, ifMatch: previous.etag }
+          : { allowOverwrite: false }),
+      });
+      return { count: next.length, liked: next.includes(hash) };
+    } catch (error) {
+      if (error instanceof BlobPreconditionFailedError ||
+          /pathname.already.exists|already exists|precondition.failed|conflict/i.test(String(error))) continue;
+      throw error;
+    }
   }
-  return readLikes(id, hash);
+  throw new Error("Trop de modifications simultanées des réactions");
 }

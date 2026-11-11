@@ -1,60 +1,51 @@
 import "server-only";
 
+import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
-import { neon } from "@neondatabase/serverless";
 import { normalizeGhostPages } from "@/lib/ghost-pages";
 import { concealHiddenPost } from "@/lib/post-publication";
 import type { PortfolioData } from "@/lib/types";
 
 type Snapshot = { data: PortfolioData | null; revision: number };
+type StoredSnapshot = { data: PortfolioData; revision: number };
+type StoredWithTag = Snapshot & { etag: string | null };
 
-const PUBLIC_TTL_MS = 60_000;
+const SNAPSHOT_KEY = "portfolio-private/content.json";
 const PUBLIC_CACHE_TAG = "portfolio-public";
+const PUBLIC_TTL_MS = 60_000;
 
-function connection() {
-  const url = process.env.DATABASE_URL;
-  return url ? neon(url) : null;
-}
-let initialized: Promise<void> | undefined;
-async function ensureTable() {
-  const sql = connection();
-  if (!sql) return;
-  if (!initialized) {
-    initialized = (async () => {
-      await sql`CREATE TABLE IF NOT EXISTS portfolio_content (
-        id integer PRIMARY KEY CHECK (id = 1),
-        payload jsonb NOT NULL,
-        revision integer NOT NULL DEFAULT 1,
-        updated_at timestamptz NOT NULL DEFAULT now()
-      )`;
-    })().catch((error) => { initialized = undefined; throw error; });
-  }
-  await initialized;
+function token() {
+  return process.env.PRIVATE_BLOB_READ_WRITE_TOKEN?.trim() ?? "";
 }
 
-/** Fresh read for the back-office. Do not use this on public traffic. */
+async function readStored(): Promise<StoredWithTag> {
+  if (!token()) return { data: null, revision: 0, etag: null };
+  const result = await get(SNAPSHOT_KEY, {
+    access: "private",
+    token: token(),
+    useCache: false,
+  });
+  if (!result || result.statusCode === 404 || !result.stream) return { data: null, revision: 0, etag: null };
+  if (result.statusCode !== 200) throw new Error("Lecture du stockage privé impossible.");
+  const value = (await new Response(result.stream).json()) as Partial<StoredSnapshot>;
+  if (!value.data || !Number.isSafeInteger(value.revision) || (value.revision ?? 0) < 1)
+    throw new Error("Sauvegarde privée invalide.");
+  return { data: value.data, revision: value.revision!, etag: result.etag };
+}
+
+/** Fresh read for authenticated administrators. */
 export async function readPortfolio(): Promise<Snapshot> {
-  const sql = connection();
-  if (!sql) return { data: null, revision: 0 };
-  await ensureTable();
-  const rows = await sql`SELECT payload, revision FROM portfolio_content WHERE id = 1 LIMIT 1`;
-  if (!rows.length) return { data: null, revision: 0 };
-  return { data: rows[0].payload as PortfolioData, revision: Number(rows[0].revision) };
+  const { data, revision } = await readStored();
+  return { data, revision };
 }
 
-const readPortfolioShared = unstable_cache(
-  async () => readPortfolio(),
-  ["portfolio-public-v1"],
+const shared = unstable_cache(
+  () => readPortfolio(),
+  ["portfolio-public-blob-v1"],
   { revalidate: 60, tags: [PUBLIC_CACHE_TAG] },
 );
-
 let memory: { at: number; snapshot: Snapshot } | null = null;
 let inflight: Promise<Snapshot> | null = null;
-
-function remember(snapshot: Snapshot) {
-  memory = { at: Date.now(), snapshot };
-  return snapshot;
-}
 
 function invalidatePublicPortfolio() {
   memory = null;
@@ -68,45 +59,51 @@ function invalidatePublicPortfolio() {
     revalidatePath("/g/[slug]", "page");
     revalidatePath("/sitemap.xml");
   } catch {
-    // Best-effort outside a request. The memory cache is already cleared.
+    // Cache invalidation is best effort outside a request.
   }
 }
 
-/**
- * Public reads share one Neon fetch per minute.
- * The raw snapshot can contain drafts: callers must filter before responding.
- */
+/** Public callers still filter drafts before responding. */
 export async function readPublicPortfolio(): Promise<Snapshot> {
-  if (!process.env.DATABASE_URL) return { data: null, revision: 0 };
+  if (!token()) return { data: null, revision: 0 };
   if (memory && Date.now() - memory.at < PUBLIC_TTL_MS) return memory.snapshot;
   if (!inflight) {
-    inflight = readPortfolioShared()
-      .then((snapshot) => remember(snapshot))
-      .catch(() => readPortfolio().then((snapshot) => remember(snapshot)))
+    inflight = shared()
+      .catch(() => readPortfolio())
+      .then((snapshot) => {
+        memory = { at: Date.now(), snapshot };
+        return snapshot;
+      })
       .finally(() => { inflight = null; });
   }
   return inflight;
 }
 
+/** Optimistic write using a private Blob ETag, never overwriting a newer revision. */
 export async function writePortfolio(data: PortfolioData, expectedRevision: number): Promise<number | null> {
-  const sql = connection();
-  if (!sql) throw new Error("DATABASE_URL manquante");
-  await ensureTable();
-  const payload = JSON.stringify(data);
-  if (expectedRevision === 0) {
-    const rows = await sql`INSERT INTO portfolio_content (id, payload, revision)
-      VALUES (1, ${payload}::jsonb, 1) ON CONFLICT (id) DO NOTHING RETURNING revision`;
-    if (!rows.length) return null;
-    invalidatePublicPortfolio();
-    return Number(rows[0].revision);
+  if (!token()) throw new Error("PRIVATE_BLOB_READ_WRITE_TOKEN manquant");
+  const previous = await readStored();
+  if (previous.revision !== expectedRevision) return null;
+  const payload = JSON.stringify({ data, revision: expectedRevision + 1 } satisfies StoredSnapshot);
+  try {
+    await put(SNAPSHOT_KEY, payload, {
+      access: "private",
+      token: token(),
+      contentType: "application/json",
+      addRandomSuffix: false,
+      ...(previous.etag
+        ? { allowOverwrite: true, ifMatch: previous.etag }
+        : { allowOverwrite: false }),
+    });
+  } catch (error) {
+    if (error instanceof BlobPreconditionFailedError ||
+        /pathname.already.exists|already exists|precondition.failed|conflict/i.test(String(error))) return null;
+    throw error;
   }
-  const rows = await sql`UPDATE portfolio_content
-    SET payload = ${payload}::jsonb, revision = revision + 1, updated_at = now()
-    WHERE id = 1 AND revision = ${expectedRevision} RETURNING revision`;
-  if (!rows.length) return null;
   invalidatePublicPortfolio();
-  return Number(rows[0].revision);
+  return expectedRevision + 1;
 }
+
 export function publicPortfolio(data: PortfolioData): PortfolioData {
   return {
     ...data,

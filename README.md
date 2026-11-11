@@ -53,11 +53,6 @@ Seule l’URL publique est enregistrée dans le portfolio (`localStorage`).
 | Images, PDF, HTML, SVG, vidéos **légères** / **alpha** | **Vercel Blob** |
 | Showreel, démos longues, feature cards vidéo | **YouTube non listé** (lien uniquement) |
 
-### Migration Cloudinary
-
-- Les URLs `res.cloudinary.com` déjà présentes dans les **defaults** ou le **localStorage** continuent de s’afficher (aucune migration forcée).
-- Les **nouveaux** fichiers n’utilisent plus Cloudinary (plus de preset unsigned / signature).
-- L’ancienne route `POST /api/cloudinary/sign` répond `410 Gone`.
 
 ## Fonctionnalités
 
@@ -72,3 +67,7 @@ Seule l’URL publique est enregistrée dans le portfolio (`localStorage`).
 
 - Les données sont stockées dans le navigateur (`mon-portfolio-v2-data`). Pas d’auth serveur.
 - Ne jamais committer `.env.local` ni le token Blob.
+
+## Préparation à la migration du back-office
+
+La future version sans Neon conserve les contenus dans un **store privé Vercel Blob**, distinct du stockage public des médias, via `PRIVATE_BLOB_READ_WRITE_TOKEN`. Les médias récents utilisent Cloudflare R2. Cette branche reste en attente de sauvegarde et de migration : **ne pas fusionner avant vérification des données**. Voir `docs/MIGRATION-SANS-NEON-CLOUDINARY.md`.
