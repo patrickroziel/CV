@@ -44,13 +44,14 @@ function previewText(html: string) {
 }
 
 function AirCardParts({ postId, parts }: { postId: string; parts: { label: string; index: number }[] }) {
+  const [open, setOpen] = useState<number[]>([]);
   if (!parts.length) return null;
   return (
     <div className="air-card-parts">
       {parts.map((part, order) => {
         const n = part.index + 1;
         const href = `/air/${postId}#${airPartAnchor(postId, part.index)}`;
-        if (order < 2) {
+        if (order < 2 || open.includes(part.index)) {
           return (
             <Link key={part.index} href={href} className="air-card-part" title={`Partie ${n}. ${part.label}`}>
               <span className="air-part-num">{n}</span>
@@ -59,9 +60,9 @@ function AirCardParts({ postId, parts }: { postId: string; parts: { label: strin
           );
         }
         return (
-          <Link key={part.index} href={href} className="air-card-dot" title={`Partie ${n}. ${part.label}`} aria-label={`Partie ${n}. ${part.label}`}>
+          <button key={part.index} type="button" className="air-card-dot" title={`Afficher la partie ${n}`} aria-label={`Afficher la partie ${n}. ${part.label}`} onClick={() => setOpen((current) => [...current, part.index])}>
             {n}
-          </Link>
+          </button>
         );
       })}
     </div>

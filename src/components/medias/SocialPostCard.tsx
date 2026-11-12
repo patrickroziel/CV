@@ -43,13 +43,14 @@ function PostPreview({ html, title, inlineMedia }: { html: string; title: string
 
 function NoteCardParts({ postId, html }: { postId: string; html: string }) {
   const parts = notePartTitles(html);
+  const [open, setOpen] = useState<number[]>([]);
   if (!parts.length) return null;
   return (
     <div className="air-card-parts !mt-0">
       {parts.map((part, order) => {
         const n = part.index + 1;
         const href = `/notes/${postId}#${notePartAnchor(postId, part.index)}`;
-        if (order < 2) {
+        if (order < 2 || open.includes(part.index)) {
           return (
             <Link key={part.index} href={href} className="air-card-part" title={`Partie ${n}. ${part.label}`}>
               <span className="air-part-num">{n}</span>
@@ -58,9 +59,9 @@ function NoteCardParts({ postId, html }: { postId: string; html: string }) {
           );
         }
         return (
-          <Link key={part.index} href={href} className="air-card-dot" title={`Partie ${n}. ${part.label}`} aria-label={`Partie ${n}. ${part.label}`}>
+          <button key={part.index} type="button" className="air-card-dot" title={`Afficher la partie ${n}`} aria-label={`Afficher la partie ${n}. ${part.label}`} onClick={() => setOpen((current) => [...current, part.index])}>
             {n}
-          </Link>
+          </button>
         );
       })}
     </div>
