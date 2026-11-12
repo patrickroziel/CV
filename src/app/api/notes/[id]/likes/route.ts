@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { blobReady } from "@/lib/server/json-blob";
 import { isPublishedPost, likeCookie, readLikes, tokenLooksValid, updateLike, visitorHash } from "@/lib/server/post-likes";
 
 export const runtime = "nodejs";
@@ -17,7 +18,7 @@ function correctOrigin(request: NextRequest) {
 export async function GET(request: NextRequest, { params }: Context) {
   const { id } = await params;
   if (!(await isPublishedPost(id))) return NextResponse.json({ error: "Publication introuvable" }, { status: 404, headers: noCache });
-  if (!process.env.DATABASE_URL) return NextResponse.json({ available: false, liked: false, count: 0 }, { headers: noCache });
+  if (!blobReady()) return NextResponse.json({ available: false, liked: false, count: 0 }, { headers: noCache });
   try {
     const cookie = request.cookies.get(likeCookie)?.value;
     const hash = tokenLooksValid(cookie) ? visitorHash(id, cookie!) : null;
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest, { params }: Context) {
   const { id } = await params;
   if (!correctOrigin(request)) return NextResponse.json({ error: "Origine non autorisée" }, { status: 403, headers: noCache });
   if (!(await isPublishedPost(id))) return NextResponse.json({ error: "Publication introuvable" }, { status: 404, headers: noCache });
-  if (!process.env.DATABASE_URL) return NextResponse.json({ error: "Base Neon non configurée" }, { status: 503, headers: noCache });
+  if (!blobReady()) return NextResponse.json({ error: "Les likes sont momentanément indisponibles." }, { status: 503, headers: noCache });
   if (Number(request.headers.get("content-length") ?? 0) > 2048)
     return NextResponse.json({ error: "Requête trop volumineuse" }, { status: 413, headers: noCache });
   let body: unknown;

@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { blobReady } from "@/lib/server/json-blob";
 import { cleanPostIds, likeCookie, publishedIdSet, readLikeStates, tokenLooksValid, visitorHash } from "@/lib/server/post-likes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const noCache = { "Cache-Control": "private, no-store" };
 
-/** Counts for every visible heart, in a single database round-trip. */
+/** Counts for every visible heart, without touching Neon. */
 export async function GET(request: NextRequest) {
   const ids = cleanPostIds((request.nextUrl.searchParams.get("ids") ?? "").split(","));
   if (!ids.length) return NextResponse.json({ posts: {} }, { headers: noCache });
-  if (!process.env.DATABASE_URL) {
+  if (!blobReady()) {
     const posts = Object.fromEntries(ids.map((id) => [id, { available: false, count: 0, liked: false }]));
     return NextResponse.json({ posts }, { headers: noCache });
   }

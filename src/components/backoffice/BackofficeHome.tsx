@@ -1,10 +1,21 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type PortfolioCloudState = {
   data: Record<string, unknown>;
   revision: number;
   initialized: boolean;
+  storage?: "neon" | "blob" | "snapshot";
+};
+
+type ModerationComment = {
+  id: string;
+  postId: string;
+  postTitle: string;
+  name: string;
+  body: string;
+  status: "pending" | "approved";
+  createdAt: string;
 };
 
 export function BackofficeHome({ authenticated, privatePath }: { authenticated: boolean; privatePath: string }) {
@@ -13,6 +24,33 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
   const [message, setMessage] = useState("");
   const [logoutError, setLogoutError] = useState(false);
   const [blobNote, setBlobNote] = useState("");
+  const [storageNote, setStorageNote] = useState("");
+  const [pending, setPending] = useState<ModerationComment[]>([]);
+  const [approved, setApproved] = useState<ModerationComment[]>([]);
+
+  async function loadComments() {
+    const response = await fetch("/api/backoffice/comments", { cache: "no-store" });
+    if (!response.ok) return;
+    const result = await response.json() as { pending?: ModerationComment[]; approved?: ModerationComment[] };
+    setPending(result.pending ?? []);
+    setApproved(result.approved ?? []);
+  }
+
+  useEffect(() => {
+    if (!authenticated) return;
+    let active = true;
+    fetch("/api/backoffice/content", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() as Promise<PortfolioCloudState> : null)
+      .then((state) => {
+        if (!active || !state) return;
+        setStorageNote(state.storage === "neon"
+          ? ""
+          : "Neon est en pause. Tu peux quand même modifier le site : ouvre Notes ou Work, puis « Modifier ». Tes textes restent enregistrés.");
+      })
+      .catch(() => { if (active) setStorageNote("Le contenu met un peu de temps à répondre. Réessaie dans un instant."); });
+    void loadComments();
+    return () => { active = false; };
+  }, [authenticated]);
 
   async function moveBlobToCloudflare() {
     setBusy(true);
@@ -60,7 +98,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
     const response = await fetch("/api/backoffice/content", { cache: "no-store" });
     if (!response.ok) {
       const detail = (await response.json().catch(() => ({}))) as { error?: string };
-      throw new Error(detail.error || "Connexion à la base de données impossible.");
+      throw new Error(detail.error || "Contenu indisponible.");
     }
     return response.json() as Promise<PortfolioCloudState>;
   }
@@ -92,29 +130,28 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
     try {
       const cloud = await currentCloud();
       if (cloud.initialized) {
-        setMessage("Le cloud contient déjà des données. Rien n'a été remplacé.");
+        setMessage("Le site a déjà un contenu enregistré. Rien n'a été remplacé.");
         return;
       }
       if (!window.confirm(
-        "Initialiser le cloud avec le contenu déjà publié sur le site ? Les brouillons uniquement stockés sur ton iMac ne sont pas inclus. Choisis plutôt Importer un export JSON si tu souhaites conserver ces brouillons."
+        "Enregistrer le contenu déjà publié sur le site ? Les brouillons uniquement stockés sur ton iMac ne sont pas inclus."
       )) {
-        setMessage("Initialisation annulée. Aucune modification.");
+        setMessage("Annulé. Rien n'a changé.");
         return;
       }
-      // Back up the exact source before initialising the database.
       download(cloud.data, "portfolio-before-cloud-setup");
       const response = await fetch("/api/backoffice/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: cloud.data, expectedRevision: 0 }),
+        body: JSON.stringify({ data: cloud.data, expectedRevision: cloud.revision }),
       });
       if (!response.ok) {
         const details = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(details.error || "Initialisation refusée.");
+        throw new Error(details.error || "Enregistrement refusé.");
       }
-      setMessage("Contenu déjà publié synchronisé ! Ouvre Work ou Notes pour commencer l'édition. Une copie JSON a été téléchargée.");
+      setMessage("Contenu enregistré. Ouvre Work ou Notes, puis « Modifier ».");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Initialisation impossible.");
+      setMessage(error instanceof Error ? error.message : "Enregistrement impossible.");
     } finally { setBusy(false); }
   }
 
@@ -129,10 +166,9 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
       }
       const cloud = await currentCloud();
       if (cloud.initialized) {
-        // Export the old state before replacement, even if the import is cancelled.
         download(cloud.data, "portfolio-before-import");
-        if (!window.confirm("Une sauvegarde cloud vient d'être téléchargée. Confirmer le remplacement de toutes les données cloud par ce JSON ?")) {
-          setMessage("Import annulé. Aucune donnée remplacée.");
+        if (!window.confirm("Une sauvegarde vient d'être téléchargée. Remplacer tout le contenu par ce JSON ?")) {
+          setMessage("Import annulé. Rien n'a été remplacé.");
           return;
         }
       }
@@ -145,9 +181,27 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
         const details = (await response.json().catch(() => ({}))) as { error?: string };
         throw new Error(details.error || "Import impossible.");
       }
-      setMessage("Import terminé. Tu peux maintenant ouvrir Work ou Notes et activer Modifier.");
+      setMessage("Import terminé. Ouvre Work ou Notes, puis « Modifier ».");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Import impossible."); }
     finally { setBusy(false); if (input.current) input.current.value = ""; }
+  }
+
+  async function decide(id: string, action: "approve" | "reject" | "delete") {
+    setBusy(true);
+    try {
+      const response = await fetch("/api/backoffice/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action }),
+      });
+      const result = await response.json().catch(() => ({})) as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Action impossible.");
+      await loadComments();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Action impossible.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -162,7 +216,8 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
           </>
         ) : (
           <div className="space-y-5">
-            <p className="text-sm text-cyan-100">Session administrateur active. Ton interface Work et Notes reste inchangée.</p>
+            <p className="text-sm text-cyan-100">Tu es connecté. Work et Notes n'ont pas changé d'adresse.</p>
+            {storageNote && <p className="rounded-2xl border border-cyan-100/20 bg-cyan-100/5 px-4 py-3 text-sm text-cyan-50">{storageNote}</p>}
             <div className="flex flex-wrap gap-3">
               <a href="/" className="rounded-xl bg-cyan-200 px-5 py-3 text-sm font-semibold text-slate-950">Modifier Work</a>
               <a href="/notes" className="rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Gérer Notes</a>
@@ -170,15 +225,41 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
             </div>
             <p className="text-xs text-zinc-400">Dans Work ou Notes, clique sur « Modifier » pour afficher les commandes d'édition.</p>
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <h2 className="font-semibold">Contenu et sauvegardes</h2>
-              <p className="mt-2 text-sm text-zinc-300">Pour commencer, importe le dernier export JSON de ton iMac (y compris les brouillons). Si tu n'as pas cet export sous la main, tu peux initialiser le cloud à partir du contenu déjà publié sur le site. Tes brouillons présents uniquement sur l'iMac ne seront pas inclus.</p>
+              <h2 className="font-semibold">Commentaires</h2>
+              <p className="mt-2 text-sm text-zinc-300">Rien n'apparaît sur le site tant que tu n'as pas cliqué sur Publier.</p>
+              {pending.length === 0 ? <p className="mt-3 text-sm text-zinc-400">Aucun commentaire en attente.</p> : (
+                <ul className="mt-3 space-y-3">
+                  {pending.map((comment) => (
+                    <li key={comment.id} className="rounded-xl border border-white/10 px-3 py-3 text-sm">
+                      <p className="text-xs text-zinc-400">{comment.postTitle} · {comment.name}</p>
+                      <p className="mt-1 whitespace-pre-wrap text-zinc-100">{comment.body}</p>
+                      <div className="mt-2 flex gap-2">
+                        <button type="button" disabled={busy} onClick={() => void decide(comment.id, "approve")} className="rounded-lg bg-cyan-200 px-3 py-1.5 text-xs font-semibold text-slate-950 disabled:opacity-50">Publier</button>
+                        <button type="button" disabled={busy} onClick={() => void decide(comment.id, "reject")} className="rounded-lg border border-white/20 px-3 py-1.5 text-xs disabled:opacity-50">Refuser</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {approved.length > 0 && <ul className="mt-4 space-y-2 border-t border-white/10 pt-3">
+                {approved.map((comment) => (
+                  <li key={comment.id} className="flex items-start justify-between gap-3 text-xs text-zinc-400">
+                    <span><span className="text-zinc-200">{comment.name}</span> — {comment.body}</span>
+                    <button type="button" disabled={busy} onClick={() => void decide(comment.id, "delete")} className="shrink-0 underline disabled:opacity-50">Retirer</button>
+                  </li>
+                ))}
+              </ul>}
+            </section>
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <h2 className="font-semibold">Sauvegardes</h2>
+              <p className="mt-2 text-sm text-zinc-300">Télécharge une copie, ou importe un ancien fichier JSON de ton iMac si tu en as un plus complet.</p>
               <button type="button" disabled={busy} onClick={() => void initializeFromPublishedContent()}
                 className="mt-4 block w-full rounded-xl bg-cyan-200 px-4 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">
-                Initialiser avec le contenu actuellement en ligne
+                Enregistrer le contenu actuellement en ligne
               </button>
               <button disabled={busy} onClick={() => void exportCloud()}
-                className="mt-4 rounded-xl border border-white/25 px-4 py-2 text-sm disabled:opacity-50">Télécharger une sauvegarde cloud</button>
-              <label htmlFor="portfolio-json" className="mt-5 block text-sm font-medium">Importer un export JSON existant</label>
+                className="mt-4 rounded-xl border border-white/25 px-4 py-2 text-sm disabled:opacity-50">Télécharger une sauvegarde</button>
+              <label htmlFor="portfolio-json" className="mt-5 block text-sm font-medium">Importer un export JSON</label>
               <input id="portfolio-json" ref={input} type="file" accept=".json,application/json" disabled={busy}
                 className="mt-2 block w-full text-sm disabled:opacity-50"
                 onChange={(e) => { const selected = e.target.files?.[0]; if (selected) void importSnapshot(selected); }} />

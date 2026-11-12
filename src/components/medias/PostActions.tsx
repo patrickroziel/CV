@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Heart } from "lucide-react";
 import { SITE_LANGUAGE_CODES, SITE_LANGUAGE_STORAGE_KEY } from "@/lib/site-translation";
 
 type ResponseState = { available?: boolean; count?: number; liked?: boolean };
+type PublicComment = { id: string; name: string; body: string; createdAt: string };
 type ShareTarget = "x" | "facebook" | "instagram" | "youtube" | "whatsapp" | "linkedin" | "telegram" | "threads" | "bluesky" | "pinterest" | "email" | "copy" | "more";
 
 const pendingLikes = new Map<string, Array<(state: ResponseState) => void>>();
@@ -65,10 +66,87 @@ function openPopup(href: string) {
   window.open(href, "_blank", "noopener,noreferrer,width=720,height=760");
 }
 
-export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark" }: {
-  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light";
+function CommentThread({ postId, tone }: { postId: string; tone: "dark" | "light" }) {
+  const [comments, setComments] = useState<PublicComment[]>([]);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [body, setBody] = useState("");
+  const [website, setWebsite] = useState("");
+  const [note, setNote] = useState("");
+  const [sending, setSending] = useState(false);
+  const quiet = tone === "light" ? "text-[#1c1917]/55" : "text-zinc-500";
+  const text = tone === "light" ? "text-[#1c1917]/80" : "text-zinc-300";
+  const field = tone === "light"
+    ? "border-[#1c1917]/15 bg-white/40 text-[#1c1917] placeholder:text-[#1c1917]/35"
+    : "border-white/10 bg-white/[0.03] text-zinc-100 placeholder:text-zinc-500";
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/notes/${encodeURIComponent(postId)}/comments`, { cache: "no-store" })
+      .then((response) => response.ok ? response.json() as Promise<{ comments?: PublicComment[] }> : { comments: [] })
+      .then((result) => { if (active) setComments(result.comments ?? []); })
+      .catch(() => { if (active) setComments([]); });
+    return () => { active = false; };
+  }, [postId]);
+
+  async function send(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trap = String(new FormData(event.currentTarget).get("website") || website);
+    setSending(true);
+    setNote("");
+    try {
+      const response = await fetch(`/api/notes/${encodeURIComponent(postId)}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, body, website: trap }),
+      });
+      const result = await response.json().catch(() => ({})) as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Envoi impossible.");
+      setBody("");
+      setOpen(false);
+      setNote("Message reçu. Il sera visible après validation.");
+    } catch (error) {
+      setNote(error instanceof Error ? error.message : "Envoi impossible.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return <div className="mt-1 max-w-xl">
+    {comments.length > 0 && <ul className="mb-2 space-y-1.5">
+      {comments.map((comment) => (
+        <li key={comment.id} className={`text-xs leading-5 ${text}`}>
+          <span className="font-medium">{comment.name}</span>
+          <span className={quiet}> — {comment.body}</span>
+        </li>
+      ))}
+    </ul>}
+    {!open ? (
+      <button type="button" onClick={() => setOpen(true)} className={`text-[11px] ${quiet} hover:underline`}>
+        Commenter
+      </button>
+    ) : (
+      <form className="mt-1 space-y-2" onSubmit={(event) => void send(event)}>
+        <input value={name} onChange={(event) => setName(event.target.value)} maxLength={40} required placeholder="Prénom ou pseudo" aria-label="Prénom ou pseudo"
+          className={`w-full rounded-lg border px-2.5 py-1.5 text-xs outline-none ${field}`} />
+        <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={800} required rows={3} placeholder="Ton message" aria-label="Message"
+          className={`w-full resize-y rounded-lg border px-2.5 py-1.5 text-xs outline-none ${field}`} />
+        <input name="website" value={website} onChange={(event) => setWebsite(event.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+        <div className="flex items-center gap-3">
+          <button type="submit" disabled={sending} className={`text-[11px] underline-offset-2 hover:underline disabled:opacity-50 ${text}`}>
+            {sending ? "Envoi…" : "Envoyer"}
+          </button>
+          <button type="button" onClick={() => setOpen(false)} className={`text-[11px] ${quiet}`}>Annuler</button>
+        </div>
+      </form>
+    )}
+    {note && <p role="status" className={`mt-1 text-[11px] ${text}`}>{note}</p>}
+  </div>;
+}
+
+export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false }: {
+  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean;
 }) {
-  const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(0);
@@ -78,7 +156,6 @@ export function PostActions({ postId, title, summary = "", visible = true, share
   useEffect(() => {
     let active = true;
     if (!visible) return;
-    setReady(false);
     setEnabled(false);
     setCount(0);
     setLiked(false);
@@ -88,19 +165,15 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         setEnabled(state.available === true);
         setCount(Math.max(0, Number(state.count) || 0));
         setLiked(state.liked === true);
-        setReady(true);
       })
-      .catch(() => { if (active) { setEnabled(false); setReady(true); } });
+      .catch(() => { if (active) setEnabled(false); });
     return () => { active = false; };
   }, [postId, visible]);
 
   if (!visible) return null;
 
   async function react() {
-    if (!enabled || busy) {
-      if (!enabled) setMessage("Like indisponible pour le moment.");
-      return;
-    }
+    if (!enabled || busy) return;
     setBusy(true); setMessage("");
     try {
       const response = await fetch(`/api/notes/${encodeURIComponent(postId)}/likes`, {
@@ -110,7 +183,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       if (!response.ok) throw new Error();
       const state = await response.json() as ResponseState;
       setLiked(state.liked === true); setCount(Number(state.count) || 0);
-    } catch { setMessage("Like indisponible, réessaie plus tard."); }
+    } catch { setMessage("Like indisponible."); }
     finally { setBusy(false); }
   }
 
@@ -118,7 +191,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     const url = articleShareUrl(sharePath, postId);
     const headline = title.trim() || "Patrick Roziel";
     const excerpt = summary.trim();
-    const message = [excerpt, url].filter(Boolean).join("\n");
+    const text = [excerpt, url].filter(Boolean).join("\n");
     setMessage("");
     try {
       if (target === "copy") {
@@ -131,23 +204,23 @@ export function PostActions({ postId, title, summary = "", visible = true, share
           await navigator.share({ title: headline, text: excerpt || headline, url });
           return;
         }
-        await navigator.clipboard.writeText(message);
+        await navigator.clipboard.writeText(text);
         setMessage("Lien copié.");
         return;
       }
       if (target === "email") {
-        window.location.href = `mailto:?subject=${encodeURIComponent(headline)}&body=${encodeURIComponent(message)}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(headline)}&body=${encodeURIComponent(text)}`;
         return;
       }
       if (target === "youtube") {
-        await navigator.clipboard.writeText(message);
+        await navigator.clipboard.writeText(text);
         openPopup("https://studio.youtube.com/");
         setMessage("Texte copié. Colle-le dans une publication YouTube.");
         return;
       }
       if (target === "instagram") {
         const imageUrl = coverShareUrl(postId, "story");
-        try { await navigator.clipboard.writeText(message); } catch { /* the image can still be shared */ }
+        try { await navigator.clipboard.writeText(text); } catch { /* the image can still be shared */ }
         try {
           const response = await fetch(imageUrl);
           if (!response.ok) throw new Error();
@@ -171,7 +244,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         return;
       }
       const encodedUrl = encodeURIComponent(url);
-      const encodedMessage = encodeURIComponent(message);
+      const encodedMessage = encodeURIComponent(text);
       const encodedExcerpt = encodeURIComponent(excerpt);
       const hrefs: Partial<Record<ShareTarget, string>> = {
         x: `https://twitter.com/intent/tweet?text=${encodedExcerpt}&url=${encodedUrl}`,
@@ -201,26 +274,19 @@ export function PostActions({ postId, title, summary = "", visible = true, share
   }
 
   const likeClass = tone === "light"
-    ? liked
-      ? "border-[#1c1917]/20 bg-[#1c1917]/[0.04] text-[#7f1d1d]"
-      : "border-[#1c1917]/12 bg-transparent text-[#1c1917]/80 hover:border-[#1c1917]/25 hover:bg-[#1c1917]/[0.03]"
-    : liked
-      ? "border-white/25 bg-white/[0.07] text-rose-100"
-      : "border-white/14 bg-white/[0.03] text-zinc-200 hover:border-white/28 hover:bg-white/[0.06]";
+    ? liked ? "text-[#1c1917]/70" : "text-[#1c1917]/35 hover:text-[#1c1917]/70"
+    : liked ? "text-zinc-300" : "text-zinc-500 hover:text-zinc-300";
   const chipClass = tone === "light"
     ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/75 hover:bg-[#1c1917]/[0.04]"
     : "border-white/12 bg-white/[0.03] text-zinc-300 hover:bg-white/[0.07]";
 
   return <div className="flex min-w-0 flex-col gap-2">
-    <div className="flex min-w-0 flex-wrap items-center gap-2">
-      <button type="button" onClick={() => void react()}
-        aria-pressed={liked} title={liked ? "Retirer mon like" : "J'aime"}
-        className={`inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-[0.78rem] font-medium tracking-[0.01em] transition ${likeClass}`}>
-        <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current" : ""}`} aria-hidden />
-        <span>J'aime</span>
-        {ready && enabled ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
-      </button>
-    </div>
+    <button type="button" onClick={() => void react()} disabled={!enabled || busy}
+      aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
+      className={`inline-flex w-fit items-center gap-1 py-0.5 text-[11px] transition disabled:opacity-40 ${likeClass}`}>
+      <Heart className={`h-3 w-3 ${liked ? "fill-current" : ""}`} aria-hidden />
+      {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
+    </button>
     <div className="flex max-w-full flex-wrap gap-1.5" data-no-translate="true">
       {SHARE_TARGETS.map((item) => (
         <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
@@ -233,6 +299,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         Plus
       </button>
     </div>
+    {comments && <CommentThread postId={postId} tone={tone} />}
     {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
   </div>;
 }
