@@ -90,7 +90,13 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
               className="air-part-dot"
               aria-expanded={opened?.id === part.id}
               title={`Partie ${part.n}. ${part.label}`}
-              onClick={() => setOpenedId((id) => (id === part.id ? null : part.id))}
+              onClick={() => {
+                if (opened?.id === part.id) {
+                  document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  return;
+                }
+                setOpenedId(part.id);
+              }}
             >
               {part.n}
             </button>
@@ -98,10 +104,14 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
         </div>
       ) : null}
       {opened ? (
-        <p className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}>
+        <a
+          href={`#${opened.id}`}
+          className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
+          onClick={jump(opened.id)}
+        >
           <span className="air-part-num">{opened.n}</span>
           <span className="air-part-name">{opened.label}</span>
-        </p>
+        </a>
       ) : null}
       <a
         href={`#${current.id}`}
