@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { WorkShare } from "@/components/work/WorkShare";
 import { DEFAULT_NAV, NAV_ITEM_META } from "@/lib/types";
 import { stripHtml } from "@/lib/sanitize-html";
 
@@ -49,24 +50,25 @@ export function WorkSidebar() {
     [data.experiences, l]
   );
 
+  const bio = stripHtml(l(data.profile?.bio ?? "")).replace(/\s+/g, " ").trim();
+  const row = "flex shrink-0 items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 lg:w-full";
+
   return (
-    <div className="mt-3 rounded-[1.35rem] border border-white/10 bg-[rgba(4,16,20,0.82)] p-3.5 shadow-[0_18px_44px_-30px_rgba(0,0,0,0.95)] backdrop-blur-xl">
-      <p className="mb-2.5 px-2 text-[9px] font-medium uppercase tracking-[0.26em] text-zinc-400">
-        Parcourir
-      </p>
+    <div>
+      <p className="text-xs text-white/60">Patrick Roziel</p>
+      <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Work</h1>
+      {bio ? (
+        <p className="mt-2 max-w-[16rem] text-[13px] leading-5 text-white/65">{bio}</p>
+      ) : null}
 
       <nav
         aria-label="Navigation Work"
-        className="flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0"
+        className="mt-7 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0"
       >
         {items.map((item) => {
           if (item.id !== "experience") {
             return (
-              <a
-                key={item.id}
-                href={item.href}
-                className="flex shrink-0 items-center rounded-xl px-2.5 py-2 text-[0.78rem] font-medium text-zinc-300 transition hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 lg:w-full"
-              >
+              <a key={item.id} href={item.href} className={row}>
                 {item.label}
               </a>
             );
@@ -85,18 +87,13 @@ export function WorkSidebar() {
                 }
               }}
             >
-              <a
-                href={item.href}
-                className="flex items-center rounded-xl px-2.5 py-2 text-[0.78rem] font-medium text-zinc-300 transition hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 lg:w-full"
-              >
+              <a href={item.href} className={row}>
                 {item.label}
               </a>
 
               <div
                 className={`hidden overflow-hidden pl-2 transition-all duration-200 lg:block ${
-                  experienceMenuOpen
-                    ? "max-h-[28rem] opacity-100"
-                    : "max-h-0 opacity-0"
+                  experienceMenuOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
                 }`}
               >
                 <div className="ml-2 border-l border-white/10 py-1 pl-2">
@@ -104,7 +101,7 @@ export function WorkSidebar() {
                     <a
                       key={exp.id}
                       href={exp.href}
-                      className="block rounded-lg px-2 py-1.5 text-[0.68rem] leading-snug text-zinc-500 transition hover:bg-white/[0.06] hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+                      className="block rounded-lg px-2 py-1.5 text-[0.68rem] leading-snug text-white/55 transition hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                     >
                       {exp.label}
                     </a>
@@ -114,6 +111,7 @@ export function WorkSidebar() {
             </div>
           );
         })}
+        <WorkShare plain />
       </nav>
     </div>
   );

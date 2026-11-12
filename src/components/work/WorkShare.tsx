@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const WORK_URL = "https://patrickroziel.com/work";
 
-export function WorkShare({ embedded = false }: { embedded?: boolean }) {
+export function WorkShare({ embedded = false, plain = false }: { embedded?: boolean; plain?: boolean }) {
   const [copied, setCopied] = useState(false);
 
   async function copyAddress() {
@@ -39,6 +39,18 @@ export function WorkShare({ embedded = false }: { embedded?: boolean }) {
       Colle-la où tu veux. La carte du profil s’affiche toute seule.
     </p>
   ) : null;
+
+  if (plain) {
+    return (
+      <button
+        type="button"
+        onClick={() => void copyAddress()}
+        className="flex w-full items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+      >
+        {copied ? "Adresse copiée" : "Partager le profil"}
+      </button>
+    );
+  }
 
   if (embedded) return <div className="w-full pt-1">{button}{hint}</div>;
 
