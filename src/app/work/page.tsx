@@ -11,6 +11,7 @@ import { ShowreelEmbed } from "@/components/shared/ShowreelEmbed";
 import { WorkSidebar } from "@/components/work/WorkSidebar";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { WorkShare } from "@/components/work/WorkShare";
+import { WorkTagTicker } from "@/components/work/WorkTagTicker";
 
 export default function Home() {
   return (
