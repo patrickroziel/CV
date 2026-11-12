@@ -1490,6 +1490,11 @@ a.air-part-float:hover {
   width: 100%;
   max-width: none;
 }
+.reading-title .air-part-float {
+  margin: 0;
+  overflow: visible;
+  border-radius: 1rem;
+}
 .reading-title .air-part-name {
   overflow: visible;
   white-space: normal;
@@ -1515,6 +1520,7 @@ a.air-part-float:hover {
   justify-content: center;
   width: 1.7rem;
   height: 1.7rem;
+  padding: 0;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.32);
   background: rgba(8, 18, 24, 0.72);

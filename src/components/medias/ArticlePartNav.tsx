@@ -33,6 +33,7 @@ export function notePartTitles(html: string) {
 
 export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; tone?: "air" | "notes" }) {
   const [parts, setParts] = useState<Part[]>([]);
+  const [openedId, setOpenedId] = useState<string | null>(null);
 
   useEffect(() => {
     const root = document.getElementById(targetId);
@@ -72,6 +73,7 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   const current = parts[parts.length - 1];
   if (!current) return null;
   const earlier = parts.slice(0, -1);
+  const opened = earlier.find((part) => part.id === openedId) ?? null;
   const jump = (id: string) => (event: MouseEvent) => {
     event.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -82,11 +84,24 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       {earlier.length ? (
         <div className="air-part-nums">
           {earlier.map((part) => (
-            <a key={part.id} href={`#${part.id}`} className="air-part-dot" title={`Partie ${part.n}. ${part.label}`} onClick={jump(part.id)}>
+            <button
+              key={part.id}
+              type="button"
+              className="air-part-dot"
+              aria-expanded={opened?.id === part.id}
+              title={`Partie ${part.n}. ${part.label}`}
+              onClick={() => setOpenedId((id) => (id === part.id ? null : part.id))}
+            >
               {part.n}
-            </a>
+            </button>
           ))}
         </div>
+      ) : null}
+      {opened ? (
+        <p className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}>
+          <span className="air-part-num">{opened.n}</span>
+          <span className="air-part-name">{opened.label}</span>
+        </p>
       ) : null}
       <a
         href={`#${current.id}`}
