@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { Heart } from "lucide-react";
 import { SITE_LANGUAGE_CODES, SITE_LANGUAGE_STORAGE_KEY } from "@/lib/site-translation";
 
@@ -138,8 +139,8 @@ function CommentThread({ postId, tone, open, onSent }: { postId: string; tone: "
   </div>;
 }
 
-export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false }: {
-  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean;
+export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false, floating = false }: {
+  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean; floating?: boolean;
 }) {
   const [enabled, setEnabled] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -147,6 +148,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [commentOpen, setCommentOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -164,6 +166,8 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       .catch(() => { if (active) setEnabled(false); });
     return () => { active = false; };
   }, [postId, visible]);
+
+  useEffect(() => { setMounted(true); }, []);
 
   if (!visible) return null;
 
@@ -277,7 +281,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/70 hover:bg-[#1c1917]/[0.04]"
     : "border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-200";
 
-  return <div className="flex min-w-0 flex-col gap-2">
+  const panel = <div className={`flex min-w-0 flex-col gap-2${floating ? " article-actions-float" : ""}`}>
     <div className="flex items-center gap-3">
       <button type="button" onClick={() => void react()} disabled={!enabled || busy}
         aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
@@ -308,4 +312,6 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     </div>
     {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
   </div>;
+  if (floating) return mounted ? createPortal(panel, document.body) : null;
+  return panel;
 }
