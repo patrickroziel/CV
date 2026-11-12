@@ -1418,16 +1418,22 @@ a.air-part-float:hover {
 .air-part-stack,
 .notes-part-stack {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 0.35rem;
   width: 100%;
   max-width: 100%;
   margin-top: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.air-part-stack::-webkit-scrollbar,
+.notes-part-stack::-webkit-scrollbar { display: none; }
 .air-part-stack .air-part-float,
 .notes-part-stack .air-part-float {
-  width: 100%;
-  max-width: none;
+  width: auto;
+  max-width: 15rem;
+  flex: none;
 }
 .air-part-more {
   display: flex;
@@ -1736,16 +1742,14 @@ a.air-part-float:hover {
     transform 0.48s cubic-bezier(0.22, 0.8, 0.28, 1),
     border-color 0.36s ease;
 }
+.air-part-morph { display: none; }
 .rich-html h2.air-part-title.air-part-held {
-  max-height: 0;
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  border-color: transparent;
-  opacity: 0;
-  transform: translateY(-6px) scale(0.98);
-  pointer-events: none;
+  max-height: none;
+  margin: revert;
+  padding: revert;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
 }
 @media (prefers-reduced-motion: reduce) {
   .rich-html h2.air-part-title,
