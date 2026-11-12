@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 type Part = { id: string; label: string; n: number };
@@ -32,18 +32,7 @@ export function notePartTitles(html: string) {
 }
 
 export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; tone?: "air" | "notes" }) {
-  const [parts, setParts] = useState<Part[]>([]);
-  const [wide, setWide] = useState(false);
-  const [open, setOpen] = useState(false);
-  const openedAt = useRef<number | null>(null);
-
-  useEffect(() => {
-    const media = window.matchMedia("(orientation: landscape)");
-    const apply = () => setWide(media.matches);
-    apply();
-    media.addEventListener("change", apply);
-    return () => media.removeEventListener("change", apply);
-  }, []);
+  const [current, setCurrent] = useState<Part | null>(null);
 
   useEffect(() => {
     const root = document.getElementById(targetId);
@@ -51,7 +40,6 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
     const heads = Array.from(root.querySelectorAll<HTMLElement>("h2.air-part-title"));
     heads.forEach((el, index) => {
       if (!el.id) el.id = `part-${index}-${targetId}`;
-      el.classList.remove("air-part-held");
     });
     const next = heads
       .map((el, index) => ({
@@ -61,20 +49,14 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       }))
       .filter((part) => part.label && part.label.toLocaleLowerCase("fr") !== "titre de la partie");
     const pick = () => {
-      if (openedAt.current != null && window.scrollY < openedAt.current - 24) {
-        openedAt.current = null;
-        setOpen(false);
-      }
       const bar = document.querySelector(".reading-title");
       const line = bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom + 6 : 110;
-      const passed = next.filter((part) => {
+      let active: Part | null = null;
+      for (const part of next) {
         const el = document.getElementById(part.id);
-        return el ? el.getBoundingClientRect().top < line : false;
-      });
-      setParts((current) => {
-        if (current.length === passed.length && current.every((part, index) => part.id === passed[index]?.id)) return current;
-        return passed;
-      });
+        if (el && el.getBoundingClientRect().top < line) active = part;
+      }
+      setCurrent((previous) => (previous?.id === active?.id ? previous : active));
     };
     pick();
     window.addEventListener("scroll", pick, { passive: true });
@@ -85,56 +67,24 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
     };
   }, [targetId]);
 
-  if (!parts.length) return null;
+  if (!current) return null;
 
-  const many = wide ? parts.length > 6 : parts.length > 3;
-  const numbers = wide ? (many && !open ? parts : []) : (many ? parts.slice(0, -2) : []);
-  const bars = wide ? (many && !open ? [] : parts) : (many ? parts.slice(-2) : parts);
-  const jump = (id: string) => (event: MouseEvent) => {
+  const jump = (event: MouseEvent) => {
     event.preventDefault();
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById(current.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
-      {numbers.length ? (
-        wide && many ? (
-          <button
-            type="button"
-            className="air-part-nums"
-            aria-expanded={open}
-            aria-label="Afficher les parties"
-            onClick={() => {
-              openedAt.current = window.scrollY;
-              setOpen(true);
-            }}
-          >
-            {numbers.map((part) => (
-              <span key={part.id} className="air-part-dot">{part.n}</span>
-            ))}
-          </button>
-        ) : (
-          <div className="air-part-nums">
-            {numbers.map((part) => (
-              <a key={part.id} href={`#${part.id}`} className="air-part-dot" title={`Partie ${part.n}. ${part.label}`} onClick={jump(part.id)}>
-                {part.n}
-              </a>
-            ))}
-          </div>
-        )
-      ) : null}
-      {bars.map((part) => (
-        <a
-          key={part.id}
-          href={`#${part.id}`}
-          title={`Partie ${part.n}. ${part.label}`}
-          className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
-          onClick={jump(part.id)}
-        >
-          <span className="air-part-num">{part.n}</span>
-          <span className="air-part-name">{part.label}</span>
-        </a>
-      ))}
+      <a
+        href={`#${current.id}`}
+        title={`Partie ${current.n}. ${current.label}`}
+        className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
+        onClick={jump}
+      >
+        <span className="air-part-num">{current.n}</span>
+        <span className="air-part-name">{current.label}</span>
+      </a>
     </div>
   );
 }
