@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Clapperboard, Cloud, Eye, FileDown, ImageIcon, Pencil, Radio } from "lucide-react";
+import { Eye, FileDown, ImageIcon, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
@@ -32,12 +32,9 @@ export function Header() {
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight text-zinc-50"
+            className="hidden min-w-0 items-center text-sm font-semibold tracking-tight text-zinc-50 sm:flex"
           >
-            <span className="glass-chip flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-cyan-200 shadow-lg sm:h-9 sm:w-9 sm:rounded-2xl">
-              {isNotes ? <Radio className="h-4 w-4" /> : isAir ? <Cloud className="h-4 w-4" /> : <Clapperboard className="h-4 w-4" />}
-            </span>
-            <span className="hidden truncate sm:inline">Patrick Roziel</span>
+            <span className="truncate">Patrick Roziel</span>
           </Link>
           <UniverseSwitch />
         </div>
