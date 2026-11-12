@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState, Fragment } from "react";
-import { ArrowUpRight, FilePlus2, Pencil, Trash2 } from "lucide-react";
+import { ArrowUpRight, Cloud, FilePlus2, Pencil, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostForm, type SocialPostFormValues } from "@/components/medias/SocialPostForm";
 import { PostActions } from "@/components/medias/PostActions";
@@ -113,7 +113,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       <p className="text-xs text-white/75">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Air</h1>
       <p className="mt-2 text-[13px] leading-5 text-white/80">Décryptages, expériences et observations.</p>
-      <nav className="mt-7 space-y-0.5" aria-label="Séries Air">
+      <nav className="mt-7 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0" aria-label="Séries Air">
         {series.map((name) => {
           const key = name.toLocaleLowerCase("fr");
           const active = scope.toLocaleLowerCase("fr") === key;
@@ -125,15 +125,18 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             });
           const pinned = pinnedSeries?.toLocaleLowerCase("fr") === key;
           return (
-            <div key={name} className="group/series">
+            <div key={name} className="group/series shrink-0 md:w-full">
               <button
                 type="button"
                 onClick={() => { setScope(active ? "Tout" : name); setActiveTag(null); setPinnedSeries(pinned ? null : name); }}
                 aria-expanded={pinned}
                 aria-label={`${name}, ${episodes.length} article${episodes.length > 1 ? "s" : ""}`}
-                className={`flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors ${active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white"}`}
+                className={`flex w-full max-w-[16rem] items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors md:max-w-none ${active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white"}`}
               >
-                <span className="min-w-0 flex-1 break-words">{name}</span>
+                <span className="inline-flex min-w-0 items-center gap-2">
+                  <Cloud className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                  <span className="truncate md:whitespace-normal md:break-words">{name}</span>
+                </span>
                 <span className="shrink-0 text-[11px] tabular-nums text-white/40">{episodes.length}</span>
               </button>
               <div className={`mt-1 space-y-0.5 pl-2 ${pinned ? "block" : "hidden group-hover/series:block"}`}>

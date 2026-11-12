@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { WorkShare } from "@/components/work/WorkShare";
-import { DEFAULT_NAV, NAV_ITEM_META } from "@/lib/types";
+import { Briefcase, Clapperboard, GraduationCap, Languages, LayoutGrid, Mail, Quote, Sparkles } from "lucide-react";
+import { DEFAULT_NAV, NAV_ITEM_META, type NavItemId } from "@/lib/types";
 import { stripHtml } from "@/lib/sanitize-html";
 
 function sortExperiences<T extends { startDate: string; endDate?: string | null }>(list: T[]) {
@@ -13,6 +14,28 @@ function sortExperiences<T extends { startDate: string; endDate?: string | null 
     if (aEnd !== bEnd) return bEnd.localeCompare(aEnd);
     return b.startDate.localeCompare(a.startDate);
   });
+}
+
+const NAV_ICONS: Record<NavItemId, typeof Mail> = {
+  home: Clapperboard,
+  experience: Briefcase,
+  projects: LayoutGrid,
+  skills: Sparkles,
+  education: GraduationCap,
+  languages: Languages,
+  quotes: Quote,
+  contact: Mail,
+  gallery: LayoutGrid,
+};
+
+function NavLabel({ id, label }: { id: NavItemId; label: string }) {
+  const Icon = NAV_ICONS[id];
+  return (
+    <span className="inline-flex min-w-0 items-center gap-2">
+      <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+      <span className="truncate">{label}</span>
+    </span>
+  );
 }
 
 function cleanRoleLabel(value: string) {
@@ -72,7 +95,7 @@ export function WorkSidebar() {
           if (item.id !== "experience") {
             return (
               <a key={item.id} href={item.href} className={row}>
-                {item.label}
+                <NavLabel id={item.id} label={item.label} />
               </a>
             );
           }
@@ -91,7 +114,7 @@ export function WorkSidebar() {
               }}
             >
               <a href={item.href} className={row}>
-                {item.label}
+                <NavLabel id={item.id} label={item.label} />
               </a>
 
               <div

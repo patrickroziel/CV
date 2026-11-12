@@ -2671,6 +2671,20 @@ video[poster*="blob.vercel-storage.com"] {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
+html[data-universe="air"] .universe-rail {
+  background: rgba(16, 48, 102, 0.58);
+  border: 1px solid rgba(214, 230, 255, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+html[data-universe="medias"] .universe-rail {
+  background: rgba(4, 22, 36, 0.74);
+  border: 1px solid rgba(125, 211, 232, 0.2);
+  box-shadow: inset 0 1px 0 rgba(186, 230, 253, 0.12);
+}
+html[data-universe="portfolio"] .universe-rail {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
 @media (min-width: 768px) {
   .universe-rail {
     position: sticky;
