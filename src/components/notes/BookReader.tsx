@@ -73,7 +73,6 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
 
   return (
     <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
-      <NotesBottomNav post={post} seedPosts={seedPosts} />
 
       {showNotice ? (
         <RichHtml html={airNoticeHtml(post.noticeIntro, BOOK_NOTICE)} className="mt-6 text-[13px] italic leading-relaxed text-white/55" />
@@ -152,10 +151,11 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
           )}
           </div>
           <div className="mt-8">
-            <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(body)} visible={post.visible !== false} comments floating />
+            <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(body)} visible={post.visible !== false} comments />
           </div>
         </div>
       </article>
+      <NotesBottomNav post={post} seedPosts={seedPosts} />
     </div>
   );
 }

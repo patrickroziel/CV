@@ -41,7 +41,6 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
     (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null));
 
   return <div className="mx-auto min-w-0 max-w-3xl px-3 sm:px-6">
-    <NotesBottomNav post={post} seedPosts={seedPosts} />
     <article className="mt-3 overflow-visible rounded-[1.75rem] border border-white/10 bg-[rgba(3,16,20,0.72)] shadow-2xl backdrop-blur-2xl">
       <div className="overflow-hidden rounded-t-[1.75rem]">
         <PostCover post={post} alt={title} />
@@ -65,9 +64,10 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}
         </a>}
         </>}
-        <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(l(post.description))} visible={post.visible !== false} comments floating />
+        <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(l(post.description))} visible={post.visible !== false} comments />
         </div>
       </div>
     </article>
+    <NotesBottomNav post={post} seedPosts={seedPosts} />
   </div>;
 }

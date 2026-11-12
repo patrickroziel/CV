@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { Layers } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
@@ -155,10 +154,6 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
     return () => window.cancelAnimationFrame(frame);
   }, [post?.id]);
   const pageRef = useRef<HTMLDivElement>(null);
-  const [navSlot, setNavSlot] = useState<HTMLElement | null>(null);
-  useEffect(() => {
-    setNavSlot(document.getElementById("bottom-nav-slot"));
-  }, [post?.id]);
   if (!post && !isHydrated && initialPost === undefined) return <div className="mx-auto h-60 max-w-3xl animate-pulse rounded-2xl bg-white/10" />;
   if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Air</Link><p className="mt-8">Article indisponible.</p></div>;
   const title = l(post.title);
@@ -170,18 +165,6 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
   const teaser = isTeaserPost(post);
   const showNotices = post.noticesHidden !== true;
   return <div ref={pageRef} className="mx-auto max-w-3xl px-3 pb-24 sm:px-6">
-    {navSlot ? createPortal(
-      <div className="air-float-bar">
-        <PostPager
-          postId={post.id}
-          universe="air"
-          seedPosts={seedPosts}
-          placement="pills"
-          extra={<PostEditButton post={post} universe="air" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-[#071433]/80 text-[0px] text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white [&_svg]:h-3.5 [&_svg]:w-3.5" />}
-        />
-      </div>,
-      navSlot,
-    ) : null}
     <article className={`air-article air-surface mt-3 overflow-visible rounded-[1.35rem] border backdrop-blur-2xl${post.id === FORCE_WHITE_ARTICLE ? " article-force-white" : ""}`}>
       {post.coverSource === "wip" ? (
         <div className="overflow-hidden rounded-t-[1.35rem]">
@@ -210,12 +193,21 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         <FeaturedMedia media={post.featuredEmbed} title={title}/>
         <PostRichBody html={stampPartAnchors(proxyBlobImages(l(post.description)), post.id)} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
         </>}
-        <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" comments floating />
+        <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" comments />
         <p className="text-right text-xs tracking-wide text-white/45">{teaser ? `${post.date} · ${TEASER_LABEL}` : post.date}</p>
         {showNotices && (
           <RichHtml html={airNoticeHtml(post.noticeReply, AIR_NOTICE_REPLY)} className="border-t border-white/10 pt-4 text-[13px] leading-6 text-white/55" />
         )}
       </div>
     </article>
+    <div className="mt-4 flex items-center justify-center">
+      <PostPager
+        postId={post.id}
+        universe="air"
+        seedPosts={seedPosts}
+        placement="pills"
+        extra={<PostEditButton post={post} universe="air" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-[#071433]/80 text-[0px] text-white/90 hover:bg-[#071433]/95 hover:text-white [&_svg]:h-3.5 [&_svg]:w-3.5" />}
+      />
+    </div>
   </div>;
 }

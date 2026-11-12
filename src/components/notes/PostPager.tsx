@@ -3,8 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import type { SocialPost } from "@/lib/types";
@@ -147,13 +146,8 @@ export function PostPager({
 const notesEditClass = "inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-cyan-200/35 bg-[rgba(3,16,20,0.82)] text-[0px] text-cyan-50 shadow-[0_6px_16px_rgba(0,8,16,0.4)] backdrop-blur-md hover:bg-[rgba(8,32,40,0.94)] hover:text-white [&_svg]:h-3.5 [&_svg]:w-3.5";
 
 export function NotesBottomNav({ post, seedPosts = [] }: { post: SocialPost; seedPosts?: SocialPost[] }) {
-  const [slot, setSlot] = useState<HTMLElement | null>(null);
-  useEffect(() => {
-    setSlot(document.getElementById("bottom-nav-slot"));
-  }, [post.id]);
-  if (!slot) return null;
-  return createPortal(
-    <div className="air-float-bar">
+  return (
+    <div className="mt-4 flex items-center justify-center">
       <PostPager
         postId={post.id}
         universe="notes"
@@ -161,7 +155,6 @@ export function NotesBottomNav({ post, seedPosts = [] }: { post: SocialPost; see
         placement="pills"
         extra={<PostEditButton post={post} universe="notes" className={notesEditClass} />}
       />
-    </div>,
-    slot,
+    </div>
   );
 }
