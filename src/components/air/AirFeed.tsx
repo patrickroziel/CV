@@ -185,12 +185,8 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           <div className="p-5 sm:p-6">
             <Link href={`/air/${post.id}`} className="block">
               <p className="text-[10px] uppercase tracking-[.2em] text-white/50">{post.date}</p>
-              <h3 className="air-title-pill mt-3">
-                <span className="air-title-copy">
-                  <span className="air-card-title">{title}</span>
-                  {lead ? <span className="air-title-sub">{lead}</span> : null}
-                </span>
-              </h3>
+              <h3 className="mt-3 break-words text-lg font-semibold tracking-tight text-white sm:text-xl">{title}</h3>
+              {lead ? <p className="mt-1 break-words text-sm leading-6 text-white/70">{lead}</p> : null}
             </Link>
             <AirCardParts postId={post.id} parts={parts} />
             <Link href={`/air/${post.id}`} className="block">

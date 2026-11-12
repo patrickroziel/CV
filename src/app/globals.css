@@ -1163,8 +1163,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   padding: 0.15rem 0.7rem 0.15rem;
   background: transparent;
 }
-.air-series-line,
-.air-title-pill {
+.air-series-line {
   position: relative;
   display: flex;
   width: 100%;
@@ -1175,7 +1174,6 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   background: #305080;
   box-shadow: none;
   color: #fff;
-  backdrop-filter: none;
 }
 .air-series-line {
   gap: 0.55rem;
@@ -1201,10 +1199,25 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   width: 0.75rem;
   height: 0.75rem;
 }
-.air-title-pill {
-  margin-top: 0.35rem;
+.air-title-pill,
+.notes-title-pill {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 100%;
   align-items: flex-start;
-  padding: 0.48rem 1rem;
+  overflow: hidden;
+  margin-top: 0.35rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(8, 18, 24, 0.42);
+  padding: 0.42rem 0.85rem;
+  color: #fff;
+  text-decoration: none;
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 28px rgba(0, 0, 0, 0.22);
+  transition: padding 0.25s ease, border-radius 0.25s ease;
 }
 .air-title-copy {
   position: relative;
@@ -1243,21 +1256,31 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   background: rgba(48, 80, 128, 0.62);
   backdrop-filter: blur(16px) saturate(1.3);
 }
-.air-title-pill h1 {
+.air-title-pill h1,
+.notes-title-main {
   position: relative;
   z-index: 1;
   margin: 0;
-  font-size: 1rem;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.01em;
-  color: #fbf7f1;
+  color: #fff;
 }
-.air-title-sub {
-  font-size: 0.8rem;
+.air-title-sub,
+.notes-title-sub {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.78rem;
   font-weight: 500;
   line-height: 1.35;
-  color: rgba(251, 247, 241, 0.86);
+  color: rgba(255, 255, 255, 0.82);
 }
 .air-card-title {
   display: -webkit-box;
@@ -1336,8 +1359,10 @@ a.air-part-float:hover {
   gap: 0.28rem;
   overflow-x: auto;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: #305080;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(8, 18, 24, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(18px) saturate(1.35);
   padding: 0.32rem 0.62rem;
   color: #fff;
   scrollbar-width: none;
@@ -1364,8 +1389,11 @@ a.air-part-float:hover {
   gap: 0.32rem;
   overflow: hidden;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: #305080;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(8, 18, 24, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
   padding: 0.22rem 0.58rem 0.22rem 0.36rem;
   color: #fff;
   font-size: 0.74rem;
@@ -1464,16 +1492,16 @@ a.air-part-float:hover {
 }
 .notes-title-main {
   -webkit-line-clamp: 2;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  line-height: 1.28;
+  line-height: 1.3;
 }
 .notes-title-sub {
   -webkit-line-clamp: 2;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 500;
-  line-height: 1.3;
-  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.82);
 }
 .air-part-float.is-arriving {
   opacity: 0;
@@ -1482,8 +1510,8 @@ a.air-part-float:hover {
   animation: air-part-land 0.7s ease;
 }
 @keyframes air-part-land {
-  from { background-color: #8eb8e8; }
-  to { background-color: #305080; }
+  from { background-color: rgba(255, 255, 255, 0.28); }
+  to { background-color: rgba(8, 18, 24, 0.42); }
 }
 .air-part-morph {
   position: fixed;
@@ -1546,11 +1574,6 @@ a.air-part-float:hover {
 }
 @keyframes air-part-cover {
   to { transform: translateX(130%); }
-}
-.air-article h2.air-part-title {
-  position: relative;
-  z-index: 2;
-  background: #305080;
 }
 .rich-html h2.air-part-title {
   display: block;
@@ -1625,8 +1648,10 @@ h2.air-part-title,
   margin: 0.85rem 0 0.7rem;
   scroll-margin-top: 16rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(8, 18, 24, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(18px) saturate(1.35);
   padding: 0.38rem 0.95rem;
   font-size: 0.8rem;
   font-weight: 600;

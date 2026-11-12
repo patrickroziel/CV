@@ -96,7 +96,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
             {title}
           </h1>
           {subtitle ? (
-            <p className="mt-3 max-w-2xl break-words text-sm leading-6 text-zinc-400 sm:text-base sm:leading-7">
+            <p className="mt-3 max-w-2xl break-words text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
               {subtitle}
             </p>
           ) : null}

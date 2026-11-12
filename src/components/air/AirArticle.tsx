@@ -123,14 +123,19 @@ function AirReadHead({
   }, []);
   return (
     <>
+      <div className="px-5 pt-6 sm:px-10">
+        <h1 id={`${bodyId}-title`} className="break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">{title}</h1>
+        {lead ? <p className="mt-3 max-w-2xl break-words text-sm leading-7 text-white/70 sm:text-base">{lead}</p> : null}
+      </div>
       <div ref={ref} className="air-read-head">
-        <a href={`#${bodyId}`} className={compact ? "air-title-pill is-compact" : "air-title-pill"} onClick={(event) => { event.preventDefault(); scrollToId(bodyId); }}>
-          <span className="air-frame-sheen air-frame-sheen--late" aria-hidden />
-          <span className="air-title-copy">
-            <h1>{title}</h1>
-            {lead ? <span className="air-title-sub">{lead}</span> : null}
-          </span>
-        </a>
+        {compact ? (
+          <a href={`#${bodyId}-title`} className="air-title-pill is-compact" onClick={(event) => { event.preventDefault(); document.getElementById(`${bodyId}-title`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
+            <span className="air-title-copy">
+              <h1>{title}</h1>
+              {lead ? <span className="air-title-sub">{lead}</span> : null}
+            </span>
+          </a>
+        ) : null}
         <ArticlePartNav targetId={bodyId} />
       </div>
     </>
