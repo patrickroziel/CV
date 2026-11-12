@@ -1472,10 +1472,14 @@ a.air-part-float:hover {
   position: fixed;
   z-index: 45;
   left: 50%;
-  bottom: calc(6.2rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(5.7rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
   width: max-content;
   max-width: calc(100vw - 1rem);
   transform: translateX(-50%);
+  flex-direction: row;
+  align-items: center;
+  gap: 0.85rem;
   padding: 0;
   border: 0;
   background: transparent;

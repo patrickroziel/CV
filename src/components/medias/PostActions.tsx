@@ -281,8 +281,8 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/70 hover:bg-[#1c1917]/[0.04]"
     : "border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-200";
 
-  const panel = <div className={`flex min-w-0 flex-col gap-2${floating ? " article-actions-float" : ""}`}>
-    <div className="flex items-center gap-3">
+  const reactions = (
+    <div className={floating ? "article-actions-float" : "flex items-center gap-3"}>
       <button type="button" onClick={() => void react()} disabled={!enabled || busy}
         aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
         className={`inline-flex items-center gap-1.5 text-[13px] font-medium transition disabled:opacity-40 ${reactionClass}`}>
@@ -297,21 +297,28 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         </button>
       )}
     </div>
-    {comments && <CommentThread postId={postId} tone={tone} open={commentOpen} onSent={() => setCommentOpen(false)} />}
-    <div className="flex max-w-full flex-wrap gap-1" data-no-translate="true">
-      {SHARE_TARGETS.map((item) => (
-        <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
+  );
+  const shares = (
+    <div className="flex min-w-0 flex-col gap-2">
+      {comments && <CommentThread postId={postId} tone={tone} open={commentOpen} onSent={() => setCommentOpen(false)} />}
+      <div className="flex max-w-full flex-wrap gap-1" data-no-translate="true">
+        {SHARE_TARGETS.map((item) => (
+          <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
+            className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
+            {item.label}
+          </button>
+        ))}
+        <button type="button" onClick={() => void shareTo("more")}
           className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
-          {item.label}
+          Plus
         </button>
-      ))}
-      <button type="button" onClick={() => void shareTo("more")}
-        className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
-        Plus
-      </button>
+      </div>
+      {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
     </div>
-    {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
-  </div>;
-  if (floating) return mounted ? createPortal(panel, document.body) : null;
-  return panel;
+  );
+  if (!floating) return <div className="flex min-w-0 flex-col gap-2">{reactions}{shares}</div>;
+  return <>
+    {mounted ? createPortal(reactions, document.body) : null}
+    {shares}
+  </>;
 }
