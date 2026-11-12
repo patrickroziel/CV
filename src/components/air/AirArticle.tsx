@@ -9,7 +9,7 @@ import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostActions, DockReactions } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
-import { ArticlePartNav } from "@/components/medias/ArticlePartNav";
+import { ArticlePartNav, ReadingTitle } from "@/components/medias/ArticlePartNav";
 import { getNoteSharePhotos } from "@/lib/notes-preview-image";
 import { displayImageUrl } from "@/lib/display-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
@@ -106,6 +106,7 @@ function AirReadHead({
         {lead ? <p className="mt-3 max-w-2xl break-words text-sm leading-7 text-white/70 sm:text-base">{lead}</p> : null}
       </div>
       <div className="air-read-head">
+        <ReadingTitle anchorId={`${bodyId}-title`} title={title} subtitle={lead} />
         <ArticlePartNav targetId={bodyId} />
       </div>
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Part = { id: string; label: string; n: number };
 
@@ -93,9 +94,42 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   );
 }
 
-export function NotesFloatingStack({ postId }: { postId: string; title?: string; subtitle?: string }) {
+export function ReadingTitle({ anchorId, title, subtitle = "" }: { anchorId: string; title: string; subtitle?: string }) {
+  const [shown, setShown] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const el = () => document.getElementById(anchorId);
+    const onScroll = () => {
+      const titleEl = el();
+      const article = titleEl?.closest("article");
+      if (!titleEl || !(article instanceof HTMLElement)) return;
+      const titleGone = titleEl.getBoundingClientRect().bottom < 72;
+      const stillInArticle = article.getBoundingClientRect().bottom > 180;
+      setShown(titleGone && stillInArticle);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [anchorId]);
+  if (!mounted || !shown || !title.trim()) return null;
+  return createPortal(
+    <div className="reading-title">
+      <p className="reading-title-main">{title}</p>
+      {subtitle.trim() ? <p className="reading-title-sub">{subtitle.trim()}</p> : null}
+    </div>,
+    document.body,
+  );
+}
+
+export function NotesFloatingStack({ postId, title = "", subtitle = "" }: { postId: string; title?: string; subtitle?: string }) {
   return (
     <div className="notes-read-head">
+      <ReadingTitle anchorId={`note-title-${postId}`} title={title} subtitle={subtitle} />
       <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
     </div>
   );
