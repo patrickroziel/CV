@@ -1157,14 +1157,13 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   display: none;
 }
 .air-read-head {
-  position: sticky;
-  top: var(--chrome-top);
-  z-index: 31;
-  margin: 0.35rem 0.45rem 0;
-  padding: 0.55rem 0.75rem 0.4rem;
-  border-radius: 1rem;
-  background: rgba(8, 22, 46, 0.96);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  position: static;
+  z-index: 1;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .air-series-line {
   position: relative;
@@ -1454,19 +1453,18 @@ a.air-part-float:hover {
   to { background-color: rgba(8, 18, 24, 0.42); }
 }
 .notes-read-head {
-  position: sticky;
-  top: calc(var(--chrome-top) + 0.15rem);
-  z-index: 30;
+  position: static;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: auto;
+  width: 100%;
   gap: 0.35rem;
-  margin: 0.45rem 0.45rem 0;
-  padding: 0.55rem 0.75rem 0.4rem;
-  border-radius: 1rem;
-  background: rgba(3, 16, 20, 0.96);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  margin: 0.75rem 0 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .article-actions-float {
   position: fixed;

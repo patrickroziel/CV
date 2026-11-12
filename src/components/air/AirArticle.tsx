@@ -99,26 +99,17 @@ function AirReadHead({
   bodyId: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [compact, setCompact] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const apply = () => {
       const article = el.closest("article");
       if (article instanceof HTMLElement) article.style.setProperty("--article-head-h", `${el.offsetHeight}px`);
-      const stuckAt = Number.parseFloat(getComputedStyle(el).top) || 0;
-      setCompact(el.getBoundingClientRect().top <= stuckAt + 2 && window.scrollY > 48);
     };
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(el);
-    window.addEventListener("scroll", apply, { passive: true });
-    window.addEventListener("resize", apply);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", apply);
-      window.removeEventListener("resize", apply);
-    };
+    return () => observer.disconnect();
   }, []);
   return (
     <>
@@ -127,14 +118,6 @@ function AirReadHead({
         {lead ? <p className="mt-3 max-w-2xl break-words text-sm leading-7 text-white/70 sm:text-base">{lead}</p> : null}
       </div>
       <div ref={ref} className="air-read-head">
-        {compact ? (
-          <a href={`#${bodyId}-title`} className="air-title-pill is-compact" onClick={(event) => { event.preventDefault(); document.getElementById(`${bodyId}-title`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
-            <span className="air-title-copy">
-              <h1>{title}</h1>
-              {lead ? <span className="air-title-sub">{lead}</span> : null}
-            </span>
-          </a>
-        ) : null}
         <ArticlePartNav targetId={bodyId} />
       </div>
     </>

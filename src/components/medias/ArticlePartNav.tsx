@@ -293,35 +293,9 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   );
 }
 
-export function NotesFloatingStack({ postId, title, subtitle = "" }: { postId: string; title: string; subtitle?: string }) {
-  const [raised, setRaised] = useState(false);
-  useEffect(() => {
-    const titleEl = document.getElementById(`note-title-${postId}`);
-    const onScroll = () => {
-      if (!titleEl) return;
-      setRaised(titleEl.getBoundingClientRect().bottom < 78);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [postId]);
+export function NotesFloatingStack({ postId }: { postId: string; title?: string; subtitle?: string }) {
   return (
     <div className="notes-read-head">
-      {raised ? (
-        <a href={`#note-title-${postId}`} className="notes-title-pill" onClick={(event) => {
-          event.preventDefault();
-          document.getElementById(`note-title-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }}>
-          <span className="notes-title-copy">
-            <span className="notes-title-main">{title}</span>
-            {subtitle.trim() ? <span className="notes-title-sub">{subtitle.trim()}</span> : null}
-          </span>
-        </a>
-      ) : null}
       <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
     </div>
   );
