@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { SITE_LANGUAGE_CODES, SITE_LANGUAGE_STORAGE_KEY } from "@/lib/site-translation";
 
 type ResponseState = { available?: boolean; count?: number; liked?: boolean };
@@ -139,8 +139,8 @@ function CommentThread({ postId, tone, open, onSent }: { postId: string; tone: "
   </div>;
 }
 
-export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false, floating = false }: {
-  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean; floating?: boolean;
+export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false, floating = false, dock = false }: {
+  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean; floating?: boolean; dock?: boolean;
 }) {
   const [enabled, setEnabled] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -168,6 +168,19 @@ export function PostActions({ postId, title, summary = "", visible = true, share
   }, [postId, visible]);
 
   useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    if (!comments) return;
+    const onOpen = (event: Event) => {
+      if ((event as CustomEvent<string>).detail !== postId) return;
+      setCommentOpen(true);
+      window.setTimeout(() => {
+        document.getElementById(`post-comments-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 60);
+    };
+    window.addEventListener("article-comments", onOpen);
+    return () => window.removeEventListener("article-comments", onOpen);
+  }, [comments, postId]);
 
   if (!visible) return null;
 
@@ -299,7 +312,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     </div>
   );
   const shares = (
-    <div className="flex min-w-0 flex-col gap-2">
+    <div className="flex min-w-0 flex-col gap-2" id={comments ? `post-comments-${postId}` : undefined}>
       {comments && <CommentThread postId={postId} tone={tone} open={commentOpen} onSent={() => setCommentOpen(false)} />}
       <div className="flex max-w-full flex-wrap gap-1" data-no-translate="true">
         {SHARE_TARGETS.map((item) => (
@@ -316,9 +329,62 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
     </div>
   );
+  if (dock) return shares;
   if (!floating) return <div className="flex min-w-0 flex-col gap-2">{reactions}{shares}</div>;
   return <>
     {mounted ? createPortal(reactions, document.body) : null}
     {shares}
+  </>;
+}
+
+export function DockReactions({ postId, comments = true }: { postId: string; comments?: boolean }) {
+  const [enabled, setEnabled] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [count, setCount] = useState(0);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    loadLike(postId)
+      .then((state) => {
+        if (!active) return;
+        setEnabled(state.available === true);
+        setCount(Math.max(0, Number(state.count) || 0));
+        setLiked(state.liked === true);
+      })
+      .catch(() => { if (active) setEnabled(false); });
+    return () => { active = false; };
+  }, [postId]);
+
+  async function react() {
+    if (!enabled || busy) return;
+    setBusy(true);
+    try {
+      const response = await fetch(`/api/notes/${encodeURIComponent(postId)}/likes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ liked: !liked }),
+      });
+      if (!response.ok) throw new Error();
+      const state = await response.json() as ResponseState;
+      setLiked(state.liked === true);
+      setCount(Number(state.count) || 0);
+    } catch { /* keep the previous state */ }
+    finally { setBusy(false); }
+  }
+
+  return <>
+    <button type="button" onClick={() => void react()} disabled={!enabled || busy}
+      aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
+      className={`dock-icon${count > 0 ? " is-wide" : ""}${liked ? " is-on" : ""}`}>
+      <Heart className={liked ? "fill-current" : ""} aria-hidden />
+      {count > 0 ? <span className="dock-count">{count.toLocaleString("fr-FR")}</span> : null}
+    </button>
+    {comments ? (
+      <button type="button" className="dock-icon" aria-label="Commenter"
+        onClick={() => window.dispatchEvent(new CustomEvent("article-comments", { detail: postId }))}>
+        <MessageCircle aria-hidden />
+      </button>
+    ) : null}
   </>;
 }

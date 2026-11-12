@@ -64,7 +64,7 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
           <FileDown className="h-4 w-4" /> {post.fileName || "Télécharger le document"}
         </a>}
         </>}
-        <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(l(post.description))} visible={post.visible !== false} comments />
+        <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(l(post.description))} visible={post.visible !== false} comments dock />
         </div>
       </div>
     </article>

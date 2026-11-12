@@ -3,9 +3,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostEditButton } from "@/components/medias/PostEditButton";
+import { DockReactions } from "@/components/medias/PostActions";
 import type { SocialPost } from "@/lib/types";
 
 function sortPosts(posts: SocialPost[]) {
@@ -22,6 +24,7 @@ export function PostPager({
   tone = "dark",
   placement = "footer",
   extra,
+  reactions,
 }: {
   postId: string;
   universe: "notes" | "air";
@@ -29,6 +32,7 @@ export function PostPager({
   tone?: "dark" | "light";
   placement?: "footer" | "pills";
   extra?: ReactNode;
+  reactions?: ReactNode;
 }) {
   const { data, editMode, l, isHydrated } = usePortfolio();
   const posts = useMemo(() => {
@@ -91,34 +95,25 @@ export function PostPager({
   }
 
   if (placement === "pills") {
-    const notes = universe === "notes";
-    const pill = notes
-      ? "inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-cyan-200/35 bg-[rgba(3,16,20,0.82)] px-2.5 text-[11px] leading-none text-cyan-50 shadow-[0_6px_16px_rgba(0,8,16,0.4)] backdrop-blur-md hover:bg-[rgba(8,32,40,0.94)] hover:text-white"
-      : "inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 px-2.5 text-[11px] leading-none text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
-    const round = notes
-      ? "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-200/35 bg-[rgba(3,16,20,0.82)] text-cyan-50 shadow-[0_6px_16px_rgba(0,8,16,0.4)] backdrop-blur-md hover:bg-[rgba(8,32,40,0.94)] hover:text-white"
-      : "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#071433]/80 text-white/90 shadow-[0_6px_16px_rgba(2,8,28,0.35)] backdrop-blur-md hover:bg-[#071433]/95 hover:text-white";
-    const idleRound = notes
-      ? "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-200/15 bg-[rgba(3,16,20,0.4)] text-cyan-100/30"
-      : "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#071433]/40 text-white/35";
     return (
       <>
-        <Link href={home} className={pill}>Retour</Link>
+        <Link href={home} className="dock-pill">Retour</Link>
+        {reactions}
         {extra}
         <nav className="no-print flex shrink-0 items-center gap-1.5" aria-label="Navigation entre les publications">
           {previous ? (
-            <Link href={href(previous.id)} className={round} aria-label={`Précédent : ${label(previous)}`} title={label(previous)}>
-              <ChevronLeft className="h-4 w-4" aria-hidden />
+            <Link href={href(previous.id)} className="dock-icon" aria-label={`Précédent : ${label(previous)}`} title={label(previous)}>
+              <ChevronLeft aria-hidden />
             </Link>
           ) : (
-            <span className={idleRound} aria-hidden="true"><ChevronLeft className="h-4 w-4" /></span>
+            <span className="dock-icon is-idle" aria-hidden="true"><ChevronLeft aria-hidden /></span>
           )}
           {next ? (
-            <Link href={href(next.id)} className={round} aria-label={`Suivant : ${label(next)}`} title={label(next)}>
-              <ChevronRight className="h-4 w-4" aria-hidden />
+            <Link href={href(next.id)} className="dock-icon" aria-label={`Suivant : ${label(next)}`} title={label(next)}>
+              <ChevronRight aria-hidden />
             </Link>
           ) : (
-            <span className={idleRound} aria-hidden="true"><ChevronRight className="h-4 w-4" /></span>
+            <span className="dock-icon is-idle" aria-hidden="true"><ChevronRight aria-hidden /></span>
           )}
         </nav>
       </>
@@ -143,18 +138,25 @@ export function PostPager({
   );
 }
 
-const notesEditClass = "inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-cyan-200/35 bg-[rgba(3,16,20,0.82)] text-[0px] text-cyan-50 shadow-[0_6px_16px_rgba(0,8,16,0.4)] backdrop-blur-md hover:bg-[rgba(8,32,40,0.94)] hover:text-white [&_svg]:h-3.5 [&_svg]:w-3.5";
+const notesEditClass = "dock-icon text-[0px] [&_svg]:h-3.5 [&_svg]:w-3.5";
 
 export function NotesBottomNav({ post, seedPosts = [] }: { post: SocialPost; seedPosts?: SocialPost[] }) {
-  return (
-    <div className="mt-4 flex items-center justify-center">
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setSlot(document.getElementById("bottom-nav-slot"));
+  }, [post.id]);
+  if (!slot) return null;
+  return createPortal(
+    <div className="air-float-bar">
       <PostPager
         postId={post.id}
         universe="notes"
         seedPosts={seedPosts}
         placement="pills"
+        reactions={<DockReactions postId={post.id} />}
         extra={<PostEditButton post={post} universe="notes" className={notesEditClass} />}
       />
-    </div>
+    </div>,
+    slot,
   );
 }
