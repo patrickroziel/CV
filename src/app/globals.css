@@ -1473,16 +1473,17 @@ a.air-part-float:hover {
   z-index: 45;
   left: 50%;
   bottom: calc(6.2rem + env(safe-area-inset-bottom, 0px));
-  width: min(34rem, calc(100vw - 1rem));
-  max-height: min(46vh, 18rem);
-  overflow: auto;
+  width: max-content;
+  max-width: calc(100vw - 1rem);
   transform: translateX(-50%);
-  padding: 0.45rem 0.7rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(8, 18, 32, 0.94);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(16px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+.article-actions-float > * {
+  pointer-events: auto;
 }
 .air-read-head .air-title-pill,
 .notes-read-head .notes-title-pill {
