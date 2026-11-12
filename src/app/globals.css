@@ -1122,7 +1122,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   position: fixed;
   z-index: 46;
   left: 50%;
-  bottom: calc(3.35rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
   justify-content: center;

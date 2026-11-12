@@ -99,50 +99,14 @@ function AirReadHead({
   lead: string;
   bodyId: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [compact, setCompact] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const apply = () => {
-      const article = el.closest("article");
-      const titleEl = document.getElementById(`${bodyId}-title`);
-      if (article instanceof HTMLElement) article.style.setProperty("--article-head-h", `${el.offsetHeight}px`);
-      const titleGone = titleEl ? titleEl.getBoundingClientRect().bottom < 78 : window.scrollY > 48;
-      const stillInArticle = article instanceof HTMLElement ? article.getBoundingClientRect().bottom > 140 : true;
-      setCompact(titleGone && stillInArticle);
-    };
-    apply();
-    window.addEventListener("scroll", apply, { passive: true });
-    window.addEventListener("resize", apply);
-    return () => {
-      window.removeEventListener("scroll", apply);
-      window.removeEventListener("resize", apply);
-    };
-  }, [bodyId]);
   return (
     <>
       <div className="px-5 pt-6 sm:px-10">
         <h1 id={`${bodyId}-title`} className="break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">{title}</h1>
         {lead ? <p className="mt-3 max-w-2xl break-words text-sm leading-7 text-white/70 sm:text-base">{lead}</p> : null}
       </div>
-      <div ref={ref} className="air-read-head">
-        {mounted ? createPortal(
-          <div className="article-float-stack">
-            {compact ? (
-              <a href={`#${bodyId}-title`} className="air-title-pill is-compact article-title-float" onClick={(event) => { event.preventDefault(); document.getElementById(`${bodyId}-title`)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
-                <span className="air-title-copy">
-                  <h1>{title}</h1>
-                  {lead ? <span className="air-title-sub">{lead}</span> : null}
-                </span>
-              </a>
-            ) : null}
-            <ArticlePartNav targetId={bodyId} />
-          </div>,
-          document.body,
-        ) : null}
+      <div className="air-read-head">
+        <ArticlePartNav targetId={bodyId} />
       </div>
     </>
   );

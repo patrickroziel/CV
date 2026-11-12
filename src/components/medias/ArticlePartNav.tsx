@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 
 type Part = { id: string; label: string; n: number };
 type Flight = { id: string; from: DOMRect; to?: DOMRect; label: string; n: number; towardChip: boolean };
@@ -107,6 +106,9 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       if (!el.id) el.id = `part-${index}-${targetId}`;
     });
     if (!heads.length) return;
+    heads.forEach((el) => el.classList.remove("air-part-held"));
+    publish(heads);
+    return;
 
     const publish = (stuck: HTMLElement[]) => {
       prevIds.current = stuck.map((el) => el.id);
@@ -294,44 +296,10 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   );
 }
 
-export function NotesFloatingStack({ postId, title = "", subtitle = "" }: { postId: string; title?: string; subtitle?: string }) {
-  const [raised, setRaised] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  useEffect(() => {
-    const titleEl = document.getElementById(`note-title-${postId}`);
-    const onScroll = () => {
-      const article = titleEl?.closest("article");
-      if (!titleEl || !(article instanceof HTMLElement)) return;
-      const titleGone = titleEl.getBoundingClientRect().bottom < 78;
-      const stillInArticle = article.getBoundingClientRect().bottom > 140;
-      setRaised(titleGone && stillInArticle);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [postId]);
-  const pill = raised ? (
-    <a href={`#note-title-${postId}`} className="notes-title-pill article-title-float" onClick={(event) => {
-      event.preventDefault();
-      document.getElementById(`note-title-${postId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }}>
-      <span className="notes-title-copy">
-        <span className="notes-title-main">{title}</span>
-        {subtitle.trim() ? <span className="notes-title-sub">{subtitle.trim()}</span> : null}
-      </span>
-    </a>
-  ) : null;
-  if (!mounted) return null;
-  return createPortal(
-        <div className="article-float-stack">
-          {pill}
-          <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
-        </div>,
-        document.body,
-      );
+export function NotesFloatingStack({ postId }: { postId: string; title?: string; subtitle?: string }) {
+  return (
+    <div className="notes-read-head">
+      <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
+    </div>
+  );
 }
