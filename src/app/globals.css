@@ -2386,6 +2386,62 @@ html[data-universe="portfolio"] .work-notes-main .glass-nested::before {
   opacity: 0.16 !important;
 }
 
+html[data-universe="portfolio"] .work-rail .work-hero-card {
+  background: rgba(7, 14, 12, 0.82) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 40px -28px rgba(0, 0, 0, 0.85) !important;
+}
+html[data-universe="portfolio"] .work-rail .work-hero-card::before,
+html[data-universe="portfolio"] .work-rail .work-hero-card::after {
+  opacity: 0.12 !important;
+}
+.work-hero-badge {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f4f4f5;
+  letter-spacing: 0.01em;
+}
+.work-hero-name,
+.work-hero-name * {
+  font-style: normal !important;
+  font-weight: 600 !important;
+  font-size: 1.12rem !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em !important;
+  color: #fafafa !important;
+}
+.work-hero-title,
+.work-hero-title * {
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 0.78rem !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0.005em !important;
+  color: rgba(244, 244, 245, 0.84) !important;
+}
+.work-hero-bio,
+.work-hero-bio * {
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-size: 0.75rem !important;
+  line-height: 1.5 !important;
+  color: rgba(212, 212, 216, 0.78) !important;
+}
+.work-hero-name p,
+.work-hero-title p,
+.work-hero-bio p {
+  margin: 0;
+}
+.work-hero-bio p:empty {
+  display: none;
+}
+.work-hero-rule {
+  width: 100%;
+  height: 1px;
+  margin: 0.35rem 0 0.15rem;
+  background: rgba(255, 255, 255, 0.12);
+}
+
 /* Phone landscape: the sticky pile must not cover the article. */
 @media (max-height: 520px) {
   html,

@@ -29,18 +29,16 @@ export function WorkShare({ embedded = false }: { embedded?: boolean }) {
     <button
       type="button"
       onClick={() => void copyAddress()}
-      className="w-full rounded-full border border-white/45 bg-white/15 px-3 py-2 text-left text-[0.84rem] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] transition hover:bg-white/25"
+      className="w-full rounded-full border border-white/18 bg-white/[0.07] px-3 py-1.5 text-left text-[12px] font-medium tracking-wide text-zinc-50 transition hover:bg-white/[0.12]"
     >
       {copied ? "Adresse copiée" : "Partager le profil"}
     </button>
   );
-  const hint = (
-    <p className={`px-0.5 text-[11px] leading-snug text-zinc-200 ${embedded ? "mt-1.5" : "mt-2"}`}>
-      {copied
-        ? "Colle-la où tu veux. La carte du profil s’affiche toute seule."
-        : "Copie l’adresse de Work. Rien ne s’ouvre : ni mail, ni réseau."}
+  const hint = copied ? (
+    <p className="mt-1.5 px-0.5 text-[11px] leading-snug text-zinc-300">
+      Colle-la où tu veux. La carte du profil s’affiche toute seule.
     </p>
-  );
+  ) : null;
 
   if (embedded) return <div className="w-full pt-1">{button}{hint}</div>;
 

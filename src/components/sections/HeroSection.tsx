@@ -277,10 +277,10 @@ export function HeroSection({
                           key={badge.id}
                           className={
                             sidebarMode
-                              ? "inline-flex max-w-full items-center rounded-full border border-white/10 px-2 py-0.5 text-[9px] font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+                              ? "work-hero-badge inline-flex max-w-full items-center rounded-full px-2.5 py-1 text-[10px] font-medium"
                               : "inline-flex max-w-full items-center rounded-full border border-white/15 px-3 py-1 text-xs font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-md"
                           }
-                          style={{
+                          style={sidebarMode ? undefined : {
                             backgroundColor: badge.bgColor,
                             color: badge.textColor,
                           }}
@@ -302,7 +302,7 @@ export function HeroSection({
                   html={profile.name}
                   className={
                     sidebarMode
-                      ? "text-[1.08rem] font-medium tracking-[-0.015em] text-zinc-50 sm:text-lg"
+                      ? "work-hero-name text-[1.12rem] font-semibold tracking-[-0.02em] text-zinc-50"
                       : "text-2xl font-semibold tracking-[-0.02em] text-zinc-50 sm:text-3xl"
                   }
                 />
@@ -312,12 +312,12 @@ export function HeroSection({
                   html={l(profile.title)}
                   className={
                     sidebarMode
-                      ? "text-[0.72rem] font-normal leading-[1.45] tracking-[0.005em] text-zinc-300/80 sm:text-xs"
+                      ? "work-hero-title text-[0.78rem] font-medium leading-snug text-zinc-200/85"
                       : "text-sm font-normal tracking-[0.01em] text-zinc-200/90 sm:text-base"
                   }
                 />
 
-                <div aria-hidden className={sidebarMode ? "h-px w-8 bg-gradient-to-r from-white/14 to-transparent" : "h-px w-12 bg-gradient-to-r from-white/30 to-transparent"} />
+                <div aria-hidden className={sidebarMode ? "work-hero-rule" : "h-px w-12 bg-gradient-to-r from-white/30 to-transparent"} />
 
                 {sidebarMode && <WorkShare embedded />}
 
@@ -329,7 +329,7 @@ export function HeroSection({
                         html={l(profile.bio)}
                         className={
                           sidebarMode
-                            ? "text-[0.72rem] leading-[1.5] text-zinc-400 sm:text-xs"
+                            ? "work-hero-bio text-[0.75rem] leading-relaxed text-zinc-300/80"
                             : "text-sm leading-6 text-zinc-300/90 sm:text-[0.95rem]"
                         }
                       />
