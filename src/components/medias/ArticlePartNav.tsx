@@ -237,9 +237,9 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
   if (!parts.length) return null;
 
-  const overflow = parts.length > 3;
-  const hidden = overflow ? parts.slice(0, -2) : [];
-  const visible = overflow ? (open ? parts : parts.slice(-2)) : parts;
+  const overflow = parts.length > 3 && !open;
+  const visible = overflow ? parts.slice(0, 2) : parts;
+  const hidden = overflow ? parts.slice(2) : [];
   const currentId = parts[parts.length - 1]?.id;
 
   const pill = (part: Part) => (
@@ -271,7 +271,8 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
-      {overflow && !open ? (
+      {visible.map(pill)}
+      {overflow ? (
         <button
           type="button"
           className="air-part-more"
@@ -288,7 +289,6 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
           ))}
         </button>
       ) : null}
-      {visible.map(pill)}
     </div>
   );
 }

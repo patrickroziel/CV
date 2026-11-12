@@ -46,22 +46,22 @@ function previewText(html: string) {
 function AirCardParts({ postId, parts }: { postId: string; parts: { label: string; index: number }[] }) {
   const [open, setOpen] = useState(false);
   if (!parts.length) return null;
-  const overflow = parts.length > 3;
-  const hidden = overflow && !open ? parts.slice(0, -2) : [];
-  const shown = overflow && !open ? parts.slice(-2) : parts;
+  const overflow = parts.length > 3 && !open;
+  const shown = overflow ? parts.slice(0, 2) : parts;
+  const rest = overflow ? parts.slice(2) : [];
   return (
     <div className="air-part-stack mt-3">
-      {hidden.length ? (
-        <button type="button" className="air-part-more" onClick={() => setOpen(true)} aria-expanded={false}>
-          {hidden.map((part) => <span key={part.index} className="air-part-num">{part.index + 1}</span>)}
-        </button>
-      ) : null}
       {shown.map((part) => (
         <Link key={part.index} href={`/air/${postId}#${airPartAnchor(postId, part.index)}`} className="air-part-float" title={part.label}>
           <span className="air-part-num">{part.index + 1}</span>
           <span className="air-part-name">{part.label}</span>
         </Link>
       ))}
+      {rest.length ? (
+        <button type="button" className="air-part-more" onClick={() => setOpen(true)} aria-expanded={false} aria-label="Afficher les autres parties">
+          {rest.map((part) => <span key={part.index} className="air-part-num">{part.index + 1}</span>)}
+        </button>
+      ) : null}
     </div>
   );
 }
