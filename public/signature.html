@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Signature — Patrick Roziel</title>
+  <style>
+    html, body { margin: 0; background: #020c10; color: #e8f7fb; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+    main { max-width: 640px; margin: 0 auto; padding: 48px 20px 72px; }
+    h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 28px 0 8px; }
+    p, li { color: #c5dde4; font-size: 15px; line-height: 1.5; }
+    ol { padding-left: 18px; }
+    button { appearance: none; border: 0; border-radius: 999px; background: #a5f3fc; color: #082026; font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 12px 18px; cursor: pointer; }
+    button:active { transform: translateY(1px); }
+    .note { min-height: 1.4em; color: #a5f3fc; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="signature">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="440" style="width:440px;max-width:100%;border-collapse:separate;border-spacing:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;">
+        <tr>
+          <td background="https://patrickroziel.com/email/signature-bg.jpg" bgcolor="#03141c" style="background-color:#03141c;background-image:url('https://patrickroziel.com/email/signature-bg.jpg');background-repeat:no-repeat;background-position:72% center;background-size:cover;border:1px solid rgba(165,243,252,0.28);border-radius:20px;padding:22px 22px 18px 22px;">
+            <div style="font-size:10px;line-height:1;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:rgba(207,250,254,0.72);padding:0 0 12px 0;">Trois univers</div>
+            <div style="font-size:22px;line-height:1.15;font-weight:600;letter-spacing:-0.03em;color:#ffffff;text-shadow:0 1px 10px rgba(0,0,0,0.45);">Patrick Roziel</div>
+            <div style="padding:6px 0 16px 0;">
+              <a href="https://patrickroziel.com" style="font-size:13px;line-height:1.3;font-weight:500;letter-spacing:0.01em;color:#a5f3fc;text-decoration:none;">patrickroziel.com</a>
+            </div>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;border-spacing:0;background-color:rgba(165,243,252,0.08);border:1px solid rgba(165,243,252,0.28);border-radius:999px;">
+              <tr>
+                <td style="padding:3px 0 3px 3px;">
+                  <a href="https://patrickroziel.com/notes" style="display:inline-block;padding:6px 13px;border-radius:999px;background-color:#a5f3fc;color:#082026;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1;font-weight:600;letter-spacing:0.01em;text-decoration:none;">Notes</a>
+                </td>
+                <td style="padding:3px 0;">
+                  <a href="https://patrickroziel.com/air" style="display:inline-block;padding:6px 13px;border-radius:999px;color:#e0f2fe;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1;font-weight:600;letter-spacing:0.01em;text-decoration:none;">Air</a>
+                </td>
+                <td style="padding:3px 3px 3px 0;">
+                  <a href="https://patrickroziel.com/work" style="display:inline-block;padding:6px 13px;border-radius:999px;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1;font-weight:600;letter-spacing:0.01em;text-decoration:none;">Work</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <h1>La poser dans Mail</h1>
+    <p class="note" id="status" role="status"></p>
+    <p><button type="button" id="copy">Copier la signature</button></p>
+    <ol>
+      <li>Ouvre cette page dans Safari.</li>
+      <li>Appuie sur Copier la signature.</li>
+      <li>Sur Mac : Mail, Réglages, Signatures, puis colle. Ne modifie plus le texte ensuite, sinon la mise en page saute.</li>
+      <li>Sur iPhone : le champ signature n’aime pas la mise en forme. Fais-la d’abord sur le Mac, avec le même compte iCloud. Elle suit sur l’iPhone.</li>
+    </ol>
+  </main>
+  <script>
+    document.getElementById("copy").addEventListener("click", async () => {
+      const node = document.getElementById("signature");
+      const html = node.innerHTML.trim();
+      const plain = "Patrick Roziel\npatrickroziel.com\nhttps://patrickroziel.com/notes\nhttps://patrickroziel.com/air\nhttps://patrickroziel.com/work";
+      const status = document.getElementById("status");
+      let rich = false;
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/html": new Blob([html], { type: "text/html" }),
+            "text/plain": new Blob([plain], { type: "text/plain" }),
+          }),
+        ]);
+        rich = true;
+      } catch (error) {
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        rich = document.execCommand("copy");
+        selection.removeAllRanges();
+      }
+      status.textContent = rich ? "C’est copié. Colle-la dans Mail." : "La copie a échoué. Sélectionne la signature à la main.";
+    });
+  </script>
+</body>
+</html>
