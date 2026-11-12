@@ -11,6 +11,7 @@ import { UniverseSwitch, useUniverse } from "@/components/layout/UniverseSwitch"
 import { downloadPortfolioSnapshot } from "@/lib/storage";
 import { SiteTranslator } from "@/components/translation/SiteTranslator";
 import { GhostPagesButton } from "@/components/ghost/GhostPagesButton";
+import { TipsLink } from "@/components/layout/SupportBar";
 
 export function Header() {
   const { editMode, setEditMode, editAllowed, cloudStatus, data, showToast } = usePortfolio();
@@ -42,6 +43,7 @@ export function Header() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <TipsLink />
           <SiteTranslator />
           <EditGate>
             {!isNotes && !isAir && (

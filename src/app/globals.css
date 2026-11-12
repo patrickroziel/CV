@@ -1144,7 +1144,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   align-items: center;
   min-width: 0;
 }
-.bottom-nav-slot:empty {
+.bottom-dock:has(.bottom-nav-slot:empty) {
   display: none;
 }
 .air-read-head {
