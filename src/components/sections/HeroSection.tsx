@@ -44,6 +44,7 @@ import {
 } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
 import { defaultHeroBadgesFromProfile } from "@/lib/storage";
+import { WorkShare } from "@/components/work/WorkShare";
 import { DEFAULT_EXPERIENCE_BADGE } from "@/lib/types";
 
 export function HeroSection({
@@ -317,6 +318,8 @@ export function HeroSection({
                 />
 
                 <div aria-hidden className={sidebarMode ? "h-px w-8 bg-gradient-to-r from-white/14 to-transparent" : "h-px w-12 bg-gradient-to-r from-white/30 to-transparent"} />
+
+                {sidebarMode && <WorkShare embedded />}
 
                 {/* Bio */}
                 {l(profile.bio) && (
