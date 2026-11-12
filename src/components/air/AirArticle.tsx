@@ -106,7 +106,7 @@ function AirReadHead({
         {lead ? <p className="mt-3 max-w-2xl break-words text-sm leading-7 text-white/70 sm:text-base">{lead}</p> : null}
       </div>
       <div className="air-read-head">
-        <ReadingTitle anchorId={`${bodyId}-title`} title={title} subtitle={lead} />
+        <ReadingTitle anchorId={`${bodyId}-title`} title={title} subtitle={lead} targetId={bodyId} />
         <ArticlePartNav targetId={bodyId} />
       </div>
     </>

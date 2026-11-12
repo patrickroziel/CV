@@ -94,14 +94,13 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   );
 }
 
-export function ReadingTitle({ anchorId, title, subtitle = "" }: { anchorId: string; title: string; subtitle?: string }) {
+export function ReadingTitle({ anchorId, title, subtitle = "", targetId, tone = "air" }: { anchorId: string; title: string; subtitle?: string; targetId: string; tone?: "air" | "notes" }) {
   const [shown, setShown] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
-    const el = () => document.getElementById(anchorId);
     const onScroll = () => {
-      const titleEl = el();
+      const titleEl = document.getElementById(anchorId);
       const article = titleEl?.closest("article");
       if (!titleEl || !(article instanceof HTMLElement)) return;
       const titleGone = titleEl.getBoundingClientRect().bottom < 72;
@@ -121,6 +120,7 @@ export function ReadingTitle({ anchorId, title, subtitle = "" }: { anchorId: str
     <div className="reading-title">
       <p className="reading-title-main">{title}</p>
       {subtitle.trim() ? <p className="reading-title-sub">{subtitle.trim()}</p> : null}
+      <ArticlePartNav targetId={targetId} tone={tone} />
     </div>,
     document.body,
   );
@@ -129,7 +129,7 @@ export function ReadingTitle({ anchorId, title, subtitle = "" }: { anchorId: str
 export function NotesFloatingStack({ postId, title = "", subtitle = "" }: { postId: string; title?: string; subtitle?: string }) {
   return (
     <div className="notes-read-head">
-      <ReadingTitle anchorId={`note-title-${postId}`} title={title} subtitle={subtitle} />
+      <ReadingTitle anchorId={`note-title-${postId}`} title={title} subtitle={subtitle} targetId={`note-body-${postId}`} tone="notes" />
       <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
     </div>
   );
