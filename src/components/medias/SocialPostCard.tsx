@@ -11,6 +11,7 @@ import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
+import { notePartAnchor, notePartTitles } from "@/components/medias/ArticlePartNav";
 import type { SocialPost, FeaturedEmbed } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
@@ -36,6 +37,32 @@ function PostPreview({ html, title, inlineMedia }: { html: string; title: string
           Lire plus...
         </button>
       ) : null}
+    </div>
+  );
+}
+
+function NoteCardParts({ postId, html }: { postId: string; html: string }) {
+  const parts = notePartTitles(html);
+  if (!parts.length) return null;
+  return (
+    <div className="air-card-parts !mt-0">
+      {parts.map((part, order) => {
+        const n = part.index + 1;
+        const href = `/notes/${postId}#${notePartAnchor(postId, part.index)}`;
+        if (order < 2) {
+          return (
+            <Link key={part.index} href={href} className="air-card-part" title={`Partie ${n}. ${part.label}`}>
+              <span className="air-part-num">{n}</span>
+              <span className="air-card-part-name">{part.label}</span>
+            </Link>
+          );
+        }
+        return (
+          <Link key={part.index} href={href} className="air-card-dot" title={`Partie ${n}. ${part.label}`} aria-label={`Partie ${n}. ${part.label}`}>
+            {n}
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -116,6 +143,8 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
               </Button>
             </div>}
           </header>
+
+          {!teaser ? <NoteCardParts postId={post.id} html={description} /> : null}
 
           {!teaser && !isBook && featured && <FeaturedMedia media={featured} title={title} />}
           {!teaser && !isBook && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
