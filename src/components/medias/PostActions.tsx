@@ -66,19 +66,18 @@ function openPopup(href: string) {
   window.open(href, "_blank", "noopener,noreferrer,width=720,height=760");
 }
 
-function CommentThread({ postId, tone }: { postId: string; tone: "dark" | "light" }) {
+function CommentThread({ postId, tone, open, onSent }: { postId: string; tone: "dark" | "light"; open: boolean; onSent: () => void }) {
   const [comments, setComments] = useState<PublicComment[]>([]);
-  const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [body, setBody] = useState("");
   const [website, setWebsite] = useState("");
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
-  const quiet = tone === "light" ? "text-[#1c1917]/55" : "text-zinc-500";
-  const text = tone === "light" ? "text-[#1c1917]/80" : "text-zinc-300";
+  const quiet = tone === "light" ? "text-[#1c1917]/55" : "text-cyan-100/55";
+  const text = tone === "light" ? "text-[#1c1917]/80" : "text-cyan-50";
   const field = tone === "light"
     ? "border-[#1c1917]/15 bg-white/40 text-[#1c1917] placeholder:text-[#1c1917]/35"
-    : "border-white/10 bg-white/[0.03] text-zinc-100 placeholder:text-zinc-500";
+    : "border-cyan-100/20 bg-[#031c25]/40 text-cyan-50 placeholder:text-cyan-100/35";
 
   useEffect(() => {
     let active = true;
@@ -103,8 +102,8 @@ function CommentThread({ postId, tone }: { postId: string; tone: "dark" | "light
       const result = await response.json().catch(() => ({})) as { error?: string };
       if (!response.ok) throw new Error(result.error || "Envoi impossible.");
       setBody("");
-      setOpen(false);
       setNote("Message reçu. Il sera visible après validation.");
+      onSent();
     } catch (error) {
       setNote(error instanceof Error ? error.message : "Envoi impossible.");
     } finally {
@@ -112,7 +111,9 @@ function CommentThread({ postId, tone }: { postId: string; tone: "dark" | "light
     }
   }
 
-  return <div className="mt-1 max-w-xl">
+  if (!open && comments.length === 0 && !note) return null;
+
+  return <div className="max-w-xl">
     {comments.length > 0 && <ul className="mb-2 space-y-1.5">
       {comments.map((comment) => (
         <li key={comment.id} className={`text-xs leading-5 ${text}`}>
@@ -121,26 +122,19 @@ function CommentThread({ postId, tone }: { postId: string; tone: "dark" | "light
         </li>
       ))}
     </ul>}
-    {!open ? (
-      <button type="button" onClick={() => setOpen(true)} className={`text-[11px] ${quiet} hover:underline`}>
-        Commenter
-      </button>
-    ) : (
-      <form className="mt-1 space-y-2" onSubmit={(event) => void send(event)}>
+    {open && (
+      <form className="space-y-2" onSubmit={(event) => void send(event)}>
         <input value={name} onChange={(event) => setName(event.target.value)} maxLength={40} required placeholder="Prénom ou pseudo" aria-label="Prénom ou pseudo"
           className={`w-full rounded-lg border px-2.5 py-1.5 text-xs outline-none ${field}`} />
         <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={800} required rows={3} placeholder="Ton message" aria-label="Message"
           className={`w-full resize-y rounded-lg border px-2.5 py-1.5 text-xs outline-none ${field}`} />
         <input name="website" value={website} onChange={(event) => setWebsite(event.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-        <div className="flex items-center gap-3">
-          <button type="submit" disabled={sending} className={`text-[11px] underline-offset-2 hover:underline disabled:opacity-50 ${text}`}>
-            {sending ? "Envoi…" : "Envoyer"}
-          </button>
-          <button type="button" onClick={() => setOpen(false)} className={`text-[11px] ${quiet}`}>Annuler</button>
-        </div>
+        <button type="submit" disabled={sending} className={`text-[13px] font-medium underline-offset-2 hover:underline disabled:opacity-50 ${text}`}>
+          {sending ? "Envoi…" : "Envoyer"}
+        </button>
       </form>
     )}
-    {note && <p role="status" className={`mt-1 text-[11px] ${text}`}>{note}</p>}
+    {note && <p role="status" className={`text-[11px] ${text}`}>{note}</p>}
   </div>;
 }
 
@@ -152,6 +146,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
   const [count, setCount] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [commentOpen, setCommentOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -273,33 +268,44 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     }
   }
 
-  const likeClass = tone === "light"
-    ? liked ? "text-[#1c1917]/70" : "text-[#1c1917]/35 hover:text-[#1c1917]/70"
-    : liked ? "text-zinc-300" : "text-zinc-500 hover:text-zinc-300";
+  const reactionClass = tone === "light"
+    ? "text-[#1c1917]/80 hover:text-[#1c1917]"
+    : sharePath === "/air"
+      ? "text-white/80 hover:text-white"
+      : "text-cyan-100 hover:text-white";
   const chipClass = tone === "light"
-    ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/75 hover:bg-[#1c1917]/[0.04]"
-    : "border-white/12 bg-white/[0.03] text-zinc-300 hover:bg-white/[0.07]";
+    ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/70 hover:bg-[#1c1917]/[0.04]"
+    : "border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-200";
 
   return <div className="flex min-w-0 flex-col gap-2">
-    <button type="button" onClick={() => void react()} disabled={!enabled || busy}
-      aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
-      className={`inline-flex w-fit items-center gap-1 py-0.5 text-[11px] transition disabled:opacity-40 ${likeClass}`}>
-      <Heart className={`h-3 w-3 ${liked ? "fill-current" : ""}`} aria-hidden />
-      {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
-    </button>
-    <div className="flex max-w-full flex-wrap gap-1.5" data-no-translate="true">
+    <div className="flex items-center gap-3">
+      <button type="button" onClick={() => void react()} disabled={!enabled || busy}
+        aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
+        className={`inline-flex items-center gap-1.5 text-[13px] font-medium transition disabled:opacity-40 ${reactionClass}`}>
+        <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current" : ""}`} aria-hidden />
+        <span>J'aime</span>
+        {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
+      </button>
+      {comments && (
+        <button type="button" onClick={() => setCommentOpen((open) => !open)} aria-expanded={commentOpen}
+          className={`text-[13px] font-medium transition ${reactionClass}`}>
+          {commentOpen ? "Fermer" : "Commenter"}
+        </button>
+      )}
+    </div>
+    {comments && <CommentThread postId={postId} tone={tone} open={commentOpen} onSent={() => setCommentOpen(false)} />}
+    <div className="flex max-w-full flex-wrap gap-1" data-no-translate="true">
       {SHARE_TARGETS.map((item) => (
         <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
-          className={`inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-semibold transition ${chipClass}`}>
+          className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
           {item.label}
         </button>
       ))}
       <button type="button" onClick={() => void shareTo("more")}
-        className={`inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-semibold transition ${chipClass}`}>
+        className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
         Plus
       </button>
     </div>
-    {comments && <CommentThread postId={postId} tone={tone} />}
     {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
   </div>;
 }
