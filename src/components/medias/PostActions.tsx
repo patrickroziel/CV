@@ -139,8 +139,8 @@ function CommentThread({ postId, tone, open, onSent }: { postId: string; tone: "
   </div>;
 }
 
-export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false, floating = false, dock = false }: {
-  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean; floating?: boolean; dock?: boolean;
+export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false, floating = false, dock = false, card = false }: {
+  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean; floating?: boolean; dock?: boolean; card?: boolean;
 }) {
   const [enabled, setEnabled] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -329,6 +329,14 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
     </div>
   );
+  if (card) {
+    return <button type="button" onClick={() => void react()} disabled={!enabled || busy}
+      aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
+      className="inline-flex items-center gap-1.5 text-[13px] text-white/70 transition hover:text-white disabled:opacity-40">
+      <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current text-white" : ""}`} aria-hidden />
+      {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
+    </button>;
+  }
   if (dock) return shares;
   if (!floating) return <div className="flex min-w-0 flex-col gap-2">{reactions}{shares}</div>;
   return <>

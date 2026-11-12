@@ -14,7 +14,6 @@ import { PostActions } from "@/components/medias/PostActions";
 import type { SocialPost, FeaturedEmbed } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
-import { shareExcerpt } from "@/lib/post-excerpt";
 import { displayImageUrl } from "@/lib/display-image";
 import { cn } from "@/lib/utils";
 
@@ -134,24 +133,24 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
 
           {post.tags?.length ? <ul className="flex min-w-0 flex-wrap gap-1.5">
             {post.tags.map(tag => <li key={tag}><button type="button" onClick={() => onTagClick?.(tag)}
-              className="break-words rounded-full border border-cyan-300/20 bg-cyan-400/10 px-2.5 py-0.5 text-left text-[11px] font-medium text-cyan-50 hover:bg-cyan-400/20">{tag}</button></li>)}
+              className="break-words rounded-full border border-white/10 px-2 py-0.5 text-left text-[11px] text-white/55 hover:text-white">{tag}</button></li>)}
           </ul> : null}
 
           {!teaser && post.fileKind === "pdf" && post.fileUrl && <a href={post.fileUrl} target="_blank" rel="noopener noreferrer"
-            className="inline-flex w-fit items-center gap-2 break-words rounded-full border border-cyan-300/30 bg-cyan-400/15 px-3.5 py-2 text-sm font-medium text-cyan-50 hover:bg-cyan-400/25">
-            <FileDown className="h-4 w-4" />{post.fileName || "Télécharger le document"}
+            className="inline-flex w-fit items-center gap-2 break-words text-xs text-white/60 hover:text-white">
+            <FileDown className="h-3.5 w-3.5" />{post.fileName || "Télécharger le document"}
           </a>}
 
           {!teaser && isBook && post.bookPdfUrl && <a href={post.bookPdfUrl} target="_blank" rel="noopener noreferrer"
-            className="inline-flex w-fit items-center gap-2 text-xs font-medium text-zinc-400 hover:text-zinc-200">
-            <FileDown className="h-4 w-4" /> Télécharger le chapitre en PDF
+            className="inline-flex w-fit items-center gap-2 text-xs text-white/55 hover:text-white">
+            <FileDown className="h-3.5 w-3.5" /> Télécharger le chapitre
           </a>}
 
-          <div className="flex flex-col gap-3">
-            <Link href={`/notes/${post.id}`} className="inline-flex w-fit items-center rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3.5 py-2 text-sm font-medium text-cyan-50 hover:bg-cyan-400/20">
-              {isBook ? "Lire le chapitre" : "Ouvrir le post"} →
+          <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+            <PostActions postId={post.id} title={title} visible={post.visible !== false} card />
+            <Link href={`/notes/${post.id}`} className="text-[13px] font-medium text-white/80 hover:text-white">
+              {isBook ? "Lire" : "Ouvrir"}
             </Link>
-            <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(description)} visible={post.visible !== false} />
           </div>
         </div>
       </GlassCard>
