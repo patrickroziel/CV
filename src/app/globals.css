@@ -1235,7 +1235,7 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   position: static;
   z-index: 1;
   margin: 0.35rem 0 0;
-  padding: 0;
+  padding: 0 1.25rem;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -1519,8 +1519,8 @@ a.air-part-float:hover {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 28px rgba(0, 0, 0, 0.22);
 }
 .notes-part-stack .air-part-float {
-  width: 100%;
-  max-width: none;
+  width: auto;
+  max-width: 15rem;
 }
 .air-part-float.is-notes.is-current {
   border-color: rgba(255, 255, 255, 0.62);
@@ -1542,7 +1542,7 @@ a.air-part-float:hover {
   width: 100%;
   gap: 0.35rem;
   margin: 0.75rem 0 0;
-  padding: 0;
+  padding: 0 1.25rem;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -1571,13 +1571,16 @@ a.air-part-float:hover {
 .article-float-stack {
   position: fixed;
   z-index: 32;
-  top: calc(var(--chrome-top) + 0.35rem);
-  left: 50%;
+  top: calc(var(--chrome-top) + 0.45rem);
+  left: 1.35rem;
+  right: 1.35rem;
   display: flex;
-  width: min(40rem, calc(100% - 1.5rem));
-  transform: translateX(-50%);
+  width: auto;
+  max-width: 36rem;
+  margin-inline: auto;
+  transform: none;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -2235,11 +2238,10 @@ blockquote.rich-link-card.ghost-link-card {
   }
 }
 @media (min-width: 640px) {
-  .air-read-head {
-    padding: 0.4rem 1.15rem 0.35rem;
-  }
+  .air-read-head,
   .notes-read-head {
-    margin-top: 1rem;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
   }
 }
 
