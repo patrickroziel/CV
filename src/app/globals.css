@@ -1663,7 +1663,7 @@ a.air-part-float:hover {
   max-width: 40rem;
   margin-inline: auto;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 0.35rem;
   padding: 0;
   border: 0;
@@ -1673,6 +1673,7 @@ a.air-part-float:hover {
   pointer-events: none;
 }
 .reading-pill {
+  width: 100%;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.28);
   background: rgba(8, 18, 24, 0.78);
@@ -2789,9 +2790,6 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
 }
 
 @media (orientation: landscape) {
-  .reading-title {
-    align-items: center;
-  }
   .air-part-stack .air-part-float,
   .notes-part-stack .air-part-float {
     flex: none !important;
