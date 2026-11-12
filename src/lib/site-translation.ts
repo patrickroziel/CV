@@ -38,6 +38,22 @@ export const SITE_LANGUAGES: SiteLanguage[] = [
   { code: "el", label: "Grec", nativeLabel: "Ελληνικά", flag: "🇬🇷" },
   { code: "zh-CN", label: "Chinois simplifié", nativeLabel: "简体中文", flag: "🇨🇳" },
   { code: "ja", label: "Japonais", nativeLabel: "日本語", flag: "🇯🇵" },
+
+  { code: "hi", label: "Hindi", nativeLabel: "हिन्दी", flag: "🇮🇳" },
+  { code: "bn", label: "Bengali", nativeLabel: "বাংলা", flag: "🇮🇳" },
+  { code: "ta", label: "Tamoul", nativeLabel: "தமிழ்", flag: "🇮🇳" },
+  { code: "te", label: "Télougou", nativeLabel: "తెలుగు", flag: "🇮🇳" },
+  { code: "mr", label: "Marathi", nativeLabel: "मराठी", flag: "🇮🇳" },
+  { code: "gu", label: "Gujarati", nativeLabel: "ગુજરાતી", flag: "🇮🇳" },
+  { code: "kn", label: "Kannada", nativeLabel: "ಕನ್ನಡ", flag: "🇮🇳" },
+  { code: "ml", label: "Malayalam", nativeLabel: "മലയാളം", flag: "🇮🇳" },
+  { code: "pa", label: "Pendjabi", nativeLabel: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
+  { code: "or", label: "Odia", nativeLabel: "ଓଡ଼ିଆ", flag: "🇮🇳" },
+  { code: "as", label: "Assamais", nativeLabel: "অসমীয়া", flag: "🇮🇳" },
+  { code: "ur", label: "Ourdou", nativeLabel: "اردو", flag: "🇮🇳" },
+  { code: "ne", label: "Népalais", nativeLabel: "नेपाली", flag: "🇳🇵" },
+  { code: "sa", label: "Sanskrit", nativeLabel: "संस्कृतम्", flag: "🇮🇳" },
+
   { code: "ha", label: "Haoussa (Niger)", nativeLabel: "Hausa", flag: "🇳🇪" },
   { code: "pt-PT", label: "Portugais", nativeLabel: "Português", flag: "🇵🇹" },
 ];

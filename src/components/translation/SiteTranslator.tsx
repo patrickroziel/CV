@@ -433,7 +433,7 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
               "translation-trigger inline-flex items-center gap-2 text-zinc-100 transition-colors",
               tone === "ghost"
                 ? "ghost-tone h-10 rounded-full px-3.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f6efe4]"
-                : "glass-chip h-9 max-w-[10.5rem] rounded-2xl px-2.5 text-xs font-medium hover:bg-white/[0.09] sm:max-w-none sm:px-3"
+                : "glass-chip inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2 text-[11px] font-semibold tracking-wide text-zinc-100 transition hover:bg-white/10 sm:h-9 sm:gap-1.5 sm:px-3 sm:text-xs"
             )}
             aria-label={`Langue : ${language.label}. Traduction automatique Google`}
             title="Traduction automatique Google"
@@ -441,9 +441,9 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
             {busy ? (
               <LoaderCircle className={cn("h-3.5 w-3.5 animate-spin", tone === "ghost" ? "text-[#e7d3ae]" : "text-cyan-200")} />
             ) : (
-              <Languages className={cn("h-3.5 w-3.5", tone === "ghost" ? "text-[#e7d3ae]" : "text-cyan-200")} />
+              <Languages className={cn(tone === "ghost" ? "h-3.5 w-3.5 text-[#e7d3ae]" : "h-3 w-3 text-cyan-200 sm:h-3.5 sm:w-3.5")} />
             )}
-            <span aria-hidden className="text-sm leading-none">{language.flag}</span>
+            <span aria-hidden className="text-[13px] leading-none">{language.flag}</span>
             <span className={cn("max-w-[8rem] truncate", tone === "ghost" ? "inline" : "hidden sm:inline")}>
               {tone === "ghost" ? (languageCode === "fr" ? "Traduire" : language.nativeLabel) : language.nativeLabel}
             </span>
