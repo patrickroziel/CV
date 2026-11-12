@@ -210,7 +210,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
         <FeaturedMedia media={post.featuredEmbed} title={title}/>
         <PostRichBody html={stampPartAnchors(proxyBlobImages(l(post.description)), post.id)} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
         </>}
-        <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" comments floating />
+        <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" comments />
         <p className="text-right text-xs tracking-wide text-white/45">{teaser ? `${post.date} · ${TEASER_LABEL}` : post.date}</p>
         {showNotices && (
           <RichHtml html={airNoticeHtml(post.noticeReply, AIR_NOTICE_REPLY)} className="border-t border-white/10 pt-4 text-[13px] leading-6 text-white/55" />

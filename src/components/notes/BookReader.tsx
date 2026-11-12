@@ -152,7 +152,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
           )}
           </div>
           <div className="mt-8">
-            <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(body)} visible={post.visible !== false} comments floating />
+            <PostActions postId={post.id} title={title} summary={teaser ? "" : shareExcerpt(body)} visible={post.visible !== false} comments />
           </div>
         </div>
       </article>
