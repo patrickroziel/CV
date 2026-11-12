@@ -1476,7 +1476,7 @@ a.air-part-float:hover {
 .notes-part-stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 0.35rem;
   width: 100%;
   min-width: 0;
@@ -1487,8 +1487,13 @@ a.air-part-float:hover {
 .air-part-stack .air-part-float,
 .notes-part-stack .air-part-float {
   flex: none;
-  width: auto;
-  max-width: 100%;
+  width: 100%;
+  max-width: none;
+}
+.reading-title .air-part-name {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: unset;
 }
 .air-part-nums {
   display: flex;
@@ -1603,8 +1608,8 @@ a.air-part-float:hover {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 28px rgba(0, 0, 0, 0.22);
 }
 .notes-part-stack .air-part-float {
-  width: auto;
-  max-width: 100%;
+  width: 100%;
+  max-width: none;
 }
 .air-part-float.is-notes.is-current {
   border-color: rgba(255, 255, 255, 0.62);
@@ -2793,8 +2798,8 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
   .air-part-stack .air-part-float,
   .notes-part-stack .air-part-float {
     flex: none !important;
-    width: auto !important;
-    max-width: min(100%, 36rem) !important;
+    width: 100% !important;
+    max-width: none !important;
   }
 }
 @media (max-height: 520px) {

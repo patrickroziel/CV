@@ -32,7 +32,7 @@ export function notePartTitles(html: string) {
 }
 
 export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; tone?: "air" | "notes" }) {
-  const [current, setCurrent] = useState<Part | null>(null);
+  const [parts, setParts] = useState<Part[]>([]);
 
   useEffect(() => {
     const root = document.getElementById(targetId);
@@ -51,12 +51,14 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
     const pick = () => {
       const bar = document.querySelector(".reading-title");
       const line = bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom + 6 : 110;
-      let active: Part | null = null;
-      for (const part of next) {
+      const passed = next.filter((part) => {
         const el = document.getElementById(part.id);
-        if (el && el.getBoundingClientRect().top < line) active = part;
-      }
-      setCurrent((previous) => (previous?.id === active?.id ? previous : active));
+        return el ? el.getBoundingClientRect().top < line : false;
+      });
+      setParts((current) => {
+        if (current.length === passed.length && current.every((part, index) => part.id === passed[index]?.id)) return current;
+        return passed;
+      });
     };
     pick();
     window.addEventListener("scroll", pick, { passive: true });
@@ -67,20 +69,30 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
     };
   }, [targetId]);
 
+  const current = parts[parts.length - 1];
   if (!current) return null;
-
-  const jump = (event: MouseEvent) => {
+  const earlier = parts.slice(0, -1);
+  const jump = (id: string) => (event: MouseEvent) => {
     event.preventDefault();
-    document.getElementById(current.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
+      {earlier.length ? (
+        <div className="air-part-nums">
+          {earlier.map((part) => (
+            <a key={part.id} href={`#${part.id}`} className="air-part-dot" title={`Partie ${part.n}. ${part.label}`} onClick={jump(part.id)}>
+              {part.n}
+            </a>
+          ))}
+        </div>
+      ) : null}
       <a
         href={`#${current.id}`}
         title={`Partie ${current.n}. ${current.label}`}
         className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
-        onClick={jump}
+        onClick={jump(current.id)}
       >
         <span className="air-part-num">{current.n}</span>
         <span className="air-part-name">{current.label}</span>
