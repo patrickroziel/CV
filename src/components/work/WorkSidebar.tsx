@@ -51,19 +51,19 @@ export function WorkSidebar() {
   );
 
   const bio = stripHtml(l(data.profile?.bio ?? "")).replace(/\s+/g, " ").trim();
-  const row = "flex shrink-0 items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 lg:w-full";
+  const row = "flex shrink-0 items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/80 transition-colors hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 md:w-full";
 
   return (
     <div>
-      <p className="text-xs text-white/60">Patrick Roziel</p>
+      <p className="text-xs text-white/75">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Work</h1>
       {bio ? (
-        <p className="mt-2 max-w-[16rem] text-[13px] leading-5 text-white/65">{bio}</p>
+        <p className="mt-2 max-w-full text-[13px] leading-5 text-white/80">{bio}</p>
       ) : null}
 
       <nav
         aria-label="Navigation Work"
-        className="mt-7 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0"
+        className="mt-7 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0"
       >
         {items.map((item) => {
           if (item.id !== "experience") {
@@ -77,7 +77,7 @@ export function WorkSidebar() {
           return (
             <div
               key={item.id}
-              className="shrink-0 lg:w-full"
+              className="shrink-0 md:w-full"
               onMouseEnter={() => setExperienceMenuOpen(true)}
               onMouseLeave={() => setExperienceMenuOpen(false)}
               onFocus={() => setExperienceMenuOpen(true)}
@@ -92,7 +92,7 @@ export function WorkSidebar() {
               </a>
 
               <div
-                className={`hidden overflow-hidden pl-2 transition-all duration-200 lg:block ${
+                className={`hidden overflow-hidden pl-2 transition-all duration-200 md:block ${
                   experienceMenuOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
                 }`}
               >

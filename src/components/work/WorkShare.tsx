@@ -45,7 +45,7 @@ export function WorkShare({ embedded = false, plain = false }: { embedded?: bool
       <button
         type="button"
         onClick={() => void copyAddress()}
-        className="flex w-full items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+        className="flex w-full shrink-0 items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/80 transition-colors hover:bg-white/[0.08] hover:text-white md:w-full"
       >
         {copied ? "Adresse copiée" : "Partager le profil"}
       </button>
