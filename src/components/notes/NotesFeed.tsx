@@ -25,8 +25,7 @@ import { NOTES_CATEGORIES, coercePostCategory, collectPostTags, type NotesCatego
 
 type Scope = "Tout" | NotesCategory;
 
-const FILTERS: Array<{ id: Scope; icon?: typeof BookOpen }> = [
-  { id: "Tout" },
+const FILTERS: Array<{ id: NotesCategory; icon: typeof BookOpen }> = [
   { id: "Livre", icon: BookOpen },
   { id: "Musique", icon: Music },
   { id: "Essais", icon: PenLine },
@@ -107,19 +106,13 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
       <aside>
         <div className="lg:sticky lg:top-28">
-          <p className="text-xs text-zinc-500">Patrick Roziel</p>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight text-white">
-            Notes
-          </h1>
-          <p className="mt-2 max-w-[18rem] text-xs leading-5 text-zinc-500 lg:max-w-none">
+          <p className="text-xs text-white/60">Patrick Roziel</p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Notes</h1>
+          <p className="mt-2 max-w-[16rem] text-[13px] leading-5 text-white/65">
             Livre, musique et essais.
           </p>
 
-          <p className="mb-3 mt-8 text-[10px] uppercase tracking-[0.28em] text-zinc-600">
-            Parcourir
-          </p>
-
-          <nav className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-2 lg:mx-0 lg:block lg:space-y-1 lg:overflow-visible lg:px-0 lg:pb-0">
+          <nav aria-label="Catégories" className="mt-7 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
             {FILTERS.map((item) => {
               const active = item.id === scope;
               const Icon = item.icon;
@@ -127,32 +120,21 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                 <button
                   type="button"
                   onClick={() => {
-                    setScope(item.id);
+                    setScope(active ? "Tout" : item.id);
                     setActiveTag(null);
                   }}
                   className={[
-                    "group/filter flex shrink-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm transition-[background-color,border-color,color] duration-150 ease-out lg:w-full",
+                    "group/filter flex shrink-0 items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors lg:w-full",
                     active
-                      ? "border-cyan-100/[0.16] bg-cyan-100/[0.16] text-cyan-50"
-                      : item.id === "Livre" && bookMenuOpen
-                        ? "border-white/[0.10] bg-white/[0.09] text-zinc-100"
-                        : "border-transparent text-zinc-500 hover:border-white/[0.10] hover:bg-white/[0.09] hover:text-zinc-100",
+                      ? "bg-white/[0.12] text-white"
+                      : "text-white/70 hover:bg-white/[0.08] hover:text-white",
                   ].join(" ")}
                 >
                   <span className="inline-flex min-w-0 items-center gap-2">
-                    {Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : null}
+                    <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
                     <span className="truncate">{item.id}</span>
                   </span>
-                  <span
-                    className={[
-                      "text-[10px] transition-colors duration-150",
-                      active
-                        ? "text-cyan-100/55"
-                        : "text-zinc-700 group-hover/filter:text-zinc-500",
-                    ].join(" ")}
-                  >
-                    {count(item.id)}
-                  </span>
+                  <span className="text-[11px] tabular-nums text-white/40">{count(item.id)}</span>
                 </button>
               );
 
@@ -250,7 +232,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               Publications
             </p>
             <h2 className="mt-1 break-words text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              {activeTag ? `#${activeTag}` : scope === "Tout" ? "Feed" : scope}
+              {activeTag ? `#${activeTag}` : scope === "Tout" ? "Notes" : scope}
             </h2>
             {activeTag ? (
               <button

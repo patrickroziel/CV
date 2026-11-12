@@ -107,10 +107,10 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   };
   return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
     <aside><div className="lg:sticky lg:top-28">
-      <p className="text-xs text-white/70">Patrick Roziel</p>
-      <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white drop-shadow-sm">Air</h1>
-      <p className="mt-2 max-w-[18rem] text-xs leading-5 text-white/75">Décryptages, expériences et observations.</p>
-      <nav className="mt-6 space-y-1" aria-label="Séries Air">
+      <p className="text-xs text-white/60">Patrick Roziel</p>
+      <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Air</h1>
+      <p className="mt-2 max-w-[16rem] text-[13px] leading-5 text-white/65">Décryptages, expériences et observations.</p>
+      <nav className="mt-7 space-y-0.5" aria-label="Séries Air">
         {series.map((name) => {
           const key = name.toLocaleLowerCase("fr");
           const active = scope.toLocaleLowerCase("fr") === key;
@@ -128,10 +128,10 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                 onClick={() => { setScope(active ? "Tout" : name); setActiveTag(null); setPinnedSeries(pinned ? null : name); }}
                 aria-expanded={pinned}
                 aria-label={`${name}, ${episodes.length} article${episodes.length > 1 ? "s" : ""}`}
-                className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm ${active ? "border-white/50 bg-white/20 text-white" : "border-transparent text-white/70 hover:bg-white/10 hover:text-white"}`}
+                className={`flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors ${active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white"}`}
               >
                 <span className="min-w-0 flex-1 break-words">{name}</span>
-                <span className="shrink-0 rounded-full border border-white/25 bg-white/15 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white">{episodes.length}</span>
+                <span className="shrink-0 text-[11px] tabular-nums text-white/40">{episodes.length}</span>
               </button>
               <div className={`mt-1 space-y-0.5 pl-2 ${pinned ? "block" : "hidden group-hover/series:block"}`}>
                 {episodes.map((post) => {
