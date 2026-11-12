@@ -6,13 +6,6 @@ const title = "Portfolio Monteur Vidéo & Motion Design — Patrick Roziel";
 const description =
   "Portfolio professionnel de Patrick Roziel : monteur vidéo, motion designer et créateur de contenus digitaux. Expériences, compétences, showreel. Basé à La Courneuve (93), Île-de-France.";
 
-const ogImage = {
-  url: "/opengraph-image",
-  width: 1200,
-  height: 630,
-  alt: "Patrick Roziel — Work",
-};
-
 export const metadata: Metadata = {
   title,
   description,
@@ -25,13 +18,11 @@ export const metadata: Metadata = {
     description,
     locale: "fr_FR",
     siteName: "Patrick Roziel",
-    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: ["/twitter-image"],
   },
 };
 

@@ -10,7 +10,7 @@ import { SectionVisibility } from "@/components/shared/SectionVisibility";
 import { ShowreelEmbed } from "@/components/shared/ShowreelEmbed";
 import { WorkSidebar } from "@/components/work/WorkSidebar";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
-import { WorkTagTicker } from "@/components/work/WorkTagTicker";
+import { WorkShare } from "@/components/work/WorkShare";
 
 export default function Home() {
   return (
@@ -18,6 +18,7 @@ export default function Home() {
       <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 sm:px-6 lg:grid-cols-[285px_minmax(0,1fr)] lg:gap-12 lg:px-8">
         <aside className="work-rail lg:sticky lg:top-24 lg:max-h-[calc(100dvh-6.5rem)] lg:self-start lg:overflow-y-auto">
           <HeroSection sidebarMode showShowreel={false} />
+          <WorkShare />
           <WorkSidebar />
           <UniversesWidget current="work" />
         </aside>
