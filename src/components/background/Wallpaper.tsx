@@ -31,6 +31,24 @@ function fallbackBackground(data: {
   );
 }
 
+const NOTES_BACKGROUND: BackgroundImage = {
+  id: "bg-notes-ocean",
+  url: "/notes-water-bg.png",
+  opacity: 1,
+  alphaVideoUrl: null,
+  alphaVideoEnabled: false,
+  alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
+};
+
+const AIR_BACKGROUND: BackgroundImage = {
+  id: "bg-air-sky-photograph",
+  url: "/IMG_6076.jpeg",
+  opacity: 1,
+  alphaVideoUrl: null,
+  alphaVideoEnabled: false,
+  alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
+};
+
 const FADE_MS = 900;
 
 /**
@@ -59,12 +77,17 @@ export function Wallpaper() {
   }, [data.backgroundImages, data.backgroundUrl]);
 
   const [active, setActive] = useState<BackgroundImage>(() =>
-    fallbackBackground(data)
+    isNotes ? NOTES_BACKGROUND : isAir ? AIR_BACKGROUND : fallbackBackground(data)
   );
   const [prev, setPrev] = useState<BackgroundImage | null>(null);
   const [fadeIn, setFadeIn] = useState(true);
   const [alphaFailed, setAlphaFailed] = useState(false);
   const [alphaVisible, setAlphaVisible] = useState(false);
+
+  useEffect(() => {
+    const image = new Image();
+    image.src = NOTES_BACKGROUND.url;
+  }, []);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -76,23 +99,9 @@ export function Wallpaper() {
     setActive((current) => {
       let next: BackgroundImage;
       if (isNotes) {
-        next = {
-          id: "bg-notes-ocean",
-          url: "/notes-water-bg.png",
-          opacity: 1,
-          alphaVideoUrl: null,
-          alphaVideoEnabled: false,
-          alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
-        };
+        next = NOTES_BACKGROUND;
       } else if (isAir) {
-        next = {
-          id: "bg-air-sky-photograph",
-          url: "/IMG_6076.jpeg",
-          opacity: 1,
-          alphaVideoUrl: null,
-          alphaVideoEnabled: false,
-          alphaVideoOpacity: DEFAULT_ALPHA_VIDEO_OPACITY,
-        };
+        next = AIR_BACKGROUND;
       } else if (!didPickRef.current) {
         didPickRef.current = true;
         next = pickRandomBackground(list, data.backgroundUrl);
@@ -102,12 +111,17 @@ export function Wallpaper() {
       }
 
       if (current.id !== next.id || current.url !== next.url) {
-        setPrev(current);
-        setFadeIn(false);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => setFadeIn(true));
-        });
-        window.setTimeout(() => setPrev(null), FADE_MS + 80);
+        if (isNotes) {
+          setPrev(null);
+          setFadeIn(true);
+        } else {
+          setPrev(current);
+          setFadeIn(false);
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => setFadeIn(true));
+          });
+          window.setTimeout(() => setPrev(null), FADE_MS + 80);
+        }
       }
       return next;
     });
@@ -155,7 +169,8 @@ export function Wallpaper() {
         <img
           src={displayImageUrl(img.url, 1920)}
           alt=""
-          loading="lazy"
+          loading={opts.visible ? "eager" : "lazy"}
+          fetchPriority={opts.visible ? "high" : "low"}
           decoding="async"
           className={`${isAir ? "air-wallpaper-breathe" : "wallpaper-kenburns"} absolute inset-0 h-full w-full object-cover`}
           style={{ opacity: op, objectPosition: isAir ? "center 30%" : undefined }}

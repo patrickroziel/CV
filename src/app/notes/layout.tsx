@@ -10,5 +10,10 @@ export default function NotesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <link rel="preload" as="image" href="/notes-water-bg.png" fetchPriority="high" />
+      {children}
+    </>
+  );
 }
