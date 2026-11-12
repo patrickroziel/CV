@@ -105,11 +105,11 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     else addSocialPost({...values,universe:"air",order:0});
     setCreateOpen(false); setEditing(null);
   };
-  return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
-    <aside><div className="lg:sticky lg:top-28">
-      <p className="text-xs text-white/60">Patrick Roziel</p>
+  return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+    <aside><div className="universe-rail">
+      <p className="text-xs text-white/75">Patrick Roziel</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Air</h1>
-      <p className="mt-2 max-w-[16rem] text-[13px] leading-5 text-white/65">Décryptages, expériences et observations.</p>
+      <p className="mt-2 text-[13px] leading-5 text-white/80">Décryptages, expériences et observations.</p>
       <nav className="mt-7 space-y-0.5" aria-label="Séries Air">
         {series.map((name) => {
           const key = name.toLocaleLowerCase("fr");

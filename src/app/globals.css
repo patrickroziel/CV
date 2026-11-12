@@ -2298,12 +2298,22 @@ video[poster*="blob.vercel-storage.com"] {
   color: #a5f3fc !important;
 }
 
-@media (min-width: 1024px) {
-  .work-rail {
-    scrollbar-width: none;
-  }
-  .work-rail::-webkit-scrollbar {
-    display: none;
+.universe-rail {
+  border-radius: 1.35rem;
+  background: rgba(5, 14, 10, 0.62);
+  padding: 1rem;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+@media (min-width: 768px) {
+  .universe-rail {
+    position: sticky;
+    top: 7rem;
+    max-height: calc(100dvh - 8.25rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
   }
 }
 

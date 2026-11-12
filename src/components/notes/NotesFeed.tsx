@@ -103,16 +103,16 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   };
 
   return (
-    <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+    <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
       <aside>
-        <div className="lg:sticky lg:top-28">
-          <p className="text-xs text-white/60">Patrick Roziel</p>
+        <div className="universe-rail">
+          <p className="text-xs text-white/75">Patrick Roziel</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Notes</h1>
-          <p className="mt-2 max-w-[16rem] text-[13px] leading-5 text-white/65">
+          <p className="mt-2 text-[13px] leading-5 text-white/80">
             Livre, musique et essais.
           </p>
 
-          <nav aria-label="Catégories" className="mt-7 flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
+          <nav aria-label="Catégories" className="mt-7 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
             {FILTERS.map((item) => {
               const active = item.id === scope;
               const Icon = item.icon;
@@ -124,7 +124,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                     setActiveTag(null);
                   }}
                   className={[
-                    "group/filter flex shrink-0 items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors lg:w-full",
+                    "group/filter flex shrink-0 items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm text-white/80 transition-colors md:w-full",
                     active
                       ? "bg-white/[0.12] text-white"
                       : "text-white/70 hover:bg-white/[0.08] hover:text-white",
@@ -139,13 +139,13 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               );
 
               if (item.id !== "Livre") {
-                return <div key={item.id} className="shrink-0 lg:w-full">{button}</div>;
+                return <div key={item.id} className="shrink-0 md:w-full">{button}</div>;
               }
 
               return (
                 <div
                   key={item.id}
-                  className="shrink-0 lg:w-full"
+                  className="shrink-0 md:w-full"
                   onMouseEnter={() => setBookMenuOpen(true)}
                   onMouseLeave={() => setBookMenuOpen(false)}
                   onFocus={() => setBookMenuOpen(true)}
@@ -159,7 +159,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
 
                   {bookChapters.length > 0 ? (
                     <div
-                      className={`hidden overflow-hidden pl-2 transition-all duration-200 lg:block ${
+                      className={`hidden overflow-hidden pl-2 transition-all duration-200 md:block ${
                         bookMenuOpen
                           ? "max-h-[32rem] opacity-100"
                           : "max-h-0 opacity-0"

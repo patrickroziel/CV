@@ -17,7 +17,7 @@ export default function Home() {
     <main className="no-print relative z-10 min-h-screen pb-36 pt-24 sm:pt-28">
       <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:gap-16 lg:px-8">
         <aside>
-          <div className="rounded-[1.35rem] bg-[rgba(5,14,10,0.62)] p-4 backdrop-blur-xl md:sticky md:top-28">
+          <div className="universe-rail">
             <WorkSidebar />
             <UniversesWidget current="work" />
             <KofiCard className="mt-3" />
