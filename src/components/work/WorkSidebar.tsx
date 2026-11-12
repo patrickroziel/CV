@@ -60,10 +60,13 @@ export function WorkSidebar() {
       {bio ? (
         <p className="mt-2 max-w-full text-[13px] leading-5 text-white/80">{bio}</p>
       ) : null}
+      <div className="mt-3">
+        <WorkShare pill />
+      </div>
 
       <nav
         aria-label="Navigation Work"
-        className="mt-7 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0"
+        className="mt-3 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0"
       >
         {items.map((item) => {
           if (item.id !== "experience") {
@@ -111,7 +114,6 @@ export function WorkSidebar() {
             </div>
           );
         })}
-        <WorkShare plain />
       </nav>
     </div>
   );
