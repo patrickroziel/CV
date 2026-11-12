@@ -27,6 +27,7 @@ export function TipsLink() {
 export function SupportBar() {
   return (
     <div className="bottom-dock no-print">
+      <div id="bottom-actions-slot" className="bottom-actions-slot" />
       <div id="bottom-nav-slot" className="bottom-nav-slot" />
     </div>
   );
