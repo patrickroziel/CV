@@ -1118,6 +1118,27 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   letter-spacing: 0.04em;
   text-transform: none;
 }
+.bottom-dock {
+  position: fixed;
+  z-index: 46;
+  left: 50%;
+  bottom: calc(3.35rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  max-width: calc(100vw - 0.7rem);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.bottom-dock > * {
+  pointer-events: auto;
+}
+.bottom-nav-slot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
 .air-float-bar {
   position: static;
   display: flex;
@@ -1126,18 +1147,6 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   width: auto;
   margin: 0;
   flex-wrap: nowrap;
-}
-.bottom-dock {
-  position: fixed;
-  z-index: 46;
-  left: 50%;
-  bottom: calc(0.2rem + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  max-width: calc(100vw - 0.7rem);
-  transform: translateX(-50%);
 }
 .bottom-nav-slot {
   display: flex;
