@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Briefcase, Clapperboard, GraduationCap, Languages, LayoutGrid, Mail, Quote, Sparkles } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { WorkShare } from "@/components/work/WorkShare";
 import { DEFAULT_NAV, type NavItemId } from "@/lib/types";
 
 const ITEMS: { id: NavItemId; target: string; icon: typeof Mail }[] = [
@@ -74,6 +75,7 @@ export function WorkCategoryDock() {
           </a>
         );
       })}
+      <WorkShare icon />
     </nav>,
     slot,
   );

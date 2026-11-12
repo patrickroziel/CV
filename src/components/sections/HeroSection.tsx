@@ -319,8 +319,6 @@ export function HeroSection({
 
                 <div aria-hidden className={sidebarMode ? "work-hero-rule" : "h-px w-12 bg-gradient-to-r from-white/30 to-transparent"} />
 
-                {sidebarMode && <WorkShare embedded />}
-
                 {/* Bio */}
                 {l(profile.bio) && (
                   <div className="w-full max-w-2xl">
@@ -336,6 +334,8 @@ export function HeroSection({
                     </div>
                   </div>
                 )}
+
+                <WorkShare embedded />
 
                 {/* Email */}
                 {c.showHeroEmail && (

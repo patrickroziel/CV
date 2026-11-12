@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Share2 } from "lucide-react";
 
 const WORK_URL = "https://patrickroziel.com/work";
 
-export function WorkShare({ embedded = false, plain = false }: { embedded?: boolean; plain?: boolean }) {
+export function WorkShare({ embedded = false, plain = false, icon = false }: { embedded?: boolean; plain?: boolean; icon?: boolean }) {
   const [copied, setCopied] = useState(false);
 
   async function copyAddress() {
@@ -39,6 +40,20 @@ export function WorkShare({ embedded = false, plain = false }: { embedded?: bool
       Colle-la où tu veux. La carte du profil s’affiche toute seule.
     </p>
   ) : null;
+
+  if (icon) {
+    return (
+      <button
+        type="button"
+        onClick={() => void copyAddress()}
+        className="dock-icon"
+        aria-label={copied ? "Adresse copiée" : "Partager le profil"}
+        title={copied ? "Adresse copiée" : "Partager le profil"}
+      >
+        <Share2 aria-hidden />
+      </button>
+    );
+  }
 
   if (plain) {
     return (
