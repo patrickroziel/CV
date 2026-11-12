@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 type Part = { id: string; label: string; n: number };
@@ -33,7 +33,6 @@ export function notePartTitles(html: string) {
 
 export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; tone?: "air" | "notes" }) {
   const [parts, setParts] = useState<Part[]>([]);
-  const [currentId, setCurrentId] = useState<string | null>(null);
 
   useEffect(() => {
     const root = document.getElementById(targetId);
@@ -50,41 +49,55 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
         label: (el.textContent || "").replace(/\s+/g, " ").trim(),
       }))
       .filter((part) => part.label && part.label.toLocaleLowerCase("fr") !== "titre de la partie");
-    setParts(next);
-    const mark = () => {
-      const line = 110;
-      let current = next[0]?.id ?? null;
-      for (const part of next) {
+    const pick = () => {
+      const bar = document.querySelector(".reading-title");
+      const line = bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom + 6 : 110;
+      const passed = next.filter((part) => {
         const el = document.getElementById(part.id);
-        if (el && el.getBoundingClientRect().top <= line) current = part.id;
-      }
-      setCurrentId(current);
+        return el ? el.getBoundingClientRect().top < line : false;
+      });
+      setParts((current) => {
+        if (current.length === passed.length && current.every((part, index) => part.id === passed[index]?.id)) return current;
+        return passed;
+      });
     };
-    mark();
-    window.addEventListener("scroll", mark, { passive: true });
-    window.addEventListener("resize", mark);
+    pick();
+    window.addEventListener("scroll", pick, { passive: true });
+    window.addEventListener("resize", pick);
     return () => {
-      window.removeEventListener("scroll", mark);
-      window.removeEventListener("resize", mark);
-      document.querySelectorAll(".air-part-morph").forEach((node) => node.remove());
+      window.removeEventListener("scroll", pick);
+      window.removeEventListener("resize", pick);
     };
   }, [targetId]);
 
   if (!parts.length) return null;
 
+  const overflow = parts.length > 3;
+  const numbers = overflow ? parts.slice(0, -2) : [];
+  const bars = overflow ? parts.slice(-2) : parts;
+  const jump = (id: string) => (event: MouseEvent) => {
+    event.preventDefault();
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
-      {parts.map((part) => (
+      {numbers.length ? (
+        <div className="air-part-nums">
+          {numbers.map((part) => (
+            <a key={part.id} href={`#${part.id}`} className="air-part-dot" title={`Partie ${part.n}. ${part.label}`} onClick={jump(part.id)}>
+              {part.n}
+            </a>
+          ))}
+        </div>
+      ) : null}
+      {bars.map((part) => (
         <a
           key={part.id}
           href={`#${part.id}`}
           title={`Partie ${part.n}. ${part.label}`}
-          aria-current={part.id === currentId ? "true" : undefined}
-          className={["air-part-float", tone === "notes" ? "is-notes" : "", part.id === currentId ? "is-current" : ""].filter(Boolean).join(" ")}
-          onClick={(event) => {
-            event.preventDefault();
-            document.getElementById(part.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
+          className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
+          onClick={jump(part.id)}
         >
           <span className="air-part-num">{part.n}</span>
           <span className="air-part-name">{part.label}</span>
@@ -129,10 +142,5 @@ export function ReadingTitle({ anchorId, title, subtitle = "", targetId, tone = 
 }
 
 export function NotesFloatingStack({ postId, title = "", subtitle = "" }: { postId: string; title?: string; subtitle?: string }) {
-  return (
-    <div className="notes-read-head">
-      <ReadingTitle anchorId={`note-title-${postId}`} title={title} subtitle={subtitle} targetId={`note-body-${postId}`} tone="notes" />
-      <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
-    </div>
-  );
+  return <ReadingTitle anchorId={`note-title-${postId}`} title={title} subtitle={subtitle} targetId={`note-body-${postId}`} tone="notes" />;
 }

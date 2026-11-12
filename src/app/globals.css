@@ -1418,22 +1418,43 @@ a.air-part-float:hover {
 .air-part-stack,
 .notes-part-stack {
   display: flex;
-  flex-flow: row nowrap;
+  flex-direction: column;
   gap: 0.35rem;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  margin-top: 0.4rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  margin-top: 0;
+  overflow: visible;
 }
 .air-part-stack .air-part-float,
 .notes-part-stack .air-part-float {
-  flex: 0 0 auto;
-  width: max-content;
+  flex: none;
+  width: 100%;
   max-width: none;
+}
+.air-part-nums {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.28rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.air-part-nums::-webkit-scrollbar { display: none; }
+.air-part-dot {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(8, 18, 24, 0.72);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
 }
 .air-part-more {
   display: flex;
@@ -1516,8 +1537,8 @@ a.air-part-float:hover {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 28px rgba(0, 0, 0, 0.22);
 }
 .notes-part-stack .air-part-float {
-  width: auto;
-  max-width: 15rem;
+  width: 100%;
+  max-width: none;
 }
 .air-part-float.is-notes.is-current {
   border-color: rgba(255, 255, 255, 0.62);
@@ -2703,8 +2724,8 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
 @media (min-width: 720px), (orientation: landscape) {
   .air-part-stack .air-part-float,
   .notes-part-stack .air-part-float {
-    flex: 0 0 auto;
-    width: max-content;
+    flex: none;
+    width: 100%;
     max-width: none;
   }
 }
