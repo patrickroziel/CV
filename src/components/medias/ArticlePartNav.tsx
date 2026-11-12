@@ -118,8 +118,10 @@ export function ReadingTitle({ anchorId, title, subtitle = "", targetId, tone = 
   if (!mounted || !shown || !title.trim()) return null;
   return createPortal(
     <div className="reading-title">
-      <p className="reading-title-main">{title}</p>
-      {subtitle.trim() ? <p className="reading-title-sub">{subtitle.trim()}</p> : null}
+      <div className="reading-pill">
+        <p className="reading-title-main">{title}</p>
+        {subtitle.trim() ? <p className="reading-title-sub">{subtitle.trim()}</p> : null}
+      </div>
       <ArticlePartNav targetId={targetId} tone={tone} />
     </div>,
     document.body,

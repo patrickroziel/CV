@@ -1418,20 +1418,22 @@ a.air-part-float:hover {
 .air-part-stack,
 .notes-part-stack {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   gap: 0.35rem;
   width: 100%;
   min-width: 0;
   max-width: 100%;
   margin-top: 0.4rem;
-  overflow: visible;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 .air-part-stack .air-part-float,
 .notes-part-stack .air-part-float {
-  flex: 1 1 100%;
-  width: auto;
-  max-width: 100%;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: none;
 }
 .air-part-more {
   display: flex;
@@ -1496,9 +1498,7 @@ a.air-part-float:hover {
   line-height: 1;
 }
 .air-part-name {
-  min-width: 0;
-  overflow: visible;
-  white-space: normal;
+  white-space: nowrap;
 }
 .air-part-float.is-current {
   border-color: rgba(255, 255, 255, 0.55);
@@ -1571,15 +1571,27 @@ a.air-part-float:hover {
   top: calc(var(--chrome-top) + 0.4rem);
   left: 1.15rem;
   right: 1.15rem;
+  display: flex;
   width: auto;
   max-width: 40rem;
   margin-inline: auto;
-  padding: 0.55rem 0.9rem 0.6rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+.reading-pill {
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(8, 18, 24, 0.94);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
-  pointer-events: none;
+  background: rgba(8, 18, 24, 0.78);
+  padding: 0.42rem 0.85rem 0.48rem;
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  pointer-events: auto;
 }
 .reading-title-main,
 .reading-title-sub {
@@ -1605,8 +1617,9 @@ a.air-part-float:hover {
 }
 .reading-title .air-part-stack,
 .reading-title .notes-part-stack {
-  max-height: 38vh;
-  overflow-y: auto;
+  max-height: none;
+  margin-top: 0;
+  overflow-x: auto;
 }
 .article-float-stack {
   position: fixed;
@@ -2690,7 +2703,9 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
 @media (min-width: 720px), (orientation: landscape) {
   .air-part-stack .air-part-float,
   .notes-part-stack .air-part-float {
-    flex: 1 1 0;
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: none;
   }
 }
 @media (max-height: 520px) {
