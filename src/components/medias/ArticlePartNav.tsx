@@ -78,7 +78,6 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   const current = parts[parts.length - 1];
   if (!current) return null;
   const shown = parts.find((part) => part.id === openedId) ?? current;
-  const others = parts.filter((part) => part.id !== shown.id);
   const jump = (id: string) => (event: MouseEvent) => {
     event.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -87,33 +86,31 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
       <div className="air-part-line">
-        <a
-          href={`#${shown.id}`}
-          title={`Partie ${shown.n}. ${shown.label}`}
-          className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
-          onClick={jump(shown.id)}
-        >
-          <span className="air-part-num">{shown.n}</span>
-          <span className="air-part-name">{shown.label}</span>
-        </a>
-        {others.length ? (
-          <div className="air-part-nums">
-            {others.map((part) => (
-              <button
-                key={part.id}
-                type="button"
-                className="air-part-dot"
-                title={`Partie ${part.n}. ${part.label}`}
-                onClick={() => {
-                  openedAt.current = window.scrollY;
-                  setOpenedId(part.id);
-                }}
-              >
-                {part.n}
-              </button>
-            ))}
-          </div>
-        ) : null}
+        {parts.map((part) => part.id === shown.id ? (
+          <a
+            key={part.id}
+            href={`#${part.id}`}
+            title={`Partie ${part.n}. ${part.label}`}
+            className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
+            onClick={jump(part.id)}
+          >
+            <span className="air-part-num">{part.n}</span>
+            <span className="air-part-name">{part.label}</span>
+          </a>
+        ) : (
+          <button
+            key={part.id}
+            type="button"
+            className="air-part-dot"
+            title={`Partie ${part.n}. ${part.label}`}
+            onClick={() => {
+              openedAt.current = window.scrollY;
+              setOpenedId(part.id);
+            }}
+          >
+            {part.n}
+          </button>
+        ))}
       </div>
     </div>
   );
