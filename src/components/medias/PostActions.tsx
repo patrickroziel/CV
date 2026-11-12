@@ -149,7 +149,6 @@ export function PostActions({ postId, title, summary = "", visible = true, share
   const [message, setMessage] = useState("");
   const [commentOpen, setCommentOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [slot, setSlot] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -168,10 +167,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     return () => { active = false; };
   }, [postId, visible]);
 
-  useEffect(() => {
-    setMounted(true);
-    setSlot(document.getElementById("bottom-actions-slot"));
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   if (!visible) return null;
 
@@ -302,7 +298,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       )}
     </div>
     {comments && <CommentThread postId={postId} tone={tone} open={commentOpen} onSent={() => setCommentOpen(false)} />}
-    <div className="flex max-w-[calc(100vw-1.2rem)] flex-nowrap gap-1 overflow-x-auto" data-no-translate="true">
+    <div className="flex max-w-full flex-wrap gap-1" data-no-translate="true">
       {SHARE_TARGETS.map((item) => (
         <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
           className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
@@ -316,6 +312,6 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     </div>
     {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
   </div>;
-  if (floating) return mounted && slot ? createPortal(panel, slot) : null;
+  if (floating) return mounted ? createPortal(panel, document.body) : null;
   return panel;
 }
