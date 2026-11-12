@@ -71,11 +71,13 @@ export function Header() {
               size="sm"
               onClick={() => setEditMode(!editMode)}
               className="gap-1.5"
+              title={editMode ? "Quitter" : "Modifier"}
+              aria-label={editMode ? "Quitter le mode édition" : "Modifier"}
             >
               {editMode ? (
                 <><Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">Quitter</span></>
               ) : (
-                <><Pencil className="h-3.5 w-3.5" /><span className="hidden sm:inline">Modifier</span></>
+                <Pencil className="h-3.5 w-3.5" />
               )}
             </Button>
           )}
