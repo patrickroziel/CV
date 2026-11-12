@@ -106,7 +106,7 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       {opened ? (
         <a
           href={`#${opened.id}`}
-          className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
+          className={["air-part-float is-preview", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
           onClick={jump(opened.id)}
         >
           <span className="air-part-num">{opened.n}</span>
