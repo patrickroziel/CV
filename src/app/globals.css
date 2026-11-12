@@ -1436,6 +1436,10 @@ a.air-part-float:hover {
   display: flex;
   flex-wrap: nowrap;
   gap: 0.28rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -2721,12 +2725,24 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
   background: rgba(255, 255, 255, 0.12);
 }
 
-@media (min-width: 720px), (orientation: landscape) {
+@media (orientation: landscape) {
+  .air-part-stack,
+  .notes-part-stack {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   .air-part-stack .air-part-float,
   .notes-part-stack .air-part-float {
-    flex: none;
-    width: 100%;
-    max-width: none;
+    flex: 1 1 calc(33.333% - 0.28rem) !important;
+    width: auto !important;
+    max-width: calc(33.333% - 0.16rem) !important;
+    min-width: 0 !important;
+  }
+  .air-part-stack .air-part-name,
+  .notes-part-stack .air-part-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 @media (max-height: 520px) {

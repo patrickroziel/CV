@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 type Part = { id: string; label: string; n: number };
@@ -33,6 +33,17 @@ export function notePartTitles(html: string) {
 
 export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; tone?: "air" | "notes" }) {
   const [parts, setParts] = useState<Part[]>([]);
+  const [wide, setWide] = useState(false);
+  const [open, setOpen] = useState(false);
+  const openedAt = useRef<number | null>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia("(orientation: landscape)");
+    const apply = () => setWide(media.matches);
+    apply();
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, []);
 
   useEffect(() => {
     const root = document.getElementById(targetId);
@@ -50,6 +61,10 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       }))
       .filter((part) => part.label && part.label.toLocaleLowerCase("fr") !== "titre de la partie");
     const pick = () => {
+      if (openedAt.current != null && window.scrollY < openedAt.current - 24) {
+        openedAt.current = null;
+        setOpen(false);
+      }
       const bar = document.querySelector(".reading-title");
       const line = bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom + 6 : 110;
       const passed = next.filter((part) => {
@@ -72,9 +87,9 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
   if (!parts.length) return null;
 
-  const overflow = parts.length > 3;
-  const numbers = overflow ? parts.slice(0, -2) : [];
-  const bars = overflow ? parts.slice(-2) : parts;
+  const many = wide ? parts.length > 6 : parts.length > 3;
+  const numbers = wide ? (many && !open ? parts : []) : (many ? parts.slice(0, -2) : []);
+  const bars = wide ? (many && !open ? [] : parts) : (many ? parts.slice(-2) : parts);
   const jump = (id: string) => (event: MouseEvent) => {
     event.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -83,13 +98,30 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
       {numbers.length ? (
-        <div className="air-part-nums">
-          {numbers.map((part) => (
-            <a key={part.id} href={`#${part.id}`} className="air-part-dot" title={`Partie ${part.n}. ${part.label}`} onClick={jump(part.id)}>
-              {part.n}
-            </a>
-          ))}
-        </div>
+        wide && many ? (
+          <button
+            type="button"
+            className="air-part-nums"
+            aria-expanded={open}
+            aria-label="Afficher les parties"
+            onClick={() => {
+              openedAt.current = window.scrollY;
+              setOpen(true);
+            }}
+          >
+            {numbers.map((part) => (
+              <span key={part.id} className="air-part-dot">{part.n}</span>
+            ))}
+          </button>
+        ) : (
+          <div className="air-part-nums">
+            {numbers.map((part) => (
+              <a key={part.id} href={`#${part.id}`} className="air-part-dot" title={`Partie ${part.n}. ${part.label}`} onClick={jump(part.id)}>
+                {part.n}
+              </a>
+            ))}
+          </div>
+        )
       ) : null}
       {bars.map((part) => (
         <a
