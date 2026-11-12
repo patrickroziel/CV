@@ -81,6 +81,17 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
+      {opened ? (
+        <a
+          href={`#${opened.id}`}
+          className={["air-part-float is-preview", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
+          onClick={jump(opened.id)}
+        >
+          <span className="air-part-num">{opened.n}</span>
+          <span className="air-part-name">{opened.label}</span>
+        </a>
+      ) : null}
+      <div className="air-part-line">
       {earlier.length ? (
         <div className="air-part-nums">
           {earlier.map((part) => (
@@ -103,16 +114,6 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
           ))}
         </div>
       ) : null}
-      {opened ? (
-        <a
-          href={`#${opened.id}`}
-          className={["air-part-float is-preview", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
-          onClick={jump(opened.id)}
-        >
-          <span className="air-part-num">{opened.n}</span>
-          <span className="air-part-name">{opened.label}</span>
-        </a>
-      ) : null}
       <a
         href={`#${current.id}`}
         title={`Partie ${current.n}. ${current.label}`}
@@ -122,6 +123,7 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
         <span className="air-part-num">{current.n}</span>
         <span className="air-part-name">{current.label}</span>
       </a>
+      </div>
     </div>
   );
 }

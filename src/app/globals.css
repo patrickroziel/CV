@@ -1514,6 +1514,24 @@ a.air-part-float:hover {
   height: 1.45rem;
   font-size: 0.66rem;
 }
+.air-part-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
+}
+.air-part-line .air-part-nums {
+  width: auto;
+  flex: none;
+  justify-content: flex-start;
+}
+.air-part-line .air-part-float {
+  flex: 1 1 auto;
+  width: auto !important;
+  min-width: 0;
+  max-width: none !important;
+}
 .air-part-nums {
   display: flex;
   flex-wrap: nowrap;
@@ -2815,6 +2833,10 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
     flex: none !important;
     width: 100% !important;
     max-width: none !important;
+  }
+  .air-part-line .air-part-float {
+    flex: 1 1 auto !important;
+    width: auto !important;
   }
 }
 @media (max-height: 520px) {
