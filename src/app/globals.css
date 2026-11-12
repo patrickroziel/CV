@@ -1516,6 +1516,7 @@ a.air-part-float:hover {
 }
 .air-part-line {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.35rem;
   width: 100%;
