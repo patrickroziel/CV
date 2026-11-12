@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Eye, FileDown, ImageIcon, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
@@ -30,12 +29,6 @@ export function Header() {
 
       <div className="site-header-bar mx-auto flex h-11 max-w-[1180px] items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <Link
-            href="/"
-            className="hidden min-w-0 items-center text-sm font-semibold tracking-tight text-zinc-50 sm:flex"
-          >
-            <span className="truncate">Patrick Roziel</span>
-          </Link>
           <UniverseSwitch />
         </div>
 
