@@ -1556,13 +1556,30 @@ a.air-part-float:hover {
 .article-actions-float > * {
   pointer-events: auto;
 }
-.article-title-float {
+.article-float-stack {
   position: fixed;
   z-index: 32;
   top: calc(var(--chrome-top) + 0.35rem);
   left: 50%;
+  display: flex;
   width: min(40rem, calc(100% - 1.5rem));
   transform: translateX(-50%);
+  flex-direction: column;
+  gap: 0.35rem;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+.article-float-stack > * {
+  pointer-events: auto;
+}
+.article-float-stack .article-title-float {
+  position: static;
+  top: auto;
+  left: auto;
+  width: 100%;
+  transform: none;
 }
 .air-read-head .article-title-float,
 .notes-read-head .article-title-float {

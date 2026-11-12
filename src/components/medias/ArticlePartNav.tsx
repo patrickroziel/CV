@@ -119,8 +119,8 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
     let primed = false;
     const pick = () => {
-      const title = root.closest("article")?.querySelector(".notes-title-pill, .air-title-pill");
-      const line = title ? title.getBoundingClientRect().bottom : 160;
+      const title = document.querySelector(".article-title-float");
+      const line = title ? title.getBoundingClientRect().bottom + 8 : 120;
       const stuck = heads.filter((el) => el.getBoundingClientRect().top < line - 8);
       const nextIds = stuck.map((el) => el.id);
       const same = nextIds.length === prevIds.current.length && nextIds.every((id, index) => id === prevIds.current[index]);
@@ -296,6 +296,8 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
 
 export function NotesFloatingStack({ postId, title = "", subtitle = "" }: { postId: string; title?: string; subtitle?: string }) {
   const [raised, setRaised] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     const titleEl = document.getElementById(`note-title-${postId}`);
     const onScroll = () => {
@@ -324,10 +326,12 @@ export function NotesFloatingStack({ postId, title = "", subtitle = "" }: { post
       </span>
     </a>
   ) : null;
-  return (
-    <div className="notes-read-head">
-      {pill ? createPortal(pill, document.body) : null}
-      <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
-    </div>
-  );
+  if (!mounted) return null;
+  return createPortal(
+        <div className="article-float-stack">
+          {pill}
+          <ArticlePartNav targetId={`note-body-${postId}`} tone="notes" />
+        </div>,
+        document.body,
+      );
 }
