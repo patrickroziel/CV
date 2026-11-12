@@ -1202,6 +1202,21 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
+.dock-icon[aria-current="true"] {
+  border-color: rgba(255, 255, 255, 0.46);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+#showreel,
+#experience,
+#projects,
+#skills,
+#education,
+#languages,
+#devis,
+#contact {
+  scroll-margin-top: 5.75rem;
+}
 .bottom-nav-slot {
   display: flex;
   align-items: center;

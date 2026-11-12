@@ -11,6 +11,7 @@ import { WorkSidebar } from "@/components/work/WorkSidebar";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { KofiCard } from "@/components/support/KofiCard";
 import { WorkTagTicker } from "@/components/work/WorkTagTicker";
+import { WorkCategoryDock } from "@/components/work/WorkCategoryDock";
 
 export default function Home() {
   return (
@@ -52,6 +53,7 @@ export default function Home() {
         </section>
       </div>
       <WorkTagTicker />
+      <WorkCategoryDock />
     </main>
   );
 }
