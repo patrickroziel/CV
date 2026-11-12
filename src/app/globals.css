@@ -1202,6 +1202,12 @@ html[data-universe="air"] .air-surface .air-article-body blockquote {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
+.work-category-dock {
+  gap: 0.7rem;
+}
+.bottom-dock:has(.work-category-dock) {
+  bottom: calc(4.15rem + env(safe-area-inset-bottom, 0px));
+}
 .dock-icon[aria-current="true"] {
   border-color: rgba(255, 255, 255, 0.46);
   background: rgba(255, 255, 255, 0.14);

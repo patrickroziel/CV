@@ -51,7 +51,7 @@ export function WorkCategoryDock() {
   if (!slot || !visible.length) return null;
 
   return createPortal(
-    <nav className="air-float-bar" aria-label="Catégories Work">
+    <nav className="air-float-bar work-category-dock" aria-label="Catégories Work">
       {visible.map((item) => {
         const Icon = item.icon;
         const label = l((data.nav ?? DEFAULT_NAV)[item.id]?.label).trim() || t(`nav.${item.id}`);
