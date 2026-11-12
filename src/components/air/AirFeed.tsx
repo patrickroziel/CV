@@ -195,7 +195,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             </Link>
           </div>
           <div className="border-t border-white/15 px-5 py-4">
-            <PostActions postId={post.id} title={title} visible={post.visible !== false} sharePath="/air" />
+            <PostActions postId={post.id} title={title} visible={post.visible !== false} sharePath="/air" commentLink={`/air/${post.id}#commenter`} />
           </div>
           {editMode && <div className="flex gap-2 border-t border-white/10 px-5 py-3">
             <button className="inline-flex items-center gap-1 text-xs text-white/70" onClick={()=>setEditing(post)}><Pencil className="h-3.5 w-3.5"/> Modifier</button>

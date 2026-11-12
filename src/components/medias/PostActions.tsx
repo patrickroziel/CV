@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { Heart, MessageCircle } from "lucide-react";
 import { SITE_LANGUAGE_CODES, SITE_LANGUAGE_STORAGE_KEY } from "@/lib/site-translation";
 
@@ -139,8 +140,8 @@ function CommentThread({ postId, tone, open, onSent }: { postId: string; tone: "
   </div>;
 }
 
-export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false, floating = false, dock = false, card = false }: {
-  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean; floating?: boolean; dock?: boolean; card?: boolean;
+export function PostActions({ postId, title, summary = "", visible = true, sharePath = "/notes", tone = "dark", comments = false, floating = false, dock = false, card = false, commentLink = "" }: {
+  postId: string; title: string; summary?: string; visible?: boolean; sharePath?: "/notes" | "/air"; tone?: "dark" | "light"; comments?: boolean; floating?: boolean; dock?: boolean; card?: boolean; commentLink?: string;
 }) {
   const [enabled, setEnabled] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -179,6 +180,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       }, 60);
     };
     window.addEventListener("article-comments", onOpen);
+    if (window.location.hash === "#commenter") onOpen(new CustomEvent("article-comments", { detail: postId }));
     return () => window.removeEventListener("article-comments", onOpen);
   }, [comments, postId]);
 
@@ -303,12 +305,17 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         <span>J'aime</span>
         {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
       </button>
-      {comments && (
+      {comments && !commentLink && (
         <button type="button" onClick={() => setCommentOpen((open) => !open)} aria-expanded={commentOpen}
           className={`text-[13px] font-medium transition ${reactionClass}`}>
           {commentOpen ? "Fermer" : "Commenter"}
         </button>
       )}
+      {commentLink ? (
+        <Link href={commentLink} aria-label="Commenter" className={`inline-flex ${reactionClass}`}>
+          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+        </Link>
+      ) : null}
     </div>
   );
   const shares = (
@@ -330,12 +337,17 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     </div>
   );
   if (card) {
-    return <button type="button" onClick={() => void react()} disabled={!enabled || busy}
-      aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
-      className="inline-flex items-center gap-1.5 text-[13px] text-white/70 transition hover:text-white disabled:opacity-40">
-      <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current text-white" : ""}`} aria-hidden />
-      {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
-    </button>;
+    return <div className="inline-flex items-center gap-3">
+      <button type="button" onClick={() => void react()} disabled={!enabled || busy}
+        aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
+        className="inline-flex items-center gap-1.5 text-[13px] text-white/70 transition hover:text-white disabled:opacity-40">
+        <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current text-white" : ""}`} aria-hidden />
+        {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
+      </button>
+      <Link href={`${sharePath}/${postId}#commenter`} aria-label="Commenter" className="inline-flex text-white/70 transition hover:text-white">
+        <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+      </Link>
+    </div>;
   }
   if (dock) return shares;
   if (!floating) return <div className="flex min-w-0 flex-col gap-2">{reactions}{shares}</div>;
