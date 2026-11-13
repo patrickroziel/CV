@@ -1,50 +1,46 @@
 import type { SVGProps } from "react";
 
-function Mark(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    />
-  );
-}
-
-/** Vague en mouvement : l'eau poussée par le vent, la rive en dessous. */
+/** Vague qui se casse, pour Notes. */
 export function WaterIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <Mark {...props}>
-      <path d="M2.5 14.2c1.6-3.6 3.8-6.2 6.6-6.2 1.8 0 3 1.3 3.6 2.8" />
-      <path d="M12.4 9.2c1.3-2 3.2-2.6 4.7-1.2 1.3 1.2 1.2 2.6-.1 3.6" />
-      <path d="M2.2 18.2c2.2.9 3.8.7 5.8-.6 2.2-1.4 3.8-1.4 6 0 2.1 1.3 3.8 1.5 6-.2" />
-    </Mark>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        d="M3.40 17.45 L3.64 17.41 L3.86 17.30 L4.08 17.11 L4.29 16.87 L4.50 16.56 L4.71 16.20 L4.92 15.80 L5.13 15.35 L5.35 14.86 L5.57 14.35 L5.80 13.81 L6.04 13.25 L6.30 12.67 L6.57 12.09 L6.85 11.50 L7.16 10.91 L7.48 10.34 L7.83 9.77 L8.20 9.23 L8.60 8.70 L9.03 8.21 L9.49 7.75 L9.98 7.34 L10.51 6.96 L11.07 6.65 L11.67 6.38 L12.31 6.18 L13.00 6.05 L13.64 5.97 L14.24 5.95 L14.81 5.98 L15.34 6.06 L15.82 6.19 L16.27 6.37 L16.68 6.58 L17.05 6.82 L17.38 7.10 L17.66 7.41 L17.91 7.73 L18.11 8.08 L18.27 8.44 L18.38 8.81 L18.45 9.18 L18.48 9.56 L18.46 9.94 L18.39 10.31 L18.28 10.67 L18.12 11.02 L17.91 11.34 L17.66 11.65 L17.36 11.93 L17.01 12.18 L16.61 12.40 L16.15 12.58 L15.65 12.71 L15.10 12.80 L14.73 12.87 L14.35 12.96 L13.96 13.06 L13.56 13.17 L13.16 13.29 L12.76 13.42 L12.34 13.57 L11.93 13.72 L11.51 13.88 L11.08 14.05 L10.66 14.23 L10.23 14.41 L9.80 14.60 L9.36 14.79 L8.93 14.98 L8.49 15.18 L8.06 15.38 L7.62 15.58 L7.19 15.78 L6.76 15.98 L6.33 16.17 L5.90 16.37 L5.47 16.56 L5.05 16.75 L4.63 16.94 L4.21 17.11 L3.80 17.29 L3.40 17.45 Z M6.25 16.25 L6.43 16.12 L6.60 15.97 L6.78 15.80 L6.95 15.61 L7.13 15.40 L7.31 15.17 L7.49 14.93 L7.68 14.67 L7.87 14.40 L8.06 14.13 L8.26 13.84 L8.47 13.55 L8.68 13.26 L8.89 12.97 L9.12 12.68 L9.35 12.39 L9.59 12.10 L9.84 11.82 L10.10 11.55 L10.38 11.29 L10.66 11.04 L10.95 10.81 L11.26 10.59 L11.58 10.39 L11.91 10.20 L12.26 10.05 L12.62 9.91 L13.00 9.80 L13.33 9.74 L13.63 9.70 L13.91 9.70 L14.17 9.73 L14.41 9.78 L14.62 9.85 L14.81 9.94 L14.98 10.05 L15.12 10.18 L15.24 10.32 L15.34 10.46 L15.41 10.62 L15.45 10.78 L15.47 10.94 L15.47 11.11 L15.44 11.27 L15.38 11.43 L15.30 11.58 L15.19 11.72 L15.06 11.86 L14.90 11.97 L14.71 12.07 L14.49 12.16 L14.25 12.22 L13.98 12.25 L13.68 12.27 L13.36 12.25 L13.00 12.20 L9.40 14.30 L6.25 16.25 Z"
+      />
+    </svg>
   );
 }
 
-/** Nuage : le plat de l'air, trois bosses d'eau. */
+/** Nuage rond, pour Air. */
 export function AirIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <Mark {...props}>
-      <path d="M7.2 17.6h10.2a3.2 3.2 0 0 0 .3-6.4 4.1 4.1 0 0 0-7.9-1.2 3 3 0 0 0-2.6 7.6z" />
-    </Mark>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true" {...props}>
+      <path d="M13.31 6.00 L14.25 6.00 L15.19 6.19 L16.12 6.56 L17.06 7.31 L17.91 8.25 L18.56 9.00 L19.50 9.38 L20.44 10.22 L21.00 11.16 L21.38 12.09 L21.56 13.03 L21.56 13.97 L21.47 14.91 L21.19 15.84 L20.72 16.78 L19.97 17.62 L19.03 18.19 L18.09 18.38 L17.16 18.19 L16.22 17.62 L15.28 17.62 L14.34 17.62 L13.41 17.62 L12.47 17.62 L11.53 17.62 L10.59 18.19 L9.66 18.56 L8.72 18.75 L7.78 18.75 L6.84 18.56 L5.91 18.28 L4.97 17.62 L4.22 16.97 L3.66 16.03 L3.28 15.09 L3.19 14.16 L3.28 13.22 L3.56 12.28 L4.12 11.34 L4.97 10.50 L5.91 9.84 L6.84 9.56 L7.78 9.38 L8.72 9.38 L9.47 9.00 L10.03 8.06 L10.88 7.12 L11.81 6.47 L12.75 6.19 Z" />
+    </svg>
   );
 }
 
-/** Deux bûches coupées, l'une sur l'autre. */
+function Log({ cx, y, w, h }: { cx: number; y: number; w: number; h: number }) {
+  const rx = 1.55;
+  const ry = h / 2;
+  const cy = y + ry;
+  return (
+    <g>
+      <rect x={cx} y={y} width={w} height={h} />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} />
+      <ellipse cx={cx} cy={cy} rx={rx * 0.42} ry={ry * 0.4} />
+    </g>
+  );
+}
+
+/** Trois bûches coupées, pour Work. */
 export function WoodIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <Mark {...props}>
-      <ellipse cx="6.6" cy="7.6" rx="2.15" ry="2.45" />
-      <ellipse cx="6.6" cy="7.6" rx="0.75" ry="0.9" />
-      <path d="M8.7 5.2H17a2.4 2.4 0 0 1 0 4.8H8.7" />
-      <ellipse cx="6.6" cy="16.2" rx="2.15" ry="2.45" />
-      <ellipse cx="6.6" cy="16.2" rx="0.75" ry="0.9" />
-      <path d="M8.7 13.8H17a2.4 2.4 0 0 1 0 4.8H8.7" />
-    </Mark>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.35" aria-hidden="true" {...props}>
+      <Log cx={8.4} y={1.6} w={12.2} h={5.6} />
+      <Log cx={5.2} y={9.2} w={12.2} h={5.6} />
+      <Log cx={7.4} y={16.8} w={12.2} h={5.6} />
+    </svg>
   );
 }
