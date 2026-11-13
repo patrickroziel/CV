@@ -709,7 +709,7 @@ export type SocialPostFileKind = "pdf" | "image";
 export type SocialPostCoverSource = "wip" | "web" | "cloudflare";
 
 /** A safe external visual displayed at the top of a post; URL only, never raw HTML. */
-export type FeaturedEmbed = { type: "youtube" | "x" | "image"; url: string };
+export type FeaturedEmbed = { type: "youtube" | "vimeo" | "x" | "image"; url: string };
 /** External media or a self-contained, independently scrollable text excerpt. */
 export type InlinePostMedia =
   | (FeaturedEmbed & { id: string })

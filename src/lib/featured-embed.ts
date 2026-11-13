@@ -1,4 +1,5 @@
 import type { FeaturedEmbed } from "@/lib/types";
+import { vimeoCanonical } from "@/lib/utils";
 
 /** Only allow known embeds. Never render arbitrary HTML/iframe supplied by authors. */
 export function normalizeFeaturedEmbed(raw: unknown): FeaturedEmbed | null {
@@ -17,6 +18,10 @@ export function normalizeFeaturedEmbed(raw: unknown): FeaturedEmbed | null {
       if (!id) id = u.pathname.match(/^\/(?:shorts|embed|live)\/([A-Za-z0-9_-]{11})/)?.[1] ?? null;
       if (!id || !/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
       return { type: "youtube", url: "https://www.youtube.com/watch?v=" + id };
+    }
+    if (item.type === "vimeo") {
+      const canonical = vimeoCanonical(url);
+      return canonical ? { type: "vimeo", url: canonical } : null;
     }
     if (item.type === "x") {
       if (!["x.com","www.x.com","twitter.com","www.twitter.com","mobile.twitter.com"].includes(host)) return null;

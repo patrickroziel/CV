@@ -7,6 +7,7 @@ import { XEmbed } from "@/components/projects/XEmbed";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { displayImageUrl } from "@/lib/display-image";
 import { isVercelBlobUrl } from "@/lib/blob-upload";
+import { vimeoEmbedUrl, vimeoThumb, vimeoVideo } from "@/lib/utils";
 
 function isBlockedMedia(url: string | null | undefined) {
   if (!url) return false;
@@ -85,6 +86,50 @@ function ViewportYouTube({ id, title, autoplay }: {
   );
 }
 
+function ViewportVimeo({ url, title, autoplay }: { url: string; title: string; autoplay: boolean }) {
+  const host = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+  const thumb = vimeoThumb(url);
+  const src = vimeoEmbedUrl(url, true);
+
+  useEffect(() => {
+    const element = host.current;
+    if (!element || !autoplay || !("IntersectionObserver" in window)) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if ((entries[0]?.intersectionRatio ?? 0) >= 0.6) setStarted(true);
+      },
+      { threshold: [0, 0.6, 1] },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [autoplay]);
+
+  return (
+    <div ref={host} className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
+      {started && src ? (
+        <iframe
+          src={src}
+          title={title || "Vidéo Vimeo"}
+          className="absolute inset-0 h-full w-full border-0"
+          loading="eager"
+          allow="autoplay; fullscreen; picture-in-picture"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      ) : (
+        <button type="button" onClick={() => setStarted(true)} aria-label="Lire la vidéo Vimeo" className="group absolute inset-0 flex h-full w-full items-center justify-center bg-black text-white">
+          {thumb && <img src={thumb} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-70" />}
+          <span className="relative flex h-14 w-20 items-center justify-center rounded-2xl bg-[#1ab7ea] shadow-xl transition-transform group-hover:scale-105">
+            <Play className="h-7 w-7 fill-white" aria-hidden="true" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function FeaturedMedia({ media, title, autoplay = true }: {
   media: FeaturedEmbed | null | undefined;
   title: string;
@@ -108,6 +153,10 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
         <XEmbed url={featured.url} title={title || "Post X"} />
       </div>
     );
+  }
+  if (featured.type === "vimeo") {
+    const video = vimeoVideo(featured.url);
+    return video ? <ViewportVimeo key={video.id} url={featured.url} title={title} autoplay={autoplay} /> : null;
   }
   const id = new URL(featured.url).searchParams.get("v");
   return id ? <ViewportYouTube key={id} id={id} title={title} autoplay={autoplay} /> : null;

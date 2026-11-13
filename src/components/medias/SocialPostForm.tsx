@@ -844,6 +844,7 @@ export function SocialPostForm({
           onChange={(e) => { setInsertType(e.target.value as FeaturedEmbed["type"] | "text" | "carousel"); setInsertInput(""); }}
           className="h-10 rounded-xl border border-white/15 bg-black/40 px-3 text-sm text-zinc-100">
           <option value="youtube">Vidéo YouTube</option>
+          <option value="vimeo">Vidéo Vimeo</option>
           <option value="x">Post X</option>
           <option value="image">Photo (URL ou fichier)</option>
           <option value="text">Bloc de texte défilant</option>
@@ -892,9 +893,9 @@ export function SocialPostForm({
           </div>
         ) : (
           <>
-            <Label htmlFor="inline-media-url">Lien du média (ou iframe YouTube)</Label>
+            <Label htmlFor="inline-media-url">Lien du média (ou code d’intégration)</Label>
             <Input id="inline-media-url" value={insertInput} onChange={e => setInsertInput(e.target.value)}
-              placeholder={insertType === "youtube" ? "https://youtu.be/…" : insertType === "x" ? "https://x.com/.../status/…" : "https://.../photo.jpg"} />
+              placeholder={insertType === "youtube" ? "https://youtu.be/…" : insertType === "vimeo" ? "https://vimeo.com/…" : insertType === "x" ? "https://x.com/.../status/…" : "https://.../photo.jpg"} />
             <Button type="button" variant="secondary" disabled={!parsedMedia || uploadTarget !== null}
               className="w-fit gap-2" onClick={insertFromLink}>
               <Plus className="h-4 w-4" /> Insérer ce média dans le texte
@@ -921,7 +922,7 @@ export function SocialPostForm({
               <div key={media.id} className="grid min-w-0 gap-2 rounded-lg bg-black/25 px-3 py-2">
                 <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
                   <span className="min-w-0 flex-1 break-words text-xs text-zinc-300">
-                    {index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "x" ? "X" : media.type === "text" ? "Bloc de texte" : media.type === "carousel" ? "Carrousel" : "Photo"}
+                    {index + 1}. {media.type === "youtube" ? "YouTube" : media.type === "vimeo" ? "Vimeo" : media.type === "x" ? "X" : media.type === "text" ? "Bloc de texte" : media.type === "carousel" ? "Carrousel" : "Photo"}
                     {" — "}{media.type === "text" ? (media.title || "Extrait à lire") : media.type === "carousel" ? `${media.title || "Photos et vidéos"} (${media.items.length})` : media.url}
                   </span>
                   <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">

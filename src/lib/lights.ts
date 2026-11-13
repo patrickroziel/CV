@@ -1,5 +1,5 @@
 import type { FeatureVideo, MainShowreel, Project, SocialPost, Translatable } from "@/lib/types";
-import { youtubeEmbedUrl, youtubeThumb, youtubeVideoId } from "@/lib/utils";
+import { vimeoCanonical, vimeoEmbedUrl, vimeoThumb, vimeoVideo, youtubeEmbedUrl, youtubeThumb, youtubeVideoId } from "@/lib/utils";
 
 export type LightCategory = "notes" | "air" | "work";
 
@@ -33,12 +33,14 @@ function item(
   partial: Omit<LightItem, "thumb" | "embed" | "file"> & { watchUrl: string },
 ): LightItem {
   const id = youtubeVideoId(partial.watchUrl);
-  return {
-    ...partial,
-    thumb: id ? youtubeThumb(partial.watchUrl) : null,
-    embed: id ? youtubeEmbedUrl(partial.watchUrl) : null,
-    file: !id,
-  };
+  if (id) {
+    return { ...partial, thumb: youtubeThumb(partial.watchUrl), embed: youtubeEmbedUrl(partial.watchUrl), file: false };
+  }
+  const vimeo = vimeoEmbedUrl(partial.watchUrl);
+  if (vimeo) {
+    return { ...partial, thumb: vimeoThumb(partial.watchUrl), embed: vimeo, file: false };
+  }
+  return { ...partial, thumb: null, embed: null, file: true };
 }
 
 function textOf(value: Translatable | undefined) {
@@ -59,20 +61,21 @@ function fromPost(post: SocialPost, titleOf: TitleOf): LightItem[] {
   const push = (url: string | null | undefined) => {
     const value = url?.trim();
     if (!value || seen.has(value)) return;
-    const clip = youtube(value);
+    const clip = youtube(value) || vimeoCanonical(value);
     if (!clip) return;
     seen.add(value);
-    out.push(item({ ...base, id: `${category}-${post.id}-${youtubeVideoId(clip)}`, watchUrl: clip }));
+    out.push(item({ ...base, id: `${category}-${post.id}-${youtubeVideoId(clip) || vimeoVideo(clip)?.id || "video"}`, watchUrl: clip }));
   };
 
-  push(post.featuredEmbed?.type === "youtube" ? post.featuredEmbed.url : null);
+  const cover = post.featuredEmbed;
+  push(cover && (cover.type === "youtube" || cover.type === "vimeo") ? cover.url : null);
   push(post.youtubeUrl);
   for (const id of (order.length ? order : [...media.keys()])) {
     const entry = media.get(id);
-    if (entry?.type === "youtube") push(entry.url);
+    if (entry?.type === "youtube" || entry?.type === "vimeo") push(entry.url);
   }
   for (const entry of post.inlineMedia ?? []) {
-    if (entry.type === "youtube") push(entry.url);
+    if (entry.type === "youtube" || entry.type === "vimeo") push(entry.url);
   }
   return out;
 }

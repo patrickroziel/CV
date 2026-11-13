@@ -69,6 +69,47 @@ export function youtubeThumb(url: string): string | null {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
 }
 
+export function vimeoVideo(url: string): { id: string; hash: string | null } | null {
+  try {
+    const u = new URL(url.trim());
+    const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "vimeo.com" && host !== "player.vimeo.com") return null;
+    const parts = u.pathname.split("/").filter(Boolean);
+    const id = host === "player.vimeo.com"
+      ? parts[parts[0] === "video" ? 1 : 0]
+      : [...parts].reverse().find((part) => /^\d{5,12}$/.test(part));
+    if (!id || !/^\d{5,12}$/.test(id)) return null;
+    const after = parts[parts.indexOf(id) + 1];
+    const hash = u.searchParams.get("h") || (after && /^[A-Za-z0-9]{4,32}$/.test(after) ? after : null);
+    return { id, hash };
+  } catch {
+    return null;
+  }
+}
+
+export function vimeoCanonical(url: string): string | null {
+  const video = vimeoVideo(url);
+  if (!video) return null;
+  return video.hash ? `https://vimeo.com/${video.id}/${video.hash}` : `https://vimeo.com/${video.id}`;
+}
+
+export function vimeoEmbedUrl(url: string, autoplay = false): string | null {
+  const video = vimeoVideo(url);
+  if (!video) return null;
+  const params = new URLSearchParams({ title: "0", byline: "0", portrait: "0", dnt: "1" });
+  if (video.hash) params.set("h", video.hash);
+  if (autoplay) {
+    params.set("autoplay", "1");
+    params.set("muted", "1");
+  }
+  return `https://player.vimeo.com/video/${video.id}?${params}`;
+}
+
+export function vimeoThumb(url: string): string | null {
+  const video = vimeoVideo(url);
+  return video ? `https://vumbnail.com/${video.id}.jpg` : null;
+}
+
 type YoutubeEmbedOptions = {
   /** Interactive player (showreel) — no autoplay */
   autoplay?: boolean;
