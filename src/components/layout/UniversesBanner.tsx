@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cloud, Clapperboard, Radio, X } from "lucide-react";
+import { X } from "lucide-react";
+import { AirIcon, WaterIcon, WoodIcon } from "@/components/layout/universe-icons";
 import { track } from "@vercel/analytics";
 import { cn } from "@/lib/utils";
 
@@ -14,21 +15,21 @@ const items = [
     href: "/notes",
     label: "Notes",
     hint: "écrits",
-    icon: Radio,
+    icon: WaterIcon,
     accent: "text-cyan-200/90",
   },
   {
     href: "/air",
     label: "Air",
     hint: "décryptages",
-    icon: Cloud,
+    icon: AirIcon,
     accent: "text-teal-200/90",
   },
   {
     href: "/work",
     label: "Work",
     hint: "portfolio",
-    icon: Clapperboard,
+    icon: WoodIcon,
     accent: "text-amber-200/90",
   },
 ];

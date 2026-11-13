@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Clapperboard, Cloud, Radio } from "lucide-react";
+import { AirIcon, WaterIcon, WoodIcon } from "@/components/layout/universe-icons";
 import { cn } from "@/lib/utils";
 import { universeFromPath, type SiteUniverse } from "@/lib/universe";
 
@@ -17,9 +17,9 @@ export function UniverseSwitch({ className }: { className?: string }) {
     className,
   )}>
     {([
-      { href: "/notes", label: "Notes", key: "medias" as const, icon: Radio, hint: "Écrits, images et musiques" },
-      { href: "/air", label: "Air", key: "air" as const, icon: Cloud, hint: "Décryptages, expériences et observations" },
-      { href: "/work", label: "Work", key: "portfolio" as const, icon: Clapperboard, hint: "Portfolio, CV et compétences" },
+      { href: "/notes", label: "Notes", key: "medias" as const, icon: WaterIcon, hint: "Écrits, images et musiques" },
+      { href: "/air", label: "Air", key: "air" as const, icon: AirIcon, hint: "Décryptages, expériences et observations" },
+      { href: "/work", label: "Work", key: "portfolio" as const, icon: WoodIcon, hint: "Portfolio, CV et compétences" },
     ]).map(({ href, label, key, icon: Icon, hint }) =>
       <Link key={key} href={href} title={hint} aria-current={active === key ? "page" : undefined}
         className={cn(

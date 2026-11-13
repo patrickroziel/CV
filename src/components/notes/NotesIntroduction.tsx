@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, BriefcaseBusiness, Cloud, Waves } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { AirIcon, WaterIcon, WoodIcon } from "@/components/layout/universe-icons";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { stripHtml } from "@/lib/sanitize-html";
@@ -51,7 +52,7 @@ export function NotesIntroduction() {
         <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-cyan-200/10 blur-2xl" />
         <div className="relative flex items-center justify-between gap-2">
           <span className="inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[.18em] text-cyan-100/70">
-            <Waves className="h-3.5 w-3.5" /> Trois univers
+            <WaterIcon className="h-3.5 w-3.5" /> Trois univers
           </span>
           <div className="flex gap-1" aria-label="Étape de présentation">
             {slides.map((slide, step) => (
@@ -103,10 +104,10 @@ export function NotesIntroduction() {
         )}
         <div className="relative mt-3 flex flex-wrap gap-1.5">
           <Link href="/air" className="inline-flex items-center gap-1 rounded-full border border-sky-100/20 bg-sky-100/[.07] px-2.5 py-1.5 text-[10px] text-sky-100 transition-colors hover:bg-sky-100/15">
-            <Cloud className="h-3 w-3" /> Air
+            <AirIcon className="h-3 w-3" /> Air
           </Link>
           <Link href="/work" className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[.05] px-2.5 py-1.5 text-[10px] text-zinc-100 transition-colors hover:bg-white/10">
-            <BriefcaseBusiness className="h-3 w-3" /> Work
+            <WoodIcon className="h-3 w-3" /> Work
           </Link>
         </div>
       </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Radio } from "lucide-react";
+import { Plus } from "lucide-react";
+import { WaterIcon } from "@/components/layout/universe-icons";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { EditGate } from "@/components/shared/EditGate";
 import { EditableSectionHeading } from "@/components/shared/EditableSectionHeading";
@@ -112,7 +113,7 @@ export function MediasFeed() {
         <GlassCard className="border-violet-300/15 p-10 text-center sm:p-14">
           <div className="mx-auto flex max-w-md flex-col items-center gap-3">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-300/30 bg-violet-400/15 text-violet-200">
-              <Radio className="h-5 w-5" />
+              <WaterIcon className="h-5 w-5" />
             </span>
             <p className="text-sm text-zinc-400">
               {editMode ? t("medias.emptyEdit") : t("medias.empty")}
