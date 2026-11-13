@@ -10,50 +10,26 @@ export type SiteLanguage = {
  * The source site remains French; all other choices are generated on demand
  * and are never written into portfolio content.
  *
- * The first five choices are intentionally ordered by Patrick's preference:
- * French, Polish, British English, American English, then Spanish.
+ * English and Arabic each keep a single variant: the most common one.
  */
 export const SITE_LANGUAGES: SiteLanguage[] = [
   { code: "fr", label: "Français", nativeLabel: "Français", flag: "🇫🇷" },
   { code: "pl", label: "Polonais", nativeLabel: "Polski", flag: "🇵🇱" },
-  { code: "en-GB", label: "Anglais britannique", nativeLabel: "British English", flag: "🇬🇧" },
-  { code: "en-US", label: "Anglais américain", nativeLabel: "American English", flag: "🇺🇸" },
+  { code: "en-US", label: "Anglais", nativeLabel: "English", flag: "🇺🇸" },
   { code: "es", label: "Espagnol", nativeLabel: "Español", flag: "🇪🇸" },
-
-  { code: "gcf-antilles", label: "Créole antillais", nativeLabel: "Kréyòl Gwadloup / Matinik", flag: "🇬🇵🇲🇶" },
-  { code: "ht", label: "Créole haïtien", nativeLabel: "Kreyòl ayisyen", flag: "🇭🇹" },
-
-  { code: "nouchi-ci", label: "Ivoirien (Nouchi)", nativeLabel: "Nouchi", flag: "🇨🇮" },
-  { code: "bm", label: "Bambara", nativeLabel: "Bamanankan", flag: "🇲🇱" },
-  { code: "snk-soninke", label: "Soninké", nativeLabel: "Sooninkanxanne", flag: "🇲🇱" },
-  { code: "ln", label: "Congolais (Lingala)", nativeLabel: "Lingála", flag: "🇨🇩🇨🇬" },
   { code: "tr", label: "Turc", nativeLabel: "Türkçe", flag: "🇹🇷" },
   { code: "vi", label: "Vietnamien", nativeLabel: "Tiếng Việt", flag: "🇻🇳" },
-
-  { code: "ar-msa", label: "Arabe littéraire", nativeLabel: "العربية الفصحى", flag: "🌍" },
-  { code: "ar-maghreb", label: "Arabe maghrébin", nativeLabel: "العربية المغاربية", flag: "🌍" },
-  { code: "ar-egypt", label: "Arabe égyptien", nativeLabel: "العربية المصرية", flag: "🇪🇬" },
-
+  { code: "ar-maghreb", label: "Arabe", nativeLabel: "العربية المغاربية", flag: "🌍" },
   { code: "ru", label: "Russe", nativeLabel: "Русский", flag: "🇷🇺" },
   { code: "el", label: "Grec", nativeLabel: "Ελληνικά", flag: "🇬🇷" },
   { code: "zh-CN", label: "Chinois simplifié", nativeLabel: "简体中文", flag: "🇨🇳" },
   { code: "ja", label: "Japonais", nativeLabel: "日本語", flag: "🇯🇵" },
-
   { code: "hi", label: "Hindi", nativeLabel: "हिन्दी", flag: "🇮🇳" },
   { code: "bn", label: "Bengali", nativeLabel: "বাংলা", flag: "🇮🇳" },
   { code: "ta", label: "Tamoul", nativeLabel: "தமிழ்", flag: "🇮🇳" },
-  { code: "te", label: "Télougou", nativeLabel: "తెలుగు", flag: "🇮🇳" },
-  { code: "mr", label: "Marathi", nativeLabel: "मराठी", flag: "🇮🇳" },
-  { code: "gu", label: "Gujarati", nativeLabel: "ગુજરાતી", flag: "🇮🇳" },
-  { code: "kn", label: "Kannada", nativeLabel: "ಕನ್ನಡ", flag: "🇮🇳" },
-  { code: "ml", label: "Malayalam", nativeLabel: "മലയാളം", flag: "🇮🇳" },
   { code: "pa", label: "Pendjabi", nativeLabel: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
-  { code: "or", label: "Odia", nativeLabel: "ଓଡ଼ିଆ", flag: "🇮🇳" },
-  { code: "as", label: "Assamais", nativeLabel: "অসমীয়া", flag: "🇮🇳" },
-  { code: "ur", label: "Ourdou", nativeLabel: "اردو", flag: "🇮🇳" },
   { code: "ne", label: "Népalais", nativeLabel: "नेपाली", flag: "🇳🇵" },
   { code: "sa", label: "Sanskrit", nativeLabel: "संस्कृतम्", flag: "🇮🇳" },
-
   { code: "ha", label: "Haoussa (Niger)", nativeLabel: "Hausa", flag: "🇳🇪" },
   { code: "pt-PT", label: "Portugais", nativeLabel: "Português", flag: "🇵🇹" },
 ];

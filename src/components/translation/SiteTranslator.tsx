@@ -361,8 +361,9 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
 
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("lang");
-    const requested = fromUrl === "en" ? "en-GB" : fromUrl;
-    const saved = localStorage.getItem(SITE_LANGUAGE_STORAGE_KEY) || DEFAULT_SITE_LANGUAGE;
+    const requested = fromUrl === "en" || fromUrl === "en-GB" ? "en-US" : fromUrl;
+    const savedRaw = localStorage.getItem(SITE_LANGUAGE_STORAGE_KEY) || DEFAULT_SITE_LANGUAGE;
+    const saved = savedRaw === "en-GB" ? "en-US" : savedRaw;
     const preferred = requested && SITE_LANGUAGES.some((item) => item.code === requested) ? requested : saved;
     const initial = SITE_LANGUAGES.some((item) => item.code === preferred) ? preferred : DEFAULT_SITE_LANGUAGE;
     if (requested && initial === requested) localStorage.setItem(SITE_LANGUAGE_STORAGE_KEY, initial);
