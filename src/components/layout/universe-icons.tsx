@@ -1,13 +1,12 @@
 import type { SVGProps } from "react";
 
-/** Vague qui se casse, pour Notes. */
+/** La vague envoyée : une crête qui se recourbe, deux lignes d'eau en dessous. */
 export function WaterIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path
-        fillRule="evenodd"
-        d="M3.40 17.45 L3.64 17.41 L3.86 17.30 L4.08 17.11 L4.29 16.87 L4.50 16.56 L4.71 16.20 L4.92 15.80 L5.13 15.35 L5.35 14.86 L5.57 14.35 L5.80 13.81 L6.04 13.25 L6.30 12.67 L6.57 12.09 L6.85 11.50 L7.16 10.91 L7.48 10.34 L7.83 9.77 L8.20 9.23 L8.60 8.70 L9.03 8.21 L9.49 7.75 L9.98 7.34 L10.51 6.96 L11.07 6.65 L11.67 6.38 L12.31 6.18 L13.00 6.05 L13.64 5.97 L14.24 5.95 L14.81 5.98 L15.34 6.06 L15.82 6.19 L16.27 6.37 L16.68 6.58 L17.05 6.82 L17.38 7.10 L17.66 7.41 L17.91 7.73 L18.11 8.08 L18.27 8.44 L18.38 8.81 L18.45 9.18 L18.48 9.56 L18.46 9.94 L18.39 10.31 L18.28 10.67 L18.12 11.02 L17.91 11.34 L17.66 11.65 L17.36 11.93 L17.01 12.18 L16.61 12.40 L16.15 12.58 L15.65 12.71 L15.10 12.80 L14.73 12.87 L14.35 12.96 L13.96 13.06 L13.56 13.17 L13.16 13.29 L12.76 13.42 L12.34 13.57 L11.93 13.72 L11.51 13.88 L11.08 14.05 L10.66 14.23 L10.23 14.41 L9.80 14.60 L9.36 14.79 L8.93 14.98 L8.49 15.18 L8.06 15.38 L7.62 15.58 L7.19 15.78 L6.76 15.98 L6.33 16.17 L5.90 16.37 L5.47 16.56 L5.05 16.75 L4.63 16.94 L4.21 17.11 L3.80 17.29 L3.40 17.45 Z M6.25 16.25 L6.43 16.12 L6.60 15.97 L6.78 15.80 L6.95 15.61 L7.13 15.40 L7.31 15.17 L7.49 14.93 L7.68 14.67 L7.87 14.40 L8.06 14.13 L8.26 13.84 L8.47 13.55 L8.68 13.26 L8.89 12.97 L9.12 12.68 L9.35 12.39 L9.59 12.10 L9.84 11.82 L10.10 11.55 L10.38 11.29 L10.66 11.04 L10.95 10.81 L11.26 10.59 L11.58 10.39 L11.91 10.20 L12.26 10.05 L12.62 9.91 L13.00 9.80 L13.33 9.74 L13.63 9.70 L13.91 9.70 L14.17 9.73 L14.41 9.78 L14.62 9.85 L14.81 9.94 L14.98 10.05 L15.12 10.18 L15.24 10.32 L15.34 10.46 L15.41 10.62 L15.45 10.78 L15.47 10.94 L15.47 11.11 L15.44 11.27 L15.38 11.43 L15.30 11.58 L15.19 11.72 L15.06 11.86 L14.90 11.97 L14.71 12.07 L14.49 12.16 L14.25 12.22 L13.98 12.25 L13.68 12.27 L13.36 12.25 L13.00 12.20 L9.40 14.30 L6.25 16.25 Z"
-      />
+    <svg viewBox="0 0 24 16" fill="none" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
+      <path d="M1.2 10.6C7.2 10.2 9.2 3.4 14 2.4C19.2 1.2 22.8 5.2 20.4 9.2C18.8 11.2 16.2 10 16.5 8" />
+      <path d="M0.8 11.6C4.2 12.5 8.2 12.2 13.2 10.7C17.2 9.5 20.2 11.2 23.2 10.5" />
+      <path d="M0.8 13.4C4.2 14.3 8.2 14 13.2 12.5C17.2 11.3 20 13 22.8 12.3" />
     </svg>
   );
 }
@@ -21,26 +20,23 @@ export function AirIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function Log({ cx, y, w, h }: { cx: number; y: number; w: number; h: number }) {
-  const rx = 1.55;
-  const ry = h / 2;
-  const cy = y + ry;
-  return (
-    <g>
-      <rect x={cx} y={y} width={w} height={h} />
-      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} />
-      <ellipse cx={cx} cy={cy} rx={rx * 0.42} ry={ry * 0.4} />
-    </g>
-  );
-}
-
-/** Trois bûches coupées, pour Work. */
+/** Trois bûches en tas : deux en bas, une au-dessus. */
 export function WoodIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.35" aria-hidden="true" {...props}>
-      <Log cx={8.4} y={1.6} w={12.2} h={5.6} />
-      <Log cx={5.2} y={9.2} w={12.2} h={5.6} />
-      <Log cx={7.4} y={16.8} w={12.2} h={5.6} />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
+      <path d="M8.4 6.9h6.4a3.3 3.3 0 0 1 0 6.6H8.4" />
+      <path d="M12.4 8.6h2.8M12.4 11h3.4" />
+      <circle cx="8.4" cy="10.2" r="3.3" />
+      <circle cx="8.4" cy="10.2" r="1.9" />
+      <circle cx="8.4" cy="10.2" r="0.7" />
+      <circle cx="5.7" cy="16.5" r="3.75" />
+      <circle cx="5.7" cy="16.5" r="2.2" />
+      <circle cx="5.7" cy="16.5" r="0.8" />
+      <path d="M10.5 12.75h7.1a3.75 3.75 0 0 1 0 7.5H10.5" />
+      <path d="M14.6 15.2h3.2M14.6 17.8h2.4" />
+      <circle cx="10.5" cy="16.5" r="3.75" />
+      <circle cx="10.5" cy="16.5" r="2.2" />
+      <circle cx="10.5" cy="16.5" r="0.8" />
     </svg>
   );
 }
