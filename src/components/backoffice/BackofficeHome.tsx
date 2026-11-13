@@ -205,8 +205,8 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
   }
 
   return (
-    <main className="relative z-20 mx-auto min-h-screen max-w-3xl px-5 pb-24 pt-32 text-white">
-      <div className="rounded-3xl border border-cyan-200/20 bg-[#041820]/90 p-6 shadow-2xl backdrop-blur-2xl sm:p-10">
+    <main className="relative z-20 mx-auto min-h-screen max-w-3xl overflow-x-hidden px-4 pb-16 pt-8 text-white sm:px-6 sm:pt-12">
+      <div className="rounded-3xl border border-cyan-200/20 bg-[#041820]/90 p-5 shadow-2xl backdrop-blur-2xl sm:p-8 md:p-10">
         <p className="mb-2 text-xs uppercase tracking-[0.3em] text-cyan-200/70">Behind the Glass</p>
         <h1 className="mb-4 text-3xl font-semibold">Espace privé</h1>
         {!authenticated ? (
@@ -219,9 +219,9 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
             <p className="text-sm text-cyan-100">Tu es connecté. Work et Notes n'ont pas changé d'adresse.</p>
             {storageNote && <p className="rounded-2xl border border-cyan-100/20 bg-cyan-100/5 px-4 py-3 text-sm text-cyan-50">{storageNote}</p>}
             <div className="flex flex-wrap gap-3">
-              <a href="/" className="rounded-xl bg-cyan-200 px-5 py-3 text-sm font-semibold text-slate-950">Modifier Work</a>
-              <a href="/notes" className="rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Gérer Notes</a>
-              <a href="/g" className="rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Pages fantômes</a>
+              <a href="/" className="inline-flex min-h-11 items-center rounded-xl bg-cyan-200 px-5 py-3 text-sm font-semibold text-slate-950">Modifier Work</a>
+              <a href="/notes" className="inline-flex min-h-11 items-center rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Gérer Notes</a>
+              <a href="/g" className="inline-flex min-h-11 items-center rounded-xl border border-cyan-100/30 px-5 py-3 text-sm font-semibold">Pages fantômes</a>
             </div>
             <p className="text-xs text-zinc-400">Dans Work ou Notes, clique sur « Modifier » pour afficher les commandes d'édition.</p>
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -233,9 +233,9 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
                     <li key={comment.id} className="rounded-xl border border-white/10 px-3 py-3 text-sm">
                       <p className="text-xs text-zinc-400">{comment.postTitle} · {comment.name}</p>
                       <p className="mt-1 whitespace-pre-wrap text-zinc-100">{comment.body}</p>
-                      <div className="mt-2 flex gap-2">
-                        <button type="button" disabled={busy} onClick={() => void decide(comment.id, "approve")} className="rounded-lg bg-cyan-200 px-3 py-1.5 text-xs font-semibold text-slate-950 disabled:opacity-50">Publier</button>
-                        <button type="button" disabled={busy} onClick={() => void decide(comment.id, "reject")} className="rounded-lg border border-white/20 px-3 py-1.5 text-xs disabled:opacity-50">Refuser</button>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <button type="button" disabled={busy} onClick={() => void decide(comment.id, "approve")} className="min-h-11 rounded-lg bg-cyan-200 px-3 py-2 text-xs font-semibold text-slate-950 disabled:opacity-50">Publier</button>
+                        <button type="button" disabled={busy} onClick={() => void decide(comment.id, "reject")} className="min-h-11 rounded-lg border border-white/20 px-3 py-2 text-xs disabled:opacity-50">Refuser</button>
                       </div>
                     </li>
                   ))}
@@ -244,8 +244,8 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
               {approved.length > 0 && <ul className="mt-4 space-y-2 border-t border-white/10 pt-3">
                 {approved.map((comment) => (
                   <li key={comment.id} className="flex items-start justify-between gap-3 text-xs text-zinc-400">
-                    <span><span className="text-zinc-200">{comment.name}</span> — {comment.body}</span>
-                    <button type="button" disabled={busy} onClick={() => void decide(comment.id, "delete")} className="shrink-0 underline disabled:opacity-50">Retirer</button>
+                    <span className="min-w-0 break-words"><span className="text-zinc-200">{comment.name}</span> — {comment.body}</span>
+                    <button type="button" disabled={busy} onClick={() => void decide(comment.id, "delete")} className="min-h-11 shrink-0 underline disabled:opacity-50">Retirer</button>
                   </li>
                 ))}
               </ul>}
@@ -261,7 +261,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
                 className="mt-4 rounded-xl border border-white/25 px-4 py-2 text-sm disabled:opacity-50">Télécharger une sauvegarde</button>
               <label htmlFor="portfolio-json" className="mt-5 block text-sm font-medium">Importer un export JSON</label>
               <input id="portfolio-json" ref={input} type="file" accept=".json,application/json" disabled={busy}
-                className="mt-2 block w-full text-sm disabled:opacity-50"
+                className="mt-2 block w-full max-w-full text-sm disabled:opacity-50"
                 onChange={(e) => { const selected = e.target.files?.[0]; if (selected) void importSnapshot(selected); }} />
               {busy && <p role="status" className="mt-3 text-sm text-zinc-300">Opération en cours…</p>}
               {message && <p role="status" className="mt-3 text-sm text-cyan-100">{message}</p>}

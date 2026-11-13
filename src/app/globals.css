@@ -2688,10 +2688,11 @@ html[data-universe="portfolio"] .universe-rail {
 @media (min-width: 768px) {
   .universe-rail {
     position: sticky;
-    top: 7rem;
-    max-height: calc(100dvh - 8.25rem);
+    top: calc(var(--chrome-top) + 0.75rem);
+    max-height: calc(100dvh - var(--chrome-top) - var(--support-h) - 1.5rem);
     overflow-y: auto;
     overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
   }

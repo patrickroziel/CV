@@ -17,8 +17,8 @@ const sections = [
   {
     title: "Principales sections",
     links: [
-      { href: "/air", label: "Air — Décryptages et observations (page d’accueil)" },
-      { href: "/notes", label: "Notes — Réflexions et créations" },
+      { href: "/notes", label: "Notes — Réflexions et créations (page d’accueil)" },
+      { href: "/air", label: "Air — Décryptages et observations" },
       { href: "/work", label: "Work — Portfolio monteur vidéo" },
       { href: "/projets", label: "Projets — Galerie de réalisations" },
     ],

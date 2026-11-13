@@ -9,7 +9,7 @@ export function GhostPagesButton() {
     <Button variant="ghost" size="sm" title="Liste des pages fantômes" asChild>
       <Link href="/g">
         <Ghost className="h-3.5 w-3.5" />
-        <span className="hidden sm:inline">Fantôme</span>
+        <span className="hidden lg:inline">Fantôme</span>
       </Link>
     </Button>
   );

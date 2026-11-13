@@ -27,7 +27,7 @@ export function Header() {
         </div>
       )}
 
-      <div className="site-header-bar mx-auto flex h-11 max-w-[1180px] items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-8">
+      <div className="site-header-bar mx-auto flex h-11 max-w-[1180px] items-center justify-between gap-2 overflow-x-auto px-3 sm:h-16 sm:gap-3 sm:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <UniverseSwitch />
         </div>
@@ -39,7 +39,7 @@ export function Header() {
             {!isNotes && !isAir && (
               <Button variant="ghost" size="sm" onClick={() => setWallpaperOpen(true)} title="Changer le fond de Work">
                 <ImageIcon className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Fond</span>
+                <span className="hidden lg:inline">Fond</span>
               </Button>
             )}
             <Button
@@ -52,7 +52,7 @@ export function Header() {
               }}
             >
               <FileDown className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Exporter</span>
+              <span className="hidden lg:inline">Exporter</span>
             </Button>
           </EditGate>
 
@@ -68,7 +68,7 @@ export function Header() {
               aria-label={editMode ? "Quitter le mode édition" : "Modifier"}
             >
               {editMode ? (
-                <><Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">Quitter</span></>
+                <><Eye className="h-3.5 w-3.5" /><span className="hidden lg:inline">Quitter</span></>
               ) : (
                 <Pencil className="h-3.5 w-3.5" />
               )}
