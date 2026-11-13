@@ -29,11 +29,11 @@ export function Header() {
       )}
 
       <div className="site-header-bar mx-auto flex h-11 max-w-[1180px] items-center justify-between gap-2 overflow-x-auto px-3 sm:h-16 sm:gap-3 sm:px-8">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center">
           <UniverseSwitch />
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="relative z-10 flex shrink-0 items-center gap-1.5 sm:gap-2">
           <TipsLink />
           <SiteTranslator />
           <EditGate>
