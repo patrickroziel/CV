@@ -41,22 +41,46 @@ function item(
   };
 }
 
-function fromPost(post: SocialPost, titleOf: TitleOf): LightItem | null {
-  const inline = post.inlineMedia?.find((media) => media.type === "youtube");
-  const watchUrl =
-    youtube(post.featuredEmbed?.type === "youtube" ? post.featuredEmbed.url : null) ||
-    youtube(post.youtubeUrl) ||
-    youtube(inline && inline.type === "youtube" ? inline.url : null);
-  if (!watchUrl) return null;
+function textOf(value: Translatable | undefined) {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value.fr || "";
+}
+
+function fromPost(post: SocialPost, titleOf: TitleOf): LightItem[] {
   const category: LightCategory = post.universe === "air" ? "air" : "notes";
-  return item({
-    id: `${category}-${post.id}`,
-    category,
-    title: titleOf(post.title, "Vidéo"),
-    date: post.date || "",
-    href: category === "air" ? `/air/${post.id}` : `/notes/${post.id}`,
-    watchUrl,
-  });
+  const href = category === "air" ? `/air/${post.id}` : `/notes/${post.id}`;
+  const base = { category, title: titleOf(post.title, "Vidéo"), date: post.date || "", href };
+  const media = new Map((post.inlineMedia ?? []).map((entry) => [entry.id, entry]));
+  const order = [...textOf(post.description).matchAll(/\[\[MEDIA:([a-zA-Z0-9_-]+)\]\]/g)].map((match) => match[1]);
+  const out: LightItem[] = [];
+  const seen = new Set<string>();
+
+  const push = (url: string | null | undefined, key: string) => {
+    const value = url?.trim();
+    if (!value || seen.has(value)) return;
+    const clip = youtube(value);
+    if (clip) {
+      seen.add(value);
+      out.push(item({ ...base, id: `${category}-${post.id}-${youtubeVideoId(clip)}`, watchUrl: clip }));
+      return;
+    }
+    if (/^https?:\/\/(www\.)?(x|twitter)\.com\//i.test(value)) {
+      seen.add(value);
+      out.push({ ...base, id: `${category}-${post.id}-x-${key}`, watchUrl: value, thumb: null, embed: null, file: false });
+    }
+  };
+
+  push(post.featuredEmbed?.type === "youtube" ? post.featuredEmbed.url : null, "cover");
+  push(post.youtubeUrl, "cover");
+  for (const id of (order.length ? order : [...media.keys()])) {
+    const entry = media.get(id);
+    if (entry && (entry.type === "youtube" || entry.type === "x")) push(entry.url, id);
+  }
+  for (const entry of post.inlineMedia ?? []) {
+    if (entry.type === "youtube" || entry.type === "x") push(entry.url, entry.id);
+  }
+  return out;
 }
 
 function fromProject(project: Project, titleOf: TitleOf): LightItem | null {
@@ -97,12 +121,13 @@ export function collectLightItems(input: {
 }): LightItem[] {
   const seen = new Set<string>();
   const list: LightItem[] = [];
-  const push = (entry: LightItem | null) => {
-    if (!entry) return;
-    const key = entry.watchUrl;
-    if (seen.has(key)) return;
-    seen.add(key);
-    list.push(entry);
+  const push = (entry: LightItem | LightItem[] | null) => {
+    const entries = Array.isArray(entry) ? entry : entry ? [entry] : [];
+    for (const one of entries) {
+      if (seen.has(one.watchUrl)) continue;
+      seen.add(one.watchUrl);
+      list.push(one);
+    }
   };
 
   for (const post of input.posts) {

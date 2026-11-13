@@ -40,6 +40,13 @@ function VideoFace({ item, open, onOpen }: { item: LightItem; open: boolean; onO
   if (open && item.file) {
     return <video src={item.watchUrl} className="absolute inset-0 h-full w-full bg-black" controls autoPlay playsInline />;
   }
+  if (!item.embed && !item.file) {
+    return (
+      <a href={item.watchUrl} target="_blank" rel="noreferrer" className="absolute inset-0 grid place-items-center bg-[linear-gradient(160deg,#071422,#02060c)] text-xs font-semibold text-white" aria-label={`Ouvrir ${item.title}`}>
+        Voir la vidéo
+      </a>
+    );
+  }
   return (
     <button type="button" onClick={onOpen} className="absolute inset-0" aria-label={`Lire ${item.title}`}>
       {item.thumb ? (
