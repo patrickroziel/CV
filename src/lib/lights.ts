@@ -56,29 +56,23 @@ function fromPost(post: SocialPost, titleOf: TitleOf): LightItem[] {
   const out: LightItem[] = [];
   const seen = new Set<string>();
 
-  const push = (url: string | null | undefined, key: string) => {
+  const push = (url: string | null | undefined) => {
     const value = url?.trim();
     if (!value || seen.has(value)) return;
     const clip = youtube(value);
-    if (clip) {
-      seen.add(value);
-      out.push(item({ ...base, id: `${category}-${post.id}-${youtubeVideoId(clip)}`, watchUrl: clip }));
-      return;
-    }
-    if (/^https?:\/\/(www\.)?(x|twitter)\.com\//i.test(value)) {
-      seen.add(value);
-      out.push({ ...base, id: `${category}-${post.id}-x-${key}`, watchUrl: value, thumb: null, embed: null, file: false });
-    }
+    if (!clip) return;
+    seen.add(value);
+    out.push(item({ ...base, id: `${category}-${post.id}-${youtubeVideoId(clip)}`, watchUrl: clip }));
   };
 
-  push(post.featuredEmbed?.type === "youtube" ? post.featuredEmbed.url : null, "cover");
-  push(post.youtubeUrl, "cover");
+  push(post.featuredEmbed?.type === "youtube" ? post.featuredEmbed.url : null);
+  push(post.youtubeUrl);
   for (const id of (order.length ? order : [...media.keys()])) {
     const entry = media.get(id);
-    if (entry && (entry.type === "youtube" || entry.type === "x")) push(entry.url, id);
+    if (entry?.type === "youtube") push(entry.url);
   }
   for (const entry of post.inlineMedia ?? []) {
-    if (entry.type === "youtube" || entry.type === "x") push(entry.url, entry.id);
+    if (entry.type === "youtube") push(entry.url);
   }
   return out;
 }
