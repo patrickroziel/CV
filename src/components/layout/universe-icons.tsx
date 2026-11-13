@@ -40,3 +40,14 @@ export function WoodIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/** Trois petits rayons, pour Lights. */
+export function LightsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" {...props}>
+      <path d="M12 15.2V6.5" />
+      <path d="M7.6 16.4 4.4 9.2" />
+      <path d="M16.4 16.4 19.6 9.2" />
+    </svg>
+  );
+}

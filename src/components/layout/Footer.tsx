@@ -17,6 +17,7 @@ export function Footer() {
     { href: "/air", label: "Air" },
     { href: "/notes", label: "Notes" },
     { href: "/work", label: "Work" },
+    { href: "/lights", label: "Lights" },
   ];
 
   return (
@@ -45,7 +46,7 @@ export function Footer() {
           <ContactButton />
           <p className="text-xs text-zinc-500">
             © {year} {name}
-            {universe === "medias" ? " · Notes" : universe === "air" ? " · Air" : " · Work"}
+            {universe === "medias" ? " · Notes" : universe === "air" ? " · Air" : universe === "lights" ? " · Lights" : " · Work"}
           </p>
         </div>
 

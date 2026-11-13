@@ -60,6 +60,7 @@ export function Wallpaper() {
   const universe = universeFromPath(usePathname());
   const isNotes = universe === "medias";
   const isAir = universe === "air";
+  const isLights = universe === "lights";
   const overlayOpacity = isHydrated ? data.ui.overlayOpacity : 0.52;
   const didPickRef = useRef(false);
 
@@ -202,6 +203,18 @@ export function Wallpaper() {
       </div>
     );
   };
+
+  if (isLights) {
+    return (
+      <div className="no-print pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[#04101c]" aria-hidden="true">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_18%_80%,rgba(255,176,72,0.28),transparent_42%),radial-gradient(ellipse_at_70%_18%,rgba(56,189,248,0.16),transparent_36%)]" />
+        <div className="absolute left-[-10%] top-[18%] h-px w-[70%] rotate-[-8deg] bg-gradient-to-r from-transparent via-amber-100/70 to-transparent blur-[1px]" />
+        <div className="absolute left-[20%] top-[34%] h-px w-[78%] rotate-[6deg] bg-gradient-to-r from-transparent via-white/50 to-transparent blur-[1px]" />
+        <div className="absolute right-[-8%] top-[22%] h-24 w-24 rounded-full border border-cyan-200/30 opacity-70 [box-shadow:0_0_40px_rgba(103,232,249,0.25)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#02060c]/80" />
+      </div>
+    );
+  }
 
   return (
     <div className="no-print pointer-events-none fixed inset-0 z-0 overflow-hidden">

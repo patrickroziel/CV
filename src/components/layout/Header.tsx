@@ -17,6 +17,7 @@ export function Header() {
   const universe = useUniverse();
   const isNotes = universe === "medias";
   const isAir = universe === "air";
+  const isLights = universe === "lights";
   const [wallpaperOpen, setWallpaperOpen] = useState(false);
 
   return (
@@ -36,7 +37,7 @@ export function Header() {
           <TipsLink />
           <SiteTranslator />
           <EditGate>
-            {!isNotes && !isAir && (
+            {!isNotes && !isAir && !isLights && (
               <Button variant="ghost" size="sm" onClick={() => setWallpaperOpen(true)} title="Changer le fond de Work">
                 <ImageIcon className="h-3.5 w-3.5" />
                 <span className="hidden lg:inline">Fond</span>
