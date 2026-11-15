@@ -135,8 +135,8 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [editAllowed, setEditAllowed] = useState(false);
   const [cloudMode, setCloudMode] = useState(false);
   const [cloudStatus, setCloudStatus] = useState<"local" | "saved" | "saving" | "error">("local");
-  const cloudSync = useRef<{ revision: number; saved: string; blocked: boolean; queue: Promise<void> }>({
-    revision: 0, saved: "", blocked: false, queue: Promise.resolve(),
+  const cloudSync = useRef<{ revision: number; writeSeq: number; saved: string; blocked: boolean; queue: Promise<void> }>({
+    revision: 0, writeSeq: 0, saved: "", blocked: false, queue: Promise.resolve(),
   });
   const [editModeRaw, setEditModeRaw] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -163,13 +163,14 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
         try {
           const response = await fetch("/api/backoffice/content", { cache: "no-store" });
           if (!response.ok) throw new Error("Cloud indisponible");
-          const result = (await response.json()) as { data: PortfolioData; revision: number };
+          const result = (await response.json()) as { data: PortfolioData; revision: number; writeSeq?: number };
           if (cancelled) return;
           const normalized = {
             ...result.data,
             ghostPages: normalizeGhostPages(result.data.ghostPages),
           };
           cloudSync.current.revision = result.revision;
+          cloudSync.current.writeSeq = typeof result.writeSeq === "number" ? result.writeSeq : 0;
           cloudSync.current.saved = JSON.stringify(normalized);
           cloudSync.current.blocked = false;
           setData(normalized);
@@ -224,82 +225,89 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   cloudModeRef.current = cloudMode;
   dataRef.current = data;
 
-  // A tab close used to drop the last edit: the cloud write waited 650ms and then gave up.
+  const enqueueCloudSave = useCallback((serialized: string) => {
+    cloudSync.current.queue = cloudSync.current.queue.then(async () => {
+      if (!cloudModeRef.current || cloudSync.current.blocked) return;
+      if (serialized !== JSON.stringify(dataRef.current) || serialized === cloudSync.current.saved) return;
+      const writeSeq = cloudSync.current.writeSeq + 1;
+      cloudSync.current.writeSeq = writeSeq;
+      setCloudStatus("saving");
+      const send = () => fetch("/api/backoffice/content", {
+        method: "PUT",
+        keepalive: true,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: JSON.parse(serialized) as PortfolioData,
+          expectedRevision: cloudSync.current.revision,
+          writeSeq,
+        }),
+      });
+      try {
+        let response = await send();
+        if (!response.ok && response.status !== 401 && serialized === JSON.stringify(dataRef.current)) {
+          await new Promise((resolve) => window.setTimeout(resolve, 600));
+          response = await send();
+        }
+        if (serialized !== JSON.stringify(dataRef.current)) return;
+        if (!response.ok) {
+          let detail = "";
+          try {
+            const payload = (await response.json()) as { error?: string };
+            detail = payload.error?.trim() || "";
+          } catch { /* ignore */ }
+          if (response.status === 401) cloudSync.current.blocked = true;
+          throw new Error(detail || (response.status === 401
+            ? "Session expirée. Reconnecte-toi, puis réenregistre."
+            : "Sauvegarde cloud impossible. Réessaie dans un instant."));
+        }
+        const result = (await response.json()) as { revision?: number; writeSeq?: number; stale?: boolean };
+        if (result.stale) return;
+        if (typeof result.revision === "number") cloudSync.current.revision = result.revision;
+        if (typeof result.writeSeq === "number") cloudSync.current.writeSeq = Math.max(cloudSync.current.writeSeq, result.writeSeq);
+        cloudSync.current.saved = serialized;
+        setCloudStatus("saved");
+        setToast("Enregistré");
+        window.setTimeout(() => setToast(null), 1800);
+        const latest = JSON.stringify(dataRef.current);
+        if (latest !== serialized) enqueueCloudSave(latest);
+      } catch (error) {
+        if (serialized !== JSON.stringify(dataRef.current)) return;
+        setCloudStatus("error");
+        setToast(error instanceof Error ? error.message : "Erreur cloud");
+        window.setTimeout(() => setToast(null), 6000);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     const flush = () => {
       if (!cloudModeRef.current || cloudSync.current.blocked) return;
-      const payload = dataRef.current;
-      const serialized = JSON.stringify(payload);
+      const serialized = JSON.stringify(dataRef.current);
       if (serialized === cloudSync.current.saved) return;
+      const writeSeq = cloudSync.current.writeSeq + 1;
+      cloudSync.current.writeSeq = writeSeq;
       void fetch("/api/backoffice/content", {
         method: "PUT",
         keepalive: true,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: payload, expectedRevision: cloudSync.current.revision }),
-      }).then(async (response) => {
-        if (!response.ok) return;
-        const result = (await response.json()) as { revision?: number };
-        if (typeof result.revision === "number") cloudSync.current.revision = result.revision;
-        cloudSync.current.saved = serialized;
+        body: JSON.stringify({
+          data: dataRef.current,
+          expectedRevision: cloudSync.current.revision,
+          writeSeq,
+        }),
       }).catch(() => undefined);
     };
     window.addEventListener("pagehide", flush);
     return () => window.removeEventListener("pagehide", flush);
   }, []);
 
-  // Serialize writes and reject conflicts instead of silently overwriting a second device.
   useEffect(() => {
     if (!isHydrated || !cloudMode || cloudSync.current.blocked) return;
     const serialized = JSON.stringify(data);
     if (serialized === cloudSync.current.saved) return;
-    const timer = window.setTimeout(() => {
-      cloudSync.current.queue = cloudSync.current.queue.then(async () => {
-        if (cloudSync.current.blocked || serialized === cloudSync.current.saved) return;
-        setCloudStatus("saving");
-        const send = (expectedRevision: number) => fetch("/api/backoffice/content", {
-          method: "PUT",
-          keepalive: true,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: JSON.parse(serialized), expectedRevision }),
-        });
-        try {
-          let response = await send(cloudSync.current.revision);
-          if (response.status === 409) {
-            const fresh = await fetch("/api/backoffice/content", { cache: "no-store" });
-            if (fresh.ok) {
-              const current = (await fresh.json()) as { revision?: number };
-              if (typeof current.revision === "number" && current.revision !== cloudSync.current.revision) {
-                cloudSync.current.revision = current.revision;
-                response = await send(current.revision);
-              }
-            }
-          }
-          if (!response.ok) {
-            let detail = "";
-            try {
-              const payload = (await response.json()) as { error?: string };
-              detail = payload.error?.trim() || "";
-            } catch { /* ignore */ }
-            if (response.status === 401) cloudSync.current.blocked = true;
-            throw new Error(detail || (response.status === 401
-              ? "Session expirée. Reconnecte-toi, puis réenregistre."
-              : "Sauvegarde cloud impossible. Réessaie dans un instant."));
-          }
-          const result = (await response.json()) as { revision: number };
-          cloudSync.current.revision = result.revision;
-          cloudSync.current.saved = serialized;
-          setCloudStatus("saved");
-          setToast("Enregistré");
-          window.setTimeout(() => setToast(null), 1800);
-        } catch (error) {
-          setCloudStatus("error");
-          setToast(error instanceof Error ? error.message : "Erreur cloud");
-          window.setTimeout(() => setToast(null), 6000);
-        }
-      });
-    }, 250);
+    const timer = window.setTimeout(() => enqueueCloudSave(serialized), 200);
     return () => window.clearTimeout(timer);
-  }, [data, isHydrated, cloudMode]);
+  }, [data, isHydrated, cloudMode, enqueueCloudSave]);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next === "en" ? "en" : "fr");

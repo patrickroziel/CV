@@ -8,10 +8,10 @@ import { readJsonBlob, writeJsonBlob } from "@/lib/server/json-blob";
 import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
 import type { PortfolioData } from "@/lib/types";
 
-type Snapshot = { data: PortfolioData | null; revision: number };
-type StoredContent = { revision: number; data: PortfolioData };
+type Snapshot = { data: PortfolioData | null; revision: number; savedAt: number; writeSeq: number };
+type StoredContent = { revision: number; savedAt?: number; writeSeq?: number; data: PortfolioData };
 export type PortfolioSource = "neon" | "blob" | "snapshot";
-export type LoadedPortfolio = { data: PortfolioData; revision: number; storage: PortfolioSource };
+export type LoadedPortfolio = { data: PortfolioData; revision: number; writeSeq: number; storage: PortfolioSource };
 
 const PUBLIC_CACHE_TAG = "portfolio-public";
 const CONTENT_BLOB = "portfolio";
@@ -32,6 +32,12 @@ async function ensureTable() {
         revision integer NOT NULL DEFAULT 1,
         updated_at timestamptz NOT NULL DEFAULT now()
       )`;
+      try {
+        await sql`ALTER TABLE portfolio_content ALTER COLUMN revision TYPE bigint`;
+        await sql`ALTER TABLE portfolio_content ADD COLUMN IF NOT EXISTS write_seq bigint NOT NULL DEFAULT 0`;
+      } catch {
+        // Neon can be full. The blob copy still keeps the site.
+      }
     })().catch((error) => { initialized = undefined; throw error; });
   }
   await initialized;
@@ -50,21 +56,44 @@ function withTimeout<T>(promise: Promise<T>, ms: number) {
 /** Fresh read for the back-office. Do not use this on public traffic. */
 export async function readPortfolio(): Promise<Snapshot> {
   const sql = connection();
-  if (!sql) return { data: null, revision: 0 };
+  if (!sql) return { data: null, revision: 0, savedAt: 0, writeSeq: 0 };
   await ensureTable();
-  const rows = await sql`SELECT payload, revision FROM portfolio_content WHERE id = 1 LIMIT 1`;
-  if (!rows.length) return { data: null, revision: 0 };
-  return { data: rows[0].payload as PortfolioData, revision: Number(rows[0].revision) };
+  try {
+    const rows = await sql`SELECT payload, revision, updated_at, write_seq FROM portfolio_content WHERE id = 1 LIMIT 1`;
+    if (!rows.length) return { data: null, revision: 0, savedAt: 0, writeSeq: 0 };
+    return {
+      data: rows[0].payload as PortfolioData,
+      revision: Number(rows[0].revision) || 0,
+      savedAt: new Date(rows[0].updated_at as string).getTime() || 0,
+      writeSeq: Number(rows[0].write_seq) || 0,
+    };
+  } catch {
+    const rows = await sql`SELECT payload, revision, updated_at FROM portfolio_content WHERE id = 1 LIMIT 1`;
+    if (!rows.length) return { data: null, revision: 0, savedAt: 0, writeSeq: 0 };
+    return {
+      data: rows[0].payload as PortfolioData,
+      revision: Number(rows[0].revision) || 0,
+      savedAt: new Date(rows[0].updated_at as string).getTime() || 0,
+      writeSeq: 0,
+    };
+  }
 }
 
 async function readContentBlob(): Promise<Snapshot | null> {
   const stored = await readJsonBlob<StoredContent>(CONTENT_BLOB);
   if (!stored?.data || typeof stored.revision !== "number") return null;
-  return { data: stored.data, revision: stored.revision };
+  return {
+    data: stored.data,
+    revision: stored.revision,
+    savedAt: typeof stored.savedAt === "number" ? stored.savedAt : 0,
+    writeSeq: typeof stored.writeSeq === "number" ? stored.writeSeq : 0,
+  };
 }
 
-async function writeContentBlob(data: PortfolioData, revision: number) {
-  await writeJsonBlob(CONTENT_BLOB, { revision, data } satisfies StoredContent);
+async function writeContentBlob(data: PortfolioData, revision: number, savedAt: number, writeSeq: number) {
+  const current = await readContentBlob().catch(() => null);
+  if (current && writeSeq < current.writeSeq) return;
+  await writeJsonBlob(CONTENT_BLOB, { revision, savedAt, writeSeq, data } satisfies StoredContent);
 }
 
 let inflight: Promise<Snapshot> | null = null;
@@ -84,11 +113,19 @@ function invalidatePublicPortfolio() {
   }
 }
 
+function preferFresh(blob: Snapshot | null, neon: Snapshot | null): Snapshot | null {
+  if (!blob?.data) return neon?.data ? neon : null;
+  if (!neon?.data) return blob;
+  if (blob.savedAt !== neon.savedAt) return blob.savedAt > neon.savedAt ? blob : neon;
+  if (blob.writeSeq !== neon.writeSeq) return blob.writeSeq > neon.writeSeq ? blob : neon;
+  return blob.revision >= neon.revision ? blob : neon;
+}
+
 /** Neon when it answers, otherwise the last copy kept outside Neon, otherwise the snapshot shipped with the site. */
 export async function loadPortfolio(): Promise<LoadedPortfolio> {
   let neon: Snapshot | null = null;
   try {
-    neon = await withTimeout(readPortfolio(), 2500);
+    neon = await withTimeout(readPortfolio(), 1500);
   } catch {
     neon = null;
   }
@@ -98,21 +135,20 @@ export async function loadPortfolio(): Promise<LoadedPortfolio> {
   } catch {
     saved = null;
   }
-  if (saved?.data && saved.revision > (neon?.revision ?? 0)) {
-    return { data: saved.data, revision: saved.revision, storage: "blob" };
+  const chosen = preferFresh(saved, neon);
+  if (chosen?.data) {
+    const storage: PortfolioSource = chosen === saved ? "blob" : "neon";
+    return { data: chosen.data, revision: chosen.revision, writeSeq: chosen.writeSeq, storage };
   }
-  if (neon?.data && neon.revision > 0) {
-    return { data: neon.data, revision: neon.revision, storage: "neon" };
-  }
-  return { data: DEFAULT_PORTFOLIO, revision: 1, storage: "snapshot" };
+  return { data: DEFAULT_PORTFOLIO, revision: 1, writeSeq: 0, storage: "snapshot" };
 }
 
 /** Public reads must not reuse a process cache: a save on another instance would stay invisible. */
 export async function readPublicPortfolio(): Promise<Snapshot> {
   if (!inflight) {
     inflight = loadPortfolio()
-      .then((loaded) => ({ data: loaded.data, revision: loaded.revision }))
-      .catch(() => ({ data: DEFAULT_PORTFOLIO, revision: 1 }))
+      .then((loaded) => ({ data: loaded.data, revision: loaded.revision, savedAt: 0, writeSeq: loaded.writeSeq }))
+      .catch(() => ({ data: DEFAULT_PORTFOLIO, revision: 1, savedAt: 0, writeSeq: 0 }))
       .finally(() => { inflight = null; });
   }
   return inflight;
@@ -138,54 +174,74 @@ export async function writePortfolio(data: PortfolioData, expectedRevision: numb
   return Number(rows[0].revision);
 }
 
-async function mirrorPortfolio(data: PortfolioData, revision: number) {
+async function mirrorPortfolio(data: PortfolioData, revision: number, writeSeq: number) {
   const sql = connection();
   if (!sql) return;
   await ensureTable();
   const payload = JSON.stringify(data);
   const updated = await sql`UPDATE portfolio_content
-    SET payload = ${payload}::jsonb, revision = ${revision}, updated_at = now()
-    WHERE id = 1 RETURNING revision`;
+    SET payload = ${payload}::jsonb, revision = ${revision}, write_seq = ${writeSeq}, updated_at = now()
+    WHERE id = 1 AND write_seq <= ${writeSeq} RETURNING revision`;
   if (updated.length) return;
-  await sql`INSERT INTO portfolio_content (id, payload, revision)
-    VALUES (1, ${payload}::jsonb, ${revision})
+  const existing = await sql`SELECT write_seq FROM portfolio_content WHERE id = 1 LIMIT 1`;
+  if (existing.length) return;
+  await sql`INSERT INTO portfolio_content (id, payload, revision, write_seq)
+    VALUES (1, ${payload}::jsonb, ${revision}, ${writeSeq})
     ON CONFLICT (id) DO UPDATE
-    SET payload = EXCLUDED.payload, revision = EXCLUDED.revision, updated_at = now()`;
+    SET payload = EXCLUDED.payload, revision = EXCLUDED.revision, write_seq = EXCLUDED.write_seq, updated_at = now()
+    WHERE portfolio_content.write_seq <= EXCLUDED.write_seq`;
 }
 
-export async function savePortfolio(data: PortfolioData, expectedRevision: number): Promise<number | null> {
-  const blob = await readContentBlob().catch(() => null);
-  const blobRevision = blob?.revision ?? 0;
+function safeRevision(value: number) {
+  if (!Number.isFinite(value) || value < 0 || value > 2_000_000_000) return 0;
+  return Math.floor(value);
+}
+
+export async function savePortfolio(data: PortfolioData, expectedRevision: number, writeSeq = 0): Promise<{ revision: number; writeSeq: number; stale: boolean }> {
+  const requestedSeq = Number.isSafeInteger(writeSeq) && writeSeq > 0 ? writeSeq : 0;
+  let knownSeq = 0;
   let neonRevision = 0;
   try {
-    const neon = await withTimeout(readPortfolio(), 2500);
-    neonRevision = neon?.revision ?? 0;
-  } catch {
-    // Neon is over quota or unreachable. The editor's copy must still be stored.
-  }
+    const blob = await readContentBlob();
+    knownSeq = Math.max(knownSeq, blob?.writeSeq ?? 0);
+  } catch { /* The blob can be missing on the first save. */ }
+  try {
+    const neon = await withTimeout(readPortfolio(), 1200);
+    knownSeq = Math.max(knownSeq, neon?.writeSeq ?? 0);
+    neonRevision = safeRevision(neon?.revision ?? 0);
+  } catch { /* Neon down must not block the save. */ }
 
-  // One person edits this site. Rejecting a revision is what made every small change disappear.
-  const next = Math.max(blobRevision, neonRevision, expectedRevision, 0) + 1;
+  if (requestedSeq > 0 && requestedSeq < knownSeq) {
+    return { revision: Math.max(neonRevision, 1), writeSeq: knownSeq, stale: true };
+  }
+  const nextSeq = Math.max(requestedSeq, knownSeq + 1, safeRevision(expectedRevision) + 1);
+  const nextRevision = Math.max(neonRevision, safeRevision(expectedRevision)) + 1;
+  const savedAt = Date.now();
+
+  let blobOk = false;
+  let neonOk = false;
   let blobError: unknown = null;
   let neonError: unknown = null;
   try {
-    await writeContentBlob(data, next);
+    await writeContentBlob(data, nextRevision, savedAt, nextSeq);
+    blobOk = true;
   } catch (error) {
     blobError = error;
   }
   try {
-    await withTimeout(mirrorPortfolio(data, next), 8000);
+    await withTimeout(mirrorPortfolio(data, nextRevision, nextSeq), 2000);
+    neonOk = true;
   } catch (error) {
     neonError = error;
   }
-  if (blobError && neonError) {
+  if (!blobOk && !neonOk) {
     console.error("portfolio save failed", blobError, neonError);
     throw blobError instanceof Error ? blobError : new Error("Sauvegarde impossible.");
   }
-  if (blobError) console.error("portfolio blob unavailable", blobError);
-  if (neonError) console.error("portfolio neon unavailable", neonError);
+  if (!blobOk) console.error("portfolio blob unavailable", blobError);
+  if (!neonOk) console.error("portfolio neon unavailable", neonError);
   invalidatePublicPortfolio();
-  return next;
+  return { revision: nextRevision, writeSeq: nextSeq, stale: false };
 }
 
 export function publicPortfolio(data: PortfolioData): PortfolioData {
