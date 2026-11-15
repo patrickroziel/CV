@@ -5,3 +5,29 @@
 .article-ink * {
   font-size: 12pt !important;
 }
+
+/* Liseuse : encre sombre, une seule taille, quelle que soit la couleur enregistrée. */
+.book-ink,
+.book-ink * {
+  color: #1c1612 !important;
+  font-family: inherit !important;
+  font-size: 1.0625rem !important;
+  line-height: 1.7 !important;
+}
+.book-ink h2,
+.book-ink h2 * {
+  font-size: 1.35rem !important;
+  line-height: 1.35 !important;
+}
+.book-ink a,
+.book-ink a * {
+  color: #7a3b24 !important;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+.book-ink p {
+  margin: 0 0 0.9em;
+}
+.book-ink p:last-child {
+  margin-bottom: 0;
+}

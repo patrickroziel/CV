@@ -22,6 +22,7 @@ import type { SocialPost } from "@/lib/types";
 import { displayImageUrl } from "@/lib/display-image";
 import { visibleCoverUrl } from "@/lib/post-publication";
 import { NOTES_CATEGORIES, coercePostCategory, collectPostTags, type NotesCategory } from "@/lib/post-taxonomy";
+import { compareBookChapters } from "@/lib/book-order";
 
 type Scope = "Tout" | NotesCategory;
 
@@ -61,10 +62,10 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     return editMode ? list : list.filter((post) => post.visible !== false);
   }, [data.socialPosts, editMode, isHydrated, seedPosts]);
 
-  const scopedPosts = useMemo(
-    () => (scope === "Tout" ? posts : posts.filter((post) => categoryOf(post) === scope)),
-    [posts, scope]
-  );
+  const scopedPosts = useMemo(() => {
+    const list = scope === "Tout" ? posts : posts.filter((post) => categoryOf(post) === scope);
+    return scope === "Livre" ? [...list].sort(compareBookChapters) : list;
+  }, [posts, scope]);
   const tags = useMemo(() => collectPostTags(scopedPosts), [scopedPosts]);
   const visiblePosts = useMemo(() => {
     if (!activeTag) return scopedPosts;
@@ -81,7 +82,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   }, [visiblePosts]);
 
   const bookChapters = useMemo(
-    () => posts.filter((post) => categoryOf(post) === "Livre"),
+    () => posts.filter((post) => categoryOf(post) === "Livre").sort(compareBookChapters),
     [posts]
   );
 

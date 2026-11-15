@@ -754,6 +754,10 @@ export function normalizeSocialPost(
           .filter(Boolean)
       : [],
     visible: typeof raw.visible === "boolean" ? raw.visible : true,
+    chapterOrder:
+      typeof raw.chapterOrder === "number" && Number.isFinite(raw.chapterOrder)
+        ? Math.trunc(raw.chapterOrder)
+        : null,
     order: typeof raw.order === "number" && !Number.isNaN(raw.order) ? raw.order : index,
   };
 }

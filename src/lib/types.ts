@@ -776,6 +776,11 @@ export type SocialPost = {
   noticeIntro?: Translatable;
   /** Air notice at the end of the article. Empty uses the default reply line. */
   noticeReply?: Translatable;
+  /**
+   * Livre only. Smaller number appears first; 0 is the first chapter.
+   * Stored for sorting. Never printed in the chapter text.
+   */
+  chapterOrder?: number | null;
   /** Lower = higher in the list */
   order: number;
   /** Notes homepage. At most six posts stay pinned. */

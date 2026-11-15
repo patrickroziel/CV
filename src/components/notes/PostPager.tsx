@@ -8,6 +8,8 @@ import { createPortal } from "react-dom";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { DockReactions } from "@/components/medias/PostActions";
+import { compareBookChapters } from "@/lib/book-order";
+import { coercePostCategory } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
 function sortPosts(posts: SocialPost[]) {
@@ -37,10 +39,15 @@ export function PostPager({
   const { data, editMode, l, isHydrated } = usePortfolio();
   const posts = useMemo(() => {
     const source = !isHydrated && seedPosts.length ? seedPosts : (data.socialPosts ?? []);
-    return sortPosts(source.filter((post) => {
+    const list = sortPosts(source.filter((post) => {
       const inUniverse = universe === "air" ? post.universe === "air" : post.universe !== "air";
       return inUniverse && (editMode || post.visible !== false);
     }));
+    const current = list.find((post) => post.id === postId);
+    if (current && coercePostCategory(current) === "Livre") {
+      return list.filter((post) => coercePostCategory(post) === "Livre").sort(compareBookChapters);
+    }
+    return list;
   }, [data.socialPosts, editMode, isHydrated, seedPosts, universe]);
 
   const index = posts.findIndex((post) => post.id === postId);

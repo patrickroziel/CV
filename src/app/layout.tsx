@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Manrope } from "next/font/google";
+import { Geist_Mono, Libre_Baskerville, Manrope } from "next/font/google";
 import { PortfolioProvider } from "@/components/providers/PortfolioProvider";
 import { SkillDetailProvider } from "@/components/skills/SkillDetailProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -18,6 +18,14 @@ const workSans = Manrope({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const bookSerif = Libre_Baskerville({
+  variable: "--font-book",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -66,7 +74,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className="dark">
       <body
-        className={`${workSans.variable} ${geistMono.variable} min-h-screen bg-zinc-950 text-zinc-50 antialiased`}
+        className={`${workSans.variable} ${geistMono.variable} ${bookSerif.variable} min-h-screen bg-zinc-950 text-zinc-50 antialiased`}
       >
         <SiteJsonLd />
         <PortfolioProvider>

@@ -42,6 +42,10 @@ function EmbeddedItem({ item, title }: { item: InlinePostMedia; title: string })
   return <FeaturedMedia media={item} title={title} />;
 }
 
+export function PostInlineMediaView({ item, title }: { item: InlinePostMedia; title: string }) {
+  return <EmbeddedItem item={item} title={title} />;
+}
+
 const MEDIA_BLOCK = /<p>\s*\[\[MEDIA:([a-zA-Z0-9_-]{8,80})\]\]\s*<\/p>|\[\[MEDIA:([a-zA-Z0-9_-]{8,80})\]\]/g;
 
 export function PostRichBody({ html, inlineMedia, title, className }: {

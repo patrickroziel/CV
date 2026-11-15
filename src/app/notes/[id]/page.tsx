@@ -11,11 +11,11 @@ import {
 } from "@/lib/server/notes-sharing";
 import { shareImageUrl } from "@/lib/server/share-locale";
 
-// Published content lives in Neon. Public HTML can lag a save by one minute.
+// A saved edit has to be visible on the next refresh.
 // Query strings are ignored on purpose: reading them made every article dynamic
 // and forced a fresh database read on each visit.
 export const runtime = "nodejs";
-export const revalidate = 60;
+export const revalidate = 0;
 
 type NoteParams = {
   params: Promise<{ id: string }>;

@@ -13,7 +13,6 @@ type StoredContent = { revision: number; data: PortfolioData };
 export type PortfolioSource = "neon" | "blob" | "snapshot";
 export type LoadedPortfolio = { data: PortfolioData; revision: number; storage: PortfolioSource };
 
-const PUBLIC_TTL_MS = 60_000;
 const PUBLIC_CACHE_TAG = "portfolio-public";
 const CONTENT_BLOB = "portfolio";
 
@@ -68,16 +67,9 @@ async function writeContentBlob(data: PortfolioData, revision: number) {
   await writeJsonBlob(CONTENT_BLOB, { revision, data } satisfies StoredContent);
 }
 
-let memory: { at: number; snapshot: Snapshot } | null = null;
 let inflight: Promise<Snapshot> | null = null;
 
-function remember(snapshot: Snapshot) {
-  memory = { at: Date.now(), snapshot };
-  return snapshot;
-}
-
 function invalidatePublicPortfolio() {
-  memory = null;
   try {
     revalidateTag(PUBLIC_CACHE_TAG, { expire: 0 });
     revalidatePath("/api/portfolio");
@@ -115,16 +107,12 @@ export async function loadPortfolio(): Promise<LoadedPortfolio> {
   return { data: DEFAULT_PORTFOLIO, revision: 1, storage: "snapshot" };
 }
 
-/**
- * Public reads share one fetch per minute.
- * The raw snapshot can contain drafts: callers must filter before responding.
- */
+/** Public reads must not reuse a process cache: a save on another instance would stay invisible. */
 export async function readPublicPortfolio(): Promise<Snapshot> {
-  if (memory && Date.now() - memory.at < PUBLIC_TTL_MS) return memory.snapshot;
   if (!inflight) {
     inflight = loadPortfolio()
-      .then((loaded) => remember({ data: loaded.data, revision: loaded.revision }))
-      .catch(() => remember({ data: DEFAULT_PORTFOLIO, revision: 1 }))
+      .then((loaded) => ({ data: loaded.data, revision: loaded.revision }))
+      .catch(() => ({ data: DEFAULT_PORTFOLIO, revision: 1 }))
       .finally(() => { inflight = null; });
   }
   return inflight;
@@ -155,38 +143,47 @@ async function mirrorPortfolio(data: PortfolioData, revision: number) {
   if (!sql) return;
   await ensureTable();
   const payload = JSON.stringify(data);
-  // Never roll Neon backwards. A newer blob is the copy the editor just loaded.
+  const updated = await sql`UPDATE portfolio_content
+    SET payload = ${payload}::jsonb, revision = ${revision}, updated_at = now()
+    WHERE id = 1 RETURNING revision`;
+  if (updated.length) return;
   await sql`INSERT INTO portfolio_content (id, payload, revision)
     VALUES (1, ${payload}::jsonb, ${revision})
     ON CONFLICT (id) DO UPDATE
-    SET payload = EXCLUDED.payload, revision = EXCLUDED.revision, updated_at = now()
-    WHERE portfolio_content.revision < EXCLUDED.revision`;
+    SET payload = EXCLUDED.payload, revision = EXCLUDED.revision, updated_at = now()`;
 }
 
 export async function savePortfolio(data: PortfolioData, expectedRevision: number): Promise<number | null> {
   const blob = await readContentBlob().catch(() => null);
   const blobRevision = blob?.revision ?? 0;
   let neonRevision = 0;
+  let neonReadOk = false;
   try {
     const neon = await withTimeout(readPortfolio(), 2500);
     neonRevision = neon?.revision ?? 0;
+    neonReadOk = true;
   } catch {
-    // Neon is over quota or unreachable. The blob copy must still accept the post.
-    neonRevision = 0;
+    neonReadOk = false;
   }
 
-  // The public site reads whichever copy is newer. The editor loaded that same head.
-  // Comparing the client only to Neon rejects every save once the blob is ahead.
-  const head = Math.max(blobRevision, neonRevision);
-  const baseline = head === 0 && expectedRevision === 1 ? 1 : head;
-  if (expectedRevision !== baseline) return null;
+  const knownHead = neonReadOk ? Math.max(blobRevision, neonRevision) : blobRevision;
+  const matchesKnown =
+    expectedRevision === blobRevision ||
+    (neonReadOk && expectedRevision === neonRevision) ||
+    (knownHead === 0 && (expectedRevision === 0 || expectedRevision === 1));
+  if (!matchesKnown) return null;
 
-  const next = baseline + 1;
+  // If Neon cannot be read, jump past any revision it might still be holding.
+  // Otherwise the next public read keeps serving the old copy and the edit vanishes.
+  const next = neonReadOk
+    ? Math.max(blobRevision, neonRevision, expectedRevision) + 1
+    : Math.max(blobRevision, expectedRevision, Date.now());
+
   await writeContentBlob(data, next);
   try {
     await withTimeout(mirrorPortfolio(data, next), 4000);
   } catch {
-    // The post is already in the blob. A dead Neon must not report a failed save.
+    // Blob is already the newer copy. A dead Neon must not undo the save.
   }
   invalidatePublicPortfolio();
   return next;

@@ -145,7 +145,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
             </div>}
           </header>
 
-          {!teaser ? <NoteCardParts postId={post.id} html={description} /> : null}
+          {!teaser && !isBook ? <NoteCardParts postId={post.id} html={description} /> : null}
 
           {!teaser && !isBook && featured && <FeaturedMedia media={featured} title={title} />}
           {!teaser && !isBook && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
@@ -157,8 +157,10 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
 
           {teaser ? (
             <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
+          ) : isBook ? (
+            <p className="text-sm leading-6 text-zinc-400">Le chapitre se lit dans la liseuse.</p>
           ) : description ? (
-            <PostPreview html={description} title={title} inlineMedia={isBook ? undefined : post.inlineMedia} />
+            <PostPreview html={description} title={title} inlineMedia={post.inlineMedia} />
           ) : null}
 
           {post.tags?.length ? <ul className="flex min-w-0 flex-wrap gap-1.5">
@@ -179,7 +181,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
           <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} card />
             <Link href={`/notes/${post.id}`} className="text-[13px] font-medium text-white/80 hover:text-white">
-              {isBook ? "Lire" : "Ouvrir"}
+              {isBook ? "Lire le chapitre" : "Ouvrir"}
             </Link>
           </div>
         </div>

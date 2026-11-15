@@ -284,6 +284,8 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           cloudSync.current.revision = result.revision;
           cloudSync.current.saved = serialized;
           setCloudStatus("saved");
+          setToast("Enregistré");
+          window.setTimeout(() => setToast(null), 1800);
         } catch (error) {
           setCloudStatus("error");
           setToast(error instanceof Error ? error.message : "Erreur cloud");
@@ -345,7 +347,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
         const withVersion = { ...resolved, version: DATA_VERSION };
         try {
           savePortfolio(withVersion);
-          if (toastMsg) showToast(toastMsg);
+          if (toastMsg && !cloudModeRef.current) showToast(toastMsg);
         } catch {
           showToast("Quota de stockage dépassé — image trop lourde ?");
         }

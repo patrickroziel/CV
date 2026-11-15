@@ -4,11 +4,12 @@ import Link from "next/link";
 import { ArrowLeft, FileDown } from "lucide-react";
 import { useMemo } from "react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
-import { PostRichBody } from "@/components/medias/PostRichBody";
 import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import { NotesBottomNav } from "@/components/notes/PostPager";
+import { BookPages } from "@/components/notes/BookPages";
 import { NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
+import { compareBookChapters } from "@/lib/book-order";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { shareExcerpt } from "@/lib/post-excerpt";
@@ -20,10 +21,7 @@ import type { SocialPost } from "@/lib/types";
 function sortBookPosts(posts: SocialPost[]) {
   return [...posts]
     .filter((post) => coercePostCategory(post) === "Livre")
-    .sort((a, b) => {
-      if (a.order !== b.order) return a.order - b.order;
-      return (b.date || "").localeCompare(a.date || "");
-    });
+    .sort(compareBookChapters);
 }
 
 function formatDate(iso: string) {
@@ -91,6 +89,8 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
             {teaser ? <><span aria-hidden>·</span><span>{TEASER_LABEL}</span></> : null}
           </div>
 
+          {teaser ? (
+            <>
           <h1 id={`note-title-${post.id}`} className="mt-4 max-w-full break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
             {title}
           </h1>
@@ -98,6 +98,8 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
             <p className="mt-3 max-w-2xl break-words text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
               {subtitle}
             </p>
+          ) : null}
+            </>
           ) : null}
           {!teaser ? <NotesFloatingStack postId={post.id} title={title} subtitle={subtitle} /> : null}
 
@@ -127,11 +129,12 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
               <FeaturedMedia media={post.featuredEmbed ?? (post.youtubeUrl ? { type: "youtube", url: post.youtubeUrl } : null)} title={title} />
             </div>
           )}
-          <PostRichBody
+          <BookPages
+            title={title}
+            titleId={`note-title-${post.id}`}
+            subtitle={subtitle}
             html={stampNotePartAnchors(body, post.id)}
             inlineMedia={post.inlineMedia}
-            title={title}
-            className="notes-force-white book-reading-text min-w-0 max-w-full overflow-hidden text-[15px] leading-7 text-white sm:text-base sm:leading-7 [&_*]:max-w-full [&_a]:break-all"
           />
 
           {post.bookPdfUrl ? (

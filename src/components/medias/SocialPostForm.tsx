@@ -223,6 +223,11 @@ export function SocialPostForm({
   const [category, setCategory] = useState<PostCategory>(
     coercePostCategory({ ...initial, universe: initial?.universe ?? universe })
   );
+  const [chapterOrder, setChapterOrder] = useState(
+    typeof initial?.chapterOrder === "number" && Number.isFinite(initial.chapterOrder)
+      ? String(Math.trunc(initial.chapterOrder))
+      : ""
+  );
   // Legacy featured embeds stay where they are until intentionally moved.
   const [legacyFeatured, setLegacyFeatured] = useState<FeaturedEmbed | null>(
     normalizeFeaturedEmbed(initial?.featuredEmbed ?? (initial?.youtubeUrl ? { type: "youtube", url: initial.youtubeUrl } : null))
@@ -501,6 +506,15 @@ export function SocialPostForm({
       setError(cover.error);
       return null;
     }
+    const parsedOrder = !isBook || !chapterOrder.trim()
+      ? null
+      : /^\d{1,4}$/.test(chapterOrder.trim())
+        ? Number(chapterOrder.trim())
+        : "invalid";
+    if (parsedOrder === "invalid") {
+      setError("L’ordre du chapitre est un nombre : 0, 1, 2… Il n’apparaît pas dans le texte.");
+      return null;
+    }
     return {
     universe: initial?.universe ?? universe,
     title,
@@ -528,6 +542,7 @@ export function SocialPostForm({
     noticesHidden: universe === "air" || isBook ? noticesHidden : undefined,
     noticeIntro: universe === "air" ? noticeIntro : isBook ? bookNotice : undefined,
     noticeReply: universe === "air" ? noticeReply : undefined,
+    chapterOrder: isBook ? parsedOrder : null,
     category,
     tags: Array.from(
       new Set(tagsText.split(",").map((tag) => tag.trim()).filter(Boolean))
@@ -645,8 +660,21 @@ export function SocialPostForm({
             <span className="font-medium">Mode Livre</span>
           </div>
           <p className="mt-2 text-xs leading-5 text-zinc-500">
-            Le texte est la version principale à lire sur le site. La couverture et le PDF sont facultatifs.
+            Le texte n’est pas lisible dans le feed. Il s’ouvre dans la liseuse.
           </p>
+          <div className="mt-4 grid max-w-[14rem] gap-2">
+            <Label htmlFor="chapter-order">Ordre d’apparition</Label>
+            <Input
+              id="chapter-order"
+              inputMode="numeric"
+              value={chapterOrder}
+              onChange={(event) => setChapterOrder(event.target.value)}
+              placeholder="0"
+            />
+            <p className="text-xs leading-5 text-zinc-500">
+              0 en premier, puis 1, 2… Ce numéro classe les chapitres. Il n’est pas écrit dans le texte.
+            </p>
+          </div>
         </div>
       )}
 
