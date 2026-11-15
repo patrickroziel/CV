@@ -5,7 +5,7 @@ import { AirArticle } from "@/components/air/AirArticle";
 import { ArticleJsonLd } from "@/components/seo/JsonLd";
 
 export const runtime = "nodejs";
-export const revalidate = 0;
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,

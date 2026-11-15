@@ -121,19 +121,22 @@ function preferFresh(blob: Snapshot | null, neon: Snapshot | null): Snapshot | n
   return blob.revision >= neon.revision ? blob : neon;
 }
 
-/** Neon when it answers, otherwise the last copy kept outside Neon, otherwise the snapshot shipped with the site. */
+/** Public and back-office reads use the blob. Neon is only a fallback for a copy that was never stamped, and only for a moment: a hanging Neon call is what burned the free CPU and killed saves. */
 export async function loadPortfolio(): Promise<LoadedPortfolio> {
-  let neon: Snapshot | null = null;
-  try {
-    neon = await withTimeout(readPortfolio(), 1500);
-  } catch {
-    neon = null;
-  }
   let saved: Snapshot | null = null;
   try {
     saved = await readContentBlob();
   } catch {
     saved = null;
+  }
+  if (saved?.data && saved.savedAt > 0) {
+    return { data: saved.data, revision: saved.revision, writeSeq: saved.writeSeq, storage: "blob" };
+  }
+  let neon: Snapshot | null = null;
+  try {
+    neon = await withTimeout(readPortfolio(), 800);
+  } catch {
+    neon = null;
   }
   const chosen = preferFresh(saved, neon);
   if (chosen?.data) {
@@ -199,47 +202,15 @@ function safeRevision(value: number) {
 
 export async function savePortfolio(data: PortfolioData, expectedRevision: number, writeSeq = 0): Promise<{ revision: number; writeSeq: number; stale: boolean }> {
   const requestedSeq = Number.isSafeInteger(writeSeq) && writeSeq > 0 ? writeSeq : 0;
-  let knownSeq = 0;
-  let neonRevision = 0;
-  try {
-    const blob = await readContentBlob();
-    knownSeq = Math.max(knownSeq, blob?.writeSeq ?? 0);
-  } catch { /* The blob can be missing on the first save. */ }
-  try {
-    const neon = await withTimeout(readPortfolio(), 1200);
-    knownSeq = Math.max(knownSeq, neon?.writeSeq ?? 0);
-    neonRevision = safeRevision(neon?.revision ?? 0);
-  } catch { /* Neon down must not block the save. */ }
-
+  const current = await readContentBlob().catch(() => null);
+  const knownSeq = current?.writeSeq ?? 0;
   if (requestedSeq > 0 && requestedSeq < knownSeq) {
-    return { revision: Math.max(neonRevision, 1), writeSeq: knownSeq, stale: true };
+    return { revision: safeRevision(current?.revision ?? expectedRevision) || 1, writeSeq: knownSeq, stale: true };
   }
-  const nextSeq = Math.max(requestedSeq, knownSeq + 1, safeRevision(expectedRevision) + 1);
-  const nextRevision = Math.max(neonRevision, safeRevision(expectedRevision)) + 1;
+  const nextSeq = Math.max(requestedSeq, knownSeq + 1);
+  const nextRevision = safeRevision(current?.revision ?? expectedRevision) + 1;
   const savedAt = Date.now();
-
-  let blobOk = false;
-  let neonOk = false;
-  let blobError: unknown = null;
-  let neonError: unknown = null;
-  try {
-    await writeContentBlob(data, nextRevision, savedAt, nextSeq);
-    blobOk = true;
-  } catch (error) {
-    blobError = error;
-  }
-  try {
-    await withTimeout(mirrorPortfolio(data, nextRevision, nextSeq), 2000);
-    neonOk = true;
-  } catch (error) {
-    neonError = error;
-  }
-  if (!blobOk && !neonOk) {
-    console.error("portfolio save failed", blobError, neonError);
-    throw blobError instanceof Error ? blobError : new Error("Sauvegarde impossible.");
-  }
-  if (!blobOk) console.error("portfolio blob unavailable", blobError);
-  if (!neonOk) console.error("portfolio neon unavailable", neonError);
+  await writeContentBlob(data, nextRevision, savedAt, nextSeq);
   invalidatePublicPortfolio();
   return { revision: nextRevision, writeSeq: nextSeq, stale: false };
 }
