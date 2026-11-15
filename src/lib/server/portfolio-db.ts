@@ -157,34 +157,33 @@ export async function savePortfolio(data: PortfolioData, expectedRevision: numbe
   const blob = await readContentBlob().catch(() => null);
   const blobRevision = blob?.revision ?? 0;
   let neonRevision = 0;
-  let neonReadOk = false;
   try {
     const neon = await withTimeout(readPortfolio(), 2500);
     neonRevision = neon?.revision ?? 0;
-    neonReadOk = true;
   } catch {
-    neonReadOk = false;
+    // Neon is over quota or unreachable. The editor's copy must still be stored.
   }
 
-  const knownHead = neonReadOk ? Math.max(blobRevision, neonRevision) : blobRevision;
-  const matchesKnown =
-    expectedRevision === blobRevision ||
-    (neonReadOk && expectedRevision === neonRevision) ||
-    (knownHead === 0 && (expectedRevision === 0 || expectedRevision === 1));
-  if (!matchesKnown) return null;
-
-  // If Neon cannot be read, jump past any revision it might still be holding.
-  // Otherwise the next public read keeps serving the old copy and the edit vanishes.
-  const next = neonReadOk
-    ? Math.max(blobRevision, neonRevision, expectedRevision) + 1
-    : Math.max(blobRevision, expectedRevision, Date.now());
-
-  await writeContentBlob(data, next);
+  // One person edits this site. Rejecting a revision is what made every small change disappear.
+  const next = Math.max(blobRevision, neonRevision, expectedRevision, 0) + 1;
+  let blobError: unknown = null;
+  let neonError: unknown = null;
   try {
-    await withTimeout(mirrorPortfolio(data, next), 4000);
-  } catch {
-    // Blob is already the newer copy. A dead Neon must not undo the save.
+    await writeContentBlob(data, next);
+  } catch (error) {
+    blobError = error;
   }
+  try {
+    await withTimeout(mirrorPortfolio(data, next), 8000);
+  } catch (error) {
+    neonError = error;
+  }
+  if (blobError && neonError) {
+    console.error("portfolio save failed", blobError, neonError);
+    throw blobError instanceof Error ? blobError : new Error("Sauvegarde impossible.");
+  }
+  if (blobError) console.error("portfolio blob unavailable", blobError);
+  if (neonError) console.error("portfolio neon unavailable", neonError);
   invalidatePublicPortfolio();
   return next;
 }

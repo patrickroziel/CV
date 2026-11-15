@@ -45,9 +45,14 @@ export async function PUT(request: Request) {
   } catch { return NextResponse.json({ error: "Données ou révision invalides." }, { status: 400, headers }); }
   try {
     const nextRevision = await savePortfolio(data, revision);
-    if (nextRevision === null) return NextResponse.json({ error: "Conflit de versions : exporte le JSON avant de recharger." }, { status: 409, headers });
+    if (nextRevision === null) {
+      console.error("portfolio save rejected", { revision });
+      return NextResponse.json({ error: "Conflit de versions : exporte le JSON avant de recharger." }, { status: 409, headers });
+    }
     return NextResponse.json({ revision: nextRevision }, { headers });
-  } catch {
-    return NextResponse.json({ error: "Sauvegarde impossible." }, { status: 503, headers });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Sauvegarde impossible.";
+    console.error("portfolio save error", message);
+    return NextResponse.json({ error: message }, { status: 503, headers });
   }
 }

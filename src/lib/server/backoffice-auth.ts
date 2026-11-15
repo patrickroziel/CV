@@ -79,8 +79,18 @@ export function createOAuthState() { return randomBytes(32).toString("base64url"
 export function validateOrigin(request: Request) {
   const origin = request.headers.get("origin");
   if (!origin) return false;
-  try { return new URL(origin).origin === new URL(request.url).origin; }
-  catch { return false; }
+  let source: string;
+  try { source = new URL(origin).origin; } catch { return false; }
+  const allowed = new Set<string>();
+  try { allowed.add(new URL(request.url).origin); } catch { /* ignore */ }
+  const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "").split(",")[0]?.trim();
+  const proto = (request.headers.get("x-forwarded-proto") || "https").split(",")[0]?.trim() || "https";
+  if (host) allowed.add(`${proto}://${host}`);
+  const base = process.env.BACKOFFICE_BASE_URL?.trim();
+  if (base) {
+    try { allowed.add(new URL(base).origin); } catch { /* ignore */ }
+  }
+  return allowed.has(source);
 }
 export function oauthCallbackUrl(_request: Request) {
   // Explicitly configured production URL, never trust X-Forwarded-Host from untrusted requests.

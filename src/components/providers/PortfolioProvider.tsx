@@ -275,10 +275,15 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
             }
           }
           if (!response.ok) {
-            if (response.status === 401 || response.status === 403) cloudSync.current.blocked = true;
-            throw new Error(response.status === 409
-              ? "Le serveur a refusé l’enregistrement. Réessaie dans un instant."
-              : "Sauvegarde cloud impossible. Réessaie dans un instant.");
+            let detail = "";
+            try {
+              const payload = (await response.json()) as { error?: string };
+              detail = payload.error?.trim() || "";
+            } catch { /* ignore */ }
+            if (response.status === 401) cloudSync.current.blocked = true;
+            throw new Error(detail || (response.status === 401
+              ? "Session expirée. Reconnecte-toi, puis réenregistre."
+              : "Sauvegarde cloud impossible. Réessaie dans un instant."));
           }
           const result = (await response.json()) as { revision: number };
           cloudSync.current.revision = result.revision;
