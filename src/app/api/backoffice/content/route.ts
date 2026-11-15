@@ -44,7 +44,8 @@ export async function PUT(request: Request) {
         parsed.expectedRevision < 0) throw new Error("JSON invalide");
     data = parsed.data;
     revision = parsed.expectedRevision;
-    incomingSeq = Number.isSafeInteger(parsed.writeSeq) && parsed.writeSeq > 0 ? parsed.writeSeq : 0;
+    const seq = parsed.writeSeq;
+    incomingSeq = typeof seq === "number" && Number.isSafeInteger(seq) && seq > 0 ? seq : 0;
   } catch { return NextResponse.json({ error: "Données ou révision invalides." }, { status: 400, headers }); }
   try {
     const saved = await savePortfolio(data, revision, incomingSeq);
