@@ -19,10 +19,6 @@ import { RichHtml } from "@/components/shared/RichHtml";
 import { AIR_NOTICE_INTRO, AIR_NOTICE_REPLY, airNoticeHtml } from "@/lib/air-notices";
 import type { SocialPost } from "@/lib/types";
 
-function proxyBlobImages(html: string) {
-  return html.replace(/https:\/\/[a-z0-9.-]*blob\.vercel-storage\.com\/[^"'\\\s)<]+/gi, (url) => `/api/media/blob?url=${encodeURIComponent(url)}`);
-}
-
 const FORCE_WHITE_ARTICLE = "adbaf437-0909-4347-a846-7910e702b954";
 
 function ArticleCover({ sources, seriesLabel }: { sources: string[]; seriesLabel?: string }) {
@@ -179,7 +175,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
       <div id={bodyId} className="space-y-6 px-5 pb-5 sm:px-10 sm:pb-10">
         {teaser ? <p className="text-sm leading-7 text-white/70">{TEASER_PUBLIC_LINE}</p> : <>
         <FeaturedMedia media={post.featuredEmbed} title={title}/>
-        <PostRichBody html={stampPartAnchors(proxyBlobImages(l(post.description)), post.id)} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
+        <PostRichBody html={stampPartAnchors(l(post.description), post.id)} inlineMedia={post.inlineMedia} title={title} className="air-article-body text-[15px] leading-7 text-white/85 [&_*]:max-w-full" />
         </>}
         <PostActions postId={post.id} title={title} visible={post.visible!==false} sharePath="/air" comments dock />
         <p className="text-right text-xs tracking-wide text-white/45">{teaser ? `${post.date} · ${TEASER_LABEL}` : post.date}</p>

@@ -19,11 +19,6 @@ export const MEDIA_FOLDERS = {
 export type MediaFolder =
   (typeof MEDIA_FOLDERS)[keyof typeof MEDIA_FOLDERS];
 
-/** @deprecated use MEDIA_FOLDERS — kept so existing imports compile */
-export const CLOUDINARY_FOLDERS = MEDIA_FOLDERS;
-/** @deprecated use MediaFolder */
-export type CloudinaryFolder = MediaFolder;
-
 export type MediaResourceType = "image" | "video" | "raw" | "auto";
 
 export type MediaUploadResult = {
@@ -126,7 +121,7 @@ async function uploadToR2(
   };
 }
 
-/** Upload a file to Cloudflare R2. Vercel Blob is not used. */
+/** Upload a file to Cloudflare R2. */
 export async function uploadToBlob(
   file: File,
   options: MediaUploadOptions = {}
@@ -142,17 +137,7 @@ export async function uploadToBlob(
   }
 }
 
-/**
- * @deprecated Prefer uploadToBlob — same behaviour, kept for older imports.
- */
-export async function uploadToCloudinary(
-  file: File,
-  options: MediaUploadOptions = {}
-): Promise<MediaUploadResult> {
-  return uploadToBlob(file, options);
-}
-
-/** True if URL points at Vercel Blob public storage */
+/** True if URL points at a suspended Vercel file store. Those images stay hidden. */
 export function isVercelBlobUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   try {
@@ -170,16 +155,6 @@ export function isVercelBlobUrl(url: string | null | undefined): boolean {
 export function isHeldMediaUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   return isVercelBlobUrl(url) || url.includes("/api/media/blob") || url.includes("blob.vercel-storage.com");
-}
-
-/** True if URL is a legacy Cloudinary delivery URL (still displayable) */
-export function isCloudinaryUrl(url: string | null | undefined): boolean {
-  if (!url) return false;
-  try {
-    return new URL(url).hostname === "res.cloudinary.com";
-  } catch {
-    return /res\.cloudinary\.com/i.test(url);
-  }
 }
 
 /** True if URL points at the Cloudflare R2 public domain */

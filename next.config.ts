@@ -6,21 +6,10 @@ const nextConfig: NextConfig = {
     contentDispositionType: "inline",
     contentSecurityPolicy: "script-src 'none'; frame-src 'none';",
     remotePatterns: [
-      // Legacy media still referenced in defaults / localStorage
+      // Existing published files. New uploads go to Cloudflare R2.
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-        pathname: "/**",
-      },
-      // Vercel Blob public URLs
-      {
-        protocol: "https",
-        hostname: "*.public.blob.vercel-storage.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "public.blob.vercel-storage.com",
         pathname: "/**",
       },
       {

@@ -1,14 +1,8 @@
 import "server-only";
 
-import { createHash } from "node:crypto";
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { get } from "@vercel/blob";
 
 const chains = new Map<string, Promise<unknown>>();
-
-function token() {
-  return process.env.BLOB_READ_WRITE_TOKEN?.trim() ?? "";
-}
 
 function r2Config() {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? "";
@@ -20,7 +14,7 @@ function r2Config() {
 }
 
 export function blobReady() {
-  return r2Config() !== null || token().length > 0;
+  return r2Config() !== null;
 }
 
 function r2Client(config: NonNullable<ReturnType<typeof r2Config>>) {
@@ -34,12 +28,6 @@ function r2Client(config: NonNullable<ReturnType<typeof r2Config>>) {
 function r2Key(name: string) {
   const safe = name.replace(/[^a-z0-9_-]/gi, "");
   return `patrick-roziel/stores/${safe || "portfolio"}.json`;
-}
-
-function legacyPath(name: string) {
-  const secret = process.env.BACKOFFICE_SESSION_SECRET?.trim() || token() || "patrickroziel";
-  const folder = createHash("sha256").update(`portfolio-store-v1:${secret}`).digest("hex").slice(0, 32);
-  return `stores/${folder}/${name}.json`;
 }
 
 export function enqueue<T>(key: string, job: () => Promise<T>): Promise<T> {
@@ -58,7 +46,7 @@ function missingObject(error: unknown) {
   return name === "NoSuchKey" || name === "NotFound" || code === 404;
 }
 
-async function readR2<T>(name: string): Promise<T | null> {
+export async function readJsonBlob<T>(name: string): Promise<T | null> {
   const config = r2Config();
   if (!config) return null;
   try {
@@ -73,27 +61,6 @@ async function readR2<T>(name: string): Promise<T | null> {
     if (missingObject(error)) return null;
     throw error;
   }
-}
-
-async function readLegacy<T>(name: string): Promise<T | null> {
-  if (!token()) return null;
-  const path = legacyPath(name);
-  for (const access of ["private", "public"] as const) {
-    try {
-      const file = await get(path, { access, token: token(), useCache: false });
-      if (!file || file.statusCode !== 200 || !file.stream) continue;
-      return JSON.parse(await new Response(file.stream).text()) as T;
-    } catch {
-      /* The suspended Vercel store must not hide the Cloudflare copy. */
-    }
-  }
-  return null;
-}
-
-export async function readJsonBlob<T>(name: string): Promise<T | null> {
-  const stored = await readR2<T>(name);
-  if (stored) return stored;
-  return readLegacy<T>(name);
 }
 
 export async function writeJsonBlob(name: string, value: unknown) {

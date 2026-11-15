@@ -7,7 +7,7 @@ function readableMediaUrl(raw: string): string | null {
     if (url.protocol !== "https:") return null;
     const host = url.hostname;
     const onBlob = host === "blob.vercel-storage.com" || host.endsWith(".blob.vercel-storage.com");
-    if (onBlob) return `/api/media/blob?url=${encodeURIComponent(url.toString())}`;
+    if (onBlob) return null;
     return url.toString();
   } catch {
     return null;

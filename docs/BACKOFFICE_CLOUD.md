@@ -7,21 +7,25 @@
 - GitHub OAuth réservé au compte personnel `patrickroziel` (ID stable `307225840`).
 - Session HTTP-only, signée HMAC, état OAuth aléatoire, expiration après sept jours.
 - `/api/backoffice/content` : brouillons compris, lecture/écriture uniquement pour l'administrateur connecté.
-- `/api/portfolio` : contenu public filtré, sans brouillons; repli sur le snapshot du dépôt si Neon est indisponible.
-- Sauvegardes PostgreSQL Neon en JSONB avec numéro de révision: une édition concurrente déclenche une erreur explicite (409).
+- `/api/portfolio` : contenu public filtré, sans brouillons; repli sur le snapshot du dépôt si Cloudflare est indisponible.
+- Le contenu du site est enregistré sur Cloudflare R2.
 - Editeur Work/Notes existant synchronisé via `PortfolioProvider`, avec sauvegarde locale de secours.
-- Les uploads Vercel Blob ne sont autorisés en production que pour une session administrateur authentifiée.
+- Les nouveaux fichiers partent sur Cloudflare R2, uniquement pour une session administrateur authentifiée.
 - Boutons d'import de snapshot JSON et d'export du document cloud dans l'espace privé.
 - Le mode édition ne peut pas être activé pour tout le public par la variable `NEXT_PUBLIC_ALLOW_EDIT` en production.
 
 ## Configuration externe encore requise
 
-Cette branche **n'a pas créé de projet Neon, d'application OAuth GitHub ni de variables Vercel**.
+Cette branche **n'a pas créé de bucket Cloudflare, d'application OAuth GitHub ni de variables Vercel**.
 Ces actions sont réservées aux comptes du propriétaire et nécessitent leur connexion ou son intervention.
 
 Variables à ajouter exclusivement côté serveur sur Vercel :
 ```
-DATABASE_URL=postgresql://...  # connexion PostgreSQL Neon, avec SSL
+CLOUDFLARE_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=
+R2_PUBLIC_URL=
 BACKOFFICE_SLUG=...           # chaîne générée de 24 caractères alphanumériques minimum
 BACKOFFICE_BASE_URL=https://<domaine exact>
 BACKOFFICE_SESSION_SECRET=... # 32+ caractères aléatoires
@@ -32,7 +36,6 @@ Générer indépendamment `BACKOFFICE_SLUG` et `BACKOFFICE_SESSION_SECRET` via `
 Dans GitHub OAuth Apps, définir le callback `https://<domaine exact>/api/backoffice/callback`.
 Aucun scope `repo` n'est requis pour se connecter.
 
-La dépendance `@neondatabase/serverless` doit être installée et le fichier `package-lock.json` régénéré avant toute fusion.
 Ne pas committer les secrets ni `.env.local`.
 
 ## Vérification de bout en bout requise avant fusion
