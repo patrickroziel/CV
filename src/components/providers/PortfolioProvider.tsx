@@ -165,13 +165,14 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           if (!response.ok) throw new Error("Cloud indisponible");
           const result = (await response.json()) as { data: PortfolioData; revision: number };
           if (cancelled) return;
-          cloudSync.current.revision = result.revision;
-          cloudSync.current.saved = JSON.stringify(result.data);
-          cloudSync.current.blocked = false;
-          setData({
+          const normalized = {
             ...result.data,
             ghostPages: normalizeGhostPages(result.data.ghostPages),
-          });
+          };
+          cloudSync.current.revision = result.revision;
+          cloudSync.current.saved = JSON.stringify(normalized);
+          cloudSync.current.blocked = false;
+          setData(normalized);
           // Don't permit cloud edits until the first explicit JSON import.
           // Otherwise a newly opened admin page could persist an incomplete snapshot.
           setCloudMode(result.revision > 0);
@@ -218,6 +219,34 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [data, isHydrated, editAllowed, cloudMode]);
 
+  const cloudModeRef = useRef(false);
+  const dataRef = useRef(data);
+  cloudModeRef.current = cloudMode;
+  dataRef.current = data;
+
+  // A tab close used to drop the last edit: the cloud write waited 650ms and then gave up.
+  useEffect(() => {
+    const flush = () => {
+      if (!cloudModeRef.current || cloudSync.current.blocked) return;
+      const payload = dataRef.current;
+      const serialized = JSON.stringify(payload);
+      if (serialized === cloudSync.current.saved) return;
+      void fetch("/api/backoffice/content", {
+        method: "PUT",
+        keepalive: true,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: payload, expectedRevision: cloudSync.current.revision }),
+      }).then(async (response) => {
+        if (!response.ok) return;
+        const result = (await response.json()) as { revision?: number };
+        if (typeof result.revision === "number") cloudSync.current.revision = result.revision;
+        cloudSync.current.saved = serialized;
+      }).catch(() => undefined);
+    };
+    window.addEventListener("pagehide", flush);
+    return () => window.removeEventListener("pagehide", flush);
+  }, []);
+
   // Serialize writes and reject conflicts instead of silently overwriting a second device.
   useEffect(() => {
     if (!isHydrated || !cloudMode || cloudSync.current.blocked) return;
@@ -227,19 +256,29 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       cloudSync.current.queue = cloudSync.current.queue.then(async () => {
         if (cloudSync.current.blocked || serialized === cloudSync.current.saved) return;
         setCloudStatus("saving");
+        const send = (expectedRevision: number) => fetch("/api/backoffice/content", {
+          method: "PUT",
+          keepalive: true,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: JSON.parse(serialized), expectedRevision }),
+        });
         try {
-          const response = await fetch("/api/backoffice/content", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ data: JSON.parse(serialized), expectedRevision: cloudSync.current.revision }),
-          });
-          if (!response.ok) {
-            if (response.status === 409 || response.status === 401 || response.status === 403) {
-              cloudSync.current.blocked = true;
+          let response = await send(cloudSync.current.revision);
+          if (response.status === 409) {
+            const fresh = await fetch("/api/backoffice/content", { cache: "no-store" });
+            if (fresh.ok) {
+              const current = (await fresh.json()) as { revision?: number };
+              if (typeof current.revision === "number" && current.revision !== cloudSync.current.revision) {
+                cloudSync.current.revision = current.revision;
+                response = await send(current.revision);
+              }
             }
+          }
+          if (!response.ok) {
+            if (response.status === 401 || response.status === 403) cloudSync.current.blocked = true;
             throw new Error(response.status === 409
-              ? "Conflit cloud entre appareils. Exporte le JSON avant de recharger."
-              : "Sauvegarde cloud impossible. Conserve ton export JSON.");
+              ? "Le serveur a refusé l’enregistrement. Réessaie dans un instant."
+              : "Sauvegarde cloud impossible. Réessaie dans un instant.");
           }
           const result = (await response.json()) as { revision: number };
           cloudSync.current.revision = result.revision;
@@ -251,7 +290,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           window.setTimeout(() => setToast(null), 6000);
         }
       });
-    }, 650);
+    }, 250);
     return () => window.clearTimeout(timer);
   }, [data, isHydrated, cloudMode]);
 

@@ -150,23 +150,44 @@ export async function writePortfolio(data: PortfolioData, expectedRevision: numb
   return Number(rows[0].revision);
 }
 
+async function mirrorPortfolio(data: PortfolioData, revision: number) {
+  const sql = connection();
+  if (!sql) return;
+  await ensureTable();
+  const payload = JSON.stringify(data);
+  // Never roll Neon backwards. A newer blob is the copy the editor just loaded.
+  await sql`INSERT INTO portfolio_content (id, payload, revision)
+    VALUES (1, ${payload}::jsonb, ${revision})
+    ON CONFLICT (id) DO UPDATE
+    SET payload = EXCLUDED.payload, revision = EXCLUDED.revision, updated_at = now()
+    WHERE portfolio_content.revision < EXCLUDED.revision`;
+}
+
 export async function savePortfolio(data: PortfolioData, expectedRevision: number): Promise<number | null> {
+  const blob = await readContentBlob().catch(() => null);
+  const blobRevision = blob?.revision ?? 0;
+  let neonRevision = 0;
   try {
-    const next = await withTimeout(writePortfolio(data, expectedRevision), 4000);
-    if (next !== null) {
-      await writeContentBlob(data, next).catch(() => undefined);
-      return next;
-    }
-    const fresh = await withTimeout(readPortfolio(), 2500);
-    if (fresh.revision > 0) return null;
+    const neon = await withTimeout(readPortfolio(), 2500);
+    neonRevision = neon?.revision ?? 0;
   } catch {
-    // Neon is over quota or unreachable. Keep editing on the backup copy.
+    // Neon is over quota or unreachable. The blob copy must still accept the post.
+    neonRevision = 0;
   }
-  const current = await readContentBlob();
-  const currentRevision = current?.revision ?? 0;
-  if (current && currentRevision !== expectedRevision) return null;
-  const next = (current ? currentRevision : Math.max(expectedRevision, 0)) + 1;
+
+  // The public site reads whichever copy is newer. The editor loaded that same head.
+  // Comparing the client only to Neon rejects every save once the blob is ahead.
+  const head = Math.max(blobRevision, neonRevision);
+  const baseline = head === 0 && expectedRevision === 1 ? 1 : head;
+  if (expectedRevision !== baseline) return null;
+
+  const next = baseline + 1;
   await writeContentBlob(data, next);
+  try {
+    await withTimeout(mirrorPortfolio(data, next), 4000);
+  } catch {
+    // The post is already in the blob. A dead Neon must not report a failed save.
+  }
   invalidatePublicPortfolio();
   return next;
 }
