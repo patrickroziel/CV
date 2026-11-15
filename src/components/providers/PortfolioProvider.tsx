@@ -234,7 +234,6 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       setCloudStatus("saving");
       const send = () => fetch("/api/backoffice/content", {
         method: "PUT",
-        keepalive: true,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           data: JSON.parse(serialized) as PortfolioData,
@@ -288,7 +287,6 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       cloudSync.current.writeSeq = writeSeq;
       void fetch("/api/backoffice/content", {
         method: "PUT",
-        keepalive: true,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           data: dataRef.current,
