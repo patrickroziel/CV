@@ -660,7 +660,7 @@ export function SocialPostForm({
             <span className="font-medium">Mode Livre</span>
           </div>
           <p className="mt-2 text-xs leading-5 text-zinc-500">
-            Le texte n’est pas lisible dans le feed. Il s’ouvre dans la liseuse.
+            Le texte est la version à lire sur le site. La couverture et le PDF sont facultatifs.
           </p>
           <div className="mt-4 grid max-w-[14rem] gap-2">
             <Label htmlFor="chapter-order">Ordre d’apparition</Label>

@@ -145,10 +145,10 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
             </div>}
           </header>
 
-          {!teaser && !isBook ? <NoteCardParts postId={post.id} html={description} /> : null}
+          {!teaser ? <NoteCardParts postId={post.id} html={description} /> : null}
 
-          {!teaser && !isBook && featured && <FeaturedMedia media={featured} title={title} />}
-          {!teaser && !isBook && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
+          {!teaser && featured && <FeaturedMedia media={featured} title={title} />}
+          {!teaser && post.fileKind === "image" && post.fileUrl && post.fileUrl !== post.bookCoverUrl &&
             post.fileUrl !== featured?.url && <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/40">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={displayImageUrl(post.fileUrl, 1200)} alt={title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-center" />
@@ -157,8 +157,6 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
 
           {teaser ? (
             <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
-          ) : isBook ? (
-            <p className="text-sm leading-6 text-zinc-400">Le chapitre se lit dans la liseuse.</p>
           ) : description ? (
             <PostPreview html={description} title={title} inlineMedia={post.inlineMedia} />
           ) : null}
@@ -181,7 +179,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
           <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} card />
             <Link href={`/notes/${post.id}`} className="text-[13px] font-medium text-white/80 hover:text-white">
-              {isBook ? "Lire le chapitre" : "Ouvrir"}
+              {isBook ? "Lire" : "Ouvrir"}
             </Link>
           </div>
         </div>
