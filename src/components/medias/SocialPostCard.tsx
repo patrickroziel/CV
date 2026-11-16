@@ -157,7 +157,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
 
           {teaser ? (
             <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
-          ) : description ? (
+          ) : description && !isBook ? (
             <PostPreview html={description} title={title} inlineMedia={post.inlineMedia} />
           ) : null}
 
@@ -179,7 +179,7 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
           <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} card />
             <Link href={`/notes/${post.id}`} className="text-[13px] font-medium text-white/80 hover:text-white">
-              {isBook ? "Lire" : "Ouvrir"}
+              {isBook ? "Lire le chapitre" : "Ouvrir"}
             </Link>
           </div>
         </div>
