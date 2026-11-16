@@ -31,9 +31,10 @@ export function notePartTitles(html: string) {
   return titles;
 }
 
-export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; tone?: "air" | "notes" }) {
+export function ArticlePartNav({ targetId, tone = "air", allParts = false }: { targetId: string; tone?: "air" | "notes"; allParts?: boolean }) {
   const [parts, setParts] = useState<Part[]>([]);
   const [openedId, setOpenedId] = useState<string | null>(null);
+  const [currentId, setCurrentId] = useState<string | null>(null);
   const openedAt = useRef<number | null>(null);
 
   useEffect(() => {
@@ -51,12 +52,25 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       }))
       .filter((part) => part.label && part.label.toLocaleLowerCase("fr") !== "titre de la partie");
     const pick = () => {
-      if (openedAt.current != null && window.scrollY > openedAt.current + 24) {
+      if (!allParts && openedAt.current != null && window.scrollY > openedAt.current + 24) {
         openedAt.current = null;
         setOpenedId(null);
       }
       const bar = document.querySelector(".reading-title");
       const line = bar instanceof HTMLElement ? bar.getBoundingClientRect().bottom + 6 : 110;
+      if (allParts) {
+        const marker = Math.max(line, window.innerHeight * 0.42);
+        let active: string | null = null;
+        for (const part of next) {
+          const el = document.getElementById(part.id);
+          if (el && el.getBoundingClientRect().top <= marker) active = part.id;
+        }
+        setCurrentId(active);
+        setParts((current) => (
+          current.length === next.length && current.every((part, index) => part.id === next[index]?.id) ? current : next
+        ));
+        return;
+      }
       const passed = next.filter((part) => {
         const el = document.getElementById(part.id);
         return el ? el.getBoundingClientRect().top < line : false;
@@ -73,11 +87,12 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
       window.removeEventListener("scroll", pick);
       window.removeEventListener("resize", pick);
     };
-  }, [targetId]);
+  }, [targetId, allParts]);
 
-  const current = parts[parts.length - 1];
-  if (!current) return null;
-  const shown = parts.find((part) => part.id === openedId) ?? current;
+  const current = allParts ? parts.find((part) => part.id === currentId) ?? null : parts[parts.length - 1];
+  if (!parts.length) return null;
+  if (!allParts && !current) return null;
+  const shown = allParts ? current : (parts.find((part) => part.id === openedId) ?? current);
   const jump = (id: string) => (event: MouseEvent) => {
     event.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -86,37 +101,38 @@ export function ArticlePartNav({ targetId, tone = "air" }: { targetId: string; t
   return (
     <div className={tone === "notes" ? "notes-part-stack" : "air-part-stack"}>
       <div className="air-part-line">
-        {parts.map((part) => part.id === shown.id ? (
+        {parts.map((part) => part.id === shown?.id ? (
           <a
             key={part.id}
             href={`#${part.id}`}
             title={`Partie ${part.n}. ${part.label}`}
-            className={["air-part-float", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
+            className={["air-part-float", "is-current", tone === "notes" ? "is-notes" : ""].filter(Boolean).join(" ")}
             onClick={jump(part.id)}
           >
             <span className="air-part-num">{part.n}</span>
             <span className="air-part-name">{part.label}</span>
           </a>
         ) : (
-          <button
+          <a
             key={part.id}
-            type="button"
+            href={`#${part.id}`}
             className="air-part-dot"
             title={`Partie ${part.n}. ${part.label}`}
-            onClick={() => {
+            onClick={allParts ? jump(part.id) : (event) => {
+              event.preventDefault();
               openedAt.current = window.scrollY;
               setOpenedId(part.id);
             }}
           >
             {part.n}
-          </button>
+          </a>
         ))}
       </div>
     </div>
   );
 }
 
-export function ReadingTitle({ anchorId, title, subtitle = "", targetId, tone = "air" }: { anchorId: string; title: string; subtitle?: string; targetId: string; tone?: "air" | "notes" }) {
+export function ReadingTitle({ anchorId, title, subtitle = "", targetId, tone = "air", allParts = false }: { anchorId: string; title: string; subtitle?: string; targetId: string; tone?: "air" | "notes"; allParts?: boolean }) {
   const [shown, setShown] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -144,12 +160,12 @@ export function ReadingTitle({ anchorId, title, subtitle = "", targetId, tone = 
         <p className="reading-title-main">{title}</p>
         {subtitle.trim() ? <p className="reading-title-sub">{subtitle.trim()}</p> : null}
       </div>
-      <ArticlePartNav targetId={targetId} tone={tone} />
+      <ArticlePartNav targetId={targetId} tone={tone} allParts={allParts} />
     </div>,
     document.body,
   );
 }
 
-export function NotesFloatingStack({ postId, title = "", subtitle = "" }: { postId: string; title?: string; subtitle?: string }) {
-  return <ReadingTitle anchorId={`note-title-${postId}`} title={title} subtitle={subtitle} targetId={`note-body-${postId}`} tone="notes" />;
+export function NotesFloatingStack({ postId, title = "", subtitle = "", allParts = false }: { postId: string; title?: string; subtitle?: string; allParts?: boolean }) {
+  return <ReadingTitle anchorId={`note-title-${postId}`} title={title} subtitle={subtitle} targetId={`note-body-${postId}`} tone="notes" allParts={allParts} />;
 }
