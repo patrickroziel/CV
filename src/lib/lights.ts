@@ -1,46 +1,41 @@
-import type { FeatureVideo, MainShowreel, Project, SocialPost, Translatable } from "@/lib/types";
+import type { FeatureVideo, LightNote, MainShowreel, Project, SocialPost, Translatable } from "@/lib/types";
 import { vimeoCanonical, vimeoEmbedUrl, vimeoThumb, vimeoVideo, youtubeEmbedUrl, youtubeThumb, youtubeVideoId } from "@/lib/utils";
 
-export type LightCategory = "notes" | "air" | "work";
+export type LightKind = LightNote["kind"];
 
-export type LightItem = {
+export type LightCard = {
   id: string;
-  category: LightCategory;
-  title: string;
+  kind: LightKind;
+  text: string;
   date: string;
-  href: string;
-  watchUrl: string;
+  mediaUrl: string | null;
   thumb: string | null;
   embed: string | null;
   file: boolean;
+  href: string | null;
+  source: string | null;
+  ownId: string | null;
 };
 
-type TitleOf = (value: Translatable | undefined, fallback: string) => string;
+const KINDS = new Set<LightKind>(["words", "quote", "image", "video", "x", "instagram"]);
 
-function youtube(url: string | null | undefined) {
-  const value = url?.trim();
-  return value && youtubeVideoId(value) ? value : null;
-}
-
-function fileVideo(url: string | null | undefined) {
-  const value = url?.trim();
-  if (!value || youtubeVideoId(value)) return null;
-  if (/\.(mp4|webm|mov)(\?|$)/i.test(value) || value.includes("/video/upload/")) return value;
-  return null;
-}
-
-function item(
-  partial: Omit<LightItem, "thumb" | "embed" | "file"> & { watchUrl: string },
-): LightItem {
-  const id = youtubeVideoId(partial.watchUrl);
-  if (id) {
-    return { ...partial, thumb: youtubeThumb(partial.watchUrl), embed: youtubeEmbedUrl(partial.watchUrl), file: false };
+export function normalizeLightNotes(raw: unknown): LightNote[] {
+  if (!Array.isArray(raw)) return [];
+  const notes: LightNote[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const row = item as Partial<LightNote>;
+    const kind = KINDS.has(row.kind as LightKind) ? row.kind as LightKind : null;
+    const id = typeof row.id === "string" ? row.id.trim() : "";
+    if (!kind || !id) continue;
+    const text = typeof row.text === "string" ? row.text.replace(/\s+/g, " ").trim().slice(0, 500) : "";
+    const url = typeof row.url === "string" && row.url.trim().startsWith("https://") ? row.url.trim().slice(0, 400) : null;
+    if ((kind === "words" || kind === "quote") && !text) continue;
+    if (kind !== "words" && kind !== "quote" && !url) continue;
+    const date = typeof row.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(row.date) ? row.date : "";
+    notes.push({ id, kind, text, url, date, visible: row.visible !== false });
   }
-  const vimeo = vimeoEmbedUrl(partial.watchUrl);
-  if (vimeo) {
-    return { ...partial, thumb: vimeoThumb(partial.watchUrl), embed: vimeo, file: false };
-  }
-  return { ...partial, thumb: null, embed: null, file: true };
+  return notes;
 }
 
 function textOf(value: Translatable | undefined) {
@@ -49,84 +44,193 @@ function textOf(value: Translatable | undefined) {
   return value.fr || "";
 }
 
-function fromPost(post: SocialPost, titleOf: TitleOf): LightItem[] {
-  const category: LightCategory = post.universe === "air" ? "air" : "notes";
-  const href = category === "air" ? `/air/${post.id}` : `/notes/${post.id}`;
-  const base = { category, title: titleOf(post.title, "Vidéo"), date: post.date || "", href };
-  const media = new Map((post.inlineMedia ?? []).map((entry) => [entry.id, entry]));
-  const order = [...textOf(post.description).matchAll(/\[\[MEDIA:([a-zA-Z0-9_-]+)\]\]/g)].map((match) => match[1]);
-  const out: LightItem[] = [];
+function youtube(url: string | null | undefined) {
+  const value = url?.trim();
+  return value && youtubeVideoId(value) ? value : null;
+}
+
+function fileVideo(url: string | null | undefined) {
+  const value = url?.trim();
+  if (!value || youtubeVideoId(value) || vimeoCanonical(value)) return null;
+  if (/\.(mp4|webm|mov)(\?|$)/i.test(value) || /\/video\/upload\//i.test(value)) return value;
+  return null;
+}
+
+function imageUrl(url: string | null | undefined) {
+  const value = url?.trim();
+  if (!value || !value.startsWith("https://") || fileVideo(value) || youtube(value)) return null;
+  return value;
+}
+
+function socialUrl(url: string | null | undefined, host: "x" | "instagram") {
+  const value = url?.trim();
+  if (!value) return null;
+  try {
+    const parsed = new URL(value);
+    const name = parsed.hostname.replace(/^www\./, "");
+    if (host === "instagram") return name === "instagram.com" ? value : null;
+    if (name === "x.com" || name === "twitter.com") return value;
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function videoCard(partial: { id: string; text: string; date: string; href: string | null; source: string | null; watchUrl: string }): LightCard | null {
+  const id = youtubeVideoId(partial.watchUrl);
+  if (id) {
+    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: youtubeThumb(partial.watchUrl), embed: youtubeEmbedUrl(partial.watchUrl), file: false, ownId: null };
+  }
+  const vimeo = vimeoEmbedUrl(partial.watchUrl);
+  if (vimeo) {
+    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: vimeoThumb(partial.watchUrl), embed: vimeo, file: false, ownId: null };
+  }
+  if (!fileVideo(partial.watchUrl)) return null;
+  return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: null, embed: null, file: true, ownId: null };
+}
+
+function fromPost(post: SocialPost, titleOf: (value: Translatable | undefined, fallback: string) => string): LightCard[] {
+  const source = post.universe === "air" ? "Air" : "Notes";
+  const href = source === "Air" ? `/air/${post.id}` : `/notes/${post.id}`;
+  const text = titleOf(post.title, "Sans titre");
+  const date = post.date || "";
+  const out: LightCard[] = [];
   const seen = new Set<string>();
 
-  const push = (url: string | null | undefined) => {
-    const value = url?.trim();
-    if (!value || seen.has(value)) return;
-    const clip = youtube(value) || vimeoCanonical(value);
-    if (!clip) return;
-    seen.add(value);
-    out.push(item({ ...base, id: `${category}-${post.id}-${youtubeVideoId(clip) || vimeoVideo(clip)?.id || "video"}`, watchUrl: clip }));
+  const push = (card: LightCard | null) => {
+    const key = card?.mediaUrl || card?.id;
+    if (!card || !key || seen.has(key)) return;
+    seen.add(key);
+    out.push(card);
+  };
+
+  const addVideo = (url: string | null | undefined) => {
+    const watchUrl = youtube(url) || vimeoCanonical(url || "") || fileVideo(url);
+    if (!watchUrl) return;
+    push(videoCard({
+      id: `${post.id}-${youtubeVideoId(watchUrl) || vimeoVideo(watchUrl)?.id || watchUrl}`,
+      text,
+      date,
+      href,
+      source,
+      watchUrl,
+    }));
+  };
+  const addImage = (url: string | null | undefined) => {
+    const image = imageUrl(url);
+    if (!image) return;
+    push({ id: `${post.id}-img-${image}`, kind: "image", text, date, mediaUrl: image, thumb: image, embed: null, file: false, href, source, ownId: null });
+  };
+  const addSocial = (url: string | null | undefined) => {
+    const x = socialUrl(url, "x");
+    if (x) {
+      push({ id: `${post.id}-x-${x}`, kind: "x", text, date, mediaUrl: x, thumb: null, embed: null, file: false, href, source, ownId: null });
+      return;
+    }
+    const instagram = socialUrl(url, "instagram");
+    if (instagram) {
+      push({ id: `${post.id}-ig-${instagram}`, kind: "instagram", text, date, mediaUrl: instagram, thumb: null, embed: instagramEmbed(instagram), file: false, href, source, ownId: null });
+    }
   };
 
   const cover = post.featuredEmbed;
-  push(cover && (cover.type === "youtube" || cover.type === "vimeo") ? cover.url : null);
-  push(post.youtubeUrl);
-  for (const id of (order.length ? order : [...media.keys()])) {
-    const entry = media.get(id);
-    if (entry?.type === "youtube" || entry?.type === "vimeo") push(entry.url);
-  }
+  if (cover?.type === "image") addImage(cover.url);
+  if (cover?.type === "youtube" || cover?.type === "vimeo") addVideo(cover.url);
+  if (cover?.type === "x") addSocial(cover.url);
+  addVideo(post.youtubeUrl);
+  if (post.fileKind === "image") addImage(post.fileUrl);
   for (const entry of post.inlineMedia ?? []) {
-    if (entry.type === "youtube" || entry.type === "vimeo") push(entry.url);
+    if (entry.type === "image") addImage(entry.url);
+    if (entry.type === "youtube" || entry.type === "vimeo") addVideo(entry.url);
+    if (entry.type === "x") addSocial(entry.url);
+    if (entry.type === "carousel") {
+      for (const item of entry.items) {
+        if (item.type === "image") addImage(item.url);
+        if (item.type === "youtube") addVideo(item.url);
+        if (item.type === "x") addSocial(item.url);
+      }
+    }
   }
+  for (const match of textOf(post.description).matchAll(/https?:\/\/[^\s"'<>]+/gi)) addSocial(match[0]);
   return out;
 }
 
-function fromProject(project: Project, titleOf: TitleOf): LightItem | null {
+function fromProject(project: Project, titleOf: (value: Translatable | undefined, fallback: string) => string): LightCard | null {
   const watchUrl = youtube(project.videoUrl) || (project.mediaType === "youtube" ? null : fileVideo(project.videoUrl));
   if (!watchUrl || project.mediaType === "image") return null;
-  if (project.mediaType !== "youtube" && !fileVideo(project.videoUrl)) return null;
-  return item({
+  return videoCard({
     id: `work-project-${project.id}`,
-    category: "work",
-    title: titleOf(project.title, "Vidéo"),
+    text: titleOf(project.title, "Vidéo"),
     date: "",
     href: `/projets/${project.id}`,
+    source: "Work",
     watchUrl,
   });
 }
 
-function fromFeature(video: FeatureVideo | MainShowreel, id: string, titleOf: TitleOf): LightItem | null {
+function fromFeature(video: FeatureVideo | MainShowreel, id: string, titleOf: (value: Translatable | undefined, fallback: string) => string): LightCard | null {
   if (video.videoType === "none" || video.videoType === "x") return null;
   const watchUrl = youtube(video.videoUrl) || fileVideo(video.videoUrl);
   if (!watchUrl) return null;
-  return item({
-    id,
-    category: "work",
-    title: titleOf(video.title, "Vidéo"),
-    date: "",
-    href: "/work",
-    watchUrl,
-  });
+  return videoCard({ id, text: titleOf(video.title, "Vidéo"), date: "", href: "/work", source: "Work", watchUrl });
 }
 
-export function collectLightItems(input: {
+export function instagramEmbed(url: string) {
+  const match = url.match(/instagram\.com\/(?:p|reel|tv)\/([^/?#]+)/i);
+  if (!match) return null;
+  const kind = /\/reel\//i.test(url) ? "reel" : "p";
+  return `https://www.instagram.com/${kind}/${match[1]}/embed`;
+}
+
+function fromNote(note: LightNote): LightCard {
+  const url = note.url;
+  if (note.kind === "video" && url) {
+    const card = videoCard({ id: note.id, text: note.text, date: note.date, href: null, source: null, watchUrl: url });
+    if (card) return { ...card, id: note.id, ownId: note.id };
+    return { id: note.id, kind: "video", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: null, file: true, href: null, source: null, ownId: note.id };
+  }
+  if (note.kind === "instagram" && url) {
+    return { id: note.id, kind: "instagram", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: instagramEmbed(url), file: false, href: null, source: null, ownId: note.id };
+  }
+  return {
+    id: note.id,
+    kind: note.kind,
+    text: note.text,
+    date: note.date,
+    mediaUrl: url,
+    thumb: note.kind === "image" ? url : null,
+    embed: null,
+    file: note.kind === "video",
+    href: null,
+    source: null,
+    ownId: note.id,
+  };
+}
+
+export function collectLightCards(input: {
   posts: SocialPost[];
   projects: Project[];
+  notes?: LightNote[];
   showreel?: MainShowreel | null;
   features?: FeatureVideo[];
-  titleOf: TitleOf;
+  titleOf: (value: Translatable | undefined, fallback: string) => string;
   includeHidden?: boolean;
-}): LightItem[] {
+}): LightCard[] {
   const seen = new Set<string>();
-  const list: LightItem[] = [];
-  const push = (entry: LightItem | LightItem[] | null) => {
-    const entries = Array.isArray(entry) ? entry : entry ? [entry] : [];
-    for (const one of entries) {
-      if (seen.has(one.watchUrl)) continue;
-      seen.add(one.watchUrl);
+  const list: LightCard[] = [];
+  const push = (entry: LightCard | LightCard[] | null) => {
+    for (const one of Array.isArray(entry) ? entry : entry ? [entry] : []) {
+      const key = one.ownId || one.mediaUrl || one.id;
+      if (seen.has(key)) continue;
+      seen.add(key);
       list.push(one);
     }
   };
 
+  for (const note of input.notes ?? []) {
+    if (!input.includeHidden && note.visible === false) continue;
+    push(fromNote(note));
+  }
   for (const post of input.posts) {
     if (!input.includeHidden && post.visible === false) continue;
     push(fromPost(post, input.titleOf));
@@ -135,5 +239,5 @@ export function collectLightItems(input: {
   push(input.showreel ? fromFeature(input.showreel, "work-showreel", input.titleOf) : null);
   for (const feature of input.features ?? []) push(fromFeature(feature, `work-feature-${feature.id}`, input.titleOf));
 
-  return list.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  return list.sort((a, b) => (b.date || "").localeCompare(a.date || "") || (a.ownId ? -1 : 1));
 }

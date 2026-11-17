@@ -819,6 +819,21 @@ export const DEFAULT_SOCIAL: SocialConfig = {
 
 export const DEFAULT_SOCIAL_POSTS: SocialPost[] = [];
 
+/** A short Lights post. It is not an article and does not belong to Notes, Air or Work. */
+export type LightKind = "words" | "quote" | "image" | "video" | "x" | "instagram";
+
+export type LightNote = {
+  id: string;
+  kind: LightKind;
+  /** A few words, a caption, or the quote. */
+  text: string;
+  /** Image, video, X or Instagram address. Empty for words and quotes. */
+  url: string | null;
+  /** ISO date YYYY-MM-DD */
+  date: string;
+  visible: boolean;
+};
+
 /** Standalone page, absent from the site menu. Shared by its own link. */
 export type GhostPage = {
   id: string;
@@ -892,6 +907,8 @@ export type PortfolioData = {
    */
   social: SocialConfig;
   socialPosts: SocialPost[];
+  /** Short Lights posts: words, quotes, images, videos, X and Instagram. */
+  lightNotes: LightNote[];
   /** Pages hors menu, destinées à être liées depuis les articles. */
   ghostPages: GhostPage[];
   version: number;

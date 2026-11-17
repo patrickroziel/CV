@@ -14,6 +14,7 @@ import {
 } from "./types";
 import snapshot from "./default-snapshot.json";
 import { normalizeGhostPages } from "./ghost-pages";
+import { normalizeLightNotes } from "./lights";
 
 /**
  * Production defaults = full portfolio snapshot (Cloudinary media, languages,
@@ -106,6 +107,7 @@ export const DEFAULT_PORTFOLIO: PortfolioData = {
     ? structuredClone((snap as { socialPosts: typeof DEFAULT_SOCIAL_POSTS }).socialPosts)
     : DEFAULT_SOCIAL_POSTS.map((p) => ({ ...p })),
   ghostPages: normalizeGhostPages((snap as { ghostPages?: unknown }).ghostPages),
+  lightNotes: normalizeLightNotes((snap as { lightNotes?: unknown }).lightNotes),
   contact: {
     ...DEFAULT_CONTACT,
     ...snap.contact,

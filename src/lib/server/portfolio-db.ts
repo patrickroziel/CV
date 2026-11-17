@@ -2,6 +2,7 @@ import "server-only";
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { normalizeGhostPages } from "@/lib/ghost-pages";
+import { normalizeLightNotes } from "@/lib/lights";
 import { concealHiddenPost } from "@/lib/post-publication";
 import { readJsonBlob, writeJsonBlob } from "@/lib/server/json-blob";
 import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
@@ -101,5 +102,6 @@ export function publicPortfolio(data: PortfolioData): PortfolioData {
       .filter((post) => post.visible !== false)
       .map((post) => concealHiddenPost(post)),
     ghostPages: normalizeGhostPages(data.ghostPages).filter((page) => page.visible),
+    lightNotes: normalizeLightNotes(data.lightNotes).filter((note) => note.visible),
   };
 }

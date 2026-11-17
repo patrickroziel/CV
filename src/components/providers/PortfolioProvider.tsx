@@ -19,6 +19,7 @@ import type {
   GhostPage,
   HeroGlassConfig,
   Language,
+  LightNote,
   Locale,
   MainShowreel,
   NavConfig,
@@ -44,6 +45,7 @@ import {
 import { createId } from "@/lib/utils";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { normalizeGhostPages } from "@/lib/ghost-pages";
+import { normalizeLightNotes } from "@/lib/lights";
 import { isEditEnvironment } from "@/lib/edit-env";
 
 import { t as translate } from "@/i18n";
@@ -124,6 +126,8 @@ type PortfolioContextValue = {
   addGhostPage: (page: GhostPage) => void;
   updateGhostPage: (id: string, partial: Partial<GhostPage>, toastMsg?: string) => void;
   removeGhostPage: (id: string) => void;
+  addLightNote: (note: LightNote) => void;
+  removeLightNote: (id: string) => void;
   resetToDefaults: () => void;
 };
 
@@ -168,6 +172,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
           const normalized = {
             ...result.data,
             ghostPages: normalizeGhostPages(result.data.ghostPages),
+            lightNotes: normalizeLightNotes(result.data.lightNotes),
           };
           cloudSync.current.revision = result.revision;
           cloudSync.current.writeSeq = typeof result.writeSeq === "number" ? result.writeSeq : 0;
@@ -196,7 +201,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
         } catch { /* Snapshot remains available. */ }
       }
       if (cancelled) return;
-      setData({ ...initial, ghostPages: normalizeGhostPages(initial.ghostPages) });
+      setData({ ...initial, ghostPages: normalizeGhostPages(initial.ghostPages), lightNotes: normalizeLightNotes(initial.lightNotes) });
       setEditAllowed(local);
       setEditModeRaw(false);
       setIsHydrated(true);
@@ -988,6 +993,20 @@ function withSharedBookNotice(
     [persist]
   );
 
+  const removeLightNote = useCallback((id: string) => {
+    persist((prev) => ({
+      ...prev,
+      lightNotes: (prev.lightNotes ?? []).filter((note) => note.id !== id),
+    }), "Retiré de Lights");
+  }, [persist]);
+
+  const addLightNote = useCallback((note: LightNote) => {
+    persist((prev) => ({
+      ...prev,
+      lightNotes: [note, ...(prev.lightNotes ?? []).filter((item) => item.id !== note.id)],
+    }), "Publié dans Lights");
+  }, [persist]);
+
   const resetToDefaults = useCallback(() => {
     persist(structuredClone(DEFAULT_PORTFOLIO), "Données réinitialisées");
   }, [persist]);
@@ -1045,6 +1064,8 @@ function withSharedBookNotice(
       addGhostPage,
       updateGhostPage,
       removeGhostPage,
+      addLightNote,
+      removeLightNote,
       resetToDefaults,
     }),
     [
@@ -1098,6 +1119,8 @@ function withSharedBookNotice(
       addGhostPage,
       updateGhostPage,
       removeGhostPage,
+      addLightNote,
+      removeLightNote,
       resetToDefaults,
     ]
   );

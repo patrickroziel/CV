@@ -37,6 +37,7 @@ import type {
   Translatable,
 } from "./types";
 import { normalizeGhostPages } from "./ghost-pages";
+import { normalizeLightNotes } from "./lights";
 import {
   DATA_VERSION,
   DEFAULT_ALPHA_VIDEO_OPACITY,
@@ -1350,6 +1351,9 @@ export function loadPortfolio(): PortfolioData {
       ),
       socialPosts: normalizeSocialPosts(
         (parsed as { socialPosts?: unknown }).socialPosts
+      ),
+      lightNotes: normalizeLightNotes(
+        (parsed as { lightNotes?: unknown }).lightNotes
       ),
       ghostPages: normalizeGhostPages(
         (parsed as { ghostPages?: unknown }).ghostPages

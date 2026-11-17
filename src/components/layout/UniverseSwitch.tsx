@@ -20,7 +20,7 @@ export function UniverseSwitch({ className }: { className?: string }) {
       { href: "/notes", label: "Notes", key: "medias" as const, icon: WaterIcon, hint: "Écrits, images et musiques" },
       { href: "/air", label: "Air", key: "air" as const, icon: AirIcon, hint: "Décryptages, expériences et observations" },
       { href: "/work", label: "Work", key: "portfolio" as const, icon: WoodIcon, hint: "Portfolio, CV et compétences" },
-      { href: "/lights", label: "Lights", key: "lights" as const, icon: LightsIcon, hint: "Interventions vidéo" },
+      { href: "/lights", label: "Lights", key: "lights" as const, icon: LightsIcon, hint: "Fil de médias" },
     ]).map(({ href, label, key, icon: Icon, hint }) =>
       <Link key={key} href={href} title={hint} aria-current={active === key ? "page" : undefined}
         className={cn(

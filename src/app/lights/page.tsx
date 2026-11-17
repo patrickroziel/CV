@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { LightsFeed } from "@/components/lights/LightsFeed";
 import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
-const title = "Lights — Interventions vidéo | Patrick Roziel";
-const description = "Lights rassemble les interventions vidéo de Patrick Roziel, classées dans Notes, Air et Work.";
+const title = "Lights — Fil de médias | Patrick Roziel";
+const description = "Citations, images, vidéos et posts. Les médias des articles apparaissent ici, avec un lien vers le texte.";
 
 export const metadata: Metadata = {
   title,
