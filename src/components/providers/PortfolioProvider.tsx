@@ -127,6 +127,7 @@ type PortfolioContextValue = {
   updateGhostPage: (id: string, partial: Partial<GhostPage>, toastMsg?: string) => void;
   removeGhostPage: (id: string) => void;
   addLightNote: (note: LightNote) => void;
+  updateLightNote: (id: string, partial: Partial<LightNote>) => void;
   removeLightNote: (id: string) => void;
   resetToDefaults: () => void;
 };
@@ -1000,6 +1001,13 @@ function withSharedBookNotice(
     }), "Retiré de Lights");
   }, [persist]);
 
+  const updateLightNote = useCallback((id: string, partial: Partial<LightNote>) => {
+    persist((prev) => ({
+      ...prev,
+      lightNotes: (prev.lightNotes ?? []).map((note) => note.id === id ? { ...note, ...partial, id } : note),
+    }), "Format enregistré");
+  }, [persist]);
+
   const addLightNote = useCallback((note: LightNote) => {
     persist((prev) => ({
       ...prev,
@@ -1065,6 +1073,7 @@ function withSharedBookNotice(
       updateGhostPage,
       removeGhostPage,
       addLightNote,
+      updateLightNote,
       removeLightNote,
       resetToDefaults,
     }),
@@ -1120,6 +1129,7 @@ function withSharedBookNotice(
       updateGhostPage,
       removeGhostPage,
       addLightNote,
+      updateLightNote,
       removeLightNote,
       resetToDefaults,
     ]

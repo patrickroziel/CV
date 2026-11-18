@@ -1,4 +1,4 @@
-import type { FeatureVideo, LightNote, MainShowreel, Project, SocialPost, Translatable } from "@/lib/types";
+import type { FeatureVideo, LightNote, LightRatio, MainShowreel, Project, SocialPost, Translatable } from "@/lib/types";
 import { vimeoCanonical, vimeoEmbedUrl, vimeoThumb, vimeoVideo, youtubeEmbedUrl, youtubeThumb, youtubeVideoId } from "@/lib/utils";
 
 export type LightKind = LightNote["kind"];
@@ -15,9 +15,15 @@ export type LightCard = {
   href: string | null;
   source: string | null;
   ownId: string | null;
+  ratio: LightRatio;
 };
 
 const KINDS = new Set<LightKind>(["words", "quote", "image", "video", "x", "instagram"]);
+const RATIOS = new Set<LightRatio>(["original", "1:1", "4:5", "16:9"]);
+
+function ratioOf(value: unknown): LightRatio {
+  return RATIOS.has(value as LightRatio) ? value as LightRatio : "original";
+}
 
 export function normalizeLightNotes(raw: unknown): LightNote[] {
   if (!Array.isArray(raw)) return [];
@@ -33,7 +39,7 @@ export function normalizeLightNotes(raw: unknown): LightNote[] {
     if ((kind === "words" || kind === "quote") && !text) continue;
     if (kind !== "words" && kind !== "quote" && !url) continue;
     const date = typeof row.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(row.date) ? row.date : "";
-    notes.push({ id, kind, text, url, date, visible: row.visible !== false });
+    notes.push({ id, kind, text, url, date, visible: row.visible !== false, ratio: ratioOf(row.ratio) });
   }
   return notes;
 }
@@ -79,14 +85,14 @@ function socialUrl(url: string | null | undefined, host: "x" | "instagram") {
 function videoCard(partial: { id: string; text: string; date: string; href: string | null; source: string | null; watchUrl: string }): LightCard | null {
   const id = youtubeVideoId(partial.watchUrl);
   if (id) {
-    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: youtubeThumb(partial.watchUrl), embed: youtubeEmbedUrl(partial.watchUrl), file: false, ownId: null };
+    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: youtubeThumb(partial.watchUrl), embed: youtubeEmbedUrl(partial.watchUrl), file: false, ownId: null, ratio: "original" };
   }
   const vimeo = vimeoEmbedUrl(partial.watchUrl);
   if (vimeo) {
-    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: vimeoThumb(partial.watchUrl), embed: vimeo, file: false, ownId: null };
+    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: vimeoThumb(partial.watchUrl), embed: vimeo, file: false, ownId: null, ratio: "original" };
   }
   if (!fileVideo(partial.watchUrl)) return null;
-  return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: null, embed: null, file: true, ownId: null };
+  return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: null, embed: null, file: true, ownId: null, ratio: "original" };
 }
 
 function fromPost(post: SocialPost, titleOf: (value: Translatable | undefined, fallback: string) => string): LightCard[] {
@@ -119,17 +125,17 @@ function fromPost(post: SocialPost, titleOf: (value: Translatable | undefined, f
   const addImage = (url: string | null | undefined) => {
     const image = imageUrl(url);
     if (!image) return;
-    push({ id: `${post.id}-img-${image}`, kind: "image", text, date, mediaUrl: image, thumb: image, embed: null, file: false, href, source, ownId: null });
+    push({ id: `${post.id}-img-${image}`, kind: "image", text, date, mediaUrl: image, thumb: image, embed: null, file: false, href, source, ownId: null, ratio: "original" });
   };
   const addSocial = (url: string | null | undefined) => {
     const x = socialUrl(url, "x");
     if (x) {
-      push({ id: `${post.id}-x-${x}`, kind: "x", text, date, mediaUrl: x, thumb: null, embed: null, file: false, href, source, ownId: null });
+      push({ id: `${post.id}-x-${x}`, kind: "x", text, date, mediaUrl: x, thumb: null, embed: null, file: false, href, source, ownId: null, ratio: "original" });
       return;
     }
     const instagram = socialUrl(url, "instagram");
     if (instagram) {
-      push({ id: `${post.id}-ig-${instagram}`, kind: "instagram", text, date, mediaUrl: instagram, thumb: null, embed: instagramEmbed(instagram), file: false, href, source, ownId: null });
+      push({ id: `${post.id}-ig-${instagram}`, kind: "instagram", text, date, mediaUrl: instagram, thumb: null, embed: instagramEmbed(instagram), file: false, href, source, ownId: null, ratio: "original" });
     }
   };
 
@@ -186,11 +192,11 @@ function fromNote(note: LightNote): LightCard {
   const url = note.url;
   if (note.kind === "video" && url) {
     const card = videoCard({ id: note.id, text: note.text, date: note.date, href: null, source: null, watchUrl: url });
-    if (card) return { ...card, id: note.id, ownId: note.id };
-    return { id: note.id, kind: "video", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: null, file: true, href: null, source: null, ownId: note.id };
+    if (card) return { ...card, id: note.id, ownId: note.id, ratio: ratioOf(note.ratio) };
+    return { id: note.id, kind: "video", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: null, file: true, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio) };
   }
   if (note.kind === "instagram" && url) {
-    return { id: note.id, kind: "instagram", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: instagramEmbed(url), file: false, href: null, source: null, ownId: note.id };
+    return { id: note.id, kind: "instagram", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: instagramEmbed(url), file: false, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio) };
   }
   return {
     id: note.id,
@@ -204,6 +210,7 @@ function fromNote(note: LightNote): LightCard {
     href: null,
     source: null,
     ownId: note.id,
+    ratio: ratioOf(note.ratio),
   };
 }
 

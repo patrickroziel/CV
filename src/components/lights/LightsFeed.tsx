@@ -6,7 +6,7 @@ import { Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { LightsIcon } from "@/components/layout/universe-icons";
 import { collectLightCards, type LightCard } from "@/lib/lights";
-import type { LightKind } from "@/lib/types";
+import type { LightKind, LightRatio } from "@/lib/types";
 import { uploadToBlob, MEDIA_FOLDERS } from "@/lib/blob-upload";
 import { youtubeEmbedUrl } from "@/lib/utils";
 
@@ -19,6 +19,22 @@ const FILTERS: { id: "all" | LightKind; label: string }[] = [
   { id: "x", label: "X" },
   { id: "instagram", label: "Instagram" },
 ];
+
+const RATIOS: { id: LightRatio; label: string }[] = [
+  { id: "original", label: "Original" },
+  { id: "1:1", label: "Carré" },
+  { id: "4:5", label: "Portrait" },
+  { id: "16:9", label: "Paysage" },
+];
+
+function frameClass(kind: LightCard["kind"], ratio: LightRatio) {
+  if (ratio === "1:1") return "relative aspect-square";
+  if (ratio === "4:5") return "relative aspect-[4/5]";
+  if (ratio === "16:9") return "relative aspect-video";
+  if (kind === "image") return "";
+  if (kind === "instagram") return "relative aspect-[4/5]";
+  return "relative aspect-video";
+}
 
 const KINDS: { id: LightKind; label: string }[] = [
   { id: "words", label: "Quelques mots" },
@@ -61,7 +77,11 @@ function MediaFace({ item, open, onOpen }: { item: LightCard; open: boolean; onO
   if (item.kind === "image" && item.mediaUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={item.mediaUrl} alt="" className="block h-auto w-full" />
+      <img
+        src={item.mediaUrl}
+        alt=""
+        className={item.ratio === "original" ? "block h-auto w-full" : "absolute inset-0 h-full w-full object-contain"}
+      />
     );
   }
   if (item.kind === "video") {
@@ -88,6 +108,7 @@ function LightComposer() {
   const [kind, setKind] = useState<LightKind>("words");
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
+  const [ratio, setRatio] = useState<LightRatio>("original");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const needsUrl = kind === "image" || kind === "video" || kind === "x" || kind === "instagram";
@@ -122,6 +143,7 @@ function LightComposer() {
       kind,
       text: words,
       url: needsUrl ? link : null,
+      ratio: kind === "image" || kind === "video" ? ratio : "original",
       date: today(),
       visible: true,
     });
@@ -157,6 +179,15 @@ function LightComposer() {
         />
       )}
       {(kind === "image" || kind === "video") && (
+        <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Ratio">
+          {RATIOS.map((entry) => (
+            <button key={entry.id} type="button" onClick={() => setRatio(entry.id)} className={`rounded-full border px-3 py-1 text-xs font-semibold ${ratio === entry.id ? "border-white/50 bg-white text-zinc-950" : "border-white/15 text-zinc-200"}`}>
+              {entry.label}
+            </button>
+          ))}
+        </div>
+      )}
+      {(kind === "image" || kind === "video") && (
         <label className="mt-2 inline-flex cursor-pointer text-xs font-medium text-cyan-100">
           {busy ? "Envoi…" : "Envoyer un fichier"}
           <input type="file" accept={kind === "video" ? "video/*" : "image/*,video/*"} className="sr-only" disabled={busy} onChange={(event) => {
@@ -174,7 +205,7 @@ function LightComposer() {
 }
 
 export function LightsFeed() {
-  const { data, l, editMode, removeLightNote } = usePortfolio();
+  const { data, l, editMode, removeLightNote, updateLightNote } = usePortfolio();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const items = useMemo(
@@ -234,15 +265,9 @@ export function LightsFeed() {
             return (
               <li key={item.id} className="overflow-hidden rounded-2xl border border-white/12 bg-black/30">
                 {face && (
-                  item.kind === "image" ? (
-                    <div className="bg-black">
-                      <MediaFace item={item} open={openId === item.id} onOpen={() => setOpenId(item.id)} />
-                    </div>
-                  ) : (
-                    <div className={`relative bg-black ${item.kind === "instagram" ? "aspect-[4/5]" : "aspect-video"}`}>
-                      <MediaFace item={item} open={openId === item.id} onOpen={() => setOpenId(item.id)} />
-                    </div>
-                  )
+                  <div className={`bg-black ${frameClass(item.kind, item.ratio)}`}>
+                    <MediaFace item={item} open={openId === item.id} onOpen={() => setOpenId(item.id)} />
+                  </div>
                 )}
                 <div className="px-3.5 py-3">
                   <div className="mb-1 flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
@@ -264,6 +289,20 @@ export function LightsFeed() {
                         Voir sur X
                       </a>
                     ) : <span />}
+                    {editMode && item.ownId && (item.kind === "image" || item.kind === "video") && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {RATIOS.map((entry) => (
+                          <button
+                            key={entry.id}
+                            type="button"
+                            onClick={() => updateLightNote(item.ownId!, { ratio: entry.id })}
+                            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${item.ratio === entry.id ? "border-white/50 bg-white text-zinc-950" : "border-white/15 text-zinc-300"}`}
+                          >
+                            {entry.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     {editMode && item.ownId && (
                       <button type="button" onClick={() => removeLightNote(item.ownId!)} className="inline-flex items-center gap-1 text-[11px] text-red-200" title="Retirer">
                         <Trash2 className="h-3.5 w-3.5" /> Retirer

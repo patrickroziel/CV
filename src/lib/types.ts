@@ -821,6 +821,7 @@ export const DEFAULT_SOCIAL_POSTS: SocialPost[] = [];
 
 /** A short Lights post. It is not an article and does not belong to Notes, Air or Work. */
 export type LightKind = "words" | "quote" | "image" | "video" | "x" | "instagram";
+export type LightRatio = "original" | "1:1" | "4:5" | "16:9";
 
 export type LightNote = {
   id: string;
@@ -829,6 +830,8 @@ export type LightNote = {
   text: string;
   /** Image, video, X or Instagram address. Empty for words and quotes. */
   url: string | null;
+  /** How the media is framed. Missing means the original format. */
+  ratio?: LightRatio;
   /** ISO date YYYY-MM-DD */
   date: string;
   visible: boolean;
