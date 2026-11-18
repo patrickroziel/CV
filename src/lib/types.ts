@@ -834,6 +834,8 @@ export type LightNote = {
   ratio?: LightRatio;
   /** ISO date YYYY-MM-DD */
   date: string;
+  /** Exact publish time. Missing on older posts. */
+  postedAt?: string;
   visible: boolean;
 };
 

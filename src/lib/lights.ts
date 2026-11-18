@@ -16,6 +16,7 @@ export type LightCard = {
   source: string | null;
   ownId: string | null;
   ratio: LightRatio;
+  postedAt: string;
 };
 
 const KINDS = new Set<LightKind>(["words", "quote", "image", "video", "x", "instagram"]);
@@ -39,7 +40,8 @@ export function normalizeLightNotes(raw: unknown): LightNote[] {
     if ((kind === "words" || kind === "quote") && !text) continue;
     if (kind !== "words" && kind !== "quote" && !url) continue;
     const date = typeof row.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(row.date) ? row.date : "";
-    notes.push({ id, kind, text, url, date, visible: row.visible !== false, ratio: ratioOf(row.ratio) });
+    const postedAt = typeof row.postedAt === "string" && /^\d{4}-\d{2}-\d{2}T/.test(row.postedAt) ? row.postedAt : "";
+    notes.push({ id, kind, text, url, date, visible: row.visible !== false, ratio: ratioOf(row.ratio), ...(postedAt ? { postedAt } : {}) });
   }
   return notes;
 }
@@ -85,14 +87,14 @@ function socialUrl(url: string | null | undefined, host: "x" | "instagram") {
 function videoCard(partial: { id: string; text: string; date: string; href: string | null; source: string | null; watchUrl: string }): LightCard | null {
   const id = youtubeVideoId(partial.watchUrl);
   if (id) {
-    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: youtubeThumb(partial.watchUrl), embed: youtubeEmbedUrl(partial.watchUrl), file: false, ownId: null, ratio: "original" };
+    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: youtubeThumb(partial.watchUrl), embed: youtubeEmbedUrl(partial.watchUrl), file: false, ownId: null, ratio: "original", postedAt: "" };
   }
   const vimeo = vimeoEmbedUrl(partial.watchUrl);
   if (vimeo) {
-    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: vimeoThumb(partial.watchUrl), embed: vimeo, file: false, ownId: null, ratio: "original" };
+    return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: vimeoThumb(partial.watchUrl), embed: vimeo, file: false, ownId: null, ratio: "original", postedAt: "" };
   }
   if (!fileVideo(partial.watchUrl)) return null;
-  return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: null, embed: null, file: true, ownId: null, ratio: "original" };
+  return { ...partial, kind: "video", mediaUrl: partial.watchUrl, thumb: null, embed: null, file: true, ownId: null, ratio: "original", postedAt: "" };
 }
 
 function fromPost(post: SocialPost, titleOf: (value: Translatable | undefined, fallback: string) => string): LightCard[] {
@@ -125,17 +127,17 @@ function fromPost(post: SocialPost, titleOf: (value: Translatable | undefined, f
   const addImage = (url: string | null | undefined) => {
     const image = imageUrl(url);
     if (!image) return;
-    push({ id: `${post.id}-img-${image}`, kind: "image", text, date, mediaUrl: image, thumb: image, embed: null, file: false, href, source, ownId: null, ratio: "original" });
+    push({ id: `${post.id}-img-${image}`, kind: "image", text, date, mediaUrl: image, thumb: image, embed: null, file: false, href, source, ownId: null, ratio: "original", postedAt: "" });
   };
   const addSocial = (url: string | null | undefined) => {
     const x = socialUrl(url, "x");
     if (x) {
-      push({ id: `${post.id}-x-${x}`, kind: "x", text, date, mediaUrl: x, thumb: null, embed: null, file: false, href, source, ownId: null, ratio: "original" });
+      push({ id: `${post.id}-x-${x}`, kind: "x", text, date, mediaUrl: x, thumb: null, embed: null, file: false, href, source, ownId: null, ratio: "original", postedAt: "" });
       return;
     }
     const instagram = socialUrl(url, "instagram");
     if (instagram) {
-      push({ id: `${post.id}-ig-${instagram}`, kind: "instagram", text, date, mediaUrl: instagram, thumb: null, embed: instagramEmbed(instagram), file: false, href, source, ownId: null, ratio: "original" });
+      push({ id: `${post.id}-ig-${instagram}`, kind: "instagram", text, date, mediaUrl: instagram, thumb: null, embed: instagramEmbed(instagram), file: false, href, source, ownId: null, ratio: "original", postedAt: "" });
     }
   };
 
@@ -188,15 +190,16 @@ export function instagramEmbed(url: string) {
   return `https://www.instagram.com/${kind}/${match[1]}/embed`;
 }
 
-function fromNote(note: LightNote): LightCard {
+function fromNote(note: LightNote, order = 0): LightCard {
   const url = note.url;
+  const postedAt = note.postedAt || `${note.date || "1970-01-01"}T00:00:00.${String(order).padStart(6, "0")}Z`;
   if (note.kind === "video" && url) {
     const card = videoCard({ id: note.id, text: note.text, date: note.date, href: null, source: null, watchUrl: url });
-    if (card) return { ...card, id: note.id, ownId: note.id, ratio: ratioOf(note.ratio) };
-    return { id: note.id, kind: "video", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: null, file: true, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio) };
+    if (card) return { ...card, id: note.id, ownId: note.id, ratio: ratioOf(note.ratio), postedAt };
+    return { id: note.id, kind: "video", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: null, file: true, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio), postedAt };
   }
   if (note.kind === "instagram" && url) {
-    return { id: note.id, kind: "instagram", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: instagramEmbed(url), file: false, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio) };
+    return { id: note.id, kind: "instagram", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: instagramEmbed(url), file: false, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio), postedAt };
   }
   return {
     id: note.id,
@@ -211,6 +214,7 @@ function fromNote(note: LightNote): LightCard {
     source: null,
     ownId: note.id,
     ratio: ratioOf(note.ratio),
+    postedAt,
   };
 }
 
@@ -234,9 +238,11 @@ export function collectLightCards(input: {
     }
   };
 
-  for (const note of input.notes ?? []) {
+  const notes = input.notes ?? [];
+  for (let index = 0; index < notes.length; index += 1) {
+    const note = notes[index];
     if (!input.includeHidden && note.visible === false) continue;
-    push(fromNote(note));
+    push(fromNote(note, notes.length - index));
   }
   for (const post of input.posts) {
     if (!input.includeHidden && post.visible === false) continue;
@@ -246,5 +252,5 @@ export function collectLightCards(input: {
   push(input.showreel ? fromFeature(input.showreel, "work-showreel", input.titleOf) : null);
   for (const feature of input.features ?? []) push(fromFeature(feature, `work-feature-${feature.id}`, input.titleOf));
 
-  return list.sort((a, b) => (b.date || "").localeCompare(a.date || "") || (a.ownId ? -1 : 1));
+  return list.sort((a, b) => (b.postedAt || b.date || "").localeCompare(a.postedAt || a.date || ""));
 }

@@ -156,6 +156,7 @@ function LightComposer() {
       url: needsUrl ? link : null,
       ratio: kind === "image" || kind === "video" ? ratio : "original",
       date: today(),
+      postedAt: new Date().toISOString(),
       visible: true,
     });
     setText("");
