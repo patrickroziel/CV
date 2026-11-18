@@ -61,7 +61,7 @@ function MediaFace({ item, open, onOpen }: { item: LightCard; open: boolean; onO
   if (item.kind === "image" && item.mediaUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={item.mediaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <img src={item.mediaUrl} alt="" className="block h-auto w-full" />
     );
   }
   if (item.kind === "video") {
@@ -234,9 +234,15 @@ export function LightsFeed() {
             return (
               <li key={item.id} className="overflow-hidden rounded-2xl border border-white/12 bg-black/30">
                 {face && (
-                  <div className={`relative bg-black ${item.kind === "instagram" ? "aspect-[4/5]" : "aspect-video"}`}>
-                    <MediaFace item={item} open={openId === item.id} onOpen={() => setOpenId(item.id)} />
-                  </div>
+                  item.kind === "image" ? (
+                    <div className="bg-black">
+                      <MediaFace item={item} open={openId === item.id} onOpen={() => setOpenId(item.id)} />
+                    </div>
+                  ) : (
+                    <div className={`relative bg-black ${item.kind === "instagram" ? "aspect-[4/5]" : "aspect-video"}`}>
+                      <MediaFace item={item} open={openId === item.id} onOpen={() => setOpenId(item.id)} />
+                    </div>
+                  )
                 )}
                 <div className="px-3.5 py-3">
                   <div className="mb-1 flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
