@@ -130,7 +130,7 @@ function LightComposer() {
 
   function publish() {
     const words = text.replace(/\s+/g, " ").trim();
-    const link = url.trim();
+    let link = url.trim();
     if ((kind === "words" || kind === "quote") && !words) {
       setError("Écris quelques mots.");
       return;
