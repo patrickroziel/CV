@@ -41,3 +41,11 @@ export const SITE_LANGUAGE_STORAGE_KEY = "patrick-site-language";
 export function getSiteLanguage(code: string | null | undefined): SiteLanguage {
   return SITE_LANGUAGES.find((language) => language.code === code) ?? SITE_LANGUAGES[0];
 }
+
+/** Language carried by a shared link. French and unknown values stay unmarked. */
+export function shareLanguageFromParam(value: string | null | undefined) {
+  if (!value) return null;
+  const lang = value === "en" || value === "en-GB" ? "en-US" : value;
+  if (lang === "fr" || !SITE_LANGUAGE_CODES.has(lang)) return null;
+  return lang;
+}

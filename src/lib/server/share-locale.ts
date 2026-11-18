@@ -1,6 +1,6 @@
 import "server-only";
 
-import { SITE_LANGUAGE_CODES } from "@/lib/site-translation";
+import { shareLanguageFromParam } from "@/lib/site-translation";
 import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
 const OPEN_GRAPH_LOCALES: Record<string, string> = {
@@ -24,8 +24,7 @@ const OPEN_GRAPH_LOCALES: Record<string, string> = {
 
 export function requestedShareLanguage(value: string | string[] | undefined | null) {
   const lang = Array.isArray(value) ? value[0] : value;
-  if (!lang || lang === "fr" || !SITE_LANGUAGE_CODES.has(lang)) return null;
-  return lang;
+  return shareLanguageFromParam(lang);
 }
 
 export function openGraphLocale(lang: string | null) {

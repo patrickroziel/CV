@@ -18,6 +18,15 @@ import {
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { cn } from "@/lib/utils";
 
+function rememberLanguageInLink(code: string) {
+  const url = new URL(window.location.href);
+  if (!code || code === DEFAULT_SITE_LANGUAGE) url.searchParams.delete("lang");
+  else url.searchParams.set("lang", code);
+  const next = `${url.pathname}${url.search}${url.hash}`;
+  const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (next !== current) window.history.replaceState(window.history.state, "", next);
+}
+
 const TRANSLATABLE_ATTRIBUTES = ["placeholder", "title", "aria-label", "alt"] as const;
 const CACHE_KEY = "patrick-google-translation-cache-v1";
 const ENGLISH_TARGETS = new Set(["en", "en-GB", "en-US"]);
@@ -370,6 +379,7 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
     languageRef.current = initial;
     setLanguageCode(initial);
     syncContentLocale(initial);
+    rememberLanguageInLink(initial);
     window.setTimeout(() => void translateCurrentPage(initial), 180);
     return () => abortRef.current?.abort();
   }, [translateCurrentPage, syncContentLocale]);
@@ -420,6 +430,7 @@ export function SiteTranslator({ className, tone = "site" }: { className?: strin
     languageRef.current = next;
     setLanguageCode(next);
     localStorage.setItem(SITE_LANGUAGE_STORAGE_KEY, next);
+    rememberLanguageInLink(next);
     syncContentLocale(next);
     window.setTimeout(() => void translateCurrentPage(next), 180);
   };

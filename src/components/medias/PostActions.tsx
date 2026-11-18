@@ -47,12 +47,16 @@ const SHARE_TARGETS: { id: ShareTarget; label: string }[] = [
 ];
 
 function selectedLanguage() {
-  const lang = localStorage.getItem(SITE_LANGUAGE_STORAGE_KEY);
+  const raw = localStorage.getItem(SITE_LANGUAGE_STORAGE_KEY);
+  const lang = raw === "en" || raw === "en-GB" ? "en-US" : raw;
   return lang && lang !== "fr" && SITE_LANGUAGE_CODES.has(lang) ? lang : null;
 }
 
 function articleShareUrl(sharePath: string, postId: string) {
-  return new URL(`${sharePath}/${encodeURIComponent(postId)}`, "https://patrickroziel.com").toString();
+  const url = new URL(`${sharePath}/${encodeURIComponent(postId)}`, "https://patrickroziel.com");
+  const lang = selectedLanguage();
+  if (lang) url.searchParams.set("lang", lang);
+  return url.toString();
 }
 
 function coverShareUrl(postId: string, format?: "story") {

@@ -170,7 +170,7 @@ export async function GET(
   const title = translated.title;
   const subtitle = french.subtitle ? translated.description.trim() : "";
   const series = post.universe === "air" && post.episode?.trim()
-    ? [subtitle, `Épisode ${post.episode.trim().replace(/^épisode\s+/i, "")}`].filter(Boolean).join(" · ")
+    ? [subtitle, `${lang ? (await translateShareText("Épisode", " ", lang)).title : "Épisode"} ${post.episode.trim().replace(/^épisode\s+/i, "")}`].filter(Boolean).join(" · ")
     : subtitle;
   const leadRaw = post.universe === "air"
     ? stripHtml(getL(post.articleSubtitle, "fr")).replace(/\s+/g, " ").trim().slice(0, 180)
