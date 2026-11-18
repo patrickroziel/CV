@@ -5,10 +5,11 @@ import { useMemo, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { LightsIcon } from "@/components/layout/universe-icons";
+import { XEmbed } from "@/components/projects/XEmbed";
 import { collectLightCards, type LightCard } from "@/lib/lights";
 import type { LightKind, LightRatio } from "@/lib/types";
 import { uploadToBlob, MEDIA_FOLDERS } from "@/lib/blob-upload";
-import { youtubeEmbedUrl } from "@/lib/utils";
+import { xPostUrl, youtubeEmbedUrl } from "@/lib/utils";
 
 const FILTERS: { id: "all" | LightKind; label: string }[] = [
   { id: "all", label: "Tout" },
@@ -134,9 +135,19 @@ function LightComposer() {
       setError("Écris quelques mots.");
       return;
     }
-    if (needsUrl && !link.startsWith("https://")) {
+    if (needsUrl && kind !== "x" && !link.startsWith("https://")) {
       setError("Il faut une adresse https.");
       return;
+    }
+    if (kind === "x") {
+      const raw = link.startsWith("http://") ? `https://${link.slice(7)}` : link;
+      const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw.replace(/^\/\//, "")}`;
+      const canonical = xPostUrl(withProtocol);
+      if (!canonical) {
+        setError("Colle le lien d’un post X, avec /status/ dans l’adresse.");
+        return;
+      }
+      link = canonical;
     }
     addLightNote({
       id: crypto.randomUUID(),
@@ -264,7 +275,9 @@ export function LightsFeed() {
             const face = item.kind === "image" || item.kind === "video" || item.kind === "instagram";
             return (
               <li key={item.id} className="overflow-hidden rounded-2xl border border-white/12 bg-black/30">
-                {face && (
+                {item.kind === "x" && item.mediaUrl ? (
+                  <XEmbed url={item.mediaUrl} className="rounded-none border-0" />
+                ) : face && (
                   <div className={`bg-black ${frameClass(item.kind, item.ratio)}`}>
                     <MediaFace item={item} open={openId === item.id} onOpen={() => setOpenId(item.id)} />
                   </div>
@@ -284,10 +297,6 @@ export function LightsFeed() {
                       <Link href={item.href} className="text-[11px] font-medium text-zinc-300 underline-offset-2 hover:text-white hover:underline">
                         Ouvrir l’article
                       </Link>
-                    ) : item.kind === "x" && item.mediaUrl ? (
-                      <a href={item.mediaUrl} target="_blank" rel="noreferrer" className="text-[11px] font-medium text-zinc-300 underline-offset-2 hover:text-white hover:underline">
-                        Voir sur X
-                      </a>
                     ) : <span />}
                     {editMode && item.ownId && (item.kind === "image" || item.kind === "video") && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
