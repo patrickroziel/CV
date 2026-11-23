@@ -14,13 +14,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const post = await getPublicNote(id);
-  if (!post || post.universe !== "air") return { title: "Article indisponible — Air", robots: { index: false, follow: false } };
+  if (!post || post.universe !== "air") return { title: "Article indisponible — Scope", robots: { index: false, follow: false } };
   const french = getNoteShareText(post);
   const url = `${NOTES_ORIGIN}/air/${encodeURIComponent(id)}`;
   const image = shareImageUrl(id, null);
   const imageType = getNoteSharePhoto(post) ? "image/jpeg" : "image/png";
   return {
-    title: `${titleForSearch(french.title)} — Air · Patrick Roziel`,
+    title: `${titleForSearch(french.title)} — Scope · Patrick Roziel`,
     description: french.description,
     alternates: { canonical: url },
     robots: { index: true, follow: true },
@@ -30,7 +30,7 @@ export async function generateMetadata({
       title: french.title,
       description: french.description,
       locale: "fr_FR",
-      siteName: "Patrick Roziel — Air",
+      siteName: "Patrick Roziel — Scope",
       images: [{
         url: image,
         secureUrl: image,
@@ -52,7 +52,7 @@ export default async function AirArticlePage({ params }: { params: Promise<{ id:
   const air = posts.filter((item) => item.universe === "air");
   return (
     <main className="relative z-10 min-h-screen pb-24 pt-24 sm:pt-28">
-      {article ? <ArticleJsonLd post={article} path={`/air/${id}`} section="Air" /> : null}
+      {article ? <ArticleJsonLd post={article} path={`/air/${id}`} section="Scope" /> : null}
       <AirArticle id={id} initialPost={article} seedPosts={air} />
     </main>
   );

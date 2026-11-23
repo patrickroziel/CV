@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   const page = `${NOTES_ORIGIN}/${kind}/${encodeURIComponent(id)}?lang=${encodeURIComponent(lang || "")}`;
   const image = shareImageUrl(id, lang, getNoteSharePhoto(post));
   const locale = openGraphLocale(lang);
-  const site = kind === "air" ? "Patrick Roziel — Air" : "Patrick Roziel — Notes";
+  const site = kind === "air" ? "Patrick Roziel — Scope" : "Patrick Roziel — Notes";
   const html = `<!doctype html>
 <html lang="${escapeAttr(lang || "fr")}">
 <head>

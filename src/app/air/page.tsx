@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AirFeed } from "@/components/air/AirFeed";
 import { listPublicPosts, NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
-const title = "Air — Décryptages & observations | Patrick Roziel";
+const title = "Scope — Récits, analyses et décryptages | Patrick Roziel";
 const description =
   "Air, le journal de Patrick Roziel : décryptages, expériences professionnelles et observations sur la communication, les institutions et le monde du travail en France.";
 
@@ -10,7 +10,7 @@ const ogImage = {
   url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: "Patrick Roziel — Air",
+  alt: "Patrick Roziel — Scope",
 };
 
 export const metadata: Metadata = {

@@ -14,7 +14,7 @@ export function Footer() {
     data.profile.name.replace(/<[^>]+>/g, "").trim() || data.profile.name;
 
   const links = [
-    { href: "/air", label: "Air" },
+    { href: "/air", label: "Scope" },
     { href: "/notes", label: "Notes" },
     { href: "/work", label: "Work" },
     { href: "/lights", label: "Lights" },
@@ -46,7 +46,7 @@ export function Footer() {
           <ContactButton />
           <p className="text-xs text-zinc-500">
             © {year} {name}
-            {universe === "medias" ? " · Notes" : universe === "air" ? " · Air" : universe === "lights" ? " · Lights" : " · Work"}
+            {universe === "medias" ? " · Notes" : universe === "air" ? " · Scope" : universe === "lights" ? " · Lights" : " · Work"}
           </p>
         </div>
 

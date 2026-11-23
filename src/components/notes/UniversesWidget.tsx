@@ -60,7 +60,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   const slides =
     current === "air"
       ? [
-          { label: "Vous êtes dans Air", content: "Décryptages, expériences et observations.", href: "/air" },
+          { label: "Vous êtes dans Scope", content: "L'air — Récits, analyses et décryptages.", href: "/air" },
           { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
           { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
         ]
@@ -68,11 +68,11 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
         ? [
             { label: "Vous êtes dans Work", content: "Parcours, showreel et compétences.", href: "/work" },
             { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-            { label: "Air", content: "Décryptages, expériences et observations.", href: "/air" },
+            { label: "Scope", content: "L'air — Récits, analyses et décryptages.", href: "/air" },
           ]
         : [
             { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-            { label: "Air", content: "Décryptages, expériences et observations.", href: "/air" },
+            { label: "Scope", content: "L'air — Récits, analyses et décryptages.", href: "/air" },
             { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
           ];
 
@@ -103,7 +103,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   const articleHref = featured
     ? `/${isAirArticle ? "air" : "notes"}/${featured.id}`
     : null;
-  const articleLabel = isAirArticle ? "À lire dans Air" : "À lire dans Notes";
+  const articleLabel = isAirArticle ? "À lire dans Scope" : "À lire dans Notes";
 
   return (
     <section aria-label="Découvrir les trois univers" className="mt-5 min-w-0">
@@ -191,7 +191,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
           )}
           {current !== "air" && (
             <Link href="/air" className="inline-flex items-center gap-1 rounded-full border border-sky-100/20 bg-sky-100/[.07] px-2.5 py-1.5 text-[10px] text-sky-100 transition-colors hover:bg-sky-100/15">
-              <AirIcon className="h-3 w-3" /> Air
+              <AirIcon className="h-3 w-3" /> Scope
             </Link>
           )}
           {current !== "work" && (

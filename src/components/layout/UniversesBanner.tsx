@@ -20,7 +20,7 @@ const items = [
   },
   {
     href: "/air",
-    label: "Air",
+    label: "Scope",
     hint: "décryptages",
     icon: AirIcon,
     accent: "text-teal-200/90",

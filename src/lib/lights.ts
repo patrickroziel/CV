@@ -98,8 +98,8 @@ function videoCard(partial: { id: string; text: string; date: string; href: stri
 }
 
 function fromPost(post: SocialPost, titleOf: (value: Translatable | undefined, fallback: string) => string): LightCard[] {
-  const source = post.universe === "air" ? "Air" : "Notes";
-  const href = source === "Air" ? `/air/${post.id}` : `/notes/${post.id}`;
+  const source = post.universe === "air" ? "Scope" : "Notes";
+  const href = source === "Scope" ? `/air/${post.id}` : `/notes/${post.id}`;
   const text = titleOf(post.title, "Sans titre");
   const date = post.date || "";
   const out: LightCard[] = [];

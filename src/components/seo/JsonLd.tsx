@@ -69,7 +69,7 @@ export function ArticleJsonLd({
 }: {
   post: SocialPost;
   path: string;
-  section: "Notes" | "Air";
+  section: "Notes" | "Scope";
 }) {
   const { title, description } = getNoteShareText(post);
   const image = getNoteSharePhoto(post);
