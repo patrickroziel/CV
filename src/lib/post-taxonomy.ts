@@ -1,4 +1,4 @@
-export const NOTES_CATEGORIES = ["Livre", "Musique", "Essais"] as const;
+export const NOTES_CATEGORIES = ["Livre", "Musique", "Essais", "Réflexion humaine"] as const;
 export const AIR_CATEGORIES = ["Parcours", "Travail", "Droits"] as const;
 
 export type NotesCategory = (typeof NOTES_CATEGORIES)[number];
