@@ -2,7 +2,7 @@
 
 import { useMemo, useState, Fragment } from "react";
 import Link from "next/link";
-import { BookOpen, Music, PenLine, Plus, UserRound } from "lucide-react";
+import { BookOpen, Eye, Library, Music, PenLine, Plus, Sparkles, UserRound } from "lucide-react";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
@@ -31,6 +31,9 @@ const FILTERS: Array<{ id: NotesCategory; icon: typeof BookOpen }> = [
   { id: "Musique", icon: Music },
   { id: "Essais", icon: PenLine },
   { id: "Réflexion humaine", icon: UserRound },
+  { id: "Spiritualité", icon: Sparkles },
+  { id: "Symbolisme", icon: Eye },
+  { id: "Fictions", icon: Library },
 ];
 
 function categoryOf(post: SocialPost): NotesCategory {
@@ -111,7 +114,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           <p className="text-xs text-white/75">Patrick Roziel</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Notes</h1>
           <p className="mt-2 text-[13px] leading-5 text-white/80">
-            Livre, musique, essais et réflexion humaine.
+            Livre, musique, essais, réflexion humaine, spiritualité, symbolisme et fictions.
           </p>
 
           <nav aria-label="Catégories" className="mt-7 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
