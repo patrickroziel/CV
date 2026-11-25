@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState, Fragment } from "react";
-import { ArrowUpRight, Cloud, FilePlus2, Pencil, Trash2 } from "lucide-react";
+import { ArrowUpRight, Cloud, FilePlus2, Pencil, Pin, Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostForm, type SocialPostFormValues } from "@/components/medias/SocialPostForm";
 import { PostActions } from "@/components/medias/PostActions";
@@ -101,19 +101,25 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     const key = activeTag.toLocaleLowerCase("fr");
     return scopedPosts.filter((post) => (post.tags ?? []).some((tag) => tag.trim().toLocaleLowerCase("fr") === key));
   }, [scopedPosts, activeTag]);
-  const tags = useMemo(() => collectPostTags(visiblePosts), [visiblePosts]);
+  const tags = useMemo(() => collectPostTags(posts), [posts]);
+  const pinnedPosts = useMemo(() => {
+    return [...visiblePosts]
+      .filter((post) => post.pinned)
+      .sort((a, b) => (b.pinnedAt || "").localeCompare(a.pinnedAt || ""))
+      .slice(0, 6);
+  }, [visiblePosts]);
   const scopeCount = scope === "Tout" ? posts.length : posts.filter((post) => seriesName(post).toLocaleLowerCase("fr") === scope.toLocaleLowerCase("fr")).length;
   const publish = (values: SocialPostFormValues) => {
     if (editing) updateSocialPost(editing.id,{...values,universe:"air"});
     else addSocialPost({...values,universe:"air",order:0});
     setCreateOpen(false); setEditing(null);
   };
-  return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
-    <aside><div className="universe-rail">
+  return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-5 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+    <aside className="min-w-0"><div className="universe-rail">
       <p className="text-xs text-white/75">Patrick Roziel</p>
-      <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Scope</h1>
-      <p className="mt-2 text-[13px] leading-5 text-white/80">L'air — Récits, analyses et décryptages.</p>
-      <nav className="mt-7 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0" aria-label="Séries Scope">
+      <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">Scope</h1>
+      <p className="mt-1 text-[13px] leading-5 text-white/80 md:mt-2">L'air — Récits, analyses et décryptages.</p>
+      <nav className="mt-3 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0" aria-label="Séries Scope">
         {series.map((name) => {
           const key = name.toLocaleLowerCase("fr");
           const active = scope.toLocaleLowerCase("fr") === key;
@@ -160,9 +166,28 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     </div>
     </aside>
     <section aria-label="Articles AIR" className="min-w-0">
-    <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-4 pb-2">
+    {pinnedPosts.length > 0 ? (
+      <div className="mb-4">
+        <p className="mb-2 text-[10px] uppercase tracking-[0.24em] text-white/50">Articles épinglés</p>
+        <div className="grid grid-cols-2 gap-2">
+          {pinnedPosts.map((post) => {
+            const title = l(post.title).trim() || "Sans titre";
+            const photo = post.coverSource === "wip" ? null : getNoteSharePhoto(post);
+            return (
+              <Link key={post.id} href={`/air/${post.id}`} className="flex min-w-0 flex-col gap-2 rounded-2xl border border-white/15 bg-white/[0.06] p-2">
+                <span className="relative h-16 overflow-hidden rounded-xl bg-black/30">
+                  {photo && !isHeldMediaUrl(photo) ? <img src={displayImageUrl(photo, 320)} alt="" className="h-full w-full object-cover" /> : null}
+                </span>
+                <span className="line-clamp-2 text-xs font-semibold leading-4 text-white">{title}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    ) : null}
+    <div className="mb-4 flex min-w-0 flex-wrap items-end justify-between gap-3 pb-1 md:mb-8 md:gap-4 md:pb-2">
       <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-white/55">Journal / Air</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-3xl">{activeTag ? `#${activeTag}` : scope === "Tout" ? "Articles & décryptages" : scope}{!activeTag && scope !== "Tout" ? <span className="ml-3 align-middle text-base font-medium text-white/60">{scopeCount} article{scopeCount > 1 ? "s" : ""}</span> : null}</h2></div>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight text-white drop-shadow-sm md:mt-2 md:text-3xl">{activeTag ? `#${activeTag}` : scope === "Tout" ? "Articles & décryptages" : scope}{!activeTag && scope !== "Tout" ? <span className="ml-3 align-middle text-base font-medium text-white/60">{scopeCount} article{scopeCount > 1 ? "s" : ""}</span> : null}</h2></div>
       {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-md"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
     </div>
     {visiblePosts.length ? <div className="space-y-6">
@@ -204,6 +229,18 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             <PostActions postId={post.id} title={title} visible={post.visible !== false} sharePath="/air" commentLink={`/air/${post.id}#commenter`} />
           </div>
           {editMode && <div className="flex gap-2 border-t border-white/10 px-5 py-3">
+            <button className="inline-flex items-center gap-1 text-xs text-white/70" onClick={() => {
+              if (post.pinned) {
+                updateSocialPost(post.id, { pinned: false, pinnedAt: null });
+                return;
+              }
+              const pinnedCount = (data.socialPosts ?? []).filter((item) => item.universe === "air" && item.pinned && item.id !== post.id).length;
+              if (pinnedCount >= 6) {
+                window.alert("Six articles Scope sont déjà épinglés.");
+                return;
+              }
+              updateSocialPost(post.id, { pinned: true, pinnedAt: new Date().toISOString() });
+            }}><Pin className={`h-3.5 w-3.5 ${post.pinned ? "text-sky-200" : ""}`} /> {post.pinned ? "Retirer l’épingle" : "Épingler"}</button>
             <button className="inline-flex items-center gap-1 text-xs text-white/70" onClick={()=>setEditing(post)}><Pencil className="h-3.5 w-3.5"/> Modifier</button>
             <button className="inline-flex items-center gap-1 text-xs text-red-300" onClick={()=>{if(window.confirm("Supprimer cet article AIR ?"))removeSocialPost(post.id)}}><Trash2 className="h-3.5 w-3.5"/> Supprimer</button>
           </div>}

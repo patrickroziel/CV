@@ -20,8 +20,7 @@ export function AirTagTicker({
 
   return (
     <div
-      className="air-tag-ticker fixed inset-x-0 z-40 border-y border-white/10 bg-[#071018]/80 text-white backdrop-blur-xl"
-      style={{ bottom: "calc(0.4rem + env(safe-area-inset-bottom, 0px))" }}
+      className="air-tag-ticker fixed inset-x-0 z-50 border-y border-white/15 bg-[#071018]/95 text-white backdrop-blur-xl"
     >
       <div className="flex h-11 items-center">
         <span className="shrink-0 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/55">

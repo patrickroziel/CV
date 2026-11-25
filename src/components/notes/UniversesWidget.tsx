@@ -106,7 +106,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   const articleLabel = isAirArticle ? "À lire dans Scope" : "À lire dans Notes";
 
   return (
-    <section aria-label="Découvrir les trois univers" className="mt-5 min-w-0">
+    <section aria-label="Découvrir les trois univers" className="mt-3 min-w-0 md:mt-5">
       <div className="relative overflow-hidden rounded-2xl border border-cyan-100/15 bg-[#031c25]/65 p-3.5 shadow-[0_16px_40px_-24px_rgba(0,0,0,.8)] backdrop-blur-xl">
         <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-cyan-200/10 blur-2xl" />
         <div className="relative flex items-center justify-between gap-2">
@@ -126,7 +126,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
             ))}
           </div>
         </div>
-        <div className="relative mt-3 min-h-[72px]">
+        <div className="relative mt-2 hidden min-h-[72px] md:mt-3 md:block">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={slideIndex}
@@ -148,7 +148,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
         </div>
 
         {featured && articleHref && (
-          <div className="relative mt-2 border-t border-white/10 pt-3">
+          <div className="relative mt-2 hidden border-t border-white/10 pt-3 md:block">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={featured.id}

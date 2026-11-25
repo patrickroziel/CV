@@ -79,9 +79,9 @@ export function WorkSidebar() {
   return (
     <div>
       <p className="text-xs text-white/75">Patrick Roziel</p>
-      <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Work</h1>
+      <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">Work</h1>
       {bio ? (
-        <p className="mt-2 max-w-full text-[13px] leading-5 text-white/80">{bio}</p>
+        <p className="mt-2 line-clamp-2 max-w-full text-[13px] leading-5 text-white/80 md:line-clamp-none">{bio}</p>
       ) : null}
       <div className="mt-3">
         <WorkShare pill />

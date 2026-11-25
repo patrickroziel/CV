@@ -108,16 +108,16 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   };
 
   return (
-    <div className="mx-auto grid min-w-0 max-w-[1180px] gap-7 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
-      <aside>
+    <div className="mx-auto grid min-w-0 max-w-[1180px] gap-4 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+      <aside className="min-w-0">
         <div className="universe-rail">
           <p className="text-xs text-white/75">Patrick Roziel</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">Notes</h1>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">Notes</h1>
           <p className="mt-2 text-[13px] leading-5 text-white/80">
             Livre, musique, essais, réflexion humaine, spiritualité, symbolisme et fictions.
           </p>
 
-          <nav aria-label="Catégories" className="mt-7 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
+          <nav aria-label="Catégories" className="mt-3 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
             {FILTERS.map((item) => {
               const active = item.id === scope;
               const Icon = item.icon;

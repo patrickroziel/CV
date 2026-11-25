@@ -687,31 +687,7 @@ export function SocialPostForm({
         placeholder={isBook ? "Ex. Chapitre 1 — Le départ" : "Titre du post"}
       />
       )}
-      {universe !== "air" && (
-        <button
-          type="button"
-          onClick={() => {
-            if (!pinned) {
-              const count = (portfolioData.socialPosts ?? []).filter((post) => post.universe !== "air" && post.pinned && post.id !== initial?.id).length;
-              if (count >= 6) {
-                setError("Six posts sont déjà épinglés.");
-                return;
-              }
-            }
-            setError(null);
-            setPinned((value) => !value);
-          }}
-          className={cn(
-            "w-fit rounded-xl border px-3 py-2.5 text-left text-sm transition",
-            pinned
-              ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50"
-              : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
-          )}
-        >
-          <span className="block font-medium">{pinned ? "Épinglé sur l’accueil" : "Épingler sur l’accueil"}</span>
-          <span className="mt-0.5 block text-xs font-normal text-zinc-400">Jusqu’à 6 posts, avec leur visuel et leur titre.</span>
-        </button>
-      )}
+
       {universe === "air" && (
       <>
       <LocalizedField
@@ -737,6 +713,29 @@ export function SocialPostForm({
         placeholder={isBook ? "Une phrase courte pour introduire le chapitre" : "Une phrase courte sous le titre"}
       />
       )}
+      <button
+        type="button"
+        onClick={() => {
+          if (!pinned) {
+            const count = (portfolioData.socialPosts ?? []).filter((post) => (universe === "air" ? post.universe === "air" : post.universe !== "air") && post.pinned && post.id !== initial?.id).length;
+            if (count >= 6) {
+              setError(universe === "air" ? "Six articles Scope sont déjà épinglés." : "Six posts sont déjà épinglés.");
+              return;
+            }
+          }
+          setError(null);
+          setPinned((value) => !value);
+        }}
+        className={cn(
+          "w-fit rounded-xl border px-3 py-2.5 text-left text-sm transition",
+          pinned
+            ? "border-cyan-200/50 bg-cyan-200/10 text-cyan-50"
+            : "border-white/10 bg-black/20 text-zinc-300 hover:border-white/25"
+        )}
+      >
+        <span className="block font-medium">{pinned ? (universe === "air" ? "Épinglé dans Scope" : "Épinglé sur l’accueil") : (universe === "air" ? "Épingler dans Scope" : "Épingler sur l’accueil")}</span>
+        <span className="mt-0.5 block text-xs font-normal text-zinc-400">Jusqu’à 6, avec leur visuel et leur titre.</span>
+      </button>
       {universe === "air" && (
         <div className="grid max-w-[12rem] gap-2">
           <Label htmlFor="air-episode">Numéro d’épisode</Label>

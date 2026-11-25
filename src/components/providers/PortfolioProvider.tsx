@@ -882,7 +882,7 @@ function withSharedBookNotice(
         const isAir = (partial.universe ?? current?.universe ?? "notes") === "air";
         let nextPartial = partial;
         if (nextPartial.pinned === true && current?.pinned !== true) {
-          const pinnedCount = posts.filter((post) => post.universe !== "air" && post.pinned && post.id !== id).length;
+          const pinnedCount = posts.filter((post) => (isAir ? post.universe === "air" : post.universe !== "air") && post.pinned && post.id !== id).length;
           if (pinnedCount >= 6) nextPartial = { ...nextPartial, pinned: false, pinnedAt: null };
           else if (!nextPartial.pinnedAt) nextPartial = { ...nextPartial, pinnedAt: new Date().toISOString() };
         }
