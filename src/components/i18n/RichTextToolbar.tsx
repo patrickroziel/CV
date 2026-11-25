@@ -9,12 +9,13 @@ type RichTextToolbarProps = {
   onCommand: (command: string, arg?: string) => void | boolean;
   className?: string;
   compact?: boolean;
+  allowPart?: boolean;
   lineHeight?: number;
   onLineHeightChange?: (value: number) => void;
 };
 
 /** Gras, italique, souligné, lien, GIF, taille, liste et remise à zéro. */
-export function RichTextToolbar({ onCommand, className, compact = false }: RichTextToolbarProps) {
+export function RichTextToolbar({ onCommand, className, compact = false, allowPart = true }: RichTextToolbarProps) {
   const btn = "inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-200 transition hover:bg-white/10 hover:text-white";
   const [fontSizeDraft, setFontSizeDraft] = useState("12");
   const [linkOpen, setLinkOpen] = useState(false);
@@ -111,7 +112,7 @@ export function RichTextToolbar({ onCommand, className, compact = false }: RichT
       {!compact && <button type="button" title="GIF" aria-expanded={gifOpen} className={cn(btn, gifOpen && "bg-white/15 text-white")} onMouseDown={(e) => e.preventDefault()} onClick={() => { setGifOpen((open) => !open); setGifError(""); setLinkOpen(false); }}><ImageIcon className="h-3.5 w-3.5" /></button>}
       {!compact && <button type="button" title="Citation — barre verticale" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("formatBlock", "blockquote")}><Quote className="h-3.5 w-3.5" /></button>}
       {!compact && <button type="button" title="Liste à puces" className={btn} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("insertUnorderedList")}><List className="h-3.5 w-3.5" /></button>}
-      {!compact && <button type="button" title="Partie — un titre, puis le texte" className={cn(btn, "w-auto gap-1 px-2 text-[11px] font-medium")} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("insertPartTitle")}><Heading className="h-3.5 w-3.5" />Partie</button>}
+      {!compact && allowPart && <button type="button" title="Partie — un titre, puis le texte" className={cn(btn, "w-auto gap-1 px-2 text-[11px] font-medium")} onMouseDown={(e) => e.preventDefault()} onClick={() => onCommand("insertPartTitle")}><Heading className="h-3.5 w-3.5" />Partie</button>}
 
       <span className="mx-0.5 h-5 w-px bg-white/10" aria-hidden />
       <div className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 p-0.5" title="Taille du texte sélectionné">

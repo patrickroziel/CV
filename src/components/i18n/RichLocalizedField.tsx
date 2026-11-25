@@ -20,6 +20,7 @@ type RichLocalizedFieldProps = {
   id?: string;
   className?: string;
   compact?: boolean;
+  allowPart?: boolean;
   hint?: string;
   insertBlockToken?: { nonce: string; token: string };
 };
@@ -33,6 +34,7 @@ export function RichLocalizedField({
   id,
   className,
   compact = false,
+  allowPart = true,
   hint,
   insertBlockToken,
 }: RichLocalizedFieldProps) {
@@ -122,7 +124,7 @@ export function RichLocalizedField({
     <div ref={rootRef} className={cn("grid gap-2", className)}>
       <Label htmlFor={fieldId}>{label}</Label>
       <div onMouseDownCapture={rememberSelection} onPointerDownCapture={rememberSelection}>
-        <RichTextToolbar onCommand={run} compact={compact} />
+        <RichTextToolbar onCommand={run} compact={compact} allowPart={allowPart} />
       <div
         id={fieldId}
         ref={editorRef}

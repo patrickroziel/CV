@@ -8,7 +8,7 @@ import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { NotesBottomNav } from "@/components/notes/PostPager";
-import { NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
+import { ArticlePartNav, NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
 import { compareBookChapters } from "@/lib/book-order";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
@@ -116,6 +116,7 @@ export function BookReader({ id, initialPost = null, seedPosts = [] }: { id: str
           <div className="my-7 h-px bg-white/[0.07] sm:my-9" />
 
           <div id={`note-body-${post.id}`}>
+          {!teaser ? <ArticlePartNav targetId={`note-body-${post.id}`} tone="notes" allParts /> : null}
           {teaser ? (
             <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p>
           ) : (

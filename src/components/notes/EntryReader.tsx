@@ -8,7 +8,7 @@ import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
 import { PostCover } from "@/components/media/PostCover";
 import { PostActions } from "@/components/medias/PostActions";
 import { NotesBottomNav } from "@/components/notes/PostPager";
-import { NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
+import { ArticlePartNav, NotesFloatingStack, stampNotePartAnchors } from "@/components/medias/ArticlePartNav";
 import { shareExcerpt } from "@/lib/post-excerpt";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { isTeaserPost, TEASER_LABEL, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
@@ -49,9 +49,10 @@ export function EntryReader({ id, initialPost = null, seedPosts = [] }: { id: st
         <p className="text-[11px] tracking-[0.04em] text-cyan-100/55">{category} · {formatDate(post.date)}{teaser ? ` · ${TEASER_LABEL}` : ""}</p>
         <h1 id={`note-title-${post.id}`} className="mt-4 break-words text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">{title}</h1>
         {post.subtitle && <p className="mt-3 max-w-2xl break-words text-sm leading-7 text-white/70 sm:text-base">{l(post.subtitle)}</p>}
-        {!teaser && <NotesFloatingStack postId={post.id} title={title} subtitle={post.subtitle ? l(post.subtitle) : ""} />}
+        {!teaser && <NotesFloatingStack postId={post.id} title={title} subtitle={post.subtitle ? l(post.subtitle) : ""} allParts />}
         <div id={`note-body-${post.id}`} className="mt-6 min-w-0 space-y-6">
         {teaser ? <p className="text-sm leading-7 text-zinc-400">{TEASER_PUBLIC_LINE}</p> : <>
+        <ArticlePartNav targetId={`note-body-${post.id}`} tone="notes" allParts />
         <FeaturedMedia media={featured} title={title} />
         {post.fileKind === "image" && post.fileUrl && post.fileUrl !== featured?.url && post.fileUrl !== post.bookCoverUrl &&
           <div className="relative aspect-video w-full max-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-black/30">

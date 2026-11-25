@@ -1649,7 +1649,12 @@ a.air-part-float:hover {
 }
 .notes-part-stack .air-part-line {
   overflow-x: auto;
+  flex-wrap: nowrap;
   scrollbar-width: none;
+}
+#note-body .notes-part-stack,
+[id^="note-body-"] > .notes-part-stack {
+  margin-bottom: 1.35rem;
 }
 .notes-part-stack .air-part-line::-webkit-scrollbar { display: none; }
 .notes-part-stack .air-part-float {

@@ -89,7 +89,7 @@ export function ArticlePartNav({ targetId, tone = "air", allParts = false }: { t
     };
   }, [targetId, allParts]);
 
-  const current = allParts ? parts.find((part) => part.id === currentId) ?? null : parts[parts.length - 1];
+  const current = allParts ? parts.find((part) => part.id === currentId) ?? parts[0] ?? null : parts[parts.length - 1];
   if (!parts.length) return null;
   if (!allParts && !current) return null;
   const shown = allParts ? current : (parts.find((part) => part.id === openedId) ?? current);

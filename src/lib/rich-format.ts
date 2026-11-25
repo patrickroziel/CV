@@ -95,7 +95,8 @@ function wrapTextLeaves(
   let n: Node | null;
   while ((n = walker.nextNode())) {
     if (n.nodeType === Node.TEXT_NODE && (n.textContent?.length ?? 0) > 0) {
-      texts.push(n as Text);
+      const parent = (n as Text).parentElement?.closest("h2.air-part-title");
+      if (!parent) texts.push(n as Text);
     }
   }
   for (const text of texts) {

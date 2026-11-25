@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LocalizedField } from "@/components/i18n/LocalizedField";
 import { RichLocalizedField } from "@/components/i18n/RichLocalizedField";
+import { ArticlePartsField } from "@/components/medias/ArticlePartsField";
 import { MediaCarouselEditor } from "@/components/shared/MediaCarouselEditor";
 import { stripHtml } from "@/lib/sanitize-html";
 import { getL, liftToLocalized, setL, type LocalizedString } from "@/lib/i18n-content";
@@ -838,11 +839,10 @@ export function SocialPostForm({
         </div>
       )}
 
-      <LocalizedField
+      <ArticlePartsField
         label={isBook ? "Texte du chapitre *" : "Texte"}
         value={description}
         onChange={setDescription}
-        multiline
         rows={isBook ? 14 : 7}
         placeholder={isBook ? "Colle ou écris le texte du chapitre ici…" : "Écris ton post…"}
         insertBlockToken={mediaInsertion}
