@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { AirIcon, WaterIcon, WoodIcon } from "@/components/layout/universe-icons";
+import { WaterIcon } from "@/components/layout/universe-icons";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { stripHtml } from "@/lib/sanitize-html";
@@ -31,19 +31,19 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   const [shuffled, setShuffled] = useState<SocialPost[]>([]);
 
   const candidates = useMemo(() => {
-    const all = (data.socialPosts ?? [])
-      .filter(post => post.visible !== false);
-
-    const notes = all.filter(p => p.universe !== "air");
-    const air = all.filter(p => p.universe === "air");
-
-    const withImage = [...notes, ...air].filter(p => {
+    const all = (data.socialPosts ?? []).filter(post => post.visible !== false);
+    const others = all.filter((post) => {
+      if (current === "air") return post.universe !== "air";
+      if (current === "notes") return post.universe === "air";
+      return true;
+    });
+    const pool = others.length ? others : all;
+    const withImage = pool.filter(p => {
       const photo = getNoteSharePhoto(p);
       return Boolean(photo && !isHeldMediaUrl(photo));
     });
-    const pool = withImage.length ? withImage : [...notes, ...air];
-    return pool;
-  }, [data.socialPosts]);
+    return withImage.length ? withImage : pool;
+  }, [data.socialPosts, current]);
 
   // Shuffle once on mount / when candidates change
   useEffect(() => {
@@ -60,7 +60,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   const slides =
     current === "air"
       ? [
-          { label: "Vous êtes dans Scope", content: "L'air — Récits, analyses et décryptages.", href: "/air" },
+          { label: "Vous êtes dans Scope", content: "Décryptages, récits et analyses.", href: "/air" },
           { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
           { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
         ]
@@ -68,11 +68,11 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
         ? [
             { label: "Vous êtes dans Work", content: "Parcours, showreel et compétences.", href: "/work" },
             { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-            { label: "Scope", content: "L'air — Récits, analyses et décryptages.", href: "/air" },
+            { label: "Scope", content: "Décryptages, récits et analyses.", href: "/air" },
           ]
         : [
             { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-            { label: "Scope", content: "L'air — Récits, analyses et décryptages.", href: "/air" },
+            { label: "Scope", content: "Décryptages, récits et analyses.", href: "/air" },
             { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
           ];
 
@@ -148,7 +148,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
         </div>
 
         {featured && articleHref && (
-          <div className="relative mt-2 hidden border-t border-white/10 pt-3 md:block">
+          <div className="relative mt-2 border-t border-white/10 pt-3">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={featured.id}
@@ -182,24 +182,6 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
             </AnimatePresence>
           </div>
         )}
-
-        <div className="relative mt-3 flex flex-wrap gap-1.5">
-          {current !== "notes" && (
-            <Link href="/notes" className="inline-flex items-center gap-1 rounded-full border border-cyan-100/20 bg-cyan-100/[.07] px-2.5 py-1.5 text-[10px] text-cyan-100 transition-colors hover:bg-cyan-100/15">
-              <WaterIcon className="h-3 w-3" /> Notes
-            </Link>
-          )}
-          {current !== "air" && (
-            <Link href="/air" className="inline-flex items-center gap-1 rounded-full border border-sky-100/20 bg-sky-100/[.07] px-2.5 py-1.5 text-[10px] text-sky-100 transition-colors hover:bg-sky-100/15">
-              <AirIcon className="h-3 w-3" /> Scope
-            </Link>
-          )}
-          {current !== "work" && (
-            <Link href="/work" className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[.05] px-2.5 py-1.5 text-[10px] text-zinc-100 transition-colors hover:bg-white/10">
-              <WoodIcon className="h-3 w-3" /> Work
-            </Link>
-          )}
-        </div>
       </div>
     </section>
   );

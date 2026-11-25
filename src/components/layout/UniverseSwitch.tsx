@@ -18,7 +18,7 @@ export function UniverseSwitch({ className }: { className?: string }) {
   )}>
     {([
       { href: "/notes", label: "Notes", key: "medias" as const, icon: WaterIcon, hint: "Écrits, images et musiques" },
-      { href: "/air", label: "Scope", key: "air" as const, icon: AirIcon, hint: "L'air — Récits, analyses et décryptages" },
+      { href: "/air", label: "Scope", key: "air" as const, icon: AirIcon, hint: "Scope — Décryptages, récits et analyses" },
       { href: "/work", label: "Work", key: "portfolio" as const, icon: WoodIcon, hint: "Portfolio, CV et compétences" },
       { href: "/lights", label: "Lights", key: "lights" as const, icon: LightsIcon, hint: "Fil de médias" },
     ]).map(({ href, label, key, icon: Icon, hint }) =>

@@ -36,7 +36,7 @@ export function NotesIntroduction() {
 
   const slides = [
     { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/" },
-    { label: "Scope", content: "L'air — Récits, analyses et décryptages", href: "/air" },
+    { label: "Scope", content: "Décryptages, récits et analyses", href: "/air" },
     { label: "Work", content: "Portfolio · CV · Compétences", href: "/work" },
   ];
 

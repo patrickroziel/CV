@@ -118,7 +118,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     <aside className="min-w-0"><div className="universe-rail">
       <p className="text-xs text-white/75">Patrick Roziel</p>
       <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">Scope</h1>
-      <p className="mt-1 text-[13px] leading-5 text-white/80 md:mt-2">L'air — Récits, analyses et décryptages.</p>
+      <p className="mt-1 text-[13px] leading-5 text-white/80 md:mt-2">Décryptages, récits et analyses.</p>
       <nav className="mt-3 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0" aria-label="Séries Scope">
         {series.map((name) => {
           const key = name.toLocaleLowerCase("fr");

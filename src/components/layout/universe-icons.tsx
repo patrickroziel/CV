@@ -14,7 +14,7 @@ export function WaterIcon(props: SVGProps<SVGSVGElement>) {
 /** Nuage simple, pour Scope. */
 export function AirIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" aria-hidden="true" {...props} stroke="#e4e4e7" strokeWidth="1.7">
+    <svg viewBox="0 0 24 24" fill="none" strokeLinejoin="round" aria-hidden="true" {...props} stroke="currentColor" strokeWidth="1.7">
       <path d="M7.4 17.6h9a3.5 3.5 0 0 0 .4-7 4.5 4.5 0 0 0-8.6-1.5 3.2 3.2 0 0 0-.8 8.5z" />
     </svg>
   );
