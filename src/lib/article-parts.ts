@@ -10,37 +10,42 @@ function textOf(html: string) {
 }
 
 function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&")
-    .replace(/</g, "<")
-    .replace(/>/g, ">");
+  return value.replace(/[&<>"]/g, (char) => {
+    if (char === "&") return "\u0026amp;";
+    if (char === "<") return "\u0026lt;";
+    if (char === ">") return "\u0026gt;";
+    return "\u0026quot;";
+  });
 }
 
-/** Split a saved article into the opening text and the framed parts. */
-export function splitArticleParts(html: string): { intro: string; parts: ArticlePartDraft[] } {
+/** Split a saved article into titled blocks. Text before the first title stays as the opening block. */
+export function splitArticleParts(html: string): ArticlePartDraft[] {
   const source = html || "";
   const matches = [...source.matchAll(PART_HEADING)];
-  if (!matches.length) return { intro: source, parts: [] };
-  const parts = matches.map((match, index) => {
+  if (!matches.length) return [{ title: "", body: source }];
+  const blocks: ArticlePartDraft[] = [];
+  const before = source.slice(0, matches[0].index ?? 0).trim();
+  if (before) blocks.push({ title: "", body: before });
+  matches.forEach((match, index) => {
     const start = (match.index ?? 0) + match[0].length;
     const end = matches[index + 1]?.index ?? source.length;
     const title = textOf(match[1] ?? "");
-    return {
+    blocks.push({
       title: title.toLocaleLowerCase("fr") === "titre de la partie" ? "" : title,
       body: source.slice(start, end).trim(),
-    };
+    });
   });
-  return { intro: source.slice(0, matches[0].index ?? 0).trim(), parts };
+  return blocks.length ? blocks : [{ title: "", body: "" }];
 }
 
-/** Rebuild the HTML the reader already understands. */
-export function joinArticleParts(intro: string, parts: ArticlePartDraft[]) {
-  const chunks = [intro.trim()].filter(Boolean);
+/** Rebuild the HTML the reader already understands. A title is written only when it is filled in. */
+export function joinArticleParts(parts: ArticlePartDraft[]) {
+  const chunks: string[] = [];
   for (const part of parts) {
     const title = part.title.trim();
     const body = part.body.trim();
     if (!title && !body) continue;
-    chunks.push(`<h2 class="air-part-title">${escapeHtml(title || "Titre de la partie")}</h2>`);
+    if (title) chunks.push(`<h2 class="air-part-title">${escapeHtml(title)}</h2>`);
     if (body) chunks.push(body);
   }
   return chunks.join("");
