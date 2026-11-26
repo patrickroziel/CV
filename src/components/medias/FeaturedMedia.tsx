@@ -130,6 +130,23 @@ function ViewportVimeo({ url, title, autoplay }: { url: string; title: string; a
   );
 }
 
+function SimpleVideoPlayer({ url, title }: { url: string; title: string }) {
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
+      <video
+        src={url}
+        controls
+        preload="metadata"
+        playsInline
+        className="absolute inset-0 h-full w-full object-contain"
+        title={title || "Vidéo"}
+      >
+        Votre navigateur ne supporte pas la lecture vidéo.
+      </video>
+    </div>
+  );
+}
+
 export function FeaturedMedia({ media, title, autoplay = true }: {
   media: FeaturedEmbed | null | undefined;
   title: string;
@@ -157,6 +174,9 @@ export function FeaturedMedia({ media, title, autoplay = true }: {
   if (featured.type === "vimeo") {
     const video = vimeoVideo(featured.url);
     return video ? <ViewportVimeo key={video.id} url={featured.url} title={title} autoplay={autoplay} /> : null;
+  }
+  if (featured.type === "video") {
+    return <SimpleVideoPlayer url={featured.url} title={title} />;
   }
   const id = new URL(featured.url).searchParams.get("v");
   return id ? <ViewportYouTube key={id} id={id} title={title} autoplay={autoplay} /> : null;
