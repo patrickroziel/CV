@@ -3042,8 +3042,8 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
   }
 }
 
-/* iPad 6 (768×1024). Blur and a centered dialog make edit mode unusable on this machine. */
-@media (min-width: 768px) and (max-width: 1024px) {
+/* iPad, portrait et paysage. Le centrage par translation sort la fenêtre de l’écran. */
+@media (max-width: 1400px) {
   body:has(header[data-editing="true"]) {
     --chrome-top: 3.6rem;
   }
@@ -3073,10 +3073,11 @@ html[data-universe="portfolio"] .work-rail .work-hero-card::after {
     max-width: none !important;
     height: 100% !important;
     max-height: none !important;
+    margin: 0 !important;
     transform: none !important;
     border-radius: 0 !important;
     background: #10161c !important;
-    padding: 3.25rem 1rem 5.5rem !important;
+    padding: 4.5rem 1rem 5.5rem !important;
     -webkit-overflow-scrolling: touch;
   }
 

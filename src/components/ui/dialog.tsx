@@ -40,8 +40,7 @@ const dialogSizeClass: Record<NonNullable<DialogContentProps["size"]>, string> =
   {
     sm: "max-w-sm",
     default: "max-w-lg",
-    // Full-width on tablet/phone, constrained on large desktop
-    form: "max-w-[calc(100vw-1rem)] md:max-w-[min(94vw,52rem)]",
+    form: "w-[min(52rem,calc(100%-1rem))] gap-4 p-4 sm:gap-5 sm:p-6",
   };
 
 const DialogContent = React.forwardRef<
@@ -53,9 +52,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        // Always stay fully on screen, including iPad portrait/landscape and safe areas
-        "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-1rem)] max-h-[min(96dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1rem))] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-x-hidden overflow-y-auto border border-white/18 bg-[linear-gradient(155deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03)),rgba(9,9,12,0.78)] p-4 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.65),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-3xl duration-200 rounded-2xl sm:p-6 sm:rounded-3xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        "pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]",
+        "fixed inset-0 z-50 m-auto grid h-fit w-[min(32rem,calc(100%-1rem))] max-h-[min(94dvh,920px)] gap-4 overflow-x-hidden overflow-y-auto border border-white/18 bg-[linear-gradient(155deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03)),rgba(9,9,12,0.78)] p-4 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.65),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-3xl rounded-2xl sm:p-6 sm:rounded-3xl pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]",
         dialogSizeClass[size],
         className
       )}
