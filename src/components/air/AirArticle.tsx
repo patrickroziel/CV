@@ -126,7 +126,7 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
     setNavSlot(document.getElementById("bottom-nav-slot"));
   }, [post?.id]);
   if (!post && !isHydrated && initialPost === undefined) return <div className="mx-auto h-60 max-w-3xl animate-pulse rounded-2xl bg-white/10" />;
-  if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Air</Link><p className="mt-8">Article indisponible.</p></div>;
+  if (!post) return <div className="mx-auto max-w-3xl px-4 text-zinc-200"><Link href="/air" className="text-cyan-100">← Retour à Scope</Link><p className="mt-8">Article indisponible.</p></div>;
   const title = l(post.title);
   const series = post.subtitle ? l(post.subtitle).trim() : "";
   const lead = post.articleSubtitle ? l(post.articleSubtitle).trim() : "";

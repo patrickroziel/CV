@@ -186,7 +186,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
       </div>
     ) : null}
     <div className="mb-4 flex min-w-0 flex-wrap items-end justify-between gap-3 pb-1 md:mb-8 md:gap-4 md:pb-2">
-      <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-white/55">Journal / Air</p>
+      <div><p className="text-[10px] font-semibold uppercase tracking-[.23em] text-white/55">Journal / Scope</p>
         <h2 className="mt-1 text-xl font-semibold tracking-tight text-white drop-shadow-sm md:mt-2 md:text-3xl">{activeTag ? `#${activeTag}` : scope === "Tout" ? "Articles & décryptages" : scope}{!activeTag && scope !== "Tout" ? <span className="ml-3 align-middle text-base font-medium text-white/60">{scopeCount} article{scopeCount > 1 ? "s" : ""}</span> : null}</h2></div>
       {editMode && <button onClick={()=>setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm text-white backdrop-blur-md"><FilePlus2 className="h-4 w-4"/>Nouvel article</button>}
     </div>
@@ -205,7 +205,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                 <WorkInProgress className="blob-wip--fill" />
               ) : photo ? (
                 isHeldMediaUrl(photo) ? <WorkInProgress className="absolute inset-0" /> : <img src={displayImageUrl(photo, 1200)} alt={title} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-              ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Air.</span>}
+              ) : <span className="flex h-full items-center justify-center text-7xl font-light text-white/15">Scope.</span>}
               {seriesLabel ? (
                 <div className="air-cover-series">
                   <AirSeriesLine label={seriesLabel} />

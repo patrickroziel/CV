@@ -21,7 +21,7 @@ export function SiteJsonLd() {
         url: NOTES_ORIGIN,
         name: "Patrick Roziel",
         description:
-          "Notes, Air et Work de Patrick Roziel : écrits, décryptages et portfolio de montage vidéo et motion design.",
+          "Notes, Scope et Work de Patrick Roziel : écrits, décryptages et portfolio de montage vidéo et motion design.",
         inLanguage: "fr-FR",
         publisher: { "@id": `${NOTES_ORIGIN}/#person` },
       },

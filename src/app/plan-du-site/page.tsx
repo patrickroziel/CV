@@ -4,7 +4,7 @@ import { NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
 const title = "Plan du site — Patrick Roziel";
 const description =
-  "Plan du site de Patrick Roziel : Air, Notes, Work, Projets et pages principales.";
+  "Plan du site de Patrick Roziel : Scope, Notes, Work, Projets et pages principales.";
 
 export const metadata: Metadata = {
   title: { absolute: title },

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";
-export const alt = "Patrick Roziel — Notes, Air et Work";
+export const alt = "Patrick Roziel — Notes, Scope et Work";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -29,7 +29,7 @@ export default function OpenGraphImage() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div style={{ fontSize: 68, fontWeight: 700, letterSpacing: -1.5, lineHeight: 1.05 }}>
-            Notes, Air & Work
+            Notes, Scope & Work
           </div>
           <div style={{ fontSize: 30, color: "#c5d4d6", maxWidth: 860, lineHeight: 1.35 }}>
             Écrits, décryptages et portfolio de montage vidéo.

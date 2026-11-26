@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s",
   },
   description:
-    "Patrick Roziel, monteur vidéo et motion designer à La Courneuve (93). Notes, décryptages Air, portfolio Work et projets : montage, motion design, showreel.",
+    "Patrick Roziel, monteur vidéo et motion designer à La Courneuve (93). Notes, Scope et Work : écrits, décryptages, portfolio de montage et motion design.",
   keywords: ["monteur vidéo", "motion design", "montage vidéo", "Patrick Roziel", "La Courneuve", "portfolio", "contenus digitaux"],
   applicationName: "Patrick Roziel",
   authors: [{ name: "Patrick Roziel", url: NOTES_ORIGIN }],
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Patrick Roziel — Notes, Air et Work",
+        alt: "Patrick Roziel — Notes, Scope et Work",
       },
     ],
   },

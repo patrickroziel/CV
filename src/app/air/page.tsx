@@ -4,7 +4,7 @@ import { listPublicPosts, NOTES_ORIGIN } from "@/lib/server/notes-sharing";
 
 const title = "Scope — Récits, analyses et décryptages | Patrick Roziel";
 const description =
-  "Air, le journal de Patrick Roziel : décryptages, expériences professionnelles et observations sur la communication, les institutions et le monde du travail en France.";
+  "Scope, le journal de Patrick Roziel : décryptages, récits et analyses sur la communication, les institutions et le monde du travail en France.";
 
 const ogImage = {
   url: "/opengraph-image",
