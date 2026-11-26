@@ -40,7 +40,7 @@ export function PostEditButton({
         Modifier
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent size="form" className="max-h-[90vh] overflow-y-auto">
+        <DialogContent size="form" className="overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>Modifier la publication</DialogTitle>
           </DialogHeader>
