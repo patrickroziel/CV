@@ -1,5 +1,6 @@
 import type { FeaturedEmbed } from "@/lib/types";
 import { vimeoCanonical } from "@/lib/utils";
+import { isR2Url } from "@/lib/blob-upload";
 
 /** Only allow known embeds. Never render arbitrary HTML/iframe supplied by authors. */
 export function normalizeFeaturedEmbed(raw: unknown): FeaturedEmbed | null {
@@ -32,6 +33,14 @@ export function normalizeFeaturedEmbed(raw: unknown): FeaturedEmbed | null {
       if (u.username || u.password || !host.includes(".")) return null;
       return { type: "image", url: u.toString() };
     }
+    if (item.type === "video") {
+      // Allow R2-hosted videos or direct https video files
+      const isVideoExt = /\.(mp4|webm|ogg|mov)$/i.test(u.pathname);
+      if (isR2Url(url) || isVideoExt) {
+        return { type: "video", url: u.toString() };
+      }
+      return null;
+    }
   } catch { return null; }
   return null;
 }
@@ -41,5 +50,5 @@ export function featuredEmbedFromInput(type: FeaturedEmbed["type"], raw: string)
   const fromTag = input.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1] || "";
   // Some providers wrap a post URL in blockquote markup.
   const candidate = fromTag || input;
-  return normalizeFeaturedEmbed({ type, url: candidate.replace(/&amp;/g, "&") });
+  return normalizeFeaturedEmbed({ type, url: candidate.replace(/&/g, "&") });
 }
