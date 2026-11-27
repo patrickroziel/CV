@@ -176,9 +176,9 @@ export function SocialPostCard({ post, index, onEdit, onTagClick }: {
             <FileDown className="h-3.5 w-3.5" /> Télécharger le chapitre
           </a>}
 
-          <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+          <div className="flex flex-col gap-3 border-t border-white/10 pt-3">
             <PostActions postId={post.id} title={title} visible={post.visible !== false} card />
-            <Link href={`/notes/${post.id}`} className="text-[13px] font-medium text-white/80 hover:text-white">
+            <Link href={`/notes/${post.id}`} className="self-end text-[13px] font-medium text-white/80 hover:text-white">
               {isBook ? "Lire le chapitre" : "Ouvrir"}
             </Link>
           </div>

@@ -22,6 +22,7 @@ import {
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { ProjectMedia } from "@/components/projects/ProjectMedia";
 import { stripHtml } from "@/lib/sanitize-html";
+import { PostActions } from "@/components/medias/PostActions";
 
 type ProjectCardProps = {
   project: Project;
@@ -87,6 +88,15 @@ export function ProjectCard({ project, index = 0, onEdit }: ProjectCardProps) {
             </div>
           </div>
         </Link>
+        <div className="border-t border-white/10 px-5 py-3 pr-14">
+          <PostActions
+            postId={project.id}
+            title={l(project.title)}
+            summary={stripHtml(l(project.description))}
+            sharePath="/projets"
+            shareOnly
+          />
+        </div>
         {project.link && (
           <a
             href={project.link}
