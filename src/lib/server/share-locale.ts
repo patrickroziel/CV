@@ -33,7 +33,7 @@ export function openGraphLocale(lang: string | null) {
 
 export function shareImageUrl(id: string, lang: string | null, cover?: string | null) {
   const url = new URL(`${NOTES_ORIGIN}/api/notes/${encodeURIComponent(id)}/share-image`);
-  url.searchParams.set("v", "12");
+  url.searchParams.set("v", "13");
   if (lang) url.searchParams.set("lang", lang);
   if (cover) {
     let hash = 0;
@@ -44,7 +44,7 @@ export function shareImageUrl(id: string, lang: string | null, cover?: string | 
 }
 
 /** Server-side copy of the on-site Google translation, for link previews only. */
-export async function translateShareText(title: string, description: string, lang: string | null) {
+export async function translateShareText(title: string, description: string, lang: string | null, full = false) {
   if (!lang) return { title, description };
   try {
     const response = await fetch(`${NOTES_ORIGIN}/api/translate`, {
@@ -58,9 +58,11 @@ export async function translateShareText(title: string, description: string, lan
     const payload = (await response.json()) as { translations?: string[] };
     const nextTitle = payload.translations?.[0]?.replace(/\s+/g, " ").trim();
     const nextDescription = payload.translations?.[1]?.replace(/\s+/g, " ").trim();
+    const resolvedTitle = nextTitle || title;
+    const resolvedDescription = nextDescription || description;
     return {
-      title: (nextTitle || title).slice(0, 130),
-      description: (nextDescription || description).slice(0, 200),
+      title: full ? resolvedTitle : resolvedTitle.slice(0, 130),
+      description: full ? resolvedDescription : resolvedDescription.slice(0, 200),
     };
   } catch {
     return { title, description };
