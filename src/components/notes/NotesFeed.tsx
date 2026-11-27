@@ -3,7 +3,8 @@
 import { useMemo, useState, Fragment } from "react";
 import Link from "next/link";
 import { BookOpen, Eye, Library, Music, PenLine, Plus, Sparkles, UserRound } from "lucide-react";
-import { KofiCard } from "@/components/support/KofiCard";
+import { SectionHeading } from "@/components/layout/SectionHeading";
+import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { SocialPostCard } from "@/components/medias/SocialPostCard";
@@ -110,10 +111,9 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     <div className="mx-auto grid min-w-0 max-w-[1180px] gap-4 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
       <aside className="min-w-0">
         <div className="universe-rail">
-          <h1 className="text-xl font-semibold tracking-tight text-white md:text-3xl">Notes</h1>
-          <p className="mt-1 text-xs leading-snug text-white/70 md:mt-2 md:text-[13px] md:leading-5">
+          <SectionHeading title="Notes">
             Livre, musique, essais, réflexion humaine, spiritualité, symbolisme et fictions.
-          </p>
+          </SectionHeading>
 
           <nav aria-label="Catégories" className="mt-2 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-0.5 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
             {FILTERS.map((item) => {
@@ -193,7 +193,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               );
             })}
           </nav>
-          <KofiCard className="mt-2 md:mt-3" />
+          <UniversesWidget current="notes" />
         </div>
       </aside>
 
@@ -272,7 +272,6 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 />
-                {index === 0 ? <KofiCard /> : null}
               </Fragment>
             ))}
           </div>

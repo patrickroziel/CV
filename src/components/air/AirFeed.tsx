@@ -12,7 +12,8 @@ import { isTeaserPost, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
 import { displayImageUrl } from "@/lib/display-image";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
 import { WorkInProgress } from "@/components/media/WorkInProgress";
-import { KofiCard } from "@/components/support/KofiCard";
+import { SectionHeading } from "@/components/layout/SectionHeading";
+import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { AirSeriesLine, airPartAnchor } from "@/components/air/AirArticle";
 import { collectPostTags } from "@/lib/post-taxonomy";
@@ -115,9 +116,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   };
   return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-5 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
     <aside className="min-w-0"><div className="universe-rail">
-      <p className="text-xs text-white/75">Patrick Roziel</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">Scope</h1>
-      <p className="mt-1 text-[13px] leading-5 text-white/80 md:mt-2">Décryptages, récits et analyses.</p>
+      <SectionHeading title="Scope">Décryptages, récits et analyses.</SectionHeading>
       <nav className="mt-3 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0" aria-label="Séries Scope">
         {series.map((name) => {
           const key = name.toLocaleLowerCase("fr");
@@ -160,7 +159,7 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           );
         })}
       </nav>
-      <KofiCard className="mt-3" />
+      <UniversesWidget current="air" />
     </div>
     </aside>
     <section aria-label="Articles AIR" className="min-w-0">
@@ -243,7 +242,6 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             <button className="inline-flex items-center gap-1 text-xs text-red-300" onClick={()=>{if(window.confirm("Supprimer cet article AIR ?"))removeSocialPost(post.id)}}><Trash2 className="h-3.5 w-3.5"/> Supprimer</button>
           </div>}
         </article>
-        {index === 0 ? <KofiCard /> : null}
         </Fragment>;
       })}
     </div> : <div className="air-surface rounded-2xl border p-10 text-center backdrop-blur-xl">

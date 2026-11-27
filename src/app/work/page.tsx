@@ -8,7 +8,7 @@ import { ContactSection } from "@/components/sections/ContactSection";
 import { SectionVisibility } from "@/components/shared/SectionVisibility";
 import { ShowreelEmbed } from "@/components/shared/ShowreelEmbed";
 import { WorkSidebar } from "@/components/work/WorkSidebar";
-import { KofiCard } from "@/components/support/KofiCard";
+import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { WorkTagTicker } from "@/components/work/WorkTagTicker";
 import { WorkCategoryDock } from "@/components/work/WorkCategoryDock";
 
@@ -19,7 +19,7 @@ export default function Home() {
         <aside>
           <div className="universe-rail">
             <WorkSidebar />
-            <KofiCard className="mt-3" />
+            <UniversesWidget current="work" />
           </div>
         </aside>
 

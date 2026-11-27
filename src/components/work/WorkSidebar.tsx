@@ -6,6 +6,7 @@ import { WorkShare } from "@/components/work/WorkShare";
 import { Briefcase, Clapperboard, GraduationCap, Languages, LayoutGrid, Mail, Quote, Sparkles } from "lucide-react";
 import { DEFAULT_NAV, NAV_ITEM_META, type NavItemId } from "@/lib/types";
 import { stripHtml } from "@/lib/sanitize-html";
+import { SectionHeading } from "@/components/layout/SectionHeading";
 
 function sortExperiences<T extends { startDate: string; endDate?: string | null }>(list: T[]) {
   return [...list].sort((a, b) => {
@@ -73,16 +74,11 @@ export function WorkSidebar() {
     [data.experiences, l]
   );
 
-  const bio = stripHtml(l(data.profile?.bio ?? "")).replace(/\s+/g, " ").trim();
   const row = "flex shrink-0 items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/80 transition-colors hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 md:w-full";
 
   return (
     <div>
-      <p className="text-xs text-white/75">Patrick Roziel</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">Work</h1>
-      {bio ? (
-        <p className="mt-2 line-clamp-2 max-w-full text-[13px] leading-5 text-white/80 md:line-clamp-none">{bio}</p>
-      ) : null}
+      <SectionHeading title="Work">Portfolio, parcours et compétences.</SectionHeading>
       <div className="mt-3">
         <WorkShare pill />
       </div>

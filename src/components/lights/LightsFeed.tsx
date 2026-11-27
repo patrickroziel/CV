@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
+import { SectionHeading } from "@/components/layout/SectionHeading";
 import { LightsIcon } from "@/components/layout/universe-icons";
+import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { LightActions } from "@/components/lights/LightActions";
 import { XEmbed } from "@/components/projects/XEmbed";
 import { collectLightCards, type LightCard } from "@/lib/lights";
@@ -358,36 +360,35 @@ export function LightsFeed() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-xl px-3 sm:px-6">
-      <header className="mb-6">
-        <p className="mb-2 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100/80">
-          <LightsIcon className="h-3.5 w-3.5" />
-          Lights
-        </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Fil</h1>
-        <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-          Citations, images, vidéos et posts. Les médias des articles apparaissent ici.
-        </p>
-      </header>
-
+    <div className="mx-auto grid min-w-0 max-w-[1180px] gap-4 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
+      <aside className="min-w-0">
+        <div className="universe-rail">
+          <SectionHeading title="Lights">Citations, images, vidéos et posts.</SectionHeading>
+          <nav aria-label="Filtres" className="mt-2 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-0.5 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
+            {FILTERS.map((entry) => {
+              const active = filter === entry.id;
+              const total = entry.id === "all" ? items.length : items.filter((item) => item.kind === entry.id).length;
+              return (
+                <button
+                  key={entry.id}
+                  type="button"
+                  onClick={() => setFilter(active && entry.id !== "all" ? "all" : entry.id)}
+                  className={[
+                    "flex shrink-0 items-center justify-between gap-2 rounded-full px-2.5 py-1 text-left text-[13px] transition-colors md:w-full md:rounded-xl md:py-2 md:text-sm",
+                    active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white",
+                  ].join(" ")}
+                >
+                  <span className="truncate">{entry.label}</span>
+                  <span className="text-[11px] tabular-nums text-white/40">{total}</span>
+                </button>
+              );
+            })}
+          </nav>
+          <UniversesWidget current="lights" />
+        </div>
+      </aside>
+      <section className="min-w-0">
       {editMode && <LightComposer />}
-
-      <div className="mb-5 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Filtres">
-        {FILTERS.map((entry) => (
-          <button
-            key={entry.id}
-            type="button"
-            role="tab"
-            aria-selected={filter === entry.id}
-            onClick={() => setFilter(entry.id)}
-            className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${
-              filter === entry.id ? "border-white/50 bg-white text-zinc-950" : "border-white/15 bg-white/5 text-zinc-200"
-            }`}
-          >
-            {entry.label}
-          </button>
-        ))}
-      </div>
 
       {visible.length === 0 ? (
         <p className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-8 text-sm text-zinc-300">
@@ -490,6 +491,7 @@ export function LightsFeed() {
           </div>
         </div>
       )}
+      </section>
     </div>
   );
 }

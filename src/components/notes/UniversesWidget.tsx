@@ -10,10 +10,28 @@ import { stripHtml } from "@/lib/sanitize-html";
 import { getNoteSharePhoto } from "@/lib/notes-preview-image";
 import { isTeaserPost } from "@/lib/post-publication";
 import { isHeldMediaUrl } from "@/lib/blob-upload";
-import type { SocialPost } from "@/lib/types";
+import type { LightNote } from "@/lib/types";
 
-type Current = "notes" | "air" | "work";
+type Current = "notes" | "air" | "work" | "lights";
 
+type Feature = {
+  id: string;
+  href: string;
+  label: string;
+  quote: string;
+  image: string | null;
+};
+
+function lightFeature(note: LightNote): Feature {
+  const image = note.thumb || (note.kind === "image" ? note.url : null);
+  return {
+    id: note.id,
+    href: `/lights#${note.id}`,
+    label: "À lire dans Lights",
+    quote: note.text || "Lights",
+    image,
+  };
+}
 function shuffle<T>(array: T[]): T[] {
   const copy = [...array];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -28,22 +46,34 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
   const reduceMotion = useReducedMotion();
   const [slideIndex, setSlideIndex] = useState(0);
   const [articleIndex, setArticleIndex] = useState(0);
-  const [shuffled, setShuffled] = useState<SocialPost[]>([]);
+  const [shuffled, setShuffled] = useState<Feature[]>([]);
 
   const candidates = useMemo(() => {
-    const all = (data.socialPosts ?? []).filter(post => post.visible !== false);
-    const others = all.filter((post) => {
-      if (current === "air") return post.universe !== "air";
-      if (current === "notes") return post.universe === "air";
-      return true;
-    });
-    const pool = others.length ? others : all;
-    const withImage = pool.filter(p => {
-      const photo = getNoteSharePhoto(p);
-      return Boolean(photo && !isHeldMediaUrl(photo));
-    });
-    return withImage.length ? withImage : pool;
-  }, [data.socialPosts, current]);
+    const posts = (data.socialPosts ?? []).filter(post => post.visible !== false);
+    const lights = (data.lightNotes ?? []).filter(note => note.visible !== false);
+    const items: Feature[] = [];
+    for (const post of posts) {
+      const scope = post.universe === "air";
+      if (current === "air" && scope) continue;
+      if (current === "notes" && !scope) continue;
+      const photo = getNoteSharePhoto(post);
+      const quote = !isTeaserPost(post)
+        ? stripHtml(l(post.description)).replace(/\[\[MEDIA:[A-Za-z0-9_-]{8,80}\]\]/g, "").replace(/\s+/g, " ").trim().slice(0, 105)
+        : "";
+      items.push({
+        id: post.id,
+        href: `/${scope ? "air" : "notes"}/${post.id}`,
+        label: scope ? "À lire dans Scope" : "À lire dans Notes",
+        quote: quote || l(post.title),
+        image: photo && !isHeldMediaUrl(photo) ? photo : null,
+      });
+    }
+    if (current !== "lights") {
+      for (const note of lights) items.push(lightFeature(note));
+    }
+    const withImage = items.filter(item => item.image);
+    return withImage.length ? withImage : items;
+  }, [data.socialPosts, data.lightNotes, current, l]);
 
   // Shuffle once on mount / when candidates change
   useEffect(() => {
@@ -57,24 +87,19 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
 
   const featured = shuffled[articleIndex % Math.max(shuffled.length, 1)] ?? null;
 
-  const slides =
-    current === "air"
-      ? [
-          { label: "Vous êtes dans Scope", content: "Décryptages, récits et analyses.", href: "/air" },
-          { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-          { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
-        ]
-      : current === "work"
-        ? [
-            { label: "Vous êtes dans Work", content: "Parcours, showreel et compétences.", href: "/work" },
-            { label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-            { label: "Scope", content: "Décryptages, récits et analyses.", href: "/air" },
-          ]
-        : [
-            { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
-            { label: "Scope", content: "Décryptages, récits et analyses.", href: "/air" },
-            { label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
-          ];
+  const here = {
+    notes: { label: "Vous êtes dans Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
+    air: { label: "Vous êtes dans Scope", content: "Décryptages, récits et analyses.", href: "/air" },
+    work: { label: "Vous êtes dans Work", content: "Portfolio, parcours et compétences.", href: "/work" },
+    lights: { label: "Vous êtes dans Lights", content: "Citations, images et vidéos.", href: "/lights" },
+  }[current];
+  const elsewhere = [
+    { key: "notes" as const, label: "Notes", content: "Textes, images, musiques et fragments personnels.", href: "/notes" },
+    { key: "air" as const, label: "Scope", content: "Décryptages, récits et analyses.", href: "/air" },
+    { key: "work" as const, label: "Work", content: "Portfolio, parcours et compétences.", href: "/work" },
+    { key: "lights" as const, label: "Lights", content: "Citations, images et vidéos.", href: "/lights" },
+  ].filter((item) => item.key !== current);
+  const slides = [here, ...elsewhere];
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -92,26 +117,13 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
     return () => window.clearInterval(timer);
   }, [reduceMotion, shuffled.length]);
 
-  const image = featured ? getNoteSharePhoto(featured) : null;
-  const quote = featured && !isTeaserPost(featured)
-    ? stripHtml(l(featured.description))
-        .replace(/\[\[MEDIA:[A-Za-z0-9_-]{8,80}\]\]/g, "")
-        .replace(/\s+/g, " ")
-        .trim().slice(0, 105)
-    : "";
-  const isAirArticle = featured?.universe === "air";
-  const articleHref = featured
-    ? `/${isAirArticle ? "air" : "notes"}/${featured.id}`
-    : null;
-  const articleLabel = isAirArticle ? "À lire dans Scope" : "À lire dans Notes";
-
   return (
-    <section aria-label="Découvrir les trois univers" className="mt-3 min-w-0 md:mt-5">
+    <section aria-label="Découvrir les quatre univers" className="mt-3 min-w-0 md:mt-5">
       <div className="relative overflow-hidden rounded-2xl border border-cyan-100/15 bg-[#031c25]/65 p-3.5 shadow-[0_16px_40px_-24px_rgba(0,0,0,.8)] backdrop-blur-xl">
         <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-cyan-200/10 blur-2xl" />
         <div className="relative flex items-center justify-between gap-2">
           <span className="inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[.18em] text-cyan-100/70">
-            <WaterIcon className="h-3.5 w-3.5" /> Trois univers
+            <WaterIcon className="h-3.5 w-3.5" /> Quatre univers
           </span>
           <div className="flex gap-1" aria-label="Étape de présentation">
             {slides.map((slide, step) => (
@@ -147,7 +159,7 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
           </AnimatePresence>
         </div>
 
-        {featured && articleHref && (
+        {featured && (
           <div className="relative mt-2 border-t border-white/10 pt-3">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
@@ -158,22 +170,22 @@ export function UniversesWidget({ current = "notes" }: { current?: Current }) {
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
               >
                 <Link
-                  href={articleHref}
+                  href={featured.href}
                   className="group flex min-w-0 items-center gap-2.5"
                   title="Lire une publication"
                 >
-                  {image && !isHeldMediaUrl(image) ? (
+                  {featured.image ? (
                     <img
-                      src={image}
+                      src={featured.image}
                       alt=""
                       loading="lazy"
                       className="h-12 w-14 shrink-0 rounded-lg object-cover"
                     />
                   ) : null}
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[9px] uppercase tracking-[.14em] text-cyan-100/50">{articleLabel}</span>
+                    <span className="block text-[9px] uppercase tracking-[.14em] text-cyan-100/50">{featured.label}</span>
                     <span className="mt-1 line-clamp-2 text-[11px] font-medium leading-snug text-zinc-200 group-hover:text-cyan-100">
-                      {quote || l(featured.title)}
+                      {featured.quote}
                     </span>
                   </span>
                   <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-cyan-100/60" aria-hidden />
