@@ -78,10 +78,14 @@ export function WorkSidebar() {
 
   return (
     <div>
-      <SectionHeading title="Work">Portfolio, parcours et compétences.</SectionHeading>
-      <div className="mt-3">
+    <div className="flex items-center justify-between gap-3 md:block">
+      <SectionHeading title="Work" className="min-w-0 flex-1">
+        Portfolio, parcours et compétences.
+      </SectionHeading>
+      <div className="shrink-0 md:mt-3">
         <WorkShare pill />
       </div>
+    </div>
 
       <nav
         aria-label="Navigation Work"

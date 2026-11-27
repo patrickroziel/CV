@@ -1,8 +1,16 @@
 import { TipsLink } from "@/components/layout/SupportBar";
 
-export function SectionHeading({ title, children }: { title: string; children?: React.ReactNode }) {
+export function SectionHeading({
+  title,
+  children,
+  className = "",
+}: {
+  title: string;
+  children?: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div>
+    <div className={className}>
       <div className="flex items-center justify-between gap-2">
         <h1 className="min-w-0 text-xl font-semibold tracking-tight text-white md:text-3xl">{title}</h1>
         <TipsLink compact />
