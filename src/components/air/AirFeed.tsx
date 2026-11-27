@@ -15,7 +15,6 @@ import { WorkInProgress } from "@/components/media/WorkInProgress";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { AirSeriesLine, airPartAnchor } from "@/components/air/AirArticle";
-import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { collectPostTags } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
 
@@ -161,7 +160,6 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
           );
         })}
       </nav>
-      <UniversesWidget current="air" />
       <KofiCard className="mt-3" />
     </div>
     </aside>

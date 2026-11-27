@@ -3,7 +3,6 @@
 import { useMemo, useState, Fragment } from "react";
 import Link from "next/link";
 import { BookOpen, Eye, Library, Music, PenLine, Plus, Sparkles, UserRound } from "lucide-react";
-import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { KofiCard } from "@/components/support/KofiCard";
 import { AirTagTicker } from "@/components/air/AirTagTicker";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
@@ -111,12 +110,12 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     <div className="mx-auto grid min-w-0 max-w-[1180px] gap-4 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
       <aside className="min-w-0">
         <div className="universe-rail">
-          <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">Notes</h1>
-          <p className="mt-2 text-[13px] leading-5 text-white/80">
+          <h1 className="text-xl font-semibold tracking-tight text-white md:text-3xl">Notes</h1>
+          <p className="mt-1 text-xs leading-snug text-white/70 md:mt-2 md:text-[13px] md:leading-5">
             Livre, musique, essais, réflexion humaine, spiritualité, symbolisme et fictions.
           </p>
 
-          <nav aria-label="Catégories" className="mt-3 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
+          <nav aria-label="Catégories" className="mt-2 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-0.5 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
             {FILTERS.map((item) => {
               const active = item.id === scope;
               const Icon = item.icon;
@@ -128,7 +127,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
                     setActiveTag(null);
                   }}
                   className={[
-                    "group/filter flex shrink-0 items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm text-white/80 transition-colors md:w-full",
+                    "group/filter flex shrink-0 items-center justify-between gap-2 rounded-full px-2.5 py-1 text-left text-[13px] text-white/80 transition-colors md:w-full md:gap-3 md:rounded-xl md:py-2 md:text-sm",
                     active
                       ? "bg-white/[0.12] text-white"
                       : "text-white/70 hover:bg-white/[0.08] hover:text-white",
@@ -194,8 +193,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
               );
             })}
           </nav>
-          <UniversesWidget current="notes" />
-          <KofiCard className="mt-3" />
+          <KofiCard className="mt-2 md:mt-3" />
         </div>
       </aside>
 
