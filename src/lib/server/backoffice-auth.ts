@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 // GitHub account ID, not a username that could be reassigned.
 const ADMIN_GITHUB_ID = "307225840";
 const SESSION_COOKIE = "pr_backoffice_session";
+const ADMIN_HINT_COOKIE = "pr_bo";
 export const OAUTH_STATE_COOKIE = "pr_backoffice_oauth_state";
 const SESSION_TTL = 60 * 60 * 24 * 7;
 
@@ -64,16 +65,24 @@ export async function isBackofficeAdmin() {
   return verifySession((await cookies()).get(SESSION_COOKIE)?.value);
 }
 export function setSessionCookie(response: NextResponse, githubId: number) {
-  response.cookies.set(SESSION_COOKIE, adminSession(githubId), {
-    httpOnly: true, secure: process.env.NODE_ENV === "production",
-    sameSite: "lax", path: "/", maxAge: SESSION_TTL,
-  });
+  const options = {
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: SESSION_TTL,
+  };
+  response.cookies.set(SESSION_COOKIE, adminSession(githubId), { ...options, httpOnly: true });
+  response.cookies.set(ADMIN_HINT_COOKIE, "1", { ...options, httpOnly: false });
 }
 export function clearSessionCookie(response: NextResponse) {
-  response.cookies.set(SESSION_COOKIE, "", {
-    httpOnly: true, secure: process.env.NODE_ENV === "production",
-    sameSite: "lax", path: "/", maxAge: 0,
-  });
+  const options = {
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: 0,
+  };
+  response.cookies.set(SESSION_COOKIE, "", { ...options, httpOnly: true });
+  response.cookies.set(ADMIN_HINT_COOKIE, "", { ...options, httpOnly: false });
 }
 export function createOAuthState() { return randomBytes(32).toString("base64url"); }
 export function validateOrigin(request: Request) {

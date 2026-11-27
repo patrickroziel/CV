@@ -43,12 +43,29 @@ async function readOriginal(src: string, key: string) {
   return Buffer.from(await upstream.arrayBuffer());
 }
 
+const encodedCache = new Map<string, Buffer>();
+const encodedOrder: string[] = [];
+const ENCODED_MAX = 24;
+
+function rememberEncoded(key: string, bytes: Buffer) {
+  if (encodedCache.has(key)) return;
+  encodedCache.set(key, bytes);
+  encodedOrder.push(key);
+  while (encodedOrder.length > ENCODED_MAX) {
+    const oldest = encodedOrder.shift();
+    if (oldest) encodedCache.delete(oldest);
+  }
+}
+
 export async function GET(req: NextRequest) {
   const src = req.nextUrl.searchParams.get("src") || "";
   const key = objectKey(src);
   if (!key) return new NextResponse("Adresse refusée", { status: 400 });
   const asked = Number(req.nextUrl.searchParams.get("w") || "1080");
   const width = WIDTHS.has(asked) ? asked : 1080;
+  const cacheKey = `${key}:${width}`;
+  const cached = encodedCache.get(cacheKey);
+  if (cached) return imageResponse(cached);
   try {
     const input = await readOriginal(src, key);
     if (!input) return NextResponse.redirect(src, 302);
@@ -57,14 +74,24 @@ export async function GET(req: NextRequest) {
       .resize({ width, withoutEnlargement: true })
       .jpeg({ quality: 75, mozjpeg: true })
       .toBuffer();
-    return new NextResponse(new Uint8Array(output), {
-      headers: {
-        "Content-Type": "image/jpeg",
-        "Content-Disposition": "inline",
-        "Cache-Control": "public, max-age=31536000, immutable",
-      },
-    });
+    const bytes = Buffer.from(output);
+    rememberEncoded(cacheKey, bytes);
+    return imageResponse(bytes);
   } catch {
     return NextResponse.redirect(src, 302);
   }
+}
+
+function imageResponse(bytes: Buffer) {
+  const body = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  return new NextResponse(body, {
+    headers: {
+      "Content-Type": "image/jpeg",
+      "Content-Disposition": "inline",
+      // max-age is the browser. s-maxage and CDN-Cache-Control are the Vercel CDN.
+      // Without them, every visit re-runs sharp and burns Fluid Active CPU.
+      "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "CDN-Cache-Control": "public, s-maxage=31536000, stale-while-revalidate=31536000",
+    },
+  });
 }

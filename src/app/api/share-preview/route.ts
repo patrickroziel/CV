@@ -2,7 +2,7 @@ import { getNoteSharePhoto, getNoteShareText, getPublicNote, NOTES_ORIGIN } from
 import { openGraphLocale, requestedShareLanguage, shareImageUrl, translateShareText } from "@/lib/server/share-locale";
 
 export const runtime = "nodejs";
-export const revalidate = 300;
+export const revalidate = 21600;
 
 function escapeAttr(value: string) {
   return value.replace(/[&"<>]/g, (char) => {
@@ -64,7 +64,8 @@ export async function GET(request: Request) {
   return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=300, s-maxage=3600",
+      "Cache-Control": "public, max-age=3600, s-maxage=21600, stale-while-revalidate=604800",
+      "CDN-Cache-Control": "public, s-maxage=21600, stale-while-revalidate=604800",
     },
   });
 }

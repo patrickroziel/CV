@@ -16,6 +16,7 @@ import { shareImageUrl } from "@/lib/server/share-locale";
 // and forced a fresh database read on each visit.
 export const runtime = "nodejs";
 export const revalidate = 300;
+export const dynamic = "force-static";
 
 type NoteParams = {
   params: Promise<{ id: string }>;

@@ -6,6 +6,7 @@ import { ArticleJsonLd } from "@/components/seo/JsonLd";
 
 export const runtime = "nodejs";
 export const revalidate = 300;
+export const dynamic = "force-static";
 
 export async function generateMetadata({
   params,

@@ -51,7 +51,8 @@ export async function translateShareText(title: string, description: string, lan
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ texts: [title, description], target: lang }),
-      cache: "no-store",
+      cache: "force-cache",
+      next: { revalidate: 86400 },
       signal: AbortSignal.timeout(12000),
     });
     if (!response.ok) return { title, description };

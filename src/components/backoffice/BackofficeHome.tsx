@@ -37,6 +37,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
 
   useEffect(() => {
     if (!authenticated) return;
+    document.cookie = "pr_bo=1; Path=/; Max-Age=604800; SameSite=Lax";
     let active = true;
     fetch("/api/backoffice/content", { cache: "no-store" })
       .then((response) => response.ok ? response.json() as Promise<PortfolioCloudState> : null)
@@ -228,6 +229,7 @@ export function BackofficeHome({ authenticated, privatePath }: { authenticated: 
               try {
                 const response = await fetch("/api/backoffice/logout", { method: "POST" });
                 if (!response.ok) throw new Error();
+                document.cookie = "pr_bo=; Path=/; Max-Age=0; SameSite=Lax";
                 window.location.assign(privatePath);
               } catch { setLogoutError(true); }
             }}>Se déconnecter</button>

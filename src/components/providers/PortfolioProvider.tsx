@@ -156,13 +156,16 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     async function hydrate() {
       const local = isEditEnvironment();
       let authenticated = false;
-      try {
-        const response = await fetch("/api/backoffice/session", { cache: "no-store" });
-        if (response.ok) {
-          const result = (await response.json()) as { authenticated?: boolean };
-          authenticated = result.authenticated === true;
-        }
-      } catch { /* Offline local editing keeps working. */ }
+      const mayBeAdmin = document.cookie.split(/;\s*/).includes("pr_bo=1");
+      if (mayBeAdmin) {
+        try {
+          const response = await fetch("/api/backoffice/session", { cache: "no-store" });
+          if (response.ok) {
+            const result = (await response.json()) as { authenticated?: boolean };
+            authenticated = result.authenticated === true;
+          }
+        } catch { /* Offline local editing keeps working. */ }
+      }
 
       if (authenticated) {
         try {

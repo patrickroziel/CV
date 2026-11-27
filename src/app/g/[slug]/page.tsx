@@ -7,6 +7,7 @@ import { getPublicGhost, ghostShareText } from "@/lib/server/ghost-pages";
 
 export const runtime = "nodejs";
 export const revalidate = 300;
+export const dynamic = "force-static";
 
 type GhostParams = { params: Promise<{ slug: string }> };
 

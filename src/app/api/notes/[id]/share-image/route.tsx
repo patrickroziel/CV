@@ -7,7 +7,7 @@ import { getL } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
 
 export const runtime = "nodejs";
-export const revalidate = 60;
+export const revalidate = 21600;
 
 async function loadPhoto(url: string) {
   const candidates = [url];
@@ -195,9 +195,8 @@ export async function GET(
   return new Response(jpeg, {
     headers: {
       "Content-Type": "image/jpeg",
-      "Cache-Control": photoSrc
-        ? "public, max-age=300, s-maxage=86400"
-        : "public, max-age=60, s-maxage=60",
+      "Cache-Control": "public, max-age=3600, s-maxage=21600, stale-while-revalidate=604800",
+      "CDN-Cache-Control": "public, s-maxage=21600, stale-while-revalidate=604800",
     },
   });
 }
