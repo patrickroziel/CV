@@ -22,36 +22,37 @@
   <main>
     <div id="stage">
       <div id="signature">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="394" style="border-collapse:collapse;width:394px;max-width:100%;color-scheme:light only;supported-color-schemes:light only;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="394" style="border-collapse:collapse;width:394px;max-width:100%;background-color:#ffffff;color-scheme:light only;supported-color-schemes:light only;">
           <tr>
-            <td style="padding:0;line-height:0;font-size:0;background-color:#081820;">
-              <a href="https://patrickroziel.com" style="text-decoration:none;">
-                <img src="https://patrickroziel.com/email/signature-url-v4.png" width="394" height="32" alt="patrickroziel.com" style="display:block;width:394px;max-width:100%;height:auto;border:0;">
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:0;line-height:0;font-size:0;background-color:#081820;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="394" style="border-collapse:collapse;width:394px;">
+            <td style="padding:0;line-height:0;font-size:0;background-color:#ffffff;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="394" style="border-collapse:collapse;width:394px;background-color:#ffffff;">
                 <tr>
-                  <td width="103" style="padding:0;line-height:0;font-size:0;">
+                  <td width="93" style="padding:0;line-height:0;font-size:0;background-color:#ffffff;">
                     <a href="https://patrickroziel.com/notes" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-notes-v4.png" width="103" height="38" alt="Notes" style="display:block;width:103px;height:auto;border:0;">
+                      <img src="https://patrickroziel.com/email/signature-notes-v5.png" width="93" height="60" alt="Notes" style="display:block;width:93px;height:60px;border:0;">
                     </a>
                   </td>
-                  <td width="94" style="padding:0;line-height:0;font-size:0;">
+                  <td width="73" style="padding:0;line-height:0;font-size:0;background-color:#ffffff;">
                     <a href="https://patrickroziel.com/air" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-air-v4.png" width="94" height="38" alt="Air" style="display:block;width:94px;height:auto;border:0;">
+                      <img src="https://patrickroziel.com/email/signature-scope-v5.png" width="73" height="60" alt="Scope" style="display:block;width:73px;height:60px;border:0;">
                     </a>
                   </td>
-                  <td width="94" style="padding:0;line-height:0;font-size:0;">
+                  <td width="66" style="padding:0;line-height:0;font-size:0;background-color:#ffffff;">
                     <a href="https://patrickroziel.com/work" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-work-v4.png" width="94" height="38" alt="Work" style="display:block;width:94px;height:auto;border:0;">
+                      <img src="https://patrickroziel.com/email/signature-work-v5.png" width="66" height="60" alt="Work" style="display:block;width:66px;height:60px;border:0;">
                     </a>
                   </td>
-                  <td width="103" style="padding:0;line-height:0;font-size:0;">
+                  <td width="76" style="padding:0;line-height:0;font-size:0;background-color:#ffffff;">
                     <a href="https://patrickroziel.com/lights" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-lights-v4.png" width="103" height="38" alt="Lights" style="display:block;width:103px;height:auto;border:0;">
+                      <img src="https://patrickroziel.com/email/signature-lights-v5.png" width="76" height="60" alt="Lights" style="display:block;width:76px;height:60px;border:0;">
+                    </a>
+                  </td>
+                  <td width="9" style="padding:0;line-height:0;font-size:0;background-color:#ffffff;">
+                    <img src="https://patrickroziel.com/email/signature-gap-v5.png" width="9" height="60" alt="" style="display:block;width:9px;height:60px;border:0;">
+                  </td>
+                  <td width="77" style="padding:0;line-height:0;font-size:0;background-color:#ffffff;">
+                    <a href="https://ko-fi.com/patrickroziel" style="text-decoration:none;">
+                      <img src="https://patrickroziel.com/email/signature-tips-v5.png" width="77" height="60" alt="Tips" style="display:block;width:77px;height:60px;border:0;">
                     </a>
                   </td>
                 </tr>
@@ -65,7 +66,7 @@
     <h1>La poser dans Mail</h1>
     <p class="note" id="status" role="status"></p>
     <p><button type="button" id="copy">Copier la signature</button></p>
-    <p>Une barre, sans le nom. Notes, Air, Work et Lights restent cliquables.</p>
+    <p>La même barre que le site, sur fond blanc. Notes, Scope, Work, Lights et Tips restent cliquables. Pas d’adresse au-dessus.</p>
     <ol>
       <li>Ouvre cette page dans Safari, sur l’iPhone ou l’iPad.</li>
       <li>Appuie sur Copier la signature.</li>
@@ -80,7 +81,7 @@
     document.getElementById("copy").addEventListener("click", async () => {
       const node = document.getElementById("signature");
       const html = node.innerHTML.trim();
-      const plain = "patrickroziel.com\nhttps://patrickroziel.com/notes\nhttps://patrickroziel.com/air\nhttps://patrickroziel.com/work\nhttps://patrickroziel.com/lights";
+      const plain = "Notes\nhttps://patrickroziel.com/notes\nScope\nhttps://patrickroziel.com/air\nWork\nhttps://patrickroziel.com/work\nLights\nhttps://patrickroziel.com/lights\nTips\nhttps://ko-fi.com/patrickroziel";
       const status = document.getElementById("status");
       let rich = false;
       try {
