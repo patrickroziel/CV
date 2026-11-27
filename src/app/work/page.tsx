@@ -7,7 +7,7 @@ import { QuotesSection } from "@/components/quotes/QuotesSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { SectionVisibility } from "@/components/shared/SectionVisibility";
 import { ShowreelEmbed } from "@/components/shared/ShowreelEmbed";
-import { WorkSidebar } from "@/components/work/WorkSidebar";
+import { WorkSidebar, WorkMenu } from "@/components/work/WorkSidebar";
 import { UniversesWidget } from "@/components/notes/UniversesWidget";
 import { WorkTagTicker } from "@/components/work/WorkTagTicker";
 import { WorkCategoryDock } from "@/components/work/WorkCategoryDock";
@@ -16,11 +16,12 @@ export default function Home() {
   return (
     <main className="no-print relative z-10 min-h-screen pb-36 pt-24 sm:pt-28">
       <div className="mx-auto grid min-w-0 max-w-[1180px] gap-4 px-3 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:gap-16 lg:px-8">
-        <aside>
+        <aside className="grid min-w-0 gap-3">
           <div className="universe-rail">
             <WorkSidebar />
             <UniversesWidget current="work" />
           </div>
+          <WorkMenu />
         </aside>
 
         <section className="work-notes-main min-w-0">

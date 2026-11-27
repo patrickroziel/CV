@@ -2702,6 +2702,22 @@ html[data-universe="portfolio"] .universe-rail {
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
+.section-menu-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.25rem;
+  overflow-x: auto;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(8, 16, 18, 0.72);
+  padding: 0.3rem;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.section-menu-bar::-webkit-scrollbar { display: none; }
 @media (min-width: 768px) {
   .universe-rail {
     position: sticky;

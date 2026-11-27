@@ -45,6 +45,29 @@ function cleanRoleLabel(value: string) {
 }
 
 export function WorkSidebar() {
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-3 md:hidden">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold tracking-tight text-white">Work</h1>
+          <p className="mt-1 text-xs leading-snug text-white/70">Portfolio, parcours et compétences.</p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <TipsLink compact />
+          <WorkShare pill />
+        </div>
+      </div>
+      <div className="hidden md:block">
+        <SectionHeading title="Work">Portfolio, parcours et compétences.</SectionHeading>
+        <div className="mt-3">
+          <WorkShare pill />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function WorkMenu() {
   const { data, l, t } = usePortfolio();
   const [experienceMenuOpen, setExperienceMenuOpen] = useState(false);
 
@@ -75,78 +98,34 @@ export function WorkSidebar() {
     [data.experiences, l]
   );
 
-  const row = "flex shrink-0 items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/80 transition-colors hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 md:w-full";
-
   return (
-    <div>
-    <div className="flex items-start justify-between gap-3 md:hidden">
-      <div className="min-w-0">
-        <h1 className="text-xl font-semibold tracking-tight text-white">Work</h1>
-        <p className="mt-1 text-xs leading-snug text-white/70">Portfolio, parcours et compétences.</p>
-      </div>
-      <div className="flex shrink-0 flex-col items-end gap-2">
-        <TipsLink compact />
-        <WorkShare pill />
-      </div>
-    </div>
-    <div className="hidden md:block">
-      <SectionHeading title="Work">Portfolio, parcours et compétences.</SectionHeading>
-      <div className="mt-3">
-        <WorkShare pill />
-      </div>
-    </div>
-
-      <nav
-        aria-label="Navigation Work"
-        className="mt-3 flex flex-nowrap items-center gap-1 overflow-x-auto pb-1 md:block md:space-y-0.5 md:overflow-visible md:pb-0"
-      >
-        {items.map((item) => {
-          if (item.id !== "experience") {
-            return (
-              <a key={item.id} href={item.href} className={row}>
-                <NavLabel id={item.id} label={item.label} />
-              </a>
-            );
-          }
-
-          return (
-            <div
-              key={item.id}
-              className="shrink-0 md:w-full"
-              onMouseEnter={() => setExperienceMenuOpen(true)}
-              onMouseLeave={() => setExperienceMenuOpen(false)}
-              onFocus={() => setExperienceMenuOpen(true)}
-              onBlur={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
-                  setExperienceMenuOpen(false);
-                }
-              }}
-            >
-              <a href={item.href} className={row}>
-                <NavLabel id={item.id} label={item.label} />
-              </a>
-
-              <div
-                className={`hidden overflow-hidden pl-2 transition-all duration-200 md:block ${
-                  experienceMenuOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="ml-2 border-l border-white/10 py-1 pl-2">
-                  {experienceItems.map((exp) => (
-                    <a
-                      key={exp.id}
-                      href={exp.href}
-                      className="block rounded-lg px-2 py-1.5 text-[0.68rem] leading-snug text-white/55 transition hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
-                    >
-                      {exp.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+    <div onMouseLeave={() => setExperienceMenuOpen(false)}>
+      <nav aria-label="Navigation Work" className="section-menu-bar">
+        {items.map((item) => (
+          <a
+            key={item.id}
+            href={item.href}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+            onMouseEnter={() => setExperienceMenuOpen(item.id === "experience")}
+            onFocus={() => setExperienceMenuOpen(item.id === "experience")}
+          >
+            <NavLabel id={item.id} label={item.label} />
+          </a>
+        ))}
       </nav>
+      {experienceMenuOpen && experienceItems.length > 0 ? (
+        <div className="mt-2 flex gap-1 overflow-x-auto px-1">
+          {experienceItems.map((exp) => (
+            <a
+              key={exp.id}
+              href={exp.href}
+              className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-xs text-white/75 hover:text-white"
+            >
+              {exp.label}
+            </a>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

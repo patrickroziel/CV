@@ -364,28 +364,28 @@ export function LightsFeed() {
       <aside className="min-w-0">
         <div className="universe-rail">
           <SectionHeading title="Lights">Citations, images, vidéos et posts.</SectionHeading>
-          <nav aria-label="Filtres" className="mt-2 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-0.5 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
-            {FILTERS.map((entry) => {
-              const active = filter === entry.id;
-              const total = entry.id === "all" ? items.length : items.filter((item) => item.kind === entry.id).length;
-              return (
-                <button
-                  key={entry.id}
-                  type="button"
-                  onClick={() => setFilter(active && entry.id !== "all" ? "all" : entry.id)}
-                  className={[
-                    "flex shrink-0 items-center justify-between gap-2 rounded-full px-2.5 py-1 text-left text-[13px] transition-colors md:w-full md:rounded-xl md:py-2 md:text-sm",
-                    active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white",
-                  ].join(" ")}
-                >
-                  <span className="truncate">{entry.label}</span>
-                  <span className="text-[11px] tabular-nums text-white/40">{total}</span>
-                </button>
-              );
-            })}
-          </nav>
           <UniversesWidget current="lights" />
         </div>
+        <nav aria-label="Filtres" className="section-menu-bar mt-3">
+          {FILTERS.map((entry) => {
+            const active = filter === entry.id;
+            const total = entry.id === "all" ? items.length : items.filter((item) => item.kind === entry.id).length;
+            return (
+              <button
+                key={entry.id}
+                type="button"
+                onClick={() => setFilter(active && entry.id !== "all" ? "all" : entry.id)}
+                className={[
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] transition-colors",
+                  active ? "bg-white/15 text-white" : "text-white/75 hover:bg-white/10 hover:text-white",
+                ].join(" ")}
+              >
+                <span>{entry.label}</span>
+                <span className="text-[11px] tabular-nums text-white/40">{total}</span>
+              </button>
+            );
+          })}
+        </nav>
       </aside>
       <section className="min-w-0">
       {editMode && <LightComposer />}

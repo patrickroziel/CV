@@ -115,85 +115,51 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             Livre, musique, essais, réflexion humaine, spiritualité, symbolisme et fictions.
           </SectionHeading>
 
-          <nav aria-label="Catégories" className="mt-2 flex w-full min-w-0 flex-nowrap items-center gap-1 overflow-x-auto pb-0.5 md:mt-7 md:block md:space-y-0.5 md:overflow-visible md:pb-0">
+          <UniversesWidget current="notes" />
+        </div>
+        <div className="mt-3" onMouseLeave={() => setBookMenuOpen(false)}>
+          <nav aria-label="Catégories" className="section-menu-bar">
             {FILTERS.map((item) => {
               const active = item.id === scope;
               const Icon = item.icon;
-              const button = (
+              return (
                 <button
+                  key={item.id}
                   type="button"
                   onClick={() => {
                     setScope(active ? "Tout" : item.id);
                     setActiveTag(null);
                   }}
+                  onMouseEnter={() => setBookMenuOpen(item.id === "Livre")}
+                  onFocus={() => setBookMenuOpen(item.id === "Livre")}
                   className={[
-                    "group/filter flex shrink-0 items-center justify-between gap-2 rounded-full px-2.5 py-1 text-left text-[13px] text-white/80 transition-colors md:w-full md:gap-3 md:rounded-xl md:py-2 md:text-sm",
-                    active
-                      ? "bg-white/[0.12] text-white"
-                      : "text-white/70 hover:bg-white/[0.08] hover:text-white",
+                    "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] transition-colors",
+                    active ? "bg-white/15 text-white" : "text-white/75 hover:bg-white/10 hover:text-white",
                   ].join(" ")}
                 >
-                  <span className="inline-flex min-w-0 items-center gap-2">
-                    <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                    <span className="truncate">{item.id}</span>
-                  </span>
+                  <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                  <span>{item.id}</span>
                   <span className="text-[11px] tabular-nums text-white/40">{count(item.id)}</span>
                 </button>
               );
-
-              if (item.id !== "Livre") {
-                return <div key={item.id} className="shrink-0 md:w-full">{button}</div>;
-              }
-
-              return (
-                <div
-                  key={item.id}
-                  className="shrink-0 md:w-full"
-                  onMouseEnter={() => setBookMenuOpen(true)}
-                  onMouseLeave={() => setBookMenuOpen(false)}
-                  onFocus={() => setBookMenuOpen(true)}
-                  onBlur={(e) => {
-                    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
-                      setBookMenuOpen(false);
-                    }
-                  }}
-                >
-                  {button}
-
-                  {bookChapters.length > 0 ? (
-                    <div
-                      className={`hidden overflow-hidden pl-2 transition-all duration-200 md:block ${
-                        bookMenuOpen
-                          ? "max-h-[32rem] opacity-100"
-                          : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="ml-2 border-l border-cyan-100/10 py-1 pl-2">
-                        {bookChapters.map((chapter) => {
-                          const chapterTitle = l(chapter.title).trim() || "Brouillon sans titre";
-                          return (
-                            <Link
-                              key={chapter.id}
-                              href={`/notes/${chapter.id}`}
-                              className="block min-w-0 rounded-lg px-2 py-1.5 text-[0.68rem] leading-snug text-zinc-500 transition-[background-color,color] duration-150 hover:bg-white/[0.06] hover:text-zinc-100 focus-visible:bg-white/[0.06] focus-visible:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
-                            >
-                              <span className="block break-words">{chapterTitle}</span>
-                              {editMode && !chapter.visible ? (
-                                <span className="mt-0.5 block text-[9px] uppercase tracking-wide text-amber-200/70">
-                                  Brouillon
-                                </span>
-                              ) : null}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              );
             })}
           </nav>
-          <UniversesWidget current="notes" />
+          {bookMenuOpen && bookChapters.length > 0 ? (
+            <div className="mt-2 flex gap-1 overflow-x-auto px-1">
+              {bookChapters.map((chapter) => {
+                const chapterTitle = l(chapter.title).trim() || "Brouillon sans titre";
+                return (
+                  <Link
+                    key={chapter.id}
+                    href={`/notes/${chapter.id}`}
+                    className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-xs text-white/75 hover:text-white"
+                  >
+                    {chapterTitle}
+                  </Link>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
       </aside>
 
