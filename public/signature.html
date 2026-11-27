@@ -22,36 +22,36 @@
   <main>
     <div id="stage">
       <div id="signature">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="440" style="border-collapse:collapse;width:440px;max-width:100%;color-scheme:light only;supported-color-schemes:light only;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="360" style="border-collapse:collapse;width:360px;max-width:100%;color-scheme:light only;supported-color-schemes:light only;">
           <tr>
-            <td style="padding:0;line-height:0;font-size:0;background-color:#03141c;">
+            <td style="padding:0;line-height:0;font-size:0;background-color:#06121a;">
               <a href="https://patrickroziel.com" style="text-decoration:none;">
-                <img src="https://patrickroziel.com/email/signature-top-v2.png" width="440" height="99" alt="Patrick Roziel — patrickroziel.com" style="display:block;width:440px;max-width:100%;height:auto;border:0;">
+                <img src="https://patrickroziel.com/email/signature-url-v3.png" width="360" height="26" alt="patrickroziel.com" style="display:block;width:360px;max-width:100%;height:auto;border:0;">
               </a>
             </td>
           </tr>
           <tr>
-            <td style="padding:0;line-height:0;font-size:0;background-color:#03141c;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="440" style="border-collapse:collapse;width:440px;">
+            <td style="padding:0;line-height:0;font-size:0;background-color:#06121a;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="360" style="border-collapse:collapse;width:360px;">
                 <tr>
-                  <td width="96" style="padding:0;line-height:0;font-size:0;">
+                  <td width="115" style="padding:0;line-height:0;font-size:0;">
                     <a href="https://patrickroziel.com/notes" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-notes-v2.png" width="96" height="101" alt="Notes" style="display:block;width:96px;height:auto;border:0;">
+                      <img src="https://patrickroziel.com/email/signature-notes-v3.png" width="115" height="30" alt="Notes" style="display:block;width:115px;height:auto;border:0;">
                     </a>
                   </td>
-                  <td width="61" style="padding:0;line-height:0;font-size:0;">
+                  <td width="58" style="padding:0;line-height:0;font-size:0;">
                     <a href="https://patrickroziel.com/air" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-air-v2.png" width="61" height="101" alt="Air" style="display:block;width:61px;height:auto;border:0;">
+                      <img src="https://patrickroziel.com/email/signature-air-v3.png" width="58" height="30" alt="Air" style="display:block;width:58px;height:auto;border:0;">
                     </a>
                   </td>
-                  <td width="83" style="padding:0;line-height:0;font-size:0;">
+                  <td width="69" style="padding:0;line-height:0;font-size:0;">
                     <a href="https://patrickroziel.com/work" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-work-v2.png" width="83" height="101" alt="Work" style="display:block;width:83px;height:auto;border:0;">
+                      <img src="https://patrickroziel.com/email/signature-work-v3.png" width="69" height="30" alt="Work" style="display:block;width:69px;height:auto;border:0;">
                     </a>
                   </td>
-                  <td width="200" style="padding:0;line-height:0;font-size:0;">
-                    <a href="https://patrickroziel.com" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-rest-v2.png" width="200" height="101" alt="" style="display:block;width:200px;height:auto;border:0;">
+                  <td width="118" style="padding:0;line-height:0;font-size:0;">
+                    <a href="https://patrickroziel.com/lights" style="text-decoration:none;">
+                      <img src="https://patrickroziel.com/email/signature-lights-v3.png" width="118" height="30" alt="Lights" style="display:block;width:118px;height:auto;border:0;">
                     </a>
                   </td>
                 </tr>
@@ -65,7 +65,7 @@
     <h1>La poser dans Mail</h1>
     <p class="note" id="status" role="status"></p>
     <p><button type="button" id="copy">Copier la signature</button></p>
-    <p>C’est une image nette. Mail ne peut plus enlever les couleurs. Notes, Air et Work restent cliquables.</p>
+    <p>Une barre, sans le nom. Notes, Air, Work et Lights restent cliquables.</p>
     <ol>
       <li>Ouvre cette page dans Safari, sur l’iPhone ou l’iPad.</li>
       <li>Appuie sur Copier la signature.</li>
@@ -80,7 +80,7 @@
     document.getElementById("copy").addEventListener("click", async () => {
       const node = document.getElementById("signature");
       const html = node.innerHTML.trim();
-      const plain = "Patrick Roziel\npatrickroziel.com\nhttps://patrickroziel.com/notes\nhttps://patrickroziel.com/air\nhttps://patrickroziel.com/work";
+      const plain = "patrickroziel.com\nhttps://patrickroziel.com/notes\nhttps://patrickroziel.com/air\nhttps://patrickroziel.com/work\nhttps://patrickroziel.com/lights";
       const status = document.getElementById("status");
       let rich = false;
       try {
