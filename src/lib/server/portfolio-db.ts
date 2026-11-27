@@ -33,8 +33,6 @@ async function writeContent(data: PortfolioData, revision: number, savedAt: numb
   await writeJsonBlob(CONTENT_KEY, { revision, savedAt, writeSeq, data } satisfies StoredContent);
 }
 
-let inflight: Promise<Snapshot> | null = null;
-
 function invalidatePublicPortfolio() {
   try {
     revalidateTag(PUBLIC_CACHE_TAG, { expire: 0 });
@@ -54,15 +52,19 @@ function invalidatePublicPortfolio() {
 
 const readCachedPublicSnapshot = unstable_cache(
   async (): Promise<Snapshot> => {
-    if (!inflight) {
-      inflight = loadPortfolio()
-        .then((loaded) => ({ data: loaded.data, revision: loaded.revision, savedAt: 0, writeSeq: loaded.writeSeq }))
-        .catch(() => ({ data: DEFAULT_PORTFOLIO, revision: 1, savedAt: 0, writeSeq: 0 }))
-        .finally(() => { inflight = null; });
+    try {
+      const loaded = await loadPortfolio();
+      return {
+        data: publicPortfolio(loaded.data ?? DEFAULT_PORTFOLIO),
+        revision: loaded.revision,
+        savedAt: 0,
+        writeSeq: loaded.writeSeq,
+      };
+    } catch {
+      return { data: publicPortfolio(DEFAULT_PORTFOLIO), revision: 1, savedAt: 0, writeSeq: 0 };
     }
-    return inflight;
   },
-  ["portfolio-public-v1"],
+  ["portfolio-public-v2"],
   { revalidate: 300, tags: [PUBLIC_CACHE_TAG] }
 );
 
