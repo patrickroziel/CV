@@ -2,22 +2,10 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { Heart, MessageCircle } from "lucide-react";
+import { ShareButton } from "@/components/medias/PostActions";
 
 type LikeState = { available?: boolean; count?: number; liked?: boolean };
 type PublicComment = { id: string; name: string; body: string; createdAt: string };
-type ShareTarget = "x" | "facebook" | "whatsapp" | "linkedin" | "copy";
-
-const TARGETS: { id: ShareTarget; label: string }[] = [
-  { id: "x", label: "X" },
-  { id: "facebook", label: "Facebook" },
-  { id: "whatsapp", label: "WhatsApp" },
-  { id: "linkedin", label: "LinkedIn" },
-  { id: "copy", label: "Copier" },
-];
-
-function openPopup(href: string) {
-  window.open(href, "_blank", "noopener,noreferrer,width=720,height=760");
-}
 
 export function LightActions({
   reactId,
@@ -86,39 +74,6 @@ export function LightActions({
     }
   }
 
-  async function shareTo(target: ShareTarget) {
-    const message = [text.trim() || title.trim(), shareUrl].filter(Boolean).join("\n");
-    setNote("");
-    try {
-      if (target === "copy") {
-        await navigator.clipboard.writeText(shareUrl);
-        setNote("Lien copié.");
-        return;
-      }
-      const encodedUrl = encodeURIComponent(shareUrl);
-      const encodedMessage = encodeURIComponent(message);
-      const encodedText = encodeURIComponent(text.trim() || title.trim());
-      const hrefs: Record<Exclude<ShareTarget, "copy">, string> = {
-        x: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-        whatsapp: `https://wa.me/?text=${encodedMessage}`,
-        linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${encodedMessage}`,
-      };
-      if (target === "facebook" && text.trim()) {
-        try { await navigator.clipboard.writeText(text.trim()); } catch { /* the link still opens */ }
-        setNote("Texte copié. Colle-le dans la publication.");
-      }
-      openPopup(hrefs[target]);
-    } catch {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        setNote("Lien copié.");
-      } catch {
-        setNote("Impossible de partager pour le moment.");
-      }
-    }
-  }
-
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!reactId) return;
@@ -144,41 +99,31 @@ export function LightActions({
 
   return (
     <div className="mt-3">
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/80">Partager</p>
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {TARGETS.map((target) => (
-          <button
-            key={target.id}
-            type="button"
-            onClick={() => void shareTo(target.id)}
-            className="shrink-0 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white"
-          >
-            {target.label}
-          </button>
-        ))}
+      <div className="flex items-center gap-3">
+        <ShareButton url={shareUrl} title={title} summary={text} />
+        {reactId && (
+          <>
+            <button
+              type="button"
+              onClick={() => void react()}
+              disabled={!enabled || busy}
+              aria-pressed={liked}
+              className="inline-flex items-center gap-1.5 text-[13px] font-medium text-cyan-100 disabled:opacity-40"
+            >
+              <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current" : ""}`} />
+              J’aime{count > 0 ? ` · ${count}` : ""}
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              className="inline-flex items-center gap-1.5 text-[13px] font-medium text-cyan-100"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              Commenter{comments.length > 0 ? ` · ${comments.length}` : ""}
+            </button>
+          </>
+        )}
       </div>
-      {reactId && (
-        <div className="mt-2 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => void react()}
-            disabled={!enabled || busy}
-            aria-pressed={liked}
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-cyan-100 disabled:opacity-40"
-          >
-            <Heart className={`h-3.5 w-3.5 ${liked ? "fill-current" : ""}`} />
-            J’aime{count > 0 ? ` · ${count}` : ""}
-          </button>
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-cyan-100"
-          >
-            <MessageCircle className="h-3.5 w-3.5" />
-            Commenter{comments.length > 0 ? ` · ${comments.length}` : ""}
-          </button>
-        </div>
-      )}
       {open && reactId && (
         <div className="mt-3">
           {comments.length > 0 && (

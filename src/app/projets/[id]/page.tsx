@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { createPortal } from "react-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,6 +17,8 @@ import { ProjectMedia } from "@/components/projects/ProjectMedia";
 import { SkillTag } from "@/components/skills/SkillTag";
 import { RichHtml } from "@/components/shared/RichHtml";
 import { useSectionVisible } from "@/components/shared/SectionVisibility";
+import { DockShare } from "@/components/medias/PostActions";
+import { stripHtml } from "@/lib/sanitize-html";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -75,8 +78,12 @@ export default function ProjectDetailPage() {
     );
   }
 
+  const title = l(project.title);
+  const summary = stripHtml(l(project.description));
+
   return (
     <main className="no-print relative z-10 pb-20 pt-28 sm:pt-32">
+      <ProjectShareDock id={project.id} title={title} summary={summary} />
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <Link
           href="/projets"
@@ -160,5 +167,19 @@ export default function ProjectDetailPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function ProjectShareDock({ id, title, summary }: { id: string; title: string; summary: string }) {
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setSlot(document.getElementById("bottom-nav-slot"));
+  }, [id]);
+  if (!slot) return null;
+  return createPortal(
+    <div className="air-float-bar">
+      <DockShare postId={id} sharePath="/projets" title={title} summary={summary} />
+    </div>,
+    slot,
   );
 }

@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { SITE_LANGUAGE_CODES, SITE_LANGUAGE_STORAGE_KEY } from "@/lib/site-translation";
 
 type ResponseState = { available?: boolean; count?: number; liked?: boolean };
@@ -37,13 +37,15 @@ function loadLike(postId: string): Promise<ResponseState> {
   });
 }
 
-const SHARE_TARGETS: { id: ShareTarget; label: string }[] = [
-  { id: "x", label: "X" },
+const SHARE_MENU: { id: ShareTarget; label: string }[] = [
   { id: "facebook", label: "Facebook" },
-  { id: "instagram", label: "Instagram" },
+  { id: "x", label: "X (Twitter)" },
+  { id: "whatsapp", label: "WhatsApp" },
   { id: "linkedin", label: "LinkedIn" },
+  { id: "instagram", label: "Instagram" },
   { id: "threads", label: "Threads" },
   { id: "email", label: "Email" },
+  { id: "copy", label: "Copier le lien" },
 ];
 
 function selectedLanguage() {
@@ -59,17 +61,141 @@ function articleShareUrl(sharePath: string, postId: string) {
   return url.toString();
 }
 
-function coverShareUrl(postId: string, format?: "story") {
-  const lang = selectedLanguage();
-  const image = new URL(`/api/notes/${encodeURIComponent(postId)}/share-image`, "https://patrickroziel.com");
-  image.searchParams.set("v", "12");
-  if (lang) image.searchParams.set("lang", lang);
-  if (format) image.searchParams.set("format", format);
-  return image.toString();
-}
-
 function openPopup(href: string) {
   window.open(href, "_blank", "noopener,noreferrer,width=720,height=760");
+}
+
+async function shareLink(target: ShareTarget, options: { url: string; title: string; summary?: string; onMessage: (message: string) => void }) {
+  const url = options.url;
+  const headline = options.title.trim() || "Patrick Roziel";
+  const excerpt = (options.summary || "").trim();
+  const text = [excerpt, url].filter(Boolean).join("\n");
+  const say = options.onMessage;
+  say("");
+  try {
+    if (target === "copy" || target === "instagram") {
+      await navigator.clipboard.writeText(url);
+      say(target === "instagram" ? "Lien copié. Colle-le dans Instagram." : "Lien copié.");
+      return;
+    }
+    if (target === "more") {
+      if (typeof navigator.share === "function") {
+        await navigator.share({ title: headline, text: excerpt || headline, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      say("Lien copié.");
+      return;
+    }
+    if (target === "email") {
+      window.location.href = `mailto:?subject=${encodeURIComponent(headline)}&body=${encodeURIComponent(text)}`;
+      return;
+    }
+    const encodedUrl = encodeURIComponent(url);
+    const encodedMessage = encodeURIComponent(text);
+    const encodedExcerpt = encodeURIComponent(excerpt);
+    const hrefs: Partial<Record<ShareTarget, string>> = {
+      x: `https://twitter.com/intent/tweet?text=${encodedExcerpt}&url=${encodedUrl}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedExcerpt}`,
+      whatsapp: `https://wa.me/?text=${encodedMessage}`,
+      linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${encodedMessage}`,
+      threads: `https://www.threads.net/intent/post?text=${encodedMessage}`,
+    };
+    const href = hrefs[target];
+    if (href) openPopup(href);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") return;
+    try {
+      await navigator.clipboard.writeText(url);
+      say("Lien copié.");
+    } catch {
+      say("Impossible de partager pour le moment.");
+    }
+  }
+}
+
+export function ShareButton({ postId = "", sharePath = "", url = "", title, summary = "", dock = false }: {
+  postId?: string; sharePath?: string; url?: string; title: string; summary?: string; dock?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [spot, setSpot] = useState<{ top: number; left: number; up: boolean } | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  function place() {
+    const rect = buttonRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const left = Math.min(window.innerWidth - 112, Math.max(112, rect.left + rect.width / 2));
+    const up = dock || window.innerHeight - rect.bottom < 320;
+    setSpot({ top: up ? rect.top : rect.bottom, left, up });
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    place();
+    const onPointer = (event: PointerEvent) => {
+      const node = event.target as Node;
+      if (buttonRef.current?.contains(node)) return;
+      const element = event.target instanceof Element ? event.target : null;
+      if (element?.closest("[data-share-menu]")) return;
+      setOpen(false);
+    };
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [open, dock]);
+
+  function currentUrl() {
+    return url || articleShareUrl(sharePath || "/notes", postId);
+  }
+
+  return (
+    <>
+      <button
+        ref={buttonRef}
+        type="button"
+        className={dock ? `dock-icon${open ? " is-on" : ""}` : "inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white"}
+        aria-label="Partager"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <Share2 className={dock ? undefined : "h-3.5 w-3.5"} aria-hidden />
+      </button>
+      {open && spot ? createPortal(
+        <div
+          data-share-menu="true"
+          data-no-translate="true"
+          className="fixed z-[80] w-52 -translate-x-1/2 rounded-2xl border border-white/15 bg-[#071018]/95 p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
+          style={spot.up ? { left: spot.left, bottom: window.innerHeight - spot.top + 8 } : { left: spot.left, top: spot.top + 8 }}
+        >
+          {SHARE_MENU.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className="flex w-full rounded-xl px-3 py-2 text-left text-[13px] font-medium text-white hover:bg-white/10"
+              onClick={() => {
+                void shareLink(item.id, { url: currentUrl(), title, summary, onMessage: setMessage });
+                if (item.id !== "copy" && item.id !== "instagram") setOpen(false);
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+          {message ? <p role="status" className="px-3 py-1.5 text-[11px] leading-snug text-cyan-100">{message}</p> : null}
+        </div>,
+        document.body,
+      ) : null}
+    </>
+  );
+}
+
+export function DockShare({ postId, sharePath, title, summary = "" }: { postId: string; sharePath: string; title: string; summary?: string }) {
+  return <ShareButton dock postId={postId} sharePath={sharePath} title={title} summary={summary} />;
 }
 
 function CommentThread({ postId, tone, open, onSent }: { postId: string; tone: "dark" | "light"; open: boolean; onSent: () => void }) {
@@ -205,101 +331,11 @@ export function PostActions({ postId, title, summary = "", visible = true, share
     finally { setBusy(false); }
   }
 
-  async function shareTo(target: ShareTarget) {
-    const url = articleShareUrl(sharePath, postId);
-    const headline = title.trim() || "Patrick Roziel";
-    const excerpt = summary.trim();
-    const text = [excerpt, url].filter(Boolean).join("\n");
-    setMessage("");
-    try {
-      if (target === "copy") {
-        await navigator.clipboard.writeText(url);
-        setMessage("Lien copié.");
-        return;
-      }
-      if (target === "more") {
-        if (typeof navigator.share === "function") {
-          await navigator.share({ title: headline, text: excerpt || headline, url });
-          return;
-        }
-        await navigator.clipboard.writeText(text);
-        setMessage("Lien copié.");
-        return;
-      }
-      if (target === "email") {
-        window.location.href = `mailto:?subject=${encodeURIComponent(headline)}&body=${encodeURIComponent(text)}`;
-        return;
-      }
-      if (target === "youtube") {
-        await navigator.clipboard.writeText(text);
-        openPopup("https://studio.youtube.com/");
-        setMessage("Texte copié. Colle-le dans une publication YouTube.");
-        return;
-      }
-      if (target === "instagram") {
-        const imageUrl = coverShareUrl(postId, "story");
-        try { await navigator.clipboard.writeText(text); } catch { /* the image can still be shared */ }
-        try {
-          const response = await fetch(imageUrl);
-          if (!response.ok) throw new Error();
-          const blob = await response.blob();
-          const file = new File([blob], "story-patrick-roziel.png", { type: blob.type || "image/png" });
-          if (navigator.canShare?.({ files: [file] })) {
-            await navigator.share({ files: [file] });
-            setMessage("Dans Instagram, choisis Story. Le lien est copié pour le sticker.");
-            return;
-          }
-          const download = document.createElement("a");
-          download.href = URL.createObjectURL(blob);
-          download.download = "story-patrick-roziel.png";
-          download.click();
-          setMessage("Image Story téléchargée. Le lien est copié : ajoute-le dans la story.");
-          return;
-        } catch (error) {
-          if (error instanceof DOMException && error.name === "AbortError") return;
-        }
-        setMessage("Le lien est copié. Ouvre Instagram, puis une story.");
-        return;
-      }
-      const encodedUrl = encodeURIComponent(url);
-      const encodedMessage = encodeURIComponent(text);
-      const encodedExcerpt = encodeURIComponent(excerpt);
-      const hrefs: Partial<Record<ShareTarget, string>> = {
-        x: `https://twitter.com/intent/tweet?text=${encodedExcerpt}&url=${encodedUrl}`,
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedExcerpt}`,
-        whatsapp: `https://wa.me/?text=${encodedMessage}`,
-        linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${encodedMessage}`,
-        telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedExcerpt}`,
-        threads: `https://www.threads.net/intent/post?text=${encodedMessage}`,
-        bluesky: `https://bsky.app/intent/compose?text=${encodedMessage}`,
-        pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodeURIComponent(coverShareUrl(postId))}&description=${encodedExcerpt}`,
-      };
-      const href = hrefs[target];
-      if (target === "facebook" && excerpt) {
-        try { await navigator.clipboard.writeText(excerpt); } catch { /* the link preview still opens */ }
-        setMessage("Texte copié. Colle-le dans la publication.");
-      }
-      if (href) openPopup(href);
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      try {
-        await navigator.clipboard.writeText(url);
-        setMessage("Lien copié.");
-      } catch {
-        setMessage("Impossible de partager pour le moment.");
-      }
-    }
-  }
-
   const reactionClass = tone === "light"
     ? "text-[#1c1917]/80 hover:text-[#1c1917]"
     : sharePath === "/air"
       ? "text-white/80 hover:text-white"
       : "text-cyan-100 hover:text-white";
-  const chipClass = tone === "light"
-    ? "border-[#1c1917]/12 bg-transparent text-[#1c1917]/70 hover:bg-[#1c1917]/[0.04]"
-    : "border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-200";
-
   const reactions = (
     <div className={floating ? "article-actions-float" : "flex items-center gap-3"}>
       <button type="button" onClick={() => void react()} disabled={!enabled || busy}
@@ -310,7 +346,7 @@ export function PostActions({ postId, title, summary = "", visible = true, share
         {count > 0 ? <span className="tabular-nums">{count.toLocaleString("fr-FR")}</span> : null}
       </button>
       {comments && !commentLink && (
-        <button type="button" onClick={() => setCommentOpen((open) => !open)} aria-expanded={commentOpen}
+        <button type="button" onClick={() => setCommentOpen((value) => !value)} aria-expanded={commentOpen}
           className={`text-[13px] font-medium transition ${reactionClass}`}>
           {commentOpen ? "Fermer" : "Commenter"}
         </button>
@@ -322,29 +358,19 @@ export function PostActions({ postId, title, summary = "", visible = true, share
       ) : null}
     </div>
   );
-  const shares = (
-    <div className="flex min-w-0 flex-col gap-2" id={comments ? `post-comments-${postId}` : undefined}>
-      {comments && <CommentThread postId={postId} tone={tone} open={commentOpen} onSent={() => setCommentOpen(false)} />}
-      <div className="flex max-w-full flex-wrap gap-1" data-no-translate="true">
-        {SHARE_TARGETS.map((item) => (
-          <button key={item.id} type="button" onClick={() => void shareTo(item.id)}
-            className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
-            {item.label}
-          </button>
-        ))}
-        <button type="button" onClick={() => void shareTo("more")}
-          className={`inline-flex h-6 items-center rounded-full border px-2 text-[10px] font-medium leading-none transition ${chipClass}`}>
-          Plus
-        </button>
-      </div>
-      {message && <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span>}
+  const share = <ShareButton postId={postId} sharePath={sharePath} title={title} summary={summary} />;
+  const thread = comments ? (
+    <div id={`post-comments-${postId}`}>
+      <CommentThread postId={postId} tone={tone} open={commentOpen} onSent={() => setCommentOpen(false)} />
     </div>
-  );
-  if (shareOnly) return shares;
+  ) : null;
+  const likeError = message ? <span role="status" className={`w-full text-xs font-medium ${tone === "light" ? "text-sky-900" : "text-cyan-100"}`}>{message}</span> : null;
+
+  if (shareOnly) return share;
   if (card) {
-    return <div className="flex min-w-0 flex-col gap-2">
-      {shares}
+    return <div className="flex flex-col gap-2">
       <div className="inline-flex items-center gap-3">
+        {share}
         <button type="button" onClick={() => void react()} disabled={!enabled || busy}
           aria-pressed={liked} aria-label={liked ? "Retirer mon like" : "J'aime"}
           className="inline-flex items-center gap-1.5 text-[13px] text-white/70 transition hover:text-white disabled:opacity-40">
@@ -355,13 +381,14 @@ export function PostActions({ postId, title, summary = "", visible = true, share
           <MessageCircle className="h-3.5 w-3.5" aria-hidden />
         </Link>
       </div>
+      {likeError}
     </div>;
   }
-  if (dock) return shares;
-  if (!floating) return <div className="flex min-w-0 flex-col gap-2">{reactions}{shares}</div>;
+  if (dock) return thread;
+  if (!floating) return <div className="flex min-w-0 flex-col gap-2"><div className="flex items-center gap-3">{share}{reactions}</div>{thread}{likeError}</div>;
   return <>
     {mounted ? createPortal(reactions, document.body) : null}
-    {shares}
+    {thread}
   </>;
 }
 

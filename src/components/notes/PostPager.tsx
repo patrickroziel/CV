@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostEditButton } from "@/components/medias/PostEditButton";
-import { DockReactions } from "@/components/medias/PostActions";
+import { DockReactions, DockShare } from "@/components/medias/PostActions";
 import { compareBookChapters } from "@/lib/book-order";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import type { SocialPost } from "@/lib/types";
@@ -148,6 +148,7 @@ export function PostPager({
 const notesEditClass = "dock-icon text-[0px] [&_svg]:h-3.5 [&_svg]:w-3.5";
 
 export function NotesBottomNav({ post, seedPosts = [] }: { post: SocialPost; seedPosts?: SocialPost[] }) {
+  const { l } = usePortfolio();
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   useEffect(() => {
     setSlot(document.getElementById("bottom-nav-slot"));
@@ -160,7 +161,12 @@ export function NotesBottomNav({ post, seedPosts = [] }: { post: SocialPost; see
         universe="notes"
         seedPosts={seedPosts}
         placement="pills"
-        reactions={<DockReactions postId={post.id} />}
+        reactions={
+          <>
+            <DockReactions postId={post.id} />
+            <DockShare postId={post.id} sharePath="/notes" title={l(post.title)} />
+          </>
+        }
         extra={<PostEditButton post={post} universe="notes" className={notesEditClass} />}
       />
     </div>,

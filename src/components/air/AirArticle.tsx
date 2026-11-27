@@ -6,7 +6,7 @@ import { Layers } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { PostRichBody } from "@/components/medias/PostRichBody";
 import { FeaturedMedia } from "@/components/medias/FeaturedMedia";
-import { PostActions, DockReactions } from "@/components/medias/PostActions";
+import { PostActions, DockReactions, DockShare } from "@/components/medias/PostActions";
 import { PostEditButton } from "@/components/medias/PostEditButton";
 import { PostPager } from "@/components/notes/PostPager";
 import { ReadingTitle } from "@/components/medias/ArticlePartNav";
@@ -143,7 +143,12 @@ export function AirArticle({ id, initialPost = null, seedPosts = [] }: { id: str
           universe="air"
           seedPosts={seedPosts}
           placement="pills"
-          reactions={<DockReactions postId={post.id} />}
+          reactions={
+            <>
+              <DockReactions postId={post.id} />
+              <DockShare postId={post.id} sharePath="/air" title={title} summary={lead} />
+            </>
+          }
           extra={<PostEditButton post={post} universe="air" className="dock-icon text-[0px] [&_svg]:h-3.5 [&_svg]:w-3.5" />}
         />
       </div>,
