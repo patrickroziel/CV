@@ -1,104 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light only" />
-  <meta name="supported-color-schemes" content="light only" />
+  <meta name="robots" content="noindex" />
   <title>Signature — Patrick Roziel</title>
   <style>
-    html, body { margin: 0; background: #f4f1ea; color: #1c1917; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; }
-    main { max-width: 640px; margin: 0 auto; padding: 48px 20px 72px; }
-    h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 28px 0 8px; }
-    p, li { color: #44403c; font-size: 15px; line-height: 1.5; }
-    ol { padding-left: 18px; }
-    button { appearance: none; border: 0; border-radius: 999px; background: #0f3c45; color: #ecfeff; font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 12px 18px; cursor: pointer; }
-    .note { min-height: 1.4em; color: #0f766e; font-size: 13px; }
-    #stage { display: inline-block; background: #fff; padding: 18px; border-radius: 12px; }
+    body { margin: 0; background: #e7eef1; color: #1c2830; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .help { max-width: 28rem; margin: 0 auto; padding: 28px 20px 8px; font-size: 15px; line-height: 1.45; }
+    .help h1 { margin: 0 0 8px; font-size: 22px; letter-spacing: -0.03em; }
+    .help p { margin: 0 0 10px; }
+    .card-wrap { max-width: 28rem; margin: 0 auto; padding: 18px 20px 48px; }
   </style>
 </head>
 <body>
-  <main>
-    <div id="stage">
-      <div id="signature">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="440" style="border-collapse:collapse;width:440px;max-width:100%;color-scheme:light only;supported-color-schemes:light only;">
-          <tr>
-            <td style="padding:0;line-height:0;font-size:0;background-color:#03141c;">
-              <a href="https://patrickroziel.com" style="text-decoration:none;">
-                <img src="https://patrickroziel.com/email/signature-top-v2.png" width="440" height="99" alt="Patrick Roziel — patrickroziel.com" style="display:block;width:440px;max-width:100%;height:auto;border:0;">
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:0;line-height:0;font-size:0;background-color:#03141c;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="440" style="border-collapse:collapse;width:440px;">
-                <tr>
-                  <td width="96" style="padding:0;line-height:0;font-size:0;">
-                    <a href="https://patrickroziel.com/notes" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-notes-v2.png" width="96" height="101" alt="Notes" style="display:block;width:96px;height:auto;border:0;">
-                    </a>
-                  </td>
-                  <td width="61" style="padding:0;line-height:0;font-size:0;">
-                    <a href="https://patrickroziel.com/air" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-air-v2.png" width="61" height="101" alt="Air" style="display:block;width:61px;height:auto;border:0;">
-                    </a>
-                  </td>
-                  <td width="83" style="padding:0;line-height:0;font-size:0;">
-                    <a href="https://patrickroziel.com/work" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-work-v2.png" width="83" height="101" alt="Work" style="display:block;width:83px;height:auto;border:0;">
-                    </a>
-                  </td>
-                  <td width="200" style="padding:0;line-height:0;font-size:0;">
-                    <a href="https://patrickroziel.com" style="text-decoration:none;">
-                      <img src="https://patrickroziel.com/email/signature-rest-v2.png" width="200" height="101" alt="" style="display:block;width:200px;height:auto;border:0;">
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
-
-    <h1>La poser dans Mail</h1>
-    <p class="note" id="status" role="status"></p>
-    <p><button type="button" id="copy">Copier la signature</button></p>
-    <p>Mail avait enlevé les couleurs. Cette version est une image nette : il ne peut plus la défaire. Notes, Air et Work restent cliquables.</p>
-    <ol>
-      <li>Attends une ou deux minutes, puis ouvre cette page dans Safari.</li>
-      <li>Appuie sur Copier la signature.</li>
-      <li>Sur Mac : Mail, Réglages, Signatures. Efface l’ancienne, puis colle. Ne retouche plus le texte.</li>
-      <li>Sur iPhone : fais-la d’abord sur le Mac, avec le même compte iCloud. Elle suit.</li>
-    </ol>
-  </main>
-  <script>
-    document.getElementById("copy").addEventListener("click", async () => {
-      const node = document.getElementById("signature");
-      const html = node.innerHTML.trim();
-      const plain = "Patrick Roziel\npatrickroziel.com\nhttps://patrickroziel.com/notes\nhttps://patrickroziel.com/air\nhttps://patrickroziel.com/work";
-      const status = document.getElementById("status");
-      let rich = false;
-      try {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            "text/html": new Blob([html], { type: "text/html" }),
-            "text/plain": new Blob([plain], { type: "text/plain" }),
-          }),
-        ]);
-        rich = true;
-      } catch (error) {
-        const range = document.createRange();
-        range.selectNodeContents(node);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        rich = document.execCommand("copy");
-        selection.removeAllRanges();
-      }
-      status.textContent = rich ? "C’est copié. Colle-la dans Mail, à la place de l’ancienne." : "La copie a échoué. Sélectionne la signature à la main.";
-    });
-  </script>
+  <div class="help">
+    <h1>Signature</h1>
+    <p>Sélectionne seulement le cadre sombre, puis copie. N’inclus pas ce texte.</p>
+  </div>
+  <div class="card-wrap">
+    <!--SIGNATURE-->
+    <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:separate;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+      <tr>
+        <td style="padding:16px 18px;background:#07151c;border:1px solid #1d4552;border-radius:18px;">
+          <div style="width:36px;height:2px;background:#9eeaf8;border-radius:2px;margin:0 0 12px;"></div>
+          <div style="font-size:18px;line-height:1.2;font-weight:600;letter-spacing:-0.03em;color:#f4fbfc;">Patrick Roziel</div>
+          <div style="margin-top:4px;font-size:13px;line-height:1.3;">
+            <a href="https://patrickroziel.com" style="color:#9eeaf8;text-decoration:none;">patrickroziel.com</a>
+          </div>
+          <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:separate;margin-top:14px;">
+            <tr>
+              <td style="padding:0 6px 0 0;">
+                <a href="https://patrickroziel.com/notes" style="display:inline-block;padding:6px 12px;background:#12343c;border:1px solid #2f6d7c;border-radius:999px;color:#e7fbff;font-size:12px;line-height:1;font-weight:600;letter-spacing:0.01em;text-decoration:none;">Notes</a>
+              </td>
+              <td style="padding:0 6px 0 0;">
+                <a href="https://patrickroziel.com/air" style="display:inline-block;padding:6px 12px;background:#12343c;border:1px solid #2f6d7c;border-radius:999px;color:#e7fbff;font-size:12px;line-height:1;font-weight:600;letter-spacing:0.01em;text-decoration:none;">Air</a>
+              </td>
+              <td>
+                <a href="https://patrickroziel.com/work" style="display:inline-block;padding:6px 12px;background:#12343c;border:1px solid #2f6d7c;border-radius:999px;color:#e7fbff;font-size:12px;line-height:1;font-weight:600;letter-spacing:0.01em;text-decoration:none;">Work</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <!--/SIGNATURE-->
+  </div>
 </body>
 </html>
