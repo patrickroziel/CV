@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { listPublicPosts } from "@/lib/server/notes-sharing";
+import { listPublicLightIds, listPublicPosts } from "@/lib/server/notes-sharing";
 import { blobReady, enqueue, readJsonBlob, writeJsonBlob } from "@/lib/server/json-blob";
 
 export const likeCookie = "pr_post_reaction";
@@ -68,8 +68,10 @@ export function cleanPostIds(ids: string[]) {
 
 export async function publishedIdSet() {
   try {
-    const posts = await listPublicPosts();
-    return new Set(posts.map((post) => post.id).filter((id) => VALID_ID.test(id)));
+    const [posts, lights] = await Promise.all([listPublicPosts(), listPublicLightIds()]);
+    return new Set(
+      [...posts.map((post) => post.id), ...lights].filter((id) => VALID_ID.test(id)),
+    );
   } catch {
     return null;
   }

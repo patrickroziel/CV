@@ -830,6 +830,8 @@ export type LightNote = {
   text: string;
   /** Image, video, X or Instagram address. Empty for words and quotes. */
   url: string | null;
+  /** Still taken from a video, so the feed can show a preview before play. */
+  thumb?: string | null;
   /** How the media is framed. Missing means the original format. */
   ratio?: LightRatio;
   /** ISO date YYYY-MM-DD */

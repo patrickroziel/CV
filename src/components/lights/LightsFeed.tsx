@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { usePortfolio } from "@/components/providers/PortfolioProvider";
 import { LightsIcon } from "@/components/layout/universe-icons";
+import { LightActions } from "@/components/lights/LightActions";
 import { XEmbed } from "@/components/projects/XEmbed";
 import { collectLightCards, type LightCard } from "@/lib/lights";
-import type { LightKind, LightRatio } from "@/lib/types";
+import type { InlinePostMedia, LightKind, LightRatio } from "@/lib/types";
+import { getL, setL } from "@/lib/i18n-content";
+import { mediaMarker } from "@/lib/post-inline-media";
 import { uploadToBlob, MEDIA_FOLDERS } from "@/lib/blob-upload";
-import { xPostUrl, youtubeEmbedUrl } from "@/lib/utils";
+import { vimeoCanonical, xPostUrl, youtubeEmbedUrl, youtubeVideoId } from "@/lib/utils";
 
 const FILTERS: { id: "all" | LightKind; label: string }[] = [
   { id: "all", label: "Tout" },
@@ -45,6 +48,86 @@ const KINDS: { id: LightKind; label: string }[] = [
   { id: "x", label: "Post X" },
   { id: "instagram", label: "Post Instagram" },
 ];
+
+function FileStill({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const seek = () => {
+      const mark = Math.min(0.5, (video.duration || 1) / 5);
+      try { video.currentTime = mark; } catch { /* the first frame stays */ }
+    };
+    video.addEventListener("loadeddata", seek, { once: true });
+    return () => video.removeEventListener("loadeddata", seek);
+  }, [src]);
+  return (
+    <video
+      ref={ref}
+      src={src}
+      muted
+      playsInline
+      preload="auto"
+      className="pointer-events-none h-full w-full bg-black object-contain"
+    />
+  );
+}
+
+function articleId(href: string | null) {
+  return href?.match(/^\/(?:notes|air)\/([^/?#]+)$/)?.[1] ?? null;
+}
+
+function shareUrlOf(item: LightCard) {
+  if (item.href) return `https://patrickroziel.com${item.href}`;
+  return `https://patrickroziel.com/lights#${encodeURIComponent(item.id)}`;
+}
+
+function embedOf(item: LightCard, id: string): InlinePostMedia | null {
+  if ((item.kind === "words" || item.kind === "quote") && item.text) {
+    return { id, type: "text", title: "", body: item.text };
+  }
+  if (!item.mediaUrl) return null;
+  if (item.kind === "image") return { id, type: "image", url: item.mediaUrl };
+  if (item.kind === "x") return { id, type: "x", url: item.mediaUrl };
+  if (item.kind === "instagram") return { id, type: "text", title: "Instagram", body: item.mediaUrl };
+  if (youtubeVideoId(item.mediaUrl)) return { id, type: "youtube", url: item.mediaUrl };
+  if (vimeoCanonical(item.mediaUrl)) return { id, type: "vimeo", url: item.mediaUrl };
+  if (item.kind === "video") return { id, type: "video", url: item.mediaUrl };
+  return null;
+}
+
+async function frameFile(file: File) {
+  const local = URL.createObjectURL(file);
+  try {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.src = local;
+    await new Promise<void>((resolve, reject) => {
+      video.onloadeddata = () => resolve();
+      video.onerror = () => reject(new Error("Aperçu impossible."));
+    });
+    const mark = Math.min(0.5, (video.duration || 1) / 5);
+    await new Promise<void>((resolve) => {
+      const done = () => resolve();
+      video.addEventListener("seeked", done, { once: true });
+      window.setTimeout(done, 800);
+      try { video.currentTime = mark; } catch { done(); }
+    });
+    if (!video.videoWidth) return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d")?.drawImage(video, 0, 0);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob((value) => resolve(value), "image/jpeg", 0.82));
+    return blob ? new File([blob], "apercu.jpg", { type: "image/jpeg" }) : null;
+  } catch {
+    return null;
+  } finally {
+    URL.revokeObjectURL(local);
+  }
+}
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -90,7 +173,9 @@ function MediaFace({ item, open, onOpen }: { item: LightCard; open: boolean; onO
       <button type="button" onClick={onOpen} className="absolute inset-0" aria-label="Lire la vidéo">
         {item.thumb ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.thumb} alt="" className="h-full w-full object-cover" />
+          <img src={item.thumb} alt="" className="h-full w-full object-contain" />
+        ) : item.file && item.mediaUrl ? (
+          <FileStill src={item.mediaUrl} />
         ) : (
           <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(125,211,252,0.28),transparent_42%),linear-gradient(160deg,#071422,#02060c)]" />
         )}
@@ -109,6 +194,7 @@ function LightComposer() {
   const [kind, setKind] = useState<LightKind>("words");
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
+  const [thumb, setThumb] = useState<string | null>(null);
   const [ratio, setRatio] = useState<LightRatio>("original");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -120,7 +206,17 @@ function LightComposer() {
     try {
       const uploaded = await uploadToBlob(file, { folder: MEDIA_FOLDERS.media });
       setUrl(uploaded.url);
-      setKind(file.type.startsWith("video/") ? "video" : "image");
+      const video = file.type.startsWith("video/");
+      setKind(video ? "video" : "image");
+      if (video) {
+        const poster = await frameFile(file);
+        if (poster) {
+          const shot = await uploadToBlob(poster, { folder: MEDIA_FOLDERS.media });
+          setThumb(shot.url);
+        }
+      } else {
+        setThumb(null);
+      }
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Envoi impossible.");
     } finally {
@@ -155,12 +251,14 @@ function LightComposer() {
       text: words,
       url: needsUrl ? link : null,
       ratio: kind === "image" || kind === "video" ? ratio : "original",
+      thumb: kind === "video" ? thumb : null,
       date: today(),
       postedAt: new Date().toISOString(),
       visible: true,
     });
     setText("");
     setUrl("");
+    setThumb(null);
     setError("");
   }
 
@@ -217,9 +315,11 @@ function LightComposer() {
 }
 
 export function LightsFeed() {
-  const { data, l, editMode, removeLightNote, updateLightNote } = usePortfolio();
+  const { data, l, editMode, removeLightNote, updateLightNote, updateSocialPost } = usePortfolio();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [embedId, setEmbedId] = useState<string | null>(null);
+  const [embedNote, setEmbedNote] = useState("");
   const items = useMemo(
     () => collectLightCards({
       posts: data.socialPosts ?? [],
@@ -233,6 +333,29 @@ export function LightsFeed() {
     [data.socialPosts, data.projects, data.lightNotes, data.mainShowreel, data.featureVideos, l, editMode],
   );
   const visible = filter === "all" ? items : items.filter((item) => item.kind === filter);
+  const articles = (data.socialPosts ?? []).filter((post) => post.visible !== false);
+  const embedding = items.find((item) => item.id === embedId) ?? null;
+
+  function placeInArticle(postId: string) {
+    if (!embedding) return;
+    const post = articles.find((item) => item.id === postId);
+    if (!post) return;
+    const id = crypto.randomUUID();
+    const media = embedOf(embedding, id);
+    if (!media) {
+      setEmbedNote("Ce post ne peut pas entrer dans un article.");
+      return;
+    }
+    const description = getL(post.description, "fr");
+    const marker = `<p>${mediaMarker(id)}</p>`;
+    updateSocialPost(postId, {
+      inlineMedia: [...(post.inlineMedia ?? []), media],
+      description: setL(post.description, "fr", description.includes(mediaMarker(id)) ? description : `${description}${marker}`),
+    });
+    const section = post.universe === "air" ? "Air" : "Notes";
+    setEmbedNote(`Intégré dans ${section} · ${l(post.title).trim() || "Sans titre"}.`);
+    setEmbedId(null);
+  }
 
   return (
     <div className="mx-auto w-full max-w-xl px-3 sm:px-6">
@@ -275,7 +398,7 @@ export function LightsFeed() {
           {visible.map((item) => {
             const face = item.kind === "image" || item.kind === "video" || item.kind === "instagram";
             return (
-              <li key={item.id} className="overflow-hidden rounded-2xl border border-white/12 bg-black/30">
+              <li key={item.id} id={item.id} className="overflow-hidden rounded-2xl border border-white/12 bg-black/30">
                 {item.kind === "x" && item.mediaUrl ? (
                   <XEmbed url={item.mediaUrl} className="rounded-none border-0" />
                 ) : face && (
@@ -293,7 +416,13 @@ export function LightsFeed() {
                       {item.kind === "quote" ? `« ${item.text} »` : item.text}
                     </p>
                   )}
-                  <div className="mt-2 flex items-center justify-between gap-3">
+                  <LightActions
+                    reactId={item.ownId ?? articleId(item.href)}
+                    shareUrl={shareUrlOf(item)}
+                    title={item.text || "Lights"}
+                    text={item.text}
+                  />
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                     {item.href ? (
                       <Link href={item.href} className="text-[11px] font-medium text-zinc-300 underline-offset-2 hover:text-white hover:underline">
                         Ouvrir l’article
@@ -314,6 +443,11 @@ export function LightsFeed() {
                       </div>
                     )}
                     {editMode && item.ownId && (
+                      <button type="button" onClick={() => { setEmbedId(item.id); setEmbedNote(""); }} className="text-[11px] font-semibold text-cyan-100">
+                        Intégrer dans un article
+                      </button>
+                    )}
+                    {editMode && item.ownId && (
                       <button type="button" onClick={() => removeLightNote(item.ownId!)} className="inline-flex items-center gap-1 text-[11px] text-red-200" title="Retirer">
                         <Trash2 className="h-3.5 w-3.5" /> Retirer
                       </button>
@@ -324,6 +458,37 @@ export function LightsFeed() {
             );
           })}
         </ol>
+      )}
+      {embedNote && <p className="mt-4 text-sm text-cyan-100">{embedNote}</p>}
+      {embedding && (
+        <div className="fixed inset-0 z-40 flex items-end bg-black/70 p-3 sm:items-center sm:justify-center">
+          <div className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/15 bg-zinc-950 p-4" role="dialog" aria-labelledby="embed-title">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 id="embed-title" className="text-lg font-semibold text-white">Intégrer dans un article</h2>
+              <button type="button" onClick={() => setEmbedId(null)} className="text-sm text-zinc-300">Fermer</button>
+            </div>
+            {articles.length === 0 ? (
+              <p className="text-sm text-zinc-300">Aucun article pour l’instant.</p>
+            ) : (
+              <ul className="grid gap-2">
+                {articles.map((post) => (
+                  <li key={post.id}>
+                    <button
+                      type="button"
+                      onClick={() => placeInArticle(post.id)}
+                      className="flex w-full flex-col items-start rounded-xl border border-white/15 px-3 py-3 text-left"
+                    >
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/80">
+                        {post.universe === "air" ? "Air" : "Notes"}
+                      </span>
+                      <span className="text-sm text-white">{l(post.title).trim() || "Sans titre"}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

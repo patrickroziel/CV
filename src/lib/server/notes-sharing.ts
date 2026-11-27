@@ -9,6 +9,7 @@ import { readPublicPortfolio } from "@/lib/server/portfolio-db";
 import type { SocialPost } from "@/lib/types";
 import { coercePostCategory } from "@/lib/post-taxonomy";
 import { concealHiddenPost, isTeaserPost, isWipCover, TEASER_PUBLIC_LINE } from "@/lib/post-publication";
+import { normalizeLightNotes } from "@/lib/lights";
 import { youtubeVideoId } from "@/lib/utils";
 
 export const NOTES_ORIGIN = "https://patrickroziel.com";
@@ -34,6 +35,18 @@ export const listPublicPosts = cache(async function listPublicPosts(): Promise<S
       const next = category === post.category ? post : { ...post, category };
       return concealHiddenPost(next);
     });
+});
+
+export const listPublicLightIds = cache(async function listPublicLightIds(): Promise<string[]> {
+  try {
+    const saved = await readPublicPortfolio();
+    return normalizeLightNotes(saved.data?.lightNotes)
+      .filter((note) => note.visible !== false)
+      .map((note) => note.id)
+      .filter((id) => isPostId(id));
+  } catch {
+    return [];
+  }
 });
 
 export async function getPublicNote(id: string): Promise<SocialPost | null> {

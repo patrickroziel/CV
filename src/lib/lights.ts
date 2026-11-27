@@ -37,11 +37,12 @@ export function normalizeLightNotes(raw: unknown): LightNote[] {
     if (!kind || !id) continue;
     const text = typeof row.text === "string" ? row.text.replace(/\s+/g, " ").trim().slice(0, 500) : "";
     const url = typeof row.url === "string" && row.url.trim().startsWith("https://") ? row.url.trim().slice(0, 400) : null;
+    const thumb = typeof row.thumb === "string" && row.thumb.trim().startsWith("https://") ? row.thumb.trim().slice(0, 400) : null;
     if ((kind === "words" || kind === "quote") && !text) continue;
     if (kind !== "words" && kind !== "quote" && !url) continue;
     const date = typeof row.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(row.date) ? row.date : "";
     const postedAt = typeof row.postedAt === "string" && /^\d{4}-\d{2}-\d{2}T/.test(row.postedAt) ? row.postedAt : "";
-    notes.push({ id, kind, text, url, date, visible: row.visible !== false, ratio: ratioOf(row.ratio), ...(postedAt ? { postedAt } : {}) });
+    notes.push({ id, kind, text, url, date, visible: row.visible !== false, ratio: ratioOf(row.ratio), ...(postedAt ? { postedAt } : {}), ...(thumb ? { thumb } : {}) });
   }
   return notes;
 }
@@ -195,8 +196,8 @@ function fromNote(note: LightNote, order = 0): LightCard {
   const postedAt = note.postedAt || `${note.date || "1970-01-01"}T00:00:00.${String(order).padStart(6, "0")}Z`;
   if (note.kind === "video" && url) {
     const card = videoCard({ id: note.id, text: note.text, date: note.date, href: null, source: null, watchUrl: url });
-    if (card) return { ...card, id: note.id, ownId: note.id, ratio: ratioOf(note.ratio), postedAt };
-    return { id: note.id, kind: "video", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: null, file: true, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio), postedAt };
+    if (card) return { ...card, id: note.id, ownId: note.id, ratio: ratioOf(note.ratio), postedAt, thumb: note.thumb || card.thumb };
+    return { id: note.id, kind: "video", text: note.text, date: note.date, mediaUrl: url, thumb: note.thumb ?? null, embed: null, file: true, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio), postedAt };
   }
   if (note.kind === "instagram" && url) {
     return { id: note.id, kind: "instagram", text: note.text, date: note.date, mediaUrl: url, thumb: null, embed: instagramEmbed(url), file: false, href: null, source: null, ownId: note.id, ratio: ratioOf(note.ratio), postedAt };
