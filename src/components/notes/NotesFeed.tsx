@@ -111,8 +111,7 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
     <div className="mx-auto grid min-w-0 max-w-[1180px] gap-4 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
       <aside className="min-w-0">
         <div className="universe-rail">
-          <p className="text-xs text-white/75">Patrick Roziel</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">Notes</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">Notes</h1>
           <p className="mt-2 text-[13px] leading-5 text-white/80">
             Livre, musique, essais, réflexion humaine, spiritualité, symbolisme et fictions.
           </p>
