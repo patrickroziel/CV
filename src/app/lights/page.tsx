@@ -16,6 +16,13 @@ export const metadata: Metadata = {
     description,
     locale: "fr_FR",
     siteName: "Patrick Roziel",
+    images: [{ url: "/lights/opengraph-image?v=impact", width: 1200, height: 630, alt: "LIGHTS" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/lights/opengraph-image?v=impact"],
   },
 };
 
