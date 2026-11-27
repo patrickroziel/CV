@@ -1230,22 +1230,22 @@ export function SocialPostForm({
       )}
 
       {error && <p className="break-words text-xs text-red-400">{error}</p>}
-      <div className="sticky bottom-0 z-30 -mx-1 grid gap-2 rounded-2xl border border-white/10 bg-[#0b1016]/95 px-2 py-2 backdrop-blur-xl sm:grid-cols-[auto_1fr_auto] sm:items-center">
-        <Button type="button" variant="ghost" onClick={onCancel}>Annuler</Button>
+      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border border-white/10 bg-[#0b1016] px-2 py-2">
+        <Button type="button" variant="ghost" onClick={onCancel} className="shrink-0 px-2 sm:px-3">Annuler</Button>
         <Button
           type="button"
           variant="secondary"
           disabled={uploadTarget !== null}
           onClick={handleSaveDraft}
-          className="justify-center gap-2 sm:justify-self-end"
+          className="min-w-0 justify-center gap-2 px-2"
         >
-          <Save className="h-4 w-4" />
-          {initial?.visible === true ? "Passer en brouillon" : "Enregistrer le brouillon"}
+          <Save className="h-4 w-4 shrink-0" />
+          <span className="truncate">{initial?.visible === true ? "Passer en brouillon" : "Enregistrer le brouillon"}</span>
         </Button>
         <Button
           type="submit"
           disabled={uploadTarget !== null}
-          className="bg-cyan-200 text-zinc-950 hover:bg-cyan-100"
+          className="shrink-0 bg-cyan-200 px-3 text-zinc-950 hover:bg-cyan-100"
         >
           {contentHidden ? "Publier le titre" : submitLabel}
         </Button>
