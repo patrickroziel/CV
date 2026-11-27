@@ -7,6 +7,7 @@ import { Briefcase, Clapperboard, GraduationCap, Languages, LayoutGrid, Mail, Qu
 import { DEFAULT_NAV, NAV_ITEM_META, type NavItemId } from "@/lib/types";
 import { stripHtml } from "@/lib/sanitize-html";
 import { SectionHeading } from "@/components/layout/SectionHeading";
+import { TipsLink } from "@/components/layout/SupportBar";
 
 function sortExperiences<T extends { startDate: string; endDate?: string | null }>(list: T[]) {
   return [...list].sort((a, b) => {
@@ -78,11 +79,19 @@ export function WorkSidebar() {
 
   return (
     <div>
-    <div className="flex items-center justify-between gap-3 md:block">
-      <SectionHeading title="Work" className="min-w-0 flex-1">
-        Portfolio, parcours et compétences.
-      </SectionHeading>
-      <div className="shrink-0 md:mt-3">
+    <div className="flex items-start justify-between gap-3 md:hidden">
+      <div className="min-w-0">
+        <h1 className="text-xl font-semibold tracking-tight text-white">Work</h1>
+        <p className="mt-1 text-xs leading-snug text-white/70">Portfolio, parcours et compétences.</p>
+      </div>
+      <div className="flex shrink-0 flex-col items-end gap-2">
+        <TipsLink compact />
+        <WorkShare pill />
+      </div>
+    </div>
+    <div className="hidden md:block">
+      <SectionHeading title="Work">Portfolio, parcours et compétences.</SectionHeading>
+      <div className="mt-3">
         <WorkShare pill />
       </div>
     </div>
