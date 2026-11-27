@@ -1230,7 +1230,7 @@ export function SocialPostForm({
       )}
 
       {error && <p className="break-words text-xs text-red-400">{error}</p>}
-      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border border-white/10 bg-[#0b1016] px-2 py-2">
+      <div className="sticky bottom-0 z-30 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border border-white/10 bg-[#0b1016] px-2 py-2">
         <Button type="button" variant="ghost" onClick={onCancel} className="shrink-0 px-2 sm:px-3">Annuler</Button>
         <Button
           type="button"

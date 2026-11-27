@@ -123,8 +123,17 @@ export function RichLocalizedField({
   return (
     <div ref={rootRef} className={cn("grid gap-2", className)}>
       <Label htmlFor={fieldId}>{label}</Label>
-      <div onMouseDownCapture={rememberSelection} onPointerDownCapture={rememberSelection}>
-        <RichTextToolbar onCommand={run} compact={compact} allowPart={allowPart} />
+      <div
+        onMouseDownCapture={rememberSelection}
+        onPointerDownCapture={rememberSelection}
+        className={cn(!compact && "flex max-h-[min(48dvh,32rem)] min-h-[14rem] flex-col overflow-hidden rounded-xl border border-white/12 bg-black/35 sm:max-h-[min(58dvh,40rem)]")}
+      >
+        <RichTextToolbar
+          onCommand={run}
+          compact={compact}
+          allowPart={allowPart}
+          className={cn(!compact && "shrink-0 rounded-none border-0 border-b border-white/10")}
+        />
       <div
         id={fieldId}
         ref={editorRef}
@@ -157,13 +166,16 @@ export function RichLocalizedField({
           }
         }}
         className={cn(
-          "rich-bio-editor w-full rounded-xl border border-white/12 bg-black/35 px-3 py-2 text-[12px] leading-5 text-zinc-100 outline-none",
+          "rich-bio-editor w-full px-3 py-2 text-[12px] leading-5 text-zinc-100 outline-none",
           "focus:border-teal-300/40 focus:ring-1 focus:ring-teal-300/30",
           "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5",
           "[&_blockquote]:my-3 [&_blockquote]:border-l-[3px] [&_blockquote]:border-cyan-300/80 [&_blockquote]:pl-4 [&_blockquote]:italic",
-          "[&_b]:font-bold [&_strong]:font-bold [&_i]:italic [&_em]:italic rich-lh"
+          "[&_b]:font-bold [&_strong]:font-bold [&_i]:italic [&_em]:italic rich-lh",
+          compact
+            ? "rounded-xl border border-white/12 bg-black/35"
+            : "min-h-0 flex-1 overflow-y-auto rounded-none border-0 bg-transparent"
         )}
-        style={{ minHeight: `${minHeight}rem`, lineHeight }}
+        style={{ minHeight: compact ? `${minHeight}rem` : "8rem", lineHeight }}
       />
       </div>
       {hint ? <p className="text-[10px] text-zinc-500">{hint}</p> : null}
