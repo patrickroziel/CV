@@ -1,10 +1,9 @@
-import { ImageResponse } from "next/og";
 import sharp from "sharp";
 import { getNoteSharePhoto, getNoteShareText, getPublicNote } from "@/lib/server/notes-sharing";
 import { requestedShareLanguage, translateShareText } from "@/lib/server/share-locale";
-import { coercePostCategory } from "@/lib/post-taxonomy";
 import { getL } from "@/lib/i18n-content";
 import { stripHtml } from "@/lib/sanitize-html";
+import { renderShareImage } from "@/lib/og/share-card";
 
 export const runtime = "nodejs";
 export const revalidate = 21600;
@@ -23,7 +22,6 @@ async function loadPhoto(url: string) {
       });
       if (!response.ok) continue;
       const bytes = Buffer.from(await response.arrayBuffer());
-      // YouTube's missing maxres thumb is a tiny placeholder. Skip it.
       if (bytes.byteLength < 8000) continue;
       return bytes;
     } catch {
@@ -47,111 +45,7 @@ async function coverJpeg(url: string, width: number, height: number) {
   }
 }
 
-function previewCard(
-  title: string,
-  subtitle: string,
-  category: string,
-  photo: string | null,
-  story: boolean,
-  air: boolean,
-  lead = "",
-) {
-  const titleSize = story ? (title.length > 48 ? 52 : 64) : (title.length > 48 ? 36 : 46);
-  const subtitleSize = story ? 36 : 28;
-  return (
-    <div style={{
-      display: "flex", position: "relative", height: "100%", width: "100%",
-      backgroundColor: "#031014", color: "#ffffff", fontFamily: "Arial, sans-serif", overflow: "hidden",
-      backgroundImage: photo ? `url(${photo})` : "linear-gradient(160deg, #031014 0%, #0c2a33 100%)",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}>
-      <div style={{
-        display: "flex", position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-        backgroundImage: photo
-          ? "linear-gradient(rgba(3,16,20,0.42), rgba(3,16,20,0.42))"
-          : "linear-gradient(160deg, rgba(3,16,20,0.15) 0%, rgba(3,16,20,0.45) 100%)",
-      }} />
-      <div style={{
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        position: "relative", width: "100%", height: "100%",
-        padding: story ? "0 80px" : "0 72px", textAlign: "center",
-      }}>
-        {!air && category ? (
-          <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              borderRadius: 999, border: "1px solid rgba(165,243,252,0.45)",
-              backgroundColor: "rgba(3,16,20,0.45)",
-              padding: story ? "10px 22px" : "7px 16px",
-              fontSize: story ? 24 : 16, letterSpacing: 2.5, color: "#a5f3fc",
-            }}>
-              {category}
-            </div>
-          </div>
-        ) : null}
-        {air && subtitle ? (
-          <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              borderRadius: 999, border: "1px solid rgba(185,228,255,0.75)",
-              backgroundColor: "rgba(3,16,20,0.28)",
-              padding: story ? "12px 28px" : "8px 18px",
-              fontSize: story ? 26 : 18, fontWeight: 600, letterSpacing: 1.2, color: "#d7f3ff",
-              textAlign: "center",
-            }}>
-              {subtitle.slice(0, 120)}
-            </div>
-          </div>
-        ) : null}
-        {air ? (
-          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: subtitle ? (story ? 28 : 18) : 0 }}>
-            <div style={{
-              display: "flex", maxWidth: story ? 900 : 980, borderRadius: 28,
-              border: "1px solid rgba(255,255,255,0.42)",
-              backgroundColor: "rgba(48,80,128,0.42)",
-              padding: story ? "22px 36px" : "16px 28px",
-              fontSize: titleSize, fontWeight: 700, lineHeight: 1.15, color: "#ffffff", textAlign: "center",
-            }}>
-              {title.slice(0, 140)}
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: category ? (story ? 28 : 18) : 0 }}>
-            <div style={{
-              display: "flex", maxWidth: story ? 880 : 980, fontSize: titleSize + 8, fontWeight: 600,
-              lineHeight: 1.12, letterSpacing: -1, color: "#ffffff", textAlign: "center",
-            }}>
-              {title.slice(0, 140)}
-            </div>
-          </div>
-        )}
-        {air && lead ? (
-          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: story ? 22 : 14 }}>
-            <div style={{
-              display: "flex", maxWidth: story ? 860 : 920, fontSize: story ? 32 : 24, fontWeight: 500,
-              lineHeight: 1.3, color: "#ffffff", textAlign: "center",
-            }}>
-              {lead.slice(0, 180)}
-            </div>
-          </div>
-        ) : null}
-        {!air && subtitle ? (
-          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: story ? 24 : 16 }}>
-            <div style={{
-              display: "flex", maxWidth: story ? 860 : 920, fontSize: subtitleSize, fontWeight: 700,
-              lineHeight: 1.3, color: "#ffffff", textAlign: "center",
-            }}>
-              {subtitle.slice(0, 180)}
-            </div>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-/** 1200×630 card: cover, then the Notes title and subtitle. */
+/** 1200×630, or 1080×1920 for a story. Cover stays in the background. */
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -169,16 +63,14 @@ export async function GET(
   const translated = await translateShareText(french.title, french.subtitle || " ", lang);
   const title = translated.title;
   const subtitle = french.subtitle ? translated.description.trim() : "";
-  const series = post.universe === "air" && post.episode?.trim()
-    ? [subtitle, `${lang ? (await translateShareText("Épisode", " ", lang)).title : "Épisode"} ${post.episode.trim().replace(/^épisode\s+/i, "")}`].filter(Boolean).join(" · ")
-    : subtitle;
+  const episode = post.universe === "air" && post.episode?.trim()
+    ? `${lang ? (await translateShareText("Épisode", " ", lang)).title : "Épisode"} ${post.episode.trim().replace(/^épisode\s+/i, "")}`
+    : "";
   const leadRaw = post.universe === "air"
     ? stripHtml(getL(post.articleSubtitle, "fr")).replace(/\s+/g, " ").trim().slice(0, 180)
     : "";
   const lead = leadRaw ? (await translateShareText(leadRaw, " ", lang)).title : "";
-  const category = post.universe === "air"
-    ? ""
-    : (await translateShareText(coercePostCategory(post), " ", lang)).title;
+  const second = [subtitle, episode, lead].filter(Boolean).filter((line, index, all) => all.indexOf(line) === index).join(" — ");
   let photoSrc: string | null = null;
   const photo = getNoteSharePhoto(post);
   if (photo) {
@@ -186,10 +78,7 @@ export async function GET(
     if (jpeg) photoSrc = `data:image/jpeg;base64,${jpeg.toString("base64")}`;
   }
 
-  const rendered = new ImageResponse(previewCard(title, series, category, photoSrc, story, post.universe === "air", lead), {
-    width,
-    height,
-  });
+  const rendered = await renderShareImage({ title, subtitle: second, width, height, photo: photoSrc });
   const png = Buffer.from(await rendered.arrayBuffer());
   const jpeg = await sharp(png).jpeg({ quality: 78, mozjpeg: true }).toBuffer();
   return new Response(jpeg, {
