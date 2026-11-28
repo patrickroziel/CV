@@ -3,10 +3,10 @@ import { DEFAULT_PORTFOLIO } from "@/lib/defaults";
 import { publicPortfolio, readPublicPortfolio } from "@/lib/server/portfolio-db";
 
 export const runtime = "nodejs";
-export const revalidate = 60;
+export const revalidate = 300;
 
 const cacheHeaders = {
-  "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
 };
 
 export async function GET() {

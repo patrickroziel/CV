@@ -1,6 +1,6 @@
 import "server-only";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { normalizeGhostPages } from "@/lib/ghost-pages";
 import { normalizeLightNotes } from "@/lib/lights";
 import { concealHiddenPost } from "@/lib/post-publication";
@@ -33,21 +33,44 @@ async function writeContent(data: PortfolioData, revision: number, savedAt: numb
   await writeJsonBlob(CONTENT_KEY, { revision, savedAt, writeSeq, data } satisfies StoredContent);
 }
 
-let inflight: Promise<Snapshot> | null = null;
-
 function invalidatePublicPortfolio() {
   try {
     revalidateTag(PUBLIC_CACHE_TAG, { expire: 0 });
     revalidatePath("/api/portfolio");
     revalidatePath("/notes");
     revalidatePath("/air");
+    revalidatePath("/lights");
+    revalidatePath("/work");
     revalidatePath("/notes/[id]", "page");
     revalidatePath("/air/[id]", "page");
     revalidatePath("/g/[slug]", "page");
     revalidatePath("/sitemap.xml");
   } catch {
-    // Best-effort outside a request. The memory cache is already cleared.
+    // Best-effort outside a request.
   }
+}
+
+const readCachedPublicSnapshot = unstable_cache(
+  async (): Promise<Snapshot> => {
+    try {
+      const loaded = await loadPortfolio();
+      return {
+        data: publicPortfolio(loaded.data ?? DEFAULT_PORTFOLIO),
+        revision: loaded.revision,
+        savedAt: 0,
+        writeSeq: loaded.writeSeq,
+      };
+    } catch {
+      return { data: publicPortfolio(DEFAULT_PORTFOLIO), revision: 1, savedAt: 0, writeSeq: 0 };
+    }
+  },
+  ["portfolio-public-v2"],
+  { revalidate: 300, tags: [PUBLIC_CACHE_TAG] }
+);
+
+/** Public pages share one cached snapshot. A save invalidates the tag immediately. */
+export async function readPublicPortfolio(): Promise<Snapshot> {
+  return readCachedPublicSnapshot();
 }
 
 /** The site content lives on Cloudflare R2. */
@@ -62,17 +85,6 @@ export async function loadPortfolio(): Promise<LoadedPortfolio> {
     return { data: saved.data, revision: saved.revision, writeSeq: saved.writeSeq, storage: "r2" };
   }
   return { data: DEFAULT_PORTFOLIO, revision: 1, writeSeq: 0, storage: "snapshot" };
-}
-
-/** Public reads must not reuse a process cache: a save on another instance would stay invisible. */
-export async function readPublicPortfolio(): Promise<Snapshot> {
-  if (!inflight) {
-    inflight = loadPortfolio()
-      .then((loaded) => ({ data: loaded.data, revision: loaded.revision, savedAt: 0, writeSeq: loaded.writeSeq }))
-      .catch(() => ({ data: DEFAULT_PORTFOLIO, revision: 1, savedAt: 0, writeSeq: 0 }))
-      .finally(() => { inflight = null; });
-  }
-  return inflight;
 }
 
 function safeRevision(value: number) {

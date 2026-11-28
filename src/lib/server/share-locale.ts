@@ -33,7 +33,7 @@ export function openGraphLocale(lang: string | null) {
 
 export function shareImageUrl(id: string, lang: string | null, cover?: string | null) {
   const url = new URL(`${NOTES_ORIGIN}/api/notes/${encodeURIComponent(id)}/share-image`);
-  url.searchParams.set("v", "13");
+  url.searchParams.set("v", "14");
   if (lang) url.searchParams.set("lang", lang);
   if (cover) {
     let hash = 0;
@@ -51,7 +51,8 @@ export async function translateShareText(title: string, description: string, lan
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ texts: [title, description], target: lang }),
-      cache: "no-store",
+      cache: "force-cache",
+      next: { revalidate: 86400 },
       signal: AbortSignal.timeout(12000),
     });
     if (!response.ok) return { title, description };

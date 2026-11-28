@@ -353,6 +353,32 @@ async function callDialectGemini({
   };
 }
 
+const translationMemory = new Map<string, { at: number; translations: string[] }>();
+const TRANSLATION_TTL = 6 * 60 * 60 * 1000;
+const TRANSLATION_MAX = 400;
+
+function translationKey(target: string, texts: string[]) {
+  return `${target}\n${texts.join("\u0001")}`;
+}
+
+function cachedTranslation(key: string) {
+  const hit = translationMemory.get(key);
+  if (!hit) return null;
+  if (Date.now() - hit.at > TRANSLATION_TTL) {
+    translationMemory.delete(key);
+    return null;
+  }
+  return hit.translations;
+}
+
+function rememberTranslation(key: string, translations: string[]) {
+  if (translationMemory.size >= TRANSLATION_MAX) {
+    const oldest = translationMemory.keys().next().value;
+    if (oldest) translationMemory.delete(oldest);
+  }
+  translationMemory.set(key, { at: Date.now(), translations });
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as { texts?: unknown; target?: unknown };
@@ -361,6 +387,15 @@ export async function POST(request: Request) {
 
     if (!texts || !SITE_LANGUAGE_CODES.has(target) || target === "fr") {
       return NextResponse.json({ error: "Requête de traduction invalide." }, { status: 400 });
+    }
+
+    const memoryKey = translationKey(target, texts);
+    const remembered = cachedTranslation(memoryKey);
+    if (remembered) {
+      return NextResponse.json(
+        { translations: remembered },
+        { headers: { "Cache-Control": "private, no-store" } }
+      );
     }
 
     const projectId = process.env.GOOGLE_TRANSLATE_PROJECT_ID?.trim() || DEFAULT_PROJECT_ID;
@@ -393,6 +428,7 @@ export async function POST(request: Request) {
           { status: result.response.status || 502 }
         );
       }
+      rememberTranslation(memoryKey, result.translations);
       return NextResponse.json({ translations: result.translations });
     }
 
@@ -429,6 +465,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Réponse de traduction incomplète." }, { status: 502 });
     }
 
+    rememberTranslation(memoryKey, translations);
     return NextResponse.json({ translations });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Impossible de traduire cette page.";
