@@ -21,7 +21,9 @@ export default function Home() {
             <WorkSidebar />
             <UniversesWidget current="work" />
           </div>
-          <WorkMenu />
+          <div className="md:hidden">
+            <WorkMenu />
+          </div>
         </aside>
 
         <section className="work-notes-main min-w-0">

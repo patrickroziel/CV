@@ -117,9 +117,51 @@ export function AirFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
   return <div className="mx-auto grid min-w-0 max-w-[1180px] gap-5 px-3 pb-24 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-16 lg:px-8">
     <aside className="min-w-0"><div className="universe-rail">
       <SectionHeading title="Scope">Décryptages, récits et analyses.</SectionHeading>
+      <nav className="mt-7 hidden space-y-0.5 md:block" aria-label="Séries Scope">
+        {series.map((name) => {
+          const key = name.toLocaleLowerCase("fr");
+          const active = scope.toLocaleLowerCase("fr") === key;
+          const episodes = posts
+            .filter((post) => seriesName(post).toLocaleLowerCase("fr") === key)
+            .sort((a, b) => {
+              const number = (post: SocialPost) => Number(post.episode?.replace(/\D/g, "")) || 999;
+              return number(a) - number(b) || b.date.localeCompare(a.date);
+            });
+          const pinned = pinnedSeries?.toLocaleLowerCase("fr") === key;
+          return (
+            <div key={name} className="group/series w-full">
+              <button
+                type="button"
+                onClick={() => { setScope(active ? "Tout" : name); setActiveTag(null); setPinnedSeries(pinned ? null : name); }}
+                aria-expanded={pinned}
+                aria-label={`${name}, ${episodes.length} article${episodes.length > 1 ? "s" : ""}`}
+                className={`flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors ${active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white"}`}
+              >
+                <span className="inline-flex min-w-0 items-center gap-2">
+                  <Cloud className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                  <span className="break-words">{name}</span>
+                </span>
+                <span className="shrink-0 text-[11px] tabular-nums text-white/40">{episodes.length}</span>
+              </button>
+              <div className={`mt-1 space-y-0.5 pl-2 ${pinned ? "block" : "hidden group-hover/series:block"}`}>
+                {episodes.map((post) => {
+                  const title = l(post.title).trim() || "Sans titre";
+                  const episode = post.episode?.trim().replace(/^épisode\s+/i, "");
+                  return (
+                    <Link key={post.id} href={`/air/${post.id}`} title={title} className="flex min-w-0 items-center gap-2 rounded-lg px-1.5 py-1 text-white/80 hover:bg-white/10 hover:text-white">
+                      {episode ? <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#305080] px-1 text-[10px] font-semibold tabular-nums text-white ring-1 ring-white/30">{episode}</span> : null}
+                      <span className="min-w-0 flex-1 truncate text-xs">{title}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </nav>
       <UniversesWidget current="air" />
     </div>
-    <div className="mt-3">
+    <div className="mt-3 md:hidden">
       <nav className="section-menu-bar" aria-label="Séries Scope">
         {series.map((name) => {
           const key = name.toLocaleLowerCase("fr");

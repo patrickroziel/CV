@@ -364,9 +364,29 @@ export function LightsFeed() {
       <aside className="min-w-0">
         <div className="universe-rail">
           <SectionHeading title="Lights">Citations, images, vidéos et posts.</SectionHeading>
+          <nav aria-label="Filtres" className="mt-7 hidden space-y-0.5 md:block">
+            {FILTERS.map((entry) => {
+              const active = filter === entry.id;
+              const total = entry.id === "all" ? items.length : items.filter((item) => item.kind === entry.id).length;
+              return (
+                <button
+                  key={entry.id}
+                  type="button"
+                  onClick={() => setFilter(active && entry.id !== "all" ? "all" : entry.id)}
+                  className={[
+                    "flex w-full items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-left text-sm transition-colors",
+                    active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white",
+                  ].join(" ")}
+                >
+                  <span className="truncate">{entry.label}</span>
+                  <span className="text-[11px] tabular-nums text-white/40">{total}</span>
+                </button>
+              );
+            })}
+          </nav>
           <UniversesWidget current="lights" />
         </div>
-        <nav aria-label="Filtres" className="section-menu-bar mt-3">
+        <nav aria-label="Filtres" className="section-menu-bar mt-3 md:hidden">
           {FILTERS.map((entry) => {
             const active = filter === entry.id;
             const total = entry.id === "all" ? items.length : items.filter((item) => item.kind === entry.id).length;

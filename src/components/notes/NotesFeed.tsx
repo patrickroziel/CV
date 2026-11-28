@@ -115,9 +115,63 @@ export function NotesFeed({ seedPosts = [] }: { seedPosts?: SocialPost[] }) {
             Livre, musique, essais, réflexion humaine, spiritualité, symbolisme et fictions.
           </SectionHeading>
 
+          <nav aria-label="Catégories" className="mt-7 hidden space-y-0.5 md:block">
+            {FILTERS.map((item) => {
+              const active = item.id === scope;
+              const Icon = item.icon;
+              const button = (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScope(active ? "Tout" : item.id);
+                    setActiveTag(null);
+                  }}
+                  className={[
+                    "flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors",
+                    active ? "bg-white/[0.12] text-white" : "text-white/70 hover:bg-white/[0.08] hover:text-white",
+                  ].join(" ")}
+                >
+                  <span className="inline-flex min-w-0 items-center gap-2">
+                    <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                    <span className="break-words">{item.id}</span>
+                  </span>
+                  <span className="text-[11px] tabular-nums text-white/40">{count(item.id)}</span>
+                </button>
+              );
+              if (item.id !== "Livre") return <div key={item.id}>{button}</div>;
+              return (
+                <div
+                  key={item.id}
+                  onMouseEnter={() => setBookMenuOpen(true)}
+                  onMouseLeave={() => setBookMenuOpen(false)}
+                  onFocus={() => setBookMenuOpen(true)}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setBookMenuOpen(false);
+                  }}
+                >
+                  {button}
+                  {bookChapters.length > 0 ? (
+                    <div className={`overflow-hidden pl-2 transition-all duration-200 ${bookMenuOpen ? "max-h-[32rem] opacity-100" : "max-h-0 opacity-0"}`}>
+                      <div className="ml-2 border-l border-cyan-100/10 py-1 pl-2">
+                        {bookChapters.map((chapter) => {
+                          const chapterTitle = l(chapter.title).trim() || "Brouillon sans titre";
+                          return (
+                            <Link key={chapter.id} href={`/notes/${chapter.id}`} className="block min-w-0 rounded-lg px-2 py-1.5 text-[0.68rem] leading-snug text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-100">
+                              <span className="block break-words">{chapterTitle}</span>
+                              {editMode && !chapter.visible ? <span className="mt-0.5 block text-[9px] uppercase tracking-wide text-amber-200/70">Brouillon</span> : null}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </nav>
           <UniversesWidget current="notes" />
         </div>
-        <div className="mt-3" onMouseLeave={() => setBookMenuOpen(false)}>
+        <div className="mt-3 md:hidden" onMouseLeave={() => setBookMenuOpen(false)}>
           <nav aria-label="Catégories" className="section-menu-bar">
             {FILTERS.map((item) => {
               const active = item.id === scope;

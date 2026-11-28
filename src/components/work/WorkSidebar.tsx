@@ -45,6 +45,34 @@ function cleanRoleLabel(value: string) {
 }
 
 export function WorkSidebar() {
+  const { data, l, t } = usePortfolio();
+  const [experienceMenuOpen, setExperienceMenuOpen] = useState(false);
+  const items = useMemo(() => {
+    const nav = data.nav ?? DEFAULT_NAV;
+    return NAV_ITEM_META.filter((meta) => {
+      if (!meta.sectionId) return false;
+      if (meta.showInNav === false) return false;
+      const cfg = nav[meta.id] ?? DEFAULT_NAV[meta.id];
+      return cfg?.visible !== false;
+    }).map((meta) => {
+      const cfg = nav[meta.id] ?? DEFAULT_NAV[meta.id];
+      return {
+        id: meta.id,
+        href: meta.href.startsWith("/#") ? `/work${meta.href.slice(1)}` : meta.href.startsWith("#") ? `/work${meta.href}` : meta.href,
+        label: l(cfg.label).trim() || t(meta.i18nKey),
+      };
+    });
+  }, [data.nav, l, t]);
+  const experienceItems = useMemo(
+    () => sortExperiences(data.experiences).map((exp) => ({
+      id: exp.id,
+      href: `#experience-${exp.id}`,
+      label: cleanRoleLabel(l(exp.role)),
+    })),
+    [data.experiences, l]
+  );
+  const row = "flex w-full items-center rounded-xl px-2.5 py-2 text-left text-sm text-white/80 transition-colors hover:bg-white/[0.08] hover:text-white";
+
   return (
     <div>
       <div className="flex items-start justify-between gap-3 md:hidden">
@@ -62,6 +90,35 @@ export function WorkSidebar() {
         <div className="mt-3">
           <WorkShare pill />
         </div>
+        <nav aria-label="Navigation Work" className="mt-7 space-y-0.5">
+          {items.map((item) => {
+            if (item.id !== "experience") {
+              return <a key={item.id} href={item.href} className={row}><NavLabel id={item.id} label={item.label} /></a>;
+            }
+            return (
+              <div
+                key={item.id}
+                onMouseEnter={() => setExperienceMenuOpen(true)}
+                onMouseLeave={() => setExperienceMenuOpen(false)}
+                onFocus={() => setExperienceMenuOpen(true)}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setExperienceMenuOpen(false);
+                }}
+              >
+                <a href={item.href} className={row}><NavLabel id={item.id} label={item.label} /></a>
+                <div className={`overflow-hidden pl-2 transition-all duration-200 ${experienceMenuOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"}`}>
+                  <div className="ml-2 border-l border-white/10 py-1 pl-2">
+                    {experienceItems.map((exp) => (
+                      <a key={exp.id} href={exp.href} className="block rounded-lg px-2 py-1.5 text-[0.68rem] leading-snug text-white/55 transition hover:bg-white/[0.06] hover:text-white">
+                        {exp.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );
